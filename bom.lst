@@ -12,5 +12,5 @@ ctk_theme_viewgen.py
 get-pip.py
 requirements.txt
 tb-artefact.sh
-theme-builder-setup.py
+theme_builder_setup.py
 user_themes
