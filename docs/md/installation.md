@@ -52,7 +52,7 @@ This will cause a ctk\_theme\_builder directory to be created (if it doesn't alr
   
   If the installation is already at the same version as that contained in the ZIP archive, the theme\_builder\_setup.py will run in a "fix" mode. For example if you have accidentally removed your venv folder, it will fix it.
   
-  <b>There is a packages folder in the project root directory.<b>
+To obtain a ZIP package, look at the releases on the GitHub project page. The installable archives start with "ctk\_theme\_builder-", followed by the version, and ending with .zip. For example: <i>ctk\_theme\_builder-2.0.0.zip`</i>
   
 
   
