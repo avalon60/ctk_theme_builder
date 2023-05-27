@@ -2,3 +2,7 @@ venv/
 .idea
 **/__pycache__/
 *.pyc
+
+assets/data/ctk_theme_builder.db
+
+tmp/
