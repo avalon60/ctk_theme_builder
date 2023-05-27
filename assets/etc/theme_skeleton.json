@@ -1,0 +1,165 @@
+{
+  "CTk": {
+    "fg_color": [null, null]
+  },
+  "CTkToplevel": {
+    "fg_color": [null, null]
+  },
+  "CTkFrame": {
+    "corner_radius": 6,
+    "border_width": 0,
+    "fg_color": [null, null],
+    "top_fg_color": [null, null],
+    "border_color": [null, null]
+  },
+  "CTkButton": {
+    "corner_radius": 6,
+    "border_width": 0,
+    "fg_color": [null, null],
+    "hover_color": [null, null],
+    "border_color": [null, null],
+    "text_color": [null, null],
+    "text_color_disabled": [null, null]
+  },
+  "CTkLabel": {
+    "corner_radius": 0,
+    "fg_color": "transparent",
+    "text_color": [null, null]
+  },
+  "CTkEntry": {
+    "corner_radius": 6,
+    "border_width": 2,
+    "fg_color": [null, null],
+    "border_color": [null, null],
+    "text_color":[null, null],
+    "placeholder_text_color": [null, null]
+  },
+  "CTkCheckbox": {
+    "corner_radius": 6,
+    "border_width": 3,
+    "fg_color": [null, null],
+    "border_color": [null, null],
+    "hover_color": [null, null],
+    "checkmark_color": [null, null],
+    "text_color": [null, null],
+    "text_color_disabled": [null, null]
+  },
+  "CTkSwitch": {
+    "corner_radius": 1000,
+    "border_width": 3,
+    "button_length": 0,
+    "fg_color": [null, null],
+    "progress_color": [null, null],
+    "button_color": [null, null],
+    "button_hover_color": [null, null],
+    "text_color": [null, null],
+    "text_color_disabled": [null, null]
+  },
+  "CTkRadiobutton": {
+    "corner_radius": 1000,
+    "border_width_checked": 6,
+    "border_width_unchecked": 3,
+    "fg_color": [null, null],
+    "border_color": [null, null],
+    "hover_color": [null, null],
+    "text_color": [null, null],
+    "text_color_disabled": [null, null]
+  },
+  "CTkProgressBar": {
+    "corner_radius": 1000,
+    "border_width": 0,
+    "fg_color": [null, null],
+    "progress_color": [null, null],
+    "border_color": [null, null]
+  },
+  "CTkSlider": {
+    "corner_radius": 1000,
+    "button_corner_radius": 1000,
+    "border_width": 6,
+    "button_length": 0,
+    "fg_color": [null, null],
+    "progress_color": [null, null],
+    "button_color": [null, null],
+    "button_hover_color": [null, null]
+  },
+  "CTkOptionMenu": {
+    "corner_radius": 6,
+    "fg_color": [null, null],
+    "button_color": [null, null],
+    "button_hover_color": [null, null],
+    "text_color": [null, null],
+    "text_color_disabled": [null, null]
+  },
+  "CTkComboBox": {
+    "corner_radius": 6,
+    "border_width": 2,
+    "fg_color": [null, null],
+    "border_color": [null, null],
+    "button_color": [null, null],
+    "button_hover_color": [null, null],
+    "text_color": [null, null],
+    "text_color_disabled": [null, null]
+  },
+  "CTkScrollbar": {
+    "corner_radius": 1000,
+    "border_spacing": 4,
+    "fg_color": "transparent",
+    "button_color": [null, null],
+    "button_hover_color": [null, null]
+  },
+  "CTkSegmentedButton": {
+    "corner_radius": 6,
+    "border_width": 2,
+    "fg_color": [null, null],
+    "selected_color": [null, null],
+    "selected_hover_color": [null, null],
+    "unselected_color": [null, null],
+    "unselected_hover_color": [null, null],
+    "text_color": [null, null],
+    "text_color_disabled": [null, null]
+  },
+  "CTkTextbox": {
+    "corner_radius": 6,
+    "border_width": 0,
+    "fg_color": [null, null],
+    "border_color": [null, null],
+    "text_color":[null, null],
+    "scrollbar_button_color": [null, null],
+    "scrollbar_button_hover_color": [null, null]
+  },
+  "CTkScrollableFrame": {
+    "label_fg_color": [null, null]
+  },
+  "DropdownMenu": {
+    "fg_color": [null, null],
+    "hover_color": [null, null],
+    "text_color": [null, null]
+  },
+  "CTkFont": {
+    "macOS": {
+      "family": "SF Display",
+      "size": 13,
+      "weight": "normal"
+    },
+    "Windows": {
+      "family": "Roboto",
+      "size": 13,
+      "weight": "normal"
+    },
+    "Linux": {
+      "family": "Roboto",
+      "size": 13,
+      "weight": "normal"
+    }
+  },
+ "provenance": {
+   "theme author": "Big Bear",
+   "date created" : null,
+   "last modified by": null,
+   "last modified date": null,
+   "created with": "CTk Theme Builder Migrator",
+   "keystone method": null,
+   "keystone colour": null
+ }
+}
+

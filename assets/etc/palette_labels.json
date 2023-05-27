@@ -1,0 +1,9 @@
+{
+  "CustomTkinter"      :["Scratch 1", "Scratch 3", "Button", "Borders", "Dropdown Hover", "Entry", "Frame (Top)", "Text", 
+                         "Scratch 2", "Scratch 4","Button Hover", "Dropdown", "Dropdown Text", "Switch/Slider/Progb", "Frame (Base)", "Text Disabled"],
+  "Analogous"          :["Source Colour", "Analog-1", "Analog-2"],
+  "Complementary"      :["Source Colour", "Complementary"],
+  "Split-complementary":["Source Colour", "Complementary-1", "Complementary-2"],
+  "Triadic"            :["Source Colour", "Triadic-1", "Triadic-2"],
+  "Tetradic"           :["Source Colour", "Tetradic-1", "Tetradic-2", "Tetradic-3"]
+}

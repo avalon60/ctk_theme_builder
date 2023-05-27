@@ -1,0 +1,60 @@
+{
+   "CTkButton":{
+      "corner_radius":[ 0, 38 ],
+      "border_width":[ 0, 20 ]
+   },
+   "CTkCheckBox":{ 
+      "corner_radius":[ 0, 12 ],
+      "border_width":[ 0, 20 ]
+   },
+   "CTkComboBox":{ 
+      "corner_radius":[ 0, 12 ],
+      "border_width":[ 0, 20 ]
+   },
+  "CTkEntry":{ 
+      "corner_radius":[ 0, 12 ],
+      "border_width":[ 0, 20 ]
+   },
+   "CTkRadioButton":{
+      "corner_radius":[ 0, 20 ],
+      "border_width_unchecked":[ 0, 20 ],
+      "border_width_checked":[ 0, 20 ]
+   },
+   "CTkFrame":{
+      "corner_radius":[ 0, 100 ],
+      "border_width":[ 0, 20 ]
+   },
+   "CTkLabel":{
+      "corner_radius":[ 0, 100 ]
+   },
+   "CTkOptionMenu":{
+      "corner_radius":[ 0, 12 ]
+   },
+   "CTkProgressBar":{
+      "corner_radius":[ 0, 1000 ],
+      "border_width":[ 0, 3 ]
+   },
+   "CTkSlider":{
+      "border_width":[ 0, 20 ],
+      "button_corner_radius": [0, 1000],
+      "border_width": [0, 12],
+      "button_length": [0, 6]
+   },
+   "CTkScrollbar":{
+      "corner_radius":[ 0, 1000 ],
+      "border_spacing":[ 0, 20 ]
+   },
+   "CTkSegmentedButton":{
+      "border_width":[ 0, 20 ],
+      "corner_radius":[ 0, 10 ]
+   },
+   "CTkSwitch":{
+      "border_width":[ 0, 20 ],
+      "corner_radius":[ 0, 10 ],
+      "button_length": [0, 50]
+   },
+   "CTkTextbox":{
+      "corner_radius":[ 0, 50 ],
+      "border_width":[ 0, 20 ]
+   }
+}

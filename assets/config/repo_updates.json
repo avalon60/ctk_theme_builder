@@ -1,0 +1,343 @@
+{
+   "001":{ "sql_apply_version":"2.0.0",
+      "description": "Initialise theme author",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('user_preference', 'theme_author', 'str', '%os_user_name%');" },
+
+   "002":{ "sql_apply_version":"2.0.0",
+      "description": "Control Panel theme",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('user_preference', 'control_panel_theme', 'str', 'GreyGhost');" },
+
+   "003":{ "sql_apply_version":"2.0.0",
+      "description": "Control Panel appearance mode",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('user_preference', 'control_panel_mode', 'str', 'Light');" },
+
+   "004":{ "sql_apply_version":"2.0.0",
+      "description": "User themes location",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('user_preference', 'theme_json_dir', 'Path', '%user_themes_location%');" },
+
+   "005":{ "sql_apply_version":"2.0.0",
+      "description": "Tooltips preference",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('user_preference', 'enable_tooltips', 'int', '1');" },
+
+   "006":{ "sql_apply_version":"2.0.0",
+      "description": "Palette labels preference",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('user_preference', 'enable_palette_labels', 'int', '1');" },
+
+   "007":{ "sql_apply_version":"2.0.0",
+      "description": "Single click paste",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('user_preference', 'enable_single_click_paste', 'int', '0');" },
+
+   "008":{ "sql_apply_version":"2.0.0",
+      "description": "Auto contrast differential",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('user_preference', 'auto_contrast_differential', 'int', '3');" },
+
+   "009":{ "sql_apply_version":"2.0.0",
+      "description": "Harmony contrast differential",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('user_preference', 'harmony_contrast_differential', 'int', '5');" },
+
+   "010":{ "sql_apply_version":"2.0.0",
+      "description": "Shade adjust differential",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('user_preference', 'shade_adjust_differential', 'int', '5');" },
+
+   "011":{ "sql_apply_version":"2.0.0",
+      "description": "Render disabled",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('auto_save', 'render_disabled', 'int', '0');" },
+
+   "012":{ "sql_apply_version":"2.0.0",
+      "description": "Control panel appearance mode",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('auto_save', 'appearance_mode', 'str', 'Light Mode');" },
+
+   "013":{ "sql_apply_version":"2.0.0",
+      "description": "Remembered widget properties view",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('auto_save', 'properties_view', 'str', 'Basic');" },
+
+   "014":{ "sql_apply_version":"2.0.0",
+      "description": "Remembered theme view",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('auto_save', 'selected_theme', 'str', 'Green.json');" },
+
+   "015":{ "sql_apply_version":"2.0.0",
+      "description": "CTk compatability",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('system', 'min_ctk_version', 'str', '5.1.3');" },
+ 
+   "016":{ "sql_apply_version":"2.0.0",
+      "description": "Control panel geometry",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('window_geometry', 'control_panel', 'str', '1050x905+10+30');" },
+
+   "017":{ "sql_apply_version":"2.0.0",
+      "description": "Widget Geometry dialog geometry",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('window_geometry', 'widget_geometry', 'str', '800+10+10');" },
+
+   "018":{ "sql_apply_version":"2.0.0",
+      "description": "Colour harmonics panel geometry",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('window_geometry', 'harmonics_panel', 'str', '650x540+10+10');" },
+
+   "019":{ "sql_apply_version":"2.0.0",
+      "description": "Preferences dialog geometry",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('window_geometry', 'preferences_panel', 'str', '650x540+10+10');" },
+
+   "020":{ "sql_apply_version":"2.0.0",
+      "description": "Preview panel geometry",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('window_geometry', 'preview_panel', 'str', '805x760+250+15');" },
+
+   "021":{ "sql_apply_version":"2.0.0",
+      "description": "Colour palette Scratch 1",
+      "sql_statement": "insert into colour_palette_entries (entry_id, row, col, label) values (0, 0, 0, 'Scratch 1');"}, 
+
+   "022":{ "sql_apply_version":"2.0.0",
+      "description": "Colour palette Scratch 2",
+      "sql_statement": "insert into colour_palette_entries (entry_id, row, col, label) values (1, 1, 0, 'Scratch 2');"}, 
+
+   "023":{ "sql_apply_version":"2.0.0",
+      "description": "Colour palette Scratch 3",
+      "sql_statement": "insert into colour_palette_entries (entry_id, row, col, label) values (2, 0, 1, 'Scratch 3');"}, 
+
+   "024":{ "sql_apply_version":"2.0.0",
+      "description": "Colour palette Scratch 4",
+      "sql_statement": "insert into colour_palette_entries (entry_id, row, col, label) values (3, 1, 1, 'Scratch 4');"}, 
+
+   "025":{ "sql_apply_version":"2.0.0",
+      "description": "Colour palette Scratch 5",
+      "sql_statement": "insert into colour_palette_entries (entry_id, row, col, label) values (4, 0, 2, 'Scratch 5');"}, 
+
+   "026":{ "sql_apply_version":"2.0.0",
+      "description": "Colour palette Scratch 6",
+      "sql_statement": "insert into colour_palette_entries (entry_id, row, col, label) values (5, 1, 2, 'Scratch 6');"}, 
+
+   "027":{ "sql_apply_version":"2.0.0",
+      "description": "Colour palette Borders",
+      "sql_statement": "insert into colour_palette_entries (entry_id, row, col, label) values (6, 0, 3, 'Borders');"}, 
+
+   "028":{ "sql_apply_version":"2.0.0",
+      "description": "Colour palette Entry",
+      "sql_statement": "insert into colour_palette_entries (entry_id, row, col, label) values (7, 1, 3, 'Entry');"}, 
+
+   "029":{ "sql_apply_version":"2.0.0",
+      "description": "Colour palette Button",
+      "sql_statement": "insert into colour_palette_entries (entry_id, row, col, label) values (8, 0, 4, 'Button');"}, 
+
+   "030":{ "sql_apply_version":"2.0.0",
+      "description": "Colour palette Button Hover",
+      "sql_statement": "insert into colour_palette_entries (entry_id, row, col, label) values (9, 1, 4, 'Button Hover');"}, 
+
+   "031":{ "sql_apply_version":"2.0.0",
+      "description": "Colour palette Frame (Top)",
+      "sql_statement": "insert into colour_palette_entries (entry_id, row, col, label) values (10, 0, 5, 'Frame (Top)');"}, 
+
+   "032":{ "sql_apply_version":"2.0.0",
+      "description": "Colour palette Frame (Base)",
+      "sql_statement": "insert into colour_palette_entries (entry_id, row, col, label) values (11, 1, 5, 'Frame (Base)');"}, 
+
+   "033":{ "sql_apply_version":"2.0.0",
+      "description": "Colour palette Progress",
+      "sql_statement": "insert into colour_palette_entries (entry_id, row, col, label) values (12, 0, 6, 'Progress');"}, 
+
+   "034":{ "sql_apply_version":"2.0.0",
+      "description": "Colour palette Progress (fg)",
+      "sql_statement": "insert into colour_palette_entries (entry_id, row, col, label) values (13, 1, 6, 'Progress (fg)');"}, 
+
+   "035":{ "sql_apply_version":"2.0.0",
+      "description": "Colour palette Text",
+      "sql_statement": "insert into colour_palette_entries (entry_id, row, col, label) values (14, 0, 7, 'Text');"}, 
+
+   "036":{ "sql_apply_version":"2.0.0",
+      "description": "Colour palette Text Disabled",
+      "sql_statement": "insert into colour_palette_entries (entry_id, row, col, label) values (15, 1, 7, 'Text Disabled');"}, 
+
+   "037":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkButton/border_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (6, 'CTkButton', 'border_color');"}, 
+
+   "038":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkCheckbox/border_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (6, 'CTkCheckbox', 'border_color');"}, 
+
+   "039":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade Entry/border_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (6, 'CTkEntry', 'border_color');"}, 
+
+   "040":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkFrame/border_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (6, 'CTkFrame', 'border_color');"}, 
+
+   "041":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkRadiobutton/border_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (6, 'CTkRadiobutton', 'border_color');"}, 
+
+   "043":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkEntry/fg_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (7, 'CTkEntry', 'fg_color');"}, 
+
+   "044":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkTextbox/fg_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (7, 'CTkTextbox', 'fg_color');"}, 
+
+   "045":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkComboBox/fg_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (7, 'CTkComboBox', 'fg_color');"}, 
+
+   "046":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkButton/fg_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (8, 'CTkButton', 'fg_color');"}, 
+
+
+   "047":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkSwitch/button_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (8, 'CTkSwitch', 'button_color');"}, 
+
+   "048":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkSlider/button_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (8, 'CTkSlider', 'button_color');"}, 
+
+   "049":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkOptionMenu/button_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (8, 'CTkOptionMenu', 'button_color');"}, 
+
+   "050":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkScrollbar/button_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (8, 'CTkScrollbar', 'button_color');"}, 
+
+   "051":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkComboBox/fg_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (8, 'CTkComboBox', 'button_color');"}, 
+
+   "052":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkButton/hover_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (9, 'CTkButton', 'hover_color');"}, 
+
+   "053":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkSwitch/button_hover_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (8, 'CTkSwitch', 'button_hover_color');"}, 
+
+   "054":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkSlider/button_hover_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (8, 'CTkSlider', 'button_hover_color');"}, 
+
+   "055":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkOptionMenu/button_hover_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (8, 'CTkOptionMenu', 'button_hover_color');"}, 
+
+   "056":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkComboBox/button_hover_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (8, 'CTkComboBox', 'button_hover_color');"}, 
+
+   "057":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkScrollbar/button_hover_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (8, 'CTkScrollbar', 'button_hover_color');"}, 
+
+   "058":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkTextbox/button_hover_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (9, 'CTkTextbox', 'button_hover_color');"}, 
+
+   "059":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkFrame/top_fg_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (10, 'CTkFrame', 'top_fg_color');"}, 
+
+   "060":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkFrame/fg_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (11, 'CTkFrame', 'fg_color');"}, 
+
+   "061":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTk/fg_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (11, 'CTk', 'fg_color');"}, 
+
+   "062":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkToplevel/fg_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (11, 'CTkToplevel', 'fg_color');"}, 
+
+   "069":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkEntry/placeholder_text_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (11, 'CTkEntry', 'placeholder_text_color');"}, 
+
+   "063":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkSwitch/progress_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (12, 'CTkProgressBar', 'progress_color');"}, 
+
+   "064":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkProgressBar/progress_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (12, 'CTkSwitch', 'progress_color');"}, 
+
+   "065":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkSlider/progress_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (12, 'CTkSlider', 'progress_color');"}, 
+
+   "066":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkSwitch/fg_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (13, 'CTkProgressBar', 'fg_color');"}, 
+
+   "067":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkProgressBar/fg_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (12, 'CTkSwitch', 'fg_color');"}, 
+
+   "068":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkSlider/fg_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (13, 'CTkSlider', 'fg_color');"}, 
+
+   "069":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkButton/text_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (14, 'CTkButton', 'text_color');"}, 
+
+   "070":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkLabel/text_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (14, 'CTkLabel', 'text_color');"}, 
+
+   "071":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkEntry/text_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (14, 'CTkEntry', 'text_color');"}, 
+
+   "072":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkSwitch/text_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (14, 'CTkSwitch', 'text_color');"}, 
+
+   "073":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkOptionMenu/text_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (14, 'CTkOptionMenu', 'text_color');"}, 
+
+   "074":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkComboBox/text_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (14, 'CTkComboBox', 'text_color');"}, 
+
+   "075":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkSegmentedButton/text_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (14, 'CTkSegmentedButton', 'text_color');"}, 
+
+   "076":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkTextbox/text_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (14, 'CTkTextbox', 'text_color');"}, 
+
+   "077":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkScrollableFrame/text_color",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (14, 'CTkScrollableFrame', 'text_color');"}, 
+
+   "079":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkButton/text_color_disabled",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (15, 'CTkButton', 'text_color_disabled');"}, 
+
+   "080":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkEntry/text_color_disabled",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (15, 'CTkEntry', 'text_color_disabled');"}, 
+
+   "081":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkSwitch/text_color_disabled",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (15, 'CTkSwitch', 'text_color_disabled');"}, 
+
+   "082":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkOptionMenu/text_color_disabled",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (15, 'CTkOptionMenu', 'text_color_disabled');"}, 
+
+   "083":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkComboBox/text_color_disabled",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (15, 'CTkComboBox', 'text_color_disabled');"}, 
+
+   "084":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkSegmentedButton/text_color_disabled",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (15, 'CTkSegmentedButton', 'text_color_disabled');"}, 
+
+   "085":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkTextbox/text_color_disabled",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (15, 'CTkTextbox', 'text_color_disabled');"}, 
+
+   "086":{ "sql_apply_version":"2.0.0",
+      "description": "Colour cascade CTkScrollableFrame/text_color_disabled",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (15, 'CTkScrollableFrame', 'text_color_disabled');"}
+
+}

@@ -1,0 +1,103 @@
+#!/usr/bin/env bash
+#
+# Script to package up CTk Theme Builder
+#
+PROG=`basename $0`
+ART_CODE="ctk_theme_builder"
+E="-e"
+
+APP_HOME=`dirname $0` 
+cd ${APP_HOME}
+APP_HOME=`pwd`
+
+date_time()
+{
+  DATE=`date +"%Y/%m/%d %T"`
+  echo $DATE
+}
+
+app_version()
+{
+  version=`head -30 ${ART_CODE}.py | grep "__version__" | cut -f3 -d " " |  sed 's/"//g'`
+  echo "$version"
+}   
+display_usage()
+{
+  echo "Usage: ${PROG}  -v <version_tag>"
+  echo $E "\nIf you don't wish to include the <artifactory-url>, <artifactory_username> and / or <artifactory_key>,"
+  echo $E "on the command line, you may export them to the shell variables ARTIFACTORY_LOC, ART_USER_ID and ART_KEY"
+  echo $E "respectively."
+  echo $E "\nIf not supplied, the default Artifactory URL, is https://artifacthub-iad.oci.oraclecorp.com/hcgbu-dev-generic-local."
+  echo $E "\nExample:"
+  echo $E "\n        ./${PROG} -v 1.3.0"
+  echo $E "\nThis example assumes that the ART_KEY is exported as a shell variable."
+  exit
+}
+while getopts "v:l" options;
+do
+  case $options in
+    v) VERSION_TAG=${OPTARG};;
+    l) WRITE_LOG=Y;;
+    *) display_usage;
+       exit 1;;
+   \?) display_usage;
+       exit 1;;
+  esac
+done
+
+app_vers=`app_version`
+if [ "${VERSION_TAG}" != "${app_vers}" ]
+then
+   echo "ERROR: A version tag of \"${VERSION_TAG}\", when ${ART_CODE}.py, thinks that it is version \"${app_vers}\""
+   exit 1
+fi
+
+echo -e "Application home: ${APP_HOME}\n"
+cd ${APP_HOME}
+${APP_HOME}/freeze.sh
+if [ -d ../stage/ctk_theme_builder ]
+then 
+  rm -fr ../stage/ctk_theme_builder
+fi
+mkdir -p ../stage/ctk_theme_builder
+for file in `cat bom.lst`
+do 
+  cp -r $file ../stage/ctk_theme_builder
+done
+# Make sure we don't include the SQLite3 database.
+rm ../stage/ctk_theme_builder/assets/data/*.db
+cd ../stage
+STAGE_LOC=`pwd`
+cd ctk_theme_builder
+
+dos2unix *.py *.txt *.sh 2> /dev/null
+find assets -type f -exec dos2unix "{}" ";" 
+cd user_themes
+dos2unix *.json
+cd ../assets
+for dir in `ls -1`
+do
+  if [ ! -d "${dir}" ]
+  then
+    continue
+  fi
+  cd ${dir}
+  dos2unix *
+  cd ..
+done
+
+cd ${STAGE_LOC}
+echo -e "\nWorking from : `pwd`"
+export arch_file="${ART_CODE}-${VERSION_TAG}.zip"
+echo "Creaing artifact archive:  ${arch_file}"
+if [ -f ${arch_file} ]
+then
+  rm ${arch_file}
+fi
+zip -r ${arch_file} ctk_theme_builder 
+if [ $? -ne 0 ]
+then 
+   exit 1
+fi
+rm -fr ../stage/ctk_theme_builder
+echo "Done."
