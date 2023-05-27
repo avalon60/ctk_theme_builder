@@ -22,7 +22,7 @@ __version__ = "2.0.0"
 
 # Constants
 ASSET_DIRS = ['etc', 'themes', 'images', 'config', 'palettes', 'views']
-KEY_INV_FILES = ['ctk_theme_builder.bat', 'ctk_theme_builder.sh', 'ctk_theme_preview.py', 'ctk_theme_builder',
+KEY_INV_FILES = ['ctk_theme_builder.bat', 'ctk_theme_builder.sh', 'ctk_theme_preview.py',
                  'build_app.sh',
                  'build_app.bat', 'get-pip.py', 'requirements.txt',
                  'assets/config/repo_updates.json', 'assets/themes/GreyGhost.json']
@@ -46,26 +46,28 @@ ap = argparse.ArgumentParser(formatter_class=SortingHelpFormatter
                              , description=f"""{prog}: The {prog} tool is used to assist in the installation and with 
                              upgrades of {PRODUCT}.""")
 
-ap.add_argument("-a", "--artefact", required=False, action="store",
-                help=f"""Used for {PRODUCT} deployments & upgrades. Use -a along with the pathname to the {PRODUCT} 
-                      artefact ZIP file.""", dest='artefact', default=None)
-
-ap.add_argument("-I", "--install-locations", required=False, action="store",
+ap.add_argument("-i", "--install-locations", required=False, action="store",
                 help=f"""Used to point to the install/upgrade location for {PRODUCT}. {PRODUCT} will be installed 
                 in a {PRODUCT.lower()}, subdirectory below the location provided. If not supplied, a default
                 location will be used. The default install location is assumed to be the user's home directory. 
                 For example on MacOS or Linux, this will equate to  $HOME, and on Windows it would be 
                 <system_drive>:\\Users\\<username>.""", dest='install_location', default=None)
 
+
+ap.add_argument("-p", "--package", required=False, action="store",
+                help=f"""Used for {PRODUCT} deployments & upgrades. Use -a along with the pathname to the {PRODUCT} 
+                      package ZIP file.""", dest='package', default=None)
+
+
 operating_system = platform.system()
 home_directory = expanduser("~")
 
 args_list = vars(ap.parse_args())
 
-artefact = args_list["artefact"]
+package = args_list["package"]
 
-if artefact is not None and not exists(artefact):
-    print(f'ERROR: Cannot locate the specified artefact ZIP file: {artefact}')
+if package is not None and not exists(package):
+    print(f'ERROR: Cannot locate the specified package ZIP file: {package}')
     exit(1)
 
 b_prog = prog.replace(".py", "")
@@ -375,15 +377,15 @@ def app_home_contents_ok():
         return True
 
 
-def unpack_artefact(zip_pathname: Path, install_location: Path):
-    """"The unpack_artefact function, is provided for when we need to perform a software upgrade.
+def unpack_package(zip_pathname: Path, install_location: Path):
+    """"The unpack_package function, is provided for when we need to perform a software upgrade.
     We unpack the wallet contents to the target application home directory, prior to initialisation of the Python
     virtual environment for the application.
     :param zip_pathname:
     :param install_location:
     """
     if not zipfile.is_zipfile(zip_pathname):
-        print(f'unpack_artefact: Artefact file, {zip_pathname}, appears to be an invalid ZIP file. Unable to proceed!')
+        print(f'unpack_package: Artefact file, {zip_pathname}, appears to be an invalid ZIP file. Unable to proceed!')
         exit(1)
 
     with ZipFile(zip_pathname, 'r') as archive:
@@ -398,7 +400,9 @@ if __name__ == "__main__":
         install_location = args_list["install_location"]
         install_location = str(os.path.abspath(install_location))
         install_location = Path(install_location)
-    artefact = os.path.abspath(artefact)
+    
+    if package:
+        package = os.path.abspath(package)
 
     print(f'Starting {PRODUCT} deployment.')
     print(f'Application home: {str(install_location)}')
@@ -429,7 +433,7 @@ if __name__ == "__main__":
     views_location = assets_location / 'views'
     db_file = data_location / f'{PRODUCT.lower()}.db'
 
-    if not exists(install_location) and artefact is not None:
+    if not exists(install_location) and package is not None:
         if exists(install_location):
             print(f'Creating application home: {app_home}')
             os.mkdir(app_home)
@@ -437,10 +441,10 @@ if __name__ == "__main__":
             print(f'ERROR: The parent directory, {install_location}, for the specified {PRODUCT} application home, '
                   f'does not exist.\nPlease correct the supplied pathname and retry.')
             exit(1)
-    elif not exists(install_location) and artefact is None:
+    elif not exists(install_location) and package is None:
         print(
-            f'ERROR: For the new application home, {install_location}, you must provide a deployment artefact via the '
-            f'"-a/--artefact" command modifier.')
+            f'ERROR: For the new application home, {install_location}, you must provide a deployment package via the '
+            f'"-a/--package" command modifier.')
         print(f'Please correct and retry.')
         exit(1)
 
@@ -474,9 +478,9 @@ if __name__ == "__main__":
         print("Greenfield installation - creating a new repository.")
         initialise_database()
 
-    if artefact:
-        print(f'Unpacking artefact: {artefact} to: {install_location}')
-        unpack_artefact(zip_pathname=artefact, install_location=install_location)
+    if package:
+        print(f'Unpacking package: {package} to: {install_location}')
+        unpack_package(zip_pathname=package, install_location=install_location)
 
     entry_point_script = PRODUCT.lower() + '.py'
 
