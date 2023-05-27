@@ -7,4 +7,4 @@
 
 CTk Theme Builder provides a WYSIWYG interface for creating and maintaining [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) themes.
 
-Installation instructions can be found [here](docs/md/installation.md)
+Installation instructions can be found [here](docs/md/installation.md).
