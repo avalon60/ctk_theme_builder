@@ -36,7 +36,7 @@
     ],
     "hover_color": [
       "#e00000",
-      "#8e0a0a"
+      "#dd0303"
     ],
     "border_color": [
       "#a20a0a",
@@ -63,12 +63,12 @@
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#246696",
-      "#3189ca"
+      "#d37612",
+      "#d37612"
     ],
     "border_color": [
-      "#185a8a",
-      "#185a8a"
+      "#ffdb00",
+      "#ffdb00"
     ],
     "text_color": [
       "#f4f4ee",
@@ -121,11 +121,11 @@
     ],
     "button_color": [
       "#a20a0a",
-      "#a20a0a"
+      "#e40000"
     ],
     "button_hover_color": [
       "#8e0a0a",
-      "#8e0a0a"
+      "#d30000"
     ],
     "text_color": [
       "#f0e9b6",
@@ -145,7 +145,7 @@
       "#a20a0a"
     ],
     "border_color": [
-      "#FFF000",
+      "#fff05e",
       "#f0e9b6"
     ],
     "hover_color": [
@@ -192,11 +192,11 @@
     ],
     "button_color": [
       "#a20a0a",
-      "#e00000"
+      "#e40000"
     ],
     "button_hover_color": [
       "#000000",
-      "#c60000"
+      "#d30000"
     ]
   },
   "CTkOptionMenu": {
@@ -230,7 +230,7 @@
       "#d67915"
     ],
     "border_color": [
-      "#246696",
+      "#FFF000",
       "#FFF000"
     ],
     "button_color": [
@@ -275,16 +275,16 @@
       "#8e0a0a"
     ],
     "selected_hover_color": [
-      "#181b28",
-      "#0e0b0e"
+      "#b50404",
+      "#b20101"
     ],
     "unselected_color": [
       "#121522",
       "#000000"
     ],
     "unselected_hover_color": [
-      "#000000",
-      "#000000"
+      "#b80707",
+      "#b50404"
     ],
     "text_color": [
       "#f4f4ee",
@@ -358,13 +358,13 @@
   },
   "provenance": {
     "theme author": "Clive Bostock",
-    "date created": "Mar 27 2023 18:16:02",
+    "date created": "Apr 29 2023 14:39:51",
     "last modified by": "Clive Bostock",
-    "last modified date": null,
     "created with": "CTk Theme Builder",
-    "keystone method": null,
+    "last modified": "May 19 2023 18:52:04",
     "keystone colour": "#ac0000",
-    "last modified": "Apr 26 2023 10:50:50",
-    "harmony method": "Split-complementary"
+    "harmony method": "Split-complementary",
+    "harmony differential": null,
+    "theme name": "Hades"
   }
 }
