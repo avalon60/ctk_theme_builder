@@ -23,7 +23,7 @@ Note that with some Python installations, you may need to run the above command 
 
 ### ZIP Package
 
-To obtain a ZIP package, look at the releases on the GitHub project page. The installable archives start with "ctk\_theme\_builder-", followed by the version, and ending with .zip. For example: <i>ctk\_theme\_builder-2.0.0.zip`</i
+To obtain a ZIP package, look at the available releases of CTk Theme Builder, on the GitHub project page. The installable archives start with "ctk\_theme\_builder-", followed by the version, and ending with .zip. For example: <i>ctk\_theme\_builder-2.0.0.zip`</i>
 
 Install using the following steps:  
   
