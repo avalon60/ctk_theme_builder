@@ -64,11 +64,11 @@ The upshot is that you can also invoke a launch of CTk Theme Builder with *ctk\_
 
 If you open the CMD/Terminal window inside the *ctk\_theme\_builder* folder, then instead of typing the full pathname, you could simply type:  
   
-	`./ctk_theme_builder` (Linux / MacOS)
+	`./ctk_theme_builder` (Linux / MacOS)  
 	
 OR
 
-	`.\ctk_theme_builder` (Windows)`
+	`.\ctk_theme_builder` (Windows)
 
 #### Path Variable
 If you don't want to include the pathname to the CTk Theme Builder launch script, you can always change your PATH variable, to include the installation directory.
