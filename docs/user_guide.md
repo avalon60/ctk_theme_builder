@@ -1,15 +1,15 @@
 # CTk Theme Builder User Guide 
 Welcome to the CTk Theme Builder User Guide. 
 ## Contents
-
-1. [Overview](overview.md)
-2. [Menu Options](menus.md)
-3. [Preferences](preferences.md)
-3. [Control Panel](control-panel.md)
-4. [Colour Harmonics](harmonics.md)
-5. [Preview Panel](preview_panel.md)
-6. Tips
-7. Known Issues
+1. [Installing](deployment.md)
+2. [Overview](overview.md)
+3. [Menu Options](menus.md)
+4. [Preferences](preferences.md)
+5. [Control Panel](control-panel.md)
+6. [Colour Harmonics](harmonics.md)
+7. [Preview Panel](preview_panel.md)
+8. Tips
+9. Known Issues
 
 
 This is a work in progress, your patience is appreciated.
