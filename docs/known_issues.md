@@ -9,7 +9,7 @@ There are some issues which needed to be worked around, in respect of the *Previ
 1. CTk 5.1.2 CTkCheckBox.configure(text\_color\_disabled=...) causes exception [#1591](https://github.com/TomSchimansky/CustomTkinter/issues/1591)
 2. CTk 5.1.2: Omission: Theme JSON property checkmark\_color of CTkCheckBox has no configure option [#1586](https://github.com/TomSchimansky/CustomTkinter/issues/1586)
 3. CTk 5.1.2: CTkSegmentedButton property setting issues [#1562](https://github.com/TomSchimansky/CustomTkinter/issues/1562)
-4. CTk 5.1.2: CTkOptionMenu.configure(text\_color\_disabled=...) raises exception [#1559] (https://github.com/TomSchimansky/CustomTkinter/issues/1559)
+4. CTk 5.1.2: CTkOptionMenu.configure(text\_color\_disabled=...) raises exception [#1559](https://github.com/TomSchimansky/CustomTkinter/issues/1559)
 5.  CTk 5.1.2: Disabling CTkLabel - no text_color_disabled property (Regression) [#1557](https://github.com/TomSchimansky/CustomTkinter/issues/1557)
 
 CTk Theme Builder has a safety mechanism, allowing it to avoid these issues. It does this by taking a less surgical approach to updating the *Preview Panel*. Rather than update at the widget level, a full top level refresh is performed, tearing down the frames and rebuilding the widgets within the top level. If / when these issues are discovered to have been fixed, the Preview Panel will be updated accordingly.
