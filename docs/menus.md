@@ -17,6 +17,8 @@ When you first start CTk Theme Builder, if you don't have a theme selected, you 
 The options on the *File* menu, have corresponding buttons in the left hand region of the control panel. Please refer to the section on the Control Panel to read about their function.
 
 ### Tools Menu
+![Tools Menu](tools-menu.png) 
+
 The *Tools* menu provides access to:
 
 1. User Preferences
