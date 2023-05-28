@@ -14,9 +14,9 @@ You will require around 160MB of disk space.
 ## Installation
 
 ### The theme\_builder\_setup.py Utility
-Installations and upgrades are performed using the <i>theme\_builder\_setup.py</i> utility. In situ upgrades or patching can be performed using <i>theme\_builder\_setup.py</i>, but it can also install/upgrade from a package in the form of a ZIP file.
+Installations and upgrades are performed using the <i>theme\_builder\_setup.py</i> utility. In situ upgrades or patching can be performed using <i>theme\_builder\_setup.py</i>, but it can also install/upgrade from a package in the form of a ZIP file. This latter method, using a ZIP package, is the recommended way to install or update the application.
 
-The <i>theme\_builder\_setup.py</i> utility expects a parent directory to be supplied. For new installations, using a ZIP package, it will create a sub-directory, ctk_theme_builder, in which the application is installed. 
+The <i>theme\_builder\_setup.py</i> utility expects a parent directory to be supplied. For new installations, using a ZIP package, it will create a sub-directory, *ctk\_theme\_builder*, in which the application is installed. 
 
 To obtain a list of options, run the command:  
   
