@@ -71,8 +71,8 @@ OR
 If you don't want to include the pathname to the CTk Theme Builder launch script, you can always change your PATH variable, to include the installation directory.
 
 #### Desktop Launchers
-Most operating systems, with a Graphical User Interface, tend to provide a launcher mechanism, which can be set up on the desktop. 
+Most operating systems, with a Graphical User Interface, tend to provide a launcher mechanism which can be set up on the desktop. 
 
-For example, you can create a desktop shortcut on Windows, in order to launch the *ctk\_theme\_builder* script, described earlier. 
+For example, you can create a desktop shortcut on Windows, in order to launch the *ctk\_theme\_builder* script, described earlier. Linux ports tend to have similar facilities. 
 
-Linux ports tend to have similar facilities. You'll need to Google how to do this for your specific operating system. 
+You'll need to Google how to set up a shortcut / launcher for your specific operating system. 
