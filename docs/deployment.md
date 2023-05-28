@@ -50,11 +50,11 @@ For example, if you had installed CTk Theme Builder in a ``/u01/utilities/ctk_th
   
 Linux/MacOS example:  
 
-  `/u01/utilities/ctk_theme_builder/ctk_theme_builder`
+	`/u01/utilities/ctk_theme_builder/ctk_theme_builder`
   
 Windows example:  
 
-C:\utilities\ctk_theme_builder\ctk_theme_builder
+	`C:\utilities\ctk_theme_builder\ctk_theme_builder`
 
 On Windows, the above should cause the *ctk\_theme\_builder.bat* file, located in the CTk Theme builder application home directory to be executed. 
 
