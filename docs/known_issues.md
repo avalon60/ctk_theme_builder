@@ -12,12 +12,15 @@ There are some issues which needed to be worked around, in respect of the *Previ
 4. CTk 5.1.2: CTkOptionMenu.configure(text\_color\_disabled=...) raises exception [#1559](https://github.com/TomSchimansky/CustomTkinter/issues/1559)
 5.  CTk 5.1.2: Disabling CTkLabel - no text_color_disabled property (Regression) [#1557](https://github.com/TomSchimansky/CustomTkinter/issues/1557)
 
-CTk Theme Builder has a safety mechanism, allowing it to avoid these issues. It does this by taking a less surgical approach to updating the *Preview Panel*. Rather than update at the widget level, a full top level refresh is performed, tearing down the frames and rebuilding the widgets within the top level. If / when these issues are discovered to have been fixed, the Preview Panel will be updated accordingly.
+CTk Theme Builder has a safety mechanism, allowing it to avoid most of these issues. It does this by taking a less surgical approach to updating the *Preview Panel*. Rather than update at the widget level, a full top level refresh is performed, tearing down the frames and rebuilding the widgets within the top level. This is not as elegant as the default behaviour, but it does allow you to get on with the task at hand. If / when these issues are discovered to have been fixed, the Preview Panel will be updated accordingly.
 
 In respect of number 5, the *Preview Panel* is unable to compensate, as it has no underlying property to work with. The disabled text colour of a CTkLabel, appears to be decided upon by Tkinter, as though we had rendered a tkinter.Label widget.
 
+#### DropdownMenu
 
-In addition, and this is not a bug as such, there is the *DropdownMenu* theme property to consider. You can perhaps think of this as a sub-component, used by *CTkComboBox* and *CTkOptionMenu*. The bottom line is that it is not a widget in its own right. This means that to effect any changes made to it in the *Control Panel*, we have to perform a similar action, to that described above - tearing down and rebuilding the widgets in the *Preview Panel*.
+In addition,there is the *DropdownMenu* theme property to consider. You can perhaps think of this as a sub-component, used by *CTkComboBox* and *CTkOptionMenu*. The bottom line is that it is not a widget in its own right. This means that to effect any changes made to it in the *Control Panel*, we currently perform a similar action, to that described above - tearing down and rebuilding the widgets in the *Preview Panel*.
+
+This is possibly something that can be improved in a future version of CTk Theme Builder.
 
 #### Geometry Updates
 
