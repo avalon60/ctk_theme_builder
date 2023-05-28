@@ -50,11 +50,11 @@ For example, if you had installed CTk Theme Builder in a ``/u01/utilities/ctk_th
   
 Linux/MacOS example:  
 
-	`/u01/utilities/ctk_theme_builder/ctk_theme_builder`
+`/u01/utilities/ctk_theme_builder/ctk_theme_builder`
   
 Windows example:  
 
-	`C:\utilities\ctk_theme_builder\ctk_theme_builder`
+`C:\utilities\ctk_theme_builder\ctk_theme_builder`
 
 On Windows, the above should cause the *ctk\_theme\_builder.bat* file, located in the CTk Theme builder application home directory to be executed. 
 
@@ -64,11 +64,11 @@ The upshot is that you can also invoke a launch of CTk Theme Builder with *ctk\_
 
 If you open the CMD/Terminal window inside the *ctk\_theme\_builder* folder, then instead of typing the full pathname, you could simply type:  
   
-	`./ctk_theme_builder` (Linux / MacOS)  
+`./ctk_theme_builder` (Linux / MacOS)  
 	
 OR
 
-	`.\ctk_theme_builder` (Windows)
+`.\ctk_theme_builder` (Windows)
 
 #### Path Variable
 If you don't want to include the pathname to the CTk Theme Builder launch script, you can always change your PATH variable, to include the installation directory.
