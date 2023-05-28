@@ -27,6 +27,6 @@ The *Tools* menu provides access to:
 
 The Colour Harmonics option is only enabled, when you start working on a theme.
 
-Each of these are covered in their own dedicated section. 
+Each of these options, are covered in their own dedicated section of the guide. 
 
 [<- Back](user_guide.md)

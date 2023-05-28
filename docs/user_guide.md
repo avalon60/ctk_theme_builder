@@ -6,7 +6,7 @@ Welcome to the CTk Theme Builder User Guide.
 2. [Menu Options](menus.md)
 3. [Preferences](preferences.md)
 3. [Control Panel](control-panel.md)
-4. Colour Harmonics
+4. [Colour Harmonics](harmonics.md)
 5. Preview Panel
 6. Tips
 7. Known Issues

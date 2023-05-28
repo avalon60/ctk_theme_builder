@@ -153,8 +153,8 @@
       "#3F5EA8"
     ],
     "text_color": [
-      "#112c7c",
-      "#112c7c"
+      "#d9d9d9",
+      "#d9d9d9"
     ],
     "text_color_disabled": [
       "#b1d9ff",
@@ -359,9 +359,9 @@
   "provenance": {
     "theme author": "Clive Bostock",
     "date created": "Mar 27 2023 18:16:02",
-    "last modified by": "Clive Bostock",
+    "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "May 22 2023 21:10:46",
+    "last modified": "May 28 2023 15:35:32",
     "keystone colour": "#1f3572",
     "harmony method": "Complementary",
     "harmony differential": 5,
