@@ -22,7 +22,7 @@ To obtain a list of options, run the command:
   
   `python theme_builder_setup.py -h`
   
-Note that with some Python installations, you may need to run the above command with __python3_, instead of _python_.
+Note that with some Python installations, you may need to run the above command with *python3*, instead of *python*.
 
 ### ZIP Package
 
