@@ -12,7 +12,7 @@ There are some issues which needed to be worked around, in respect of the *Previ
 4. CTk 5.1.2: CTkOptionMenu.configure(text\_color\_disabled=...) raises exception [#1559](https://github.com/TomSchimansky/CustomTkinter/issues/1559)
 5.  CTk 5.1.2: Disabling CTkLabel - no text_color_disabled property (Regression) [#1557](https://github.com/TomSchimansky/CustomTkinter/issues/1557)
 
-CTk Theme Builder has a safety mechanism, allowing it to avoid most of these issues. It does this by taking a less surgical approach to updating the *Preview Panel*. Rather than update at the widget level, a full top level refresh is performed, tearing down the frames and rebuilding the widgets within the top level. This is not as elegant as the default behaviour, but it does allow you to get on with the task at hand. If / when these issues are discovered to have been fixed, the Preview Panel will be updated accordingly.
+CTk Theme Builder has a safety mechanism, allowing it to avoid most of these issues. It does this by taking a less surgical approach to updating the *Preview Panel*. Rather than updating at the widget level, a full top level refresh is performed, tearing down the frames and rebuilding the widgets within the top level. This is not as elegant as the default behaviour, but it does allow you to get on with the task at hand. If / when these issues are discovered to have been fixed, the Preview Panel will be updated accordingly.
 
 In respect of number 5, the *Preview Panel* is unable to compensate, as it has no underlying property to work with. The disabled text colour of a CTkLabel, appears to be decided upon by Tkinter, as though we had rendered a tkinter.Label widget.
 
@@ -30,12 +30,12 @@ This issue causes the described geometry property to be ignored.
 
 ### CTk Theme Builder
 #### Colour Harmonics
-You may encounter a situation where, despite having an open theme, the Colour Harmonics option is greyed out (disabled). You can work around this by saving any changes and restarting the app.
+You may encounter a situation where, despite having an open theme, the Colour Harmonics option is greyed out (disabled). this doesn't happen that frequently, but if it does. you can work around this by saving any changes and restarting the app.
 
-As soon as I spot the workflow which causes this I will fix it. (It's a difficult one to spot)
+As soon as I spot the workflow which causes this I will fix it (it's a difficult one to spot).
 
 #### Listener Timeout
-When this occurs, the *Control Panel* cannot communicate with the *Preview Panel*, leaving it in a "zombie" state. This should be rare, unless you keep attempting to launch the application whilst an instance of it is already running.
+When this occurs, the *Control Panel* cannot communicate with the *Preview Panel*, leaving it in a "zombie" state. This should be rare, unless you keep attempting to launch the application whilst another instance of it is already running.
 
 Depending on your operating system, this means that you will need to use xkill, Task manager etc,  to kill the panel.
 

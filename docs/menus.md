@@ -1,6 +1,6 @@
 [<- Back](user_guide.md)
 # Menus
-As you have undoubtedly noticed, when you launch CTk Theme Builder, the control panel has menu a menu toolbar. This includes a *File* menu as well as a Tools menu, as we see here:
+As you have undoubtedly noticed, when you launch CTk Theme Builder, the control panel has menu a menu toolbar. This includes a *File* menu as well as a *Tools* menu, as we see here:
 
 ![Main Menu](main-menus.png) 
 

@@ -37,7 +37,7 @@ Example:
 
 `python theme_builder_setup.py -i /home/clive/utilities -a /tmp/ctk_theme_builder-2.0.0.zip`
 
-This will cause a ctk\_theme\_builder directory to be created (if it doesn't already exist), below the utilities folder. The ZIP file will be unpacked to the folder and the application will be set up into a runnable state. 
+If one doesn't already exist, this will cause a ctk\_theme\_builder directory to be created, below the utilities folder. The ZIP file will be unpacked to the folder and the application will be set up into a runnable state. 
 
   If there is already an installation of ctk\_theme\_builder, below the specified installation location, theme\_builder\_setup.py will attempt an upgrade.   
   
@@ -68,10 +68,10 @@ If you open the CMD/Terminal window inside the *ctk\_theme\_builder* folder, the
 	
 OR
 
-`.\ctk_theme_builder` (Windows)
+eone`.\ctk_theme_builder` (Windows)
 
-#### Path Variable
-If you don't want to include the pathname to the CTk Theme Builder launch script, you can always change your PATH variable, to include the installation directory.
+#### PATH Variable
+If you don't want to include the pathname to the CTk Theme Builder script, you can always change your operating system PATH variable, to include the installation directory.
 
 #### Desktop Launchers
 Most operating systems, with a Graphical User Interface, tend to provide a launcher mechanism which can be set up on the desktop. 

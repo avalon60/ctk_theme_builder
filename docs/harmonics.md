@@ -32,6 +32,6 @@ You can read more about the methods [here](https://www.oberlo.com/blog/color-com
 When pressed, the *Copy to Palette* button, causes the *Keystone Colour*, and the generated colours, immediately below it, to be copied to the *Scratch* tiles on the themes Theme Palette display. 
 
 ### Tag Keystone
-The *Tag Keystone* button, causes the Keystone colour and the chosen harmony method to be tagged to your theme. If you subsequently open the *Colour Harmonics* panel, for the same theme, the colours will be restored to the same state, as the point you tagged them.  
+The *Tag Keystone* button, causes the Keystone colour and the chosen harmony method to be tagged to your theme. If you subsequently open the *Colour Harmonics* panel, for a given theme, the colours will be restored to the same state, as per when they were tagged.  
 
 [<- Back](user_guide.md)

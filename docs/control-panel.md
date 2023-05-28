@@ -5,11 +5,11 @@
 
 Here we see the Control Panel. This is where the real work goes on. 
 
-The Main Controls are accesses via selections and buttons on the left hand side. 
+The Main Controls are accessed via selections and buttons on the left hand side. 
 
 The entries we see under *Widget Geometry* are buttons which allow you to define the respective, non-colour, widget properties.
 
-The area immediately below *widget Geometry** is the *Theme Palette*. This is basically a working area for your theme colours.
+The area immediately below *widget Geometry** is the *Theme Palette*. This is basically a holding space for your common theme colours.
 
 Finally the Colour Mappings region is where you assign colour properties to the CustomTkinter widget properties.
 
@@ -27,6 +27,7 @@ This also causes the *Theme Palette* and *Colour Mappings* regions to update, to
 
 #### Top Frame
 The default position for the *Top Frame* is set to enabled. If enabled this renders the Preview Panel, in such as way as to emulate the rendered widgets inside an embedded (top) frame.
+
 When CustomTkinter renders a top frame, it uses the top\_fg\_color property to determine the frame's foreground colour. This is often a contrasting shade (or colour) to the parent frame's fg\_colour.
 
 It's a good idea to toggle this switch, to make sure that your widgets render well, in both modes.
@@ -35,19 +36,19 @@ It's a good idea to toggle this switch, to make sure that your widgets render we
 You should occasionally enable this switch, to see how your widget colours render, when they have been disabled.
 
 #### Properties View
-The *Properties View* allows you to control the way widgets (or widget groupings) are presented for selection in the *Filter View* drop-down. There is a *Basic*view as well as a *Categorised* view. 
+The *Properties View* allows you to control the way widgets (or widget groupings) are presented for selection in the *Filter View* drop-down. There is a *Basic*view as well as a *Categorised* view. See the next section, for more details on these.
 
 #### Filter View
 Depending on the *Properties View* setting, this drop-down menu allows you to control which properties are listed in the *Colour Mappings* region. 
 
 In *Basic* mode, you can select *All*, to render all property widgets, or you can select an individual widget.
 
-In *Categorised* mode, you can (as in *Basic* mode), select *All*, or you can select groups of widgets, based on common attribute. For example, all widgets which allow text entry, or which have scrollable components.
+In *Categorised* mode, you can also select *All*, or you can select groups of widgets, based on common attribute. For example, all widgets which allow text entry, or which have scrollable components.
 
 #### Refresh Preview
 The *Refresh Preview * button, causes a full reload of the *Preview Panel*. 
 
-This can be useful, for, if you have been changing the state of the widgets in the *Preview Panel*. For example, you may have entered text in a CTkEntry widget and wish to reset its state, such that it re-renders the placeholder text. 
+This can be useful where you have been changing the state of the widgets in the *Preview Panel*. For example, you may have entered text in a CTkEntry widget and wish to reset its state, such that it re-renders the placeholder text. 
 
 #### Reset Button
 This allows you to roll back any changes to your last *Save*. We all make mistakes ;o)
@@ -59,7 +60,7 @@ If you have been working on another theme, and have unsaved changes, a pop-up di
 
 #### Sync Modes
 
-The Sync Modes operates against the displayed colour properties, which you have currently selected via the *Filter View*, and which show in the *Colour Mappings* region. It's effect is to copy the colour properties to the complementary appearance mode. For example, if you have *Dark Mode* selected, the colour properties will be copied over to the *Light Mode* property counter-parts.
+The Sync Modes button, operates against the displayed colour properties, which you have currently selected via the *Filter View*, and which are shown in the *Colour Mappings* region. It's effect is to copy the colour properties to the complementary appearance mode. For example, if you have *Dark Mode* selected, the colour properties will be copied over to the *Light Mode* property counter-parts.
 
 This operation does not include the Theme Palette properties.
 
@@ -80,21 +81,24 @@ To make adjustments,adjust the sliders and the rendered widget will respond, to 
 When you *Save* your changes, the preview panel will also update any matching widget types.
 
 ## Theme Palette
-Depending on your methodology, you might find the *Theme Palette*, more or less useful. It's an area where you can persist colours, whilst switching between *Filter View* selections. 
+Depending on your methodology, you might find the *Theme Palette*, more or less useful. It's an area where you can persist colours, whilst switching between *Filter View* selections, as well as between theme maintenance sessions. 
 
-If you are more methodical, you can use it to plan your colours, to strive for better consistency.   
+If you are more methodical, you can use it to plan your colours, in order to strive for better consistency.   
   
   Be aware that the *Colour Harmonics* dialogue has a *copy to Palette** button. When pressed, this will cause the keystone colour, and the generated base colours, to be copied to the first tiles in the Theme Palette (*Scratch1, Scratch2* etc. up to 4 colours in total, depending on the selected harmony method).
   
 If you right-click a tile in the *Theme Palette* region, you will be presented with a floating  menu. This will provide options for copying, pasting or various options for adjusting the colour of the selected tile. 
+
+If you don't care for the labels which appear below the Theme Palette tiles, they can be switched off, via the Tools > Preferences menu selection.
   
 ## Colour Mappings Region
 This region reflects the colour properties of the widgets selected via the* Properties View / Filter View* widgets. Here is where you target and manage individual widget colour properties.
-As with the *Theme Palette* tiles, floating menus are available, which allow you to perform operations as we see here:  
+
+As with the *Theme Palette* tiles, floating menus are available, which allow you to perform operations, as we see here:  
   
   ![Preferences](floating-menu.png)
   
-The *Lighter Shade/Darker Shade* options, cause incremental adjustments in the shade of the colour, based upon the *Adjust Shade Step*, setting described under *User Preferences*. 
+The *Lighter Shade/Darker Shade* options, cause incremental adjustments in the shade of the colour, based upon the *Adjust Shade Step*, setting described under user *Preferences*. 
 
 As you can see there are multiplier options, which allow you to magnify the shade step adjustment.
 
