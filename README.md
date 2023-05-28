@@ -1,4 +1,4 @@
-# CTkThemeBuilder
+# CTk Theme Builder
 Hello and welcome to the CTk Theme Builder repository!
 
 <img src="docs/images/CTkThemeBuilder-about.png"  width="800" height="400">
