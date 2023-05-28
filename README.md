@@ -8,4 +8,4 @@ CTk Theme Builder provides a WYSIWYG interface for creating and maintaining [Cus
 
 Deployment instructions can be found [here](docs/deployment.md).
 
-The user guide, can be found [here](docs/user_guide.md)
+The user guide, can be found [here](docs/user_guide.md).
