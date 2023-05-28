@@ -1,7 +1,7 @@
 # CTk Theme Builder User Guide 
 Welcome to the CTk Theme Builder User Guide. 
 ## Contents
-1. [Installing](deployment.md)
+1. [Deploying / Updating the App](deployment.md)
 2. [Overview](overview.md)
 3. [Menu Options](menus.md)
 4. [Preferences](preferences.md)
