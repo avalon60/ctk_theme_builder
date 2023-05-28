@@ -45,6 +45,10 @@ In *Basic* mode, you can select *All*, to render all property widgets, or you ca
 
 In *Categorised* mode, you can also select *All*, or you can select groups of widgets, based on common attribute. For example, all widgets which allow text entry, or which have scrollable components.
 
+![categorised](categorised_view.png)
+
+In the above image, we have the *Categorised* view selected and we are filtering on widgets with buttons.
+
 #### Refresh Preview
 The *Refresh Preview * button, causes a full reload of the *Preview Panel*. 
 
