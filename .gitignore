@@ -8,3 +8,5 @@ assets/data/ctk_theme_builder.db
 tmp/
 
 *.backup
+
+assets/etc/listener.started
