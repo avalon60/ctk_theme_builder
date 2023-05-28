@@ -68,7 +68,7 @@ If you open the CMD/Terminal window inside the *ctk\_theme\_builder* folder, the
 	
 OR
 
-eone`.\ctk_theme_builder` (Windows)
+`.\ctk_theme_builder` (Windows)
 
 #### PATH Variable
 If you don't want to include the pathname to the CTk Theme Builder script, you can always change your operating system PATH variable, to include the installation directory.
