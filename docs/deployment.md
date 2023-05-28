@@ -3,11 +3,13 @@
 
 ## Requirements
 
-You must have Python installed. The minimum recommended version of Python is 3.10. 
+You must have Python installed. The recommended version of Python is 3.10, although anything above Python 3.8 should suffice. 
+
+Note the application has not been tested against Python 3.11. 
 
 The application has been tested on Linux Mint and Windows 10, although there is no obvious reason as to why it shouldn't work on MacOS or other Linux ports.
 
-You will require at least 160MB of disk space.
+You will require around 160MB of disk space.
 
 ## Installation
 
