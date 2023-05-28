@@ -1,3 +1,4 @@
+[<- Back](user_guide.md)
 # Preferences
 The Preferences dialogue is accessed via the *Tools->Preferences* menu option.
 The preferences screen will appear something like this:
@@ -47,7 +48,7 @@ This setting allows you to tune the shade step options, which are available when
 
 This setting allows you to tune the behaviour of the colours generated in the Colour Harmonics dialogue. The larger the selected value, the bigger the difference in consecutive shades generated to the right side of the dialogue.
 
-  ![shade steps](colour-harmonics.png)
+  ![colour harmonies](colour-harmonics.png)
 
 Colour Harmonics Dialogue
 
