@@ -46,7 +46,7 @@ This will cause a ctk\_theme\_builder directory to be created (if it doesn't alr
 ### Launching CTk Theme Builder
 There are a number of options, for launching CTk Theme Builder, and these vary slightly depending on the operating system. One common method for them all is to launch using the *ctk\_theme\_builder* command. The most basic way is to open a CMD/Terminal window and type in a command. 
 
-For example, if you had installed CTk Theme Builder in a ``/u01/utilities/ctk_theme_builder`folder, then you could launch, using the command:  
+For example, if you had installed CTk Theme Builder in a ``/u01/utilities/ctk_theme_builder`folder, then you could launch, using the following:-  
   
 Linux/MacOS example:  
 
