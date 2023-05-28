@@ -12,7 +12,5 @@ Welcome to the CTk Theme Builder User Guide.
 9. [Known Issues & Behaviours](known_issues.md)
 
 
-This is a work in progress, your patience is appreciated.
 
-*A thank-you to my ever patient, ever loving wife, who has let me beaver 
-away at this project for many an hour.*
+*A thank-you to my ever patient, ever loving, beautiful wife, who has let me hide in my office and beaver away at this project, for many an hour.*
