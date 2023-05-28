@@ -52,11 +52,8 @@ SMALL_TEXT = cbtk.SMALL_TEXT
 
 DEBUG = 0
 HEADER_SIZE = ctk_theme_preview.HEADER_SIZE
-ACK_LISTENER_PORT = ctk_theme_preview.ACK_LISTENER_PORT
-
 SERVER = ctk_theme_preview.SERVER
 METHOD_LISTENER_ADDRESS = ctk_theme_preview.METHOD_LISTENER_ADDRESS
-CONTROLLER_ACK_ADDRESS = ctk_theme_preview.CONTROLLER_ACK_ADDRESS
 ENCODING_FORMAT = ctk_theme_preview.ENCODING_FORMAT
 DISCONNECT_MESSAGE = ctk_theme_preview.DISCONNECT_MESSAGE
 DISCONNECT_JSON = ctk_theme_preview.DISCONNECT_JSON
@@ -959,21 +956,6 @@ class ControlPanel:
         send_length += b' ' * (HEADER_SIZE - len(send_length))
         return send_length, message
 
-    def _receive_ack(self):
-        def _method_listener(self):
-            """Initialise our listener's client_handlers dictionary. This will keep track of connected
-            sessions (there should normally be only one). Each incoming request, is handed off to the
-            handle_client function.
-            """
-            self._client_handlers = {}
-            print("Preview listener starting...")
-            server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            server.bind(CONTROLLER_ACK_ADDRESS)
-            server.listen()
-            print(f'Waiting on "ACK" from port: {ACK_LISTENER_PORT}')
-            # print('Waiting for a client request...')
-            conn, address = server.accept()
-            print('Listener "ACK" recieved...')
 
     def _send_message(self, message):
 
@@ -1982,15 +1964,6 @@ class ControlPanel:
         self._new_theme_json_dir = Path(tk.filedialog.askdirectory(initialdir=self._theme_json_dir))
         self._lbl_pref_theme_dir_disp.configure(text=self._new_theme_json_dir)
 
-    def _open_client_socket(self, port=5050):
-        return
-        if self.client_socket is not None:
-            return
-        self.client_socket = socket.socket()
-
-        hostname = socket.gethostname()  # Server IP/Hostname
-        self.client_socket.connect((hostname, port))  # Connects to server
-        self._client_port = port
 
     def _app_themes_list(self):
         """This method generates a list of theme names, based on the json files found in the application themes folder
@@ -3322,7 +3295,6 @@ class ControlPanel:
             program = [designer, '-a', appearance_mode, '-t', self._wip_json]
             print(f'Launching designer: {designer}')
             self.process = sp.Popen(program)
-            self._receive_ack()
             listener_started = False
             # Wait for Preview Pamel to start the listener.
             # We expect a semaphore file to be created when this
