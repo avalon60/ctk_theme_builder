@@ -8,8 +8,7 @@ Welcome to the CTk Theme Builder User Guide.
 5. [Control Panel](control-panel.md)
 6. [Colour Harmonics](harmonics.md)
 7. [Preview Panel](preview_panel.md)
-8. Tips
-9. Known Issues
+8. [Known Issues & Behaviours](known_issues.md)
 
 
 This is a work in progress, your patience is appreciated.
