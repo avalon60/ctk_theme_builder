@@ -54,7 +54,7 @@ Linux/MacOS example:
   
 Windows example:  
 
-``   C:\utilities\ctk_theme_builder\ctk_theme_builder`
+C:\utilities\ctk_theme_builder\ctk_theme_builder
 
 On Windows, the above should cause the *ctk\_theme\_builder.bat* file, located in the CTk Theme builder application home directory to be executed. 
 
@@ -68,7 +68,7 @@ If you open the CMD/Terminal window inside the *ctk\_theme\_builder* folder, the
 	
 OR
 
-``.\ctk_theme_builder` (Windows)
+``.\ctk_theme_builder` (Windows)`
 
 #### Path Variable
 If you don't want to include the pathname to the CTk Theme Builder launch script, you can always change your PATH variable, to include the installation directory.
