@@ -1,0 +1,101 @@
+[<- Back](user_guide.md)
+# Control Panel
+
+<img src="control-panel2.png"  width="600" height="600">
+
+Here we see the Control Panel. This is where the real work goes on. 
+
+The Main Controls are accesses via selections and buttons on the left hand side. 
+
+The entries we see under *Widget Geometry* are buttons which allow you to define the respective, non-colour, widget properties.
+
+The area immediately below *widget Geometry** is the *Theme Palette*. This is basically a working area for your theme colours.
+
+Finally the Colour Mappings region is where you assign colour properties to the CustomTkinter widget properties.
+
+We will go into detail, on these various regions, in the subsequent sections.
+
+
+## Main Controls
+#### Select Theme
+This is a drop-down menu which allows you to select a theme, on which to begin work. The list is generated based upon entries in your user theme location (refer to Preferences).
+
+#### Preview Appearance
+This option allows you to switch the *Preview Panel* (covered in a later section)  between the CustomTkinter *Light* and *Dark* modes. 
+
+This also causes the *Theme Palette* and *Colour Mappings* regions to update, to reflect the colours configured for the selected mode.
+
+#### Top Frame
+The default position for the *Top Frame* is set to enabled. If enabled this renders the Preview Panel, in such as way as to emulate the rendered widgets inside an embedded (top) frame.
+When CustomTkinter renders a top frame, it uses the top\_fg\_color property to determine the frame's foreground colour. This is often a contrasting shade (or colour) to the parent frame's fg\_colour.
+
+It's a good idea to toggle this switch, to make sure that your widgets render well, in both modes.
+
+#### Render Disabled
+You should occasionally enable this switch, to see how your widget colours render, when they have been disabled.
+
+#### Properties View
+The *Properties View* allows you to control the way widgets (or widget groupings) are presented for selection in the *Filter View* drop-down. There is a *Basic*view as well as a *Categorised* view. 
+
+#### Filter View
+Depending on the *Properties View* setting, this drop-down menu allows you to control which properties are listed in the *Colour Mappings* region. 
+
+In *Basic* mode, you can select *All*, to render all property widgets, or you can select an individual widget.
+
+In *Categorised* mode, you can (as in *Basic* mode), select *All*, or you can select groups of widgets, based on common attribute. For example, all widgets which allow text entry, or which have scrollable components.
+
+#### Refresh Preview
+The *Refresh Preview * button, causes a full reload of the *Preview Panel*. 
+
+This can be useful, for, if you have been changing the state of the widgets in the *Preview Panel*. For example, you may have entered text in a CTkEntry widget and wish to reset its state, such that it re-renders the placeholder text. 
+
+#### Reset Button
+This allows you to roll back any changes to your last *Save*. We all make mistakes ;o)
+
+#### New Theme
+As this suggests, this allows you to create a brand new theme. When pressed a pop-up dialogue will be displayed, where you can enter the new theme name.
+
+If you have been working on another theme, and have unsaved changes, a pop-up dialogue will appear, asking you if you wish to discard your changes.
+
+#### Sync Modes
+
+The Sync Modes operates against the displayed colour properties, which you have currently selected via the *Filter View*, and which show in the *Colour Mappings* region. It's effect is to copy the colour properties to the complementary appearance mode. For example, if you have *Dark Mode* selected, the colour properties will be copied over to the *Light Mode* property counter-parts.
+
+This operation does not include the Theme Palette properties.
+
+#### Sync Palette
+ This behaves in a similar fashion to the *Sync Modes* button, except that is only effects changes to the *Theme Palette* colours.
+ 
+#### Remaining Buttons
+Hopefully you will find the functionality of *Save*, *Save As*, *Delete* and *Quit* somewhat obvious.
+Needless to say, if you have any unsaved changes, you will be prompted with a choice of what you wish to do with them.
+
+## Widget Geometry
+The *Widget Geometry* buttons allow you to target a particular widget type, and adjust its geometry properties (corner radius, border width etc).
+
+![Preferences](geometry-dialog.png)
+
+To make adjustments,adjust the sliders and the rendered widget will respond, to provide a mini-preview or the effects of your changes.
+
+When you *Save* your changes, the preview panel will also update any matching widget types.
+
+## Theme Palette
+Depending on your methodology, you might find the *Theme Palette*, more or less useful. It's an area where you can persist colours, whilst switching between *Filter View* selections. 
+
+If you are more methodical, you can use it to plan your colours, to strive for better consistency.   
+  
+  Be aware that the *Colour Harmonics* dialogue has a *copy to Palette** button. When pressed, this will cause the keystone colour, and the generated base colours, to be copied to the first tiles in the Theme Palette (*Scratch1, Scratch2* etc. up to 4 colours in total, depending on the selected harmony method).
+  
+If you right-click a tile in the *Theme Palette* region, you will be presented with a floating  menu. This will provide options for copying, pasting or various options for adjusting the colour of the selected tile. 
+  
+## Colour Mappings Region
+This region reflects the colour properties of the widgets selected via the* Properties View / Filter View* widgets. Here is where you target and manage individual widget colour properties.
+As with the *Theme Palette* tiles, floating menus are available, which allow you to perform operations as we see here:  
+  
+  ![Preferences](floating-menu.png)
+  
+The *Lighter Shade/Darker Shade* options, cause incremental adjustments in the shade of the colour, based upon the *Adjust Shade Step*, setting described under *User Preferences*. 
+
+As you can see there are multiplier options, which allow you to magnify the shade step adjustment.
+
+[<- Back](user_guide.md)
