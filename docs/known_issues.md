@@ -4,7 +4,7 @@
 ### CustomtKinter
 
 #### Colour Property Updates
-There are some issues which needed to be worked around, in respect of the *Preview Panel* operations. During release 2.0.0 of CTk Theme Builder, the latest release of CustomTkinter was 5.1.3. This had several issues associated:  
+There are some issues which needed to be worked around, in respect of the *Preview Panel* operations. During release 2.0.0 of CTk Theme Builder, the latest release of CustomTkinter was 5.1.3. This had several associated issues:  
   
 1. CTk 5.1.2 CTkCheckBox.configure(text\_color\_disabled=...) causes exception [#1591](https://github.com/TomSchimansky/CustomTkinter/issues/1591)
 2. CTk 5.1.2: Omission: Theme JSON property checkmark\_color of CTkCheckBox has no configure option [#1586](https://github.com/TomSchimansky/CustomTkinter/issues/1586)
