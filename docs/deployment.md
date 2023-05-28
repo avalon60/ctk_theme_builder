@@ -1,4 +1,4 @@
-# CTk Theme Builder Installation
+# CTk Theme Builder Deployment
 
 ## Requirements
 
@@ -17,7 +17,7 @@ The <i>theme\_builder\_setup.py</i> utility expects a parent directory to be sup
 
 To obtain a list of options, run the command:  
   
-  `python theme\_builder\_setup.py -h`
+  `python theme_builder_setup.py -h`
   
 Note that with some Python installations, you may need to run the above command with __python3_, instead of _python_.
 
@@ -32,7 +32,7 @@ Install using the following steps:
 
 Example:
 
-`python theme\_builder\_setup.py -i /home/clive/utilities -a /tmp/ctk_theme_builder-2.0.0.zip`
+`python theme_builder_setup.py -i /home/clive/utilities -a /tmp/ctk_theme_builder-2.0.0.zip`
 
 This will cause a ctk\_theme\_builder directory to be created (if it doesn't already exist), below the utilities folder. The ZIP file will be unpacked to the folder and the application will be set up into a runnable state. 
 
@@ -40,11 +40,39 @@ This will cause a ctk\_theme\_builder directory to be created (if it doesn't alr
   
   If the installation is already at the same version as that contained in the ZIP archive, the theme\_builder\_setup.py will run in a "fix" mode. For example if you have accidentally removed your venv folder, it will fix it.
   
->
+### Launching CTk Theme Builder
+There are a number of options, for launching CTk Theme Builder, and these vary slightly depending on the operating system. One common method for them all is to launch using the *ctk\_theme\_builder* command. The most basic way is to open a CMD/Terminal window and type in a command. 
 
-
-
+For example, if you had installed CTk Theme Builder in a ``/u01/utilities/ctk_theme_builder`folder, then you could launch, using the command:  
   
+Linux/MacOS example:  
 
+  `/u01/utilities/ctk_theme_builder/ctk_theme_builder`
   
-   
+Windows example:  
+
+``   C:\utilities\ctk_theme_builder\ctk_theme_builder`
+
+On Windows, the above should cause the *ctk\_theme\_builder.bat* file, located in the CTk Theme builder application home directory to be executed. 
+
+On Linux and MacOS, the *ctk\_theme\_builder* is a hard link to *ctk\_theme\_builder.sh*. 
+
+The upshot is that you can also invoke a launch of CTk Theme Builder with *ctk\_theme\_builder.bat* or *ctk\_theme\_builder.sh*, depending on your operating system.
+
+If you open the CMD/Terminal window inside the *ctk\_theme\_builder* folder, then instead of typing the full pathname, you could simply type:  
+  
+  `./ctk_theme_builder` (Linux / MacOS)
+	
+OR
+
+``.\ctk_theme_builder` (Windows)
+
+#### Path Variable
+If you don't want to include the pathname to the CTk Theme Builder launch script, you can always change your PATH variable, to include the installation directory.
+
+#### Desktop Launchers
+Most operating systems, with a Graphical User Interface, tend to provide a launcher mechanism, which can be set up on the desktop. 
+
+For example, you can create a desktop shortcut on Windows, in order to launch the *ctk\_theme\_builder* script, described earlier. 
+
+Linux ports tend to have similar facilities. You'll need to Google how to do this for your specific operating system. 
