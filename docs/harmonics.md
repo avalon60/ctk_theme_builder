@@ -25,12 +25,13 @@ The drop-down menu, below the *Keystone Colour* tile, allows you the choice of a
 
 The numbers in parentheses, indicate the number of generated complementary colours, associated with the method chosen.
 
-You can read more about these [here](https://www.oberlo.com/blog/color-combinations-cheat-sheet)
+You can read more about the methods [here](https://www.oberlo.com/blog/color-combinations-cheat-sheet)
 
 ### Copy to Palette
 
 When pressed, the *Copy to Palette* button, causes the *Keystone Colour*, and the generated colours, immediately below it, to be copied to the *Scratch* tiles on the themes Theme Palette display. 
 
 ### Tag Keystone
-The *Tag Keystone* button, causes the Keystone colour and the chosen harmony method to be tagged to your theme. If you subsequently open the *Colour Harmonics* panel, for the same theme, the colours will be restored to the same state, as the point you tagged them.
+The *Tag Keystone* button, causes the Keystone colour and the chosen harmony method to be tagged to your theme. If you subsequently open the *Colour Harmonics* panel, for the same theme, the colours will be restored to the same state, as the point you tagged them.  
+
 [<- Back](user_guide.md)
