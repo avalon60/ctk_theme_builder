@@ -5,7 +5,7 @@
 
  <figure>
   <img src="control-panel2.png" alt="Control Panel" style="width:80%">
-  <figcaption><i>Control Panel display.</i></figcaption>
+  <figcaption><i>Control Panel display.<br><br></i></figcaption>
 </figure> 
 
 Here we see the Control Panel. This is where the real work goes on. 
@@ -55,7 +55,7 @@ In *Categorised* mode, you can also select *All*, or you can select groups of wi
 
  <figure>
   <img src="categorised_view.png" alt="Categorised View" style="width:60%">
-  <figcaption><i>Example of a  "Categorised" view display.</i></figcaption>
+  <figcaption><i>Example of a  "Categorised" view display.<br><br></i></figcaption>
 </figure> 
 
 In the above image, we have the *Categorised* view selected and we are filtering on widgets with buttons.
@@ -94,7 +94,7 @@ The *Widget Geometry* buttons allow you to target a particular widget type, and 
 
  <figure>
   <img src="geometry-dialog.png" alt="Categorised View" style="width:60%">
-  <figcaption><i>Widget Geometry adjustment dialogue.</i></figcaption>
+  <figcaption><i>Widget Geometry adjustment dialogue.<br><br></i></figcaption>
 </figure> 
 
 
@@ -122,7 +122,7 @@ As with the *Theme Palette* tiles, floating menus are available, which allow you
   
  <figure>
   <img src="floating-menu.png" alt="Categorised View" style="width:80%">
-  <figcaption><i>Colour Mappings, floating menu.</i></figcaption>
+  <figcaption><i>Colour Mappings, floating menu.<br><br></i></figcaption>
 </figure> 
   
 The *Lighter Shade/Darker Shade* options, cause incremental adjustments in the shade of the colour, based upon the *Adjust Shade Step*, setting described under user *Preferences*. 

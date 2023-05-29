@@ -6,7 +6,7 @@ The *Preview Panel* is launched as soon as a theme is opened. This panel listens
 
  <figure>
   <img src="preview-panel.png" alt="About" style="width:100%">
-  <figcaption><i>The Preview Panel.</i></figcaption>
+  <figcaption><i>The Preview Panel.</i><br><br></figcaption>
 </figure> 
 
 

@@ -7,7 +7,7 @@ The preferences screen will appear something like this:
 
  <figure>
   <img src="preferences.png" alt="Preferences" style="width:80%">
-  <figcaption><i>The user Preferences dialogue.</i></figcaption>
+  <figcaption><i>The user Preferences dialogue.</i><br><br></figcaption>
 </figure> 
 
 For new installations, the Preferences dialogue should be the first Port of call.
@@ -34,7 +34,7 @@ By default they are enabled, and you should see something similar to what is sho
   
  <figure>
   <img src="palette-labels.png" alt="Palette Labels" style="width:60%">
-  <figcaption><i>The colour Palette region.</i></figcaption>
+  <figcaption><i>The colour Palette region.</i><br><br></figcaption>
 </figure> 
 
 ### Load Last Theme
@@ -53,7 +53,7 @@ This setting allows you to tune the shade step options, which are available when
 
  <figure>
   <img src="shade-steps.png" alt="Shade-steps" style="width:40%">
-  <figcaption><i>Shade step, floating menu options.</i></figcaption>
+  <figcaption><i>Shade step, floating menu options.</i><br><br></figcaption>
 </figure> 
 
 *Shade Steps* influence the behaviour demonstrated in the above image.
@@ -64,7 +64,7 @@ Right clicking a colour tile, on any updatable tile, will cause a floating menu 
 
  <figure>
   <img src="colour-picker.png" alt="Linux Colour Picker" style="width:60%">
-  <figcaption><i>Linux Colour Picker.</i></figcaption>
+  <figcaption><i>Linux Colour Picker.</i><br><br></figcaption>
 </figure> 
 
 
@@ -78,7 +78,7 @@ This setting allows you to tune the behaviour of the colours generated in the Co
 
  <figure>
   <img src="colour-harmonics.png" alt="The Colour Harmonics Dialogue" style="width:80%">
-  <figcaption><i>The Colour Harmonics Dialogue.</i></figcaption>
+  <figcaption><i>The Colour Harmonics Dialogue.</i><br><br></figcaption>
 </figure> 
 
 

@@ -30,7 +30,7 @@ You can only run once instance of CTk Theme Builder at a time. This is because t
 
  <figure>
   <img src="timeout.png" alt="Timeout" style="width:40%">
-  <figcaption><i>Listener timeout error message.</i></figcaption>
+  <figcaption><i>Listener timeout error message.</i><br><br></figcaption>
 </figure> 
 
 [<- Back to Contents](user_guide.md)

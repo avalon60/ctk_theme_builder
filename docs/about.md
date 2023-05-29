@@ -7,7 +7,7 @@
 
  <figure>
   <img src="about.png" alt="About" style="width:60%">
-  <figcaption><i>The ""About" Dialogue.</i></figcaption>
+  <figcaption><i>The ""About" Dialogue.<br><br></i></figcaption>
 </figure> 
 
 This is accessible, via the Tools menu.  

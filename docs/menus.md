@@ -4,7 +4,7 @@ As you have undoubtedly noticed, when you launch CTk Theme Builder, the control 
 
  <figure>
   <img src="main-menus.png" alt="Main Menu" style="width:95%">
-  <figcaption><i>Menu Toolbar.</i></figcaption>
+  <figcaption><i>Menu Toolbar.</i><br><br></figcaption>
 </figure> 
 
 
@@ -17,7 +17,7 @@ The options of the File menu, bear a close correspondence to the buttons display
 
  <figure>
   <img src="file-menu.png" alt="File Menu" style="width:25%">
-  <figcaption><i>File menu options.</i></figcaption>
+  <figcaption><i>File menu options.</i><br><br></figcaption>
 </figure> 
 
 When you first start CTk Theme Builder, if you don't have a theme selected, you will find that most of the *File* menu options are disabled. They only become enabled when you start working on a theme.
@@ -28,7 +28,7 @@ The options on the *File* menu, have corresponding buttons in the left hand regi
 
  <figure>
   <img src="tools-menu.png" alt="Tools Menu" style="width:30%">
-  <figcaption><i>Tools menu options.</i></figcaption>
+  <figcaption><i>Tools menu options.<br><br></i></figcaption>
 </figure> 
 
 The *Tools* menu provides access to:
