@@ -6,7 +6,7 @@ The preferences screen will appear something like this:
 
 
  <figure>
-  <img src="preferences.png" alt="Preferences" style="width:60%">
+  <img src="preferences.png" alt="Preferences" style="width:50%">
   <figcaption><i>The user Preferences dialogue.</i><br><br></figcaption>
 </figure> 
 
@@ -52,7 +52,7 @@ This disabled by default. When enabled, it enabled the single left mouse click t
 This setting allows you to tune the shade step options, which are available when you right click a colour tile. The larger the value chosen, the bigger the colour shade step applied, when the *Lighten Shade/Darken Shade*options are selected.
 
  <figure>
-  <img src="shade-steps.png" alt="Shade-steps" style="width:40%">
+  <img src="shade-steps.png" alt="Shade-steps" style="width:35%">
   <figcaption><i>Shade step, floating menu options.</i><br><br></figcaption>
 </figure> 
 
