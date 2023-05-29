@@ -6,7 +6,7 @@
 
 
  <figure>
-  <img src="about.png" alt="About" style="width:60%">
+  <img src="about.png" alt="About" style="width:40%">
   <figcaption><i>The ""About" Dialogue.<br><br></i></figcaption>
 </figure> 
 
