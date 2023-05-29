@@ -7,7 +7,7 @@ The idea behind it, is that you can generate colours, around which you can base 
 
  <figure>
   <img src="harmonics.png" alt="Colour Harmonics" style="width:60%">
-  <figcaption><i>The Colour Harmonics panel.</i></figcaption>
+  <figcaption><i>The Colour Harmonics panel.<br><br></i></figcaption>
 </figure> 
 
 
