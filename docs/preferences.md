@@ -6,7 +6,7 @@ The preferences screen will appear something like this:
 
 
  <figure>
-  <img src="preferences.png" alt="Preferences" style="width:80%">
+  <img src="preferences.png" alt="Preferences" style="width:60%">
   <figcaption><i>The user Preferences dialogue.</i><br><br></figcaption>
 </figure> 
 
