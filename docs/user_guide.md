@@ -1,7 +1,7 @@
 # CTk Theme Builder User Guide
 
  <figure>
-  <img src="guide.png" alt="About" style="width:100%">
+  <img src="guide.png" alt="About" style="width:80%">
 </figure> 
  
 Welcome to the CTk Theme Builder User Guide. 
