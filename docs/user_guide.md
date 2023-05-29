@@ -1,4 +1,9 @@
-# CTk Theme Builder User Guide 
+# CTk Theme Builder User Guide
+
+ <figure>
+  <img src="guide.png" alt="About" style="width:100%">
+</figure> 
+ 
 Welcome to the CTk Theme Builder User Guide. 
 ## Contents
 1. [Deploying / Updating the App](deployment.md)
