@@ -52,7 +52,7 @@ This disabled by default. When enabled, it enabled the single left mouse click t
 This setting allows you to tune the shade step options, which are available when you right click a colour tile. The larger the value chosen, the bigger the colour shade step applied, when the *Lighten Shade/Darken Shade*options are selected.
 
  <figure>
-  <img src="shade-steps.png" alt="Shade-steps" style="width:30%">
+  <img src="shade-steps.png" alt="Shade-steps" style="width:25%">
   <figcaption><i>Shade step, floating menu options.</i><br><br></figcaption>
 </figure> 
 
@@ -85,5 +85,7 @@ This setting allows you to tune the behaviour of the colours generated in the Co
 
 ### Themes Location
 The default folder for storing your themes, is the ctk\_theme\_builder/user_themes folder. However you can elect to change this by clicking the Themes Folder icon. This will allow you to navigate to, and select an alternative location.
+
+NOTE: If you change the theme location at any time, you will need manually copy / paste your themes from the old location, as required.
 
 [<- Back to Contents](user_guide.md)
