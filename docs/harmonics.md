@@ -1,13 +1,15 @@
-[<- Back](user_guide.md)
+[<- Back to Contents](user_guide.md)
 # Colour Harmonics
 
 The *Colour Harmonics* panel, becomes available when you open a theme.
 
 The idea behind it, is that you can generate colours, around which you can base a new theme.
 
-> ![Colour Harmonics](harmonics.png)
-> 
-> *Colour Harmonics panel.*
+ <figure>
+  <img src="harmonics.png" alt="Colour Harmonics" style="width:60%">
+  <figcaption><i>The Colour Harmonics panel.</i></figcaption>
+</figure> 
+
 
 Amongst other functions, right clicking the *Keystone Colour* tile, presents a *Paste* option, allowing you to seed a hex colour code, which is then used to generate complementary colours. The core generated colours are rendered below the Keystone Colour* on the left. 
 
@@ -36,4 +38,4 @@ When pressed, the *Copy to Palette* button, causes the *Keystone Colour*, and th
 ### Tag Keystone
 The *Tag Keystone* button, causes the Keystone colour and the chosen harmony method to be tagged to your theme. If you subsequently open the *Colour Harmonics* panel, for a given theme, the colours will be restored to the same state, as per when they were tagged.  
 
-[<- Back](user_guide.md)
+[<- Back to Contents](user_guide.md)

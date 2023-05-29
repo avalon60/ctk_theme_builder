@@ -1,8 +1,9 @@
 # CTkThemeBuilder
 Hello and welcome to the CTk Theme Builder repository!
 
-<img src="docs/CTkThemeBuilder-about.png"  width="800" height="400">
-
+ <figure>
+  <img src="docs/CTkThemeBuilder-about.png" alt="About" style="width:100%">
+</figure> 
 
 CTk Theme Builder provides a WYSIWYG interface for creating and maintaining [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) themes.
 

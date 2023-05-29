@@ -1,4 +1,4 @@
-[<- Back](user_guide.md)
+[<- Back to Contents](user_guide.md)
 # Known Issues and Behaviours
 
 ### CustomtKinter
@@ -42,4 +42,4 @@ Depending on your operating system, this means that you will need to use xkill, 
 #### Copy / Paste
 Linux users should be aware that by default the clipboard contents are emptied if the application is closed. However, there are tools, such as *Clipboard Manager*, which can prevent this.
 
-[<- Back](user_guide.md)
+[<- Back to Contents](user_guide.md)

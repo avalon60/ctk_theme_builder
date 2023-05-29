@@ -1,11 +1,13 @@
-[<- Back](user_guide.md)
+[<- Back to Contents](user_guide.md)
 # CTk Theme Builder Overview
 
 ### Primary Windows
 There are two main windows, the *Control Panel* and the *Preview Panel*. There are a sections in the guide, which cover these panels as well as other dialogues.
 
-> <img src="CTkThemeBuilder-about.png"  width="800" height="400">
-*Control Panel* (left) & the *Preview Panel* (right).
+ <figure>
+  <img src="CTkThemeBuilder-about.png" alt="About" style="width:90%">
+  <figcaption><i>Control Panel (left) & the Preview Panel (right).</i></figcaption>
+</figure> 
 
 The job of the *Control Panel* is to present the controls, giving you the means to create and manage the appearance of your theme. 
 
@@ -25,8 +27,10 @@ When working your themes, you work / see, one appearance mode of a theme, at any
 ### Concurrency
 You can only run once instance of CTk Theme Builder at a time. This is because the *Control Panel* communicates via a fixed socket address (port 5051). If you attempt to run two instances of CTk Theme Builder on the same computer, you will see a timeout message:
 
-> ![timeout](timeout.png)
-> 
-> *Listener timeout error message.*
 
-[<- Back](user_guide.md)
+ <figure>
+  <img src="timeout.png" alt="Timeout" style="width:50%">
+  <figcaption><i>Listener timeout error message.</i></figcaption>
+</figure> 
+
+[<- Back to Contents](user_guide.md)

@@ -1,12 +1,14 @@
-[<- Back](user_guide.md)
+[<- Back to Contents](user_guide.md)
 # Preferences
 The Preferences dialogue is accessed via the *Tools->Preferences* menu option.
 The preferences screen will appear something like this:
 
-> ![Preferences](preferences.png)
-> 
-> *The user Preferences dialogue.*
-> 
+
+
+ <figure>
+  <img src="preferences.png" alt="Preferences" style="width:80%">
+  <figcaption><i>The user Preferences dialogue.</i></figcaption>
+</figure> 
 
 For new installations, the Preferences dialogue should be the first Port of call.
 
@@ -30,9 +32,10 @@ By default tooltips are enabled. The application is quite generous with tooltips
 If you wish to save some real-estate, you can disable colour palette labels.
 By default they are enabled, and you should see something similar to what is shown here:  
   
->   ![palette labels](palette-labels.png)
->   
->   *Colour Palette region*.
+ <figure>
+  <img src="palette-labels.png" alt="Palette Labels" style="width:60%">
+  <figcaption><i>The colour Palette region.</i></figcaption>
+</figure> 
 
 ### Load Last Theme
 If enabled, this causes the last theme you were working on to be automatically opened, when you next start CTk Theme Builder.
@@ -48,18 +51,22 @@ This disabled by default. When enabled, it enabled the single left mouse click t
 ### Adjust Shade Step
 This setting allows you to tune the shade step options, which are available when you right click a colour tile. The larger the value chosen, the bigger the colour shade step applied, when the *Lighten Shade/Darken Shade*options are selected.
 
->   ![shade steps](shade-steps.png)
->   
->   *Shade step, floating menu options.*
- 
+ <figure>
+  <img src="shade-steps.png" alt="Shade-steps" style="width:40%">
+  <figcaption><i>Shade step, floating menu options.</i></figcaption>
+</figure> 
 
 *Shade Steps* influence the behaviour demonstrated in the above image.
 
 ### Colour Picker
 Right clicking a colour tile, on any updatable tile, will cause a floating menu to appear. Included on the menu is a *Colour Picker* option. When selected a pop-up will appear, allowing you to choose, or paste a colour.
 
-> ![colorpicker](colour-picker.png)    
-> *Linux Colour Picker*
+
+ <figure>
+  <img src="colour-picker.png" alt="Linux Colour Picker" style="width:60%">
+  <figcaption><i>Linux Colour Picker.</i></figcaption>
+</figure> 
+
 
 When the colour picker appears, the initial colour will automatically reflect the colour of the tile, from which it was invoked.
 
@@ -69,11 +76,14 @@ The appearance of the Colour Picker will vary, depending on your operating syste
 
 This setting allows you to tune the behaviour of the colours generated in the Colour Harmonics dialogue. The larger the selected value, the bigger the difference in consecutive shades generated to the right side of the dialogue.
 
->   ![colour harmonies](colour-harmonics.png)
+ <figure>
+  <img src="colour-harmonics.png" alt="The Colour Harmonics Dialogue" style="width:80%">
+  <figcaption><i>The Colour Harmonics Dialogue.</i></figcaption>
+</figure> 
 
-Colour Harmonics Dialogue
+
 
 ### Themes Location
 The default folder for storing your themes, is the ctk\_theme\_builder/user_themes folder. However you can elect to change this by clicking the Themes Folder icon. This will allow you to navigate to, and select an alternative location.
 
-[<- Back](user_guide.md)
+[<- Back to Contents](user_guide.md)

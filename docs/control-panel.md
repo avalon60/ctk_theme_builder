@@ -1,9 +1,12 @@
-[<- Back](user_guide.md)
+[<- Back to Contents](user_guide.md)
 # Control Panel
 
-> <img src="control-panel2.png"  width="600" height="600">
-> 
-*Control Panel display*.
+
+
+ <figure>
+  <img src="control-panel2.png" alt="Control Panel" style="width:80%">
+  <figcaption><i>Control Panel display.</i></figcaption>
+</figure> 
 
 Here we see the Control Panel. This is where the real work goes on. 
 
@@ -49,8 +52,11 @@ In *Basic* mode, you can select *All*, to render all property widgets, or you ca
 
 In *Categorised* mode, you can also select *All*, or you can select groups of widgets, based on common attribute. For example, all widgets which allow text entry, or which have scrollable components.
 
-> ![categorised](categorised_view.png)
-> *Example "Categorised" view display.*
+
+ <figure>
+  <img src="categorised_view.png" alt="Categorised View" style="width:60%">
+  <figcaption><i>Example of a  "Categorised" view display.</i></figcaption>
+</figure> 
 
 In the above image, we have the *Categorised* view selected and we are filtering on widgets with buttons.
 
@@ -85,10 +91,16 @@ Needless to say, if you have any unsaved changes, you will be prompted with a ch
 ## Widget Geometry
 The *Widget Geometry* buttons allow you to target a particular widget type, and adjust its geometry properties (corner radius, border width etc).
 
-> ![Preferences](geometry-dialog.png)
->  *Widget Geometry adjustment dialogue.*
+
+ <figure>
+  <img src="geometry-dialog.png" alt="Categorised View" style="width:60%">
+  <figcaption><i>Widget Geometry adjustment dialogue.</i></figcaption>
+</figure> 
+
 
 To make adjustments,adjust the sliders and the rendered widget will respond, to provide a mini-preview or the effects of your changes.
+
+Depending on the widget type, different property sliders may appear.
 
 When you *Save* your changes, the preview panel will also update any matching widget types.
 
@@ -108,11 +120,13 @@ Here is where you target and manage individual widget colour properties. This re
 
 As with the *Theme Palette* tiles, floating menus are available, which allow you to perform operations, as we see here:  
   
->   ![Preferences](floating-menu.png)
->   *Colour Mappings, floating menu.*
+ <figure>
+  <img src="floating-menu.png" alt="Categorised View" style="width:80%">
+  <figcaption><i>Colour Mappings, floating menu.</i></figcaption>
+</figure> 
   
 The *Lighter Shade/Darker Shade* options, cause incremental adjustments in the shade of the colour, based upon the *Adjust Shade Step*, setting described under user *Preferences*. 
 
 As you can see there are multiplier options, which allow you to magnify the shade step adjustment.
 
-[<- Back](user_guide.md)
+[<- Back to Contents](user_guide.md)

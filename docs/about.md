@@ -1,4 +1,4 @@
-<a href="javascript:window.history.back();">Back</a>
+[<- Back to Contents](user_guide.md)
 
 # About CTk Theme Builder
 
@@ -16,4 +16,4 @@ Aside from a picture of a cute tekno-colour bear, the About dialogue is useful f
 
 If you are creating an issue on GitHub, you should quote the reported versions on the About dialogue.
 
-<a href="javascript:window.history.back();">Back</a>
+[<- Back to Contents](user_guide.md)

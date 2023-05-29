@@ -1,4 +1,4 @@
-[<- Back](user_guide.md)
+[<- Back to Contents](user_guide.md)
 # CTk Theme Builder Deployment
 
 ## Requirements
@@ -80,4 +80,4 @@ For example, you can create a desktop shortcut on Windows, in order to launch th
 
 You'll need to Google how to set up a shortcut / launcher for your specific operating system. 
 
-[<- Back](user_guide.md)
+[<- Back to Contents](user_guide.md)
