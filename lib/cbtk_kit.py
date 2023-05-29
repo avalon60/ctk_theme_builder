@@ -276,6 +276,7 @@ class CBtkMenu(tk.Menu):
 
     @classmethod
     def update_widgets_mode(cls):
+        """Method to update all menu widgets following an appearance mode change."""
         for widget in CBtkMenu.widget_registry:
             try:
                 widget.update_appearance_mode()
@@ -284,6 +285,7 @@ class CBtkMenu(tk.Menu):
                 pass
 
     def update_appearance_mode(self):
+        """Method called to scan through rendered widgets and update to a new appearance mode setting."""
         mode = ctk.get_appearance_mode()
         if mode == 'Light':
             mode = 0
@@ -298,6 +300,10 @@ class CBtkMenu(tk.Menu):
                        fg=text_color,
                        activebackground=hover_color,
                        activeforeground=text_color)
+
+    def destroy(self) -> None:
+        CBtkMenu.widget_registry.remove(self)
+        self.destroy()
 
 class CBtkMenu2(tk.Menu, CTkAppearanceModeBaseClass):
     def __init__(self):
