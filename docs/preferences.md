@@ -63,7 +63,7 @@ Right clicking a colour tile, on any updatable tile, will cause a floating menu 
 
 
  <figure>
-  <img src="colour-picker.png" alt="Linux Colour Picker" style="width:60%">
+  <img src="colour-picker.png" alt="Linux Colour Picker" style="width:50%">
   <figcaption><i>Linux Colour Picker.</i><br><br></figcaption>
 </figure> 
 
@@ -77,7 +77,7 @@ The appearance of the Colour Picker will vary, depending on your operating syste
 This setting allows you to tune the behaviour of the colours generated in the Colour Harmonics dialogue. The larger the selected value, the bigger the difference in consecutive shades generated to the right side of the dialogue.
 
  <figure>
-  <img src="colour-harmonics.png" alt="The Colour Harmonics Dialogue" style="width:80%">
+  <img src="colour-harmonics.png" alt="The Colour Harmonics Dialogue" style="width:60%">
   <figcaption><i>The Colour Harmonics Dialogue.</i><br><br></figcaption>
 </figure> 
 
