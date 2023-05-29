@@ -6,7 +6,7 @@ There are two main windows, the *Control Panel* and the *Preview Panel*. There a
 
  <figure>
   <img src="CTkThemeBuilder-about.png" alt="About" style="width:90%">
-  <figcaption><i>Control Panel (left) & the Preview Panel (right).</i></figcaption>
+  <figcaption><i>Control Panel (left) & the Preview Panel (right).</i><br><br></figcaption>
 </figure> 
 
 The job of the *Control Panel* is to present the controls, giving you the means to create and manage the appearance of your theme. 
