@@ -132,7 +132,7 @@ Here is where you target and manage individual widget colour properties. This re
 As with the *Theme Palette* tiles, floating menus are available, which allow you to perform operations, as we see here:  
   
  <figure>
-  <img src="floating-menu.png" alt="Categorised View" style="width:80%">
+  <img src="floating-menu.png" alt="Categorised View" style="width:50%">
   <figcaption><i>Colour Mappings, floating menu.<br><br></i></figcaption>
 </figure> 
 
