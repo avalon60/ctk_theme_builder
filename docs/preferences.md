@@ -3,7 +3,10 @@
 The Preferences dialogue is accessed via the *Tools->Preferences* menu option.
 The preferences screen will appear something like this:
 
-![Preferences](preferences.png)
+> ![Preferences](preferences.png)
+> 
+> *The user Preferences dialogue.*
+> 
 
 For new installations, the Preferences dialogue should be the first Port of call.
 
@@ -27,11 +30,17 @@ By default tooltips are enabled. The application is quite generous with tooltips
 If you wish to save some real-estate, you can disable colour palette labels.
 By default they are enabled, and you should see something similar to what is shown here:  
   
-  ![palette labels](palette-labels.png)
+>   ![palette labels](palette-labels.png)
+>   
+>   *Colour Palette region*.
 
 ### Load Last Theme
 If enabled, this causes the last theme you were working on to be automatically opened, when you next start CTk Theme Builder.
 
+### Copy / Paste
+Most colour tiles in the application provide *Copy & Paste* functions (some only provide *Copy*), via a right-click to the tile. This way you can copy a colour from one tile and paste it to another.
+
+Linux users should be aware that by default the clipboard contents are emptied if the application is closed. However, there are tools, such as *Clipboard Manager*, which can prevent this.
 
 ### Single Click Paste
 This disabled by default. When enabled, it enabled the single left mouse click to be used to paste colours into a property colour, or palette tile. Be aware that if you enable this, it's all too easy to get mouse-click happy and perform an unintentional paste. If you want to play it safe, use the right click -> context menu to perform a paste operation.
@@ -39,16 +48,28 @@ This disabled by default. When enabled, it enabled the single left mouse click t
 ### Adjust Shade Step
 This setting allows you to tune the shade step options, which are available when you right click a colour tile. The larger the value chosen, the bigger the colour shade step applied, when the *Lighten Shade/Darken Shade*options are selected.
 
-  ![shade steps](shade-steps.png)
+>   ![shade steps](shade-steps.png)
+>   
+>   *Shade step, floating menu options.*
  
- *Shade Steps* influence the behaviour demonstrated in the above image.
- 
+
+*Shade Steps* influence the behaviour demonstrated in the above image.
+
+### Colour Picker
+Right clicking a colour tile, on any updatable tile, will cause a floating menu to appear. Included on the menu is a *Colour Picker* option. When selected a pop-up will appear, allowing you to choose, or paste a colour.
+
+> ![colorpicker](colour-picker.png)    
+> *Linux Colour Picker*
+
+When the colour picker appears, the initial colour will automatically reflect the colour of the tile, from which it was invoked.
+
+The appearance of the Colour Picker will vary, depending on your operating system. On Linux you will see the Tkinter, built-in colour picker, whereas for example on Windows, you will see a Windows native colour picker. 
  
 ### Harmony Shade Step
 
 This setting allows you to tune the behaviour of the colours generated in the Colour Harmonics dialogue. The larger the selected value, the bigger the difference in consecutive shades generated to the right side of the dialogue.
 
-  ![colour harmonies](colour-harmonics.png)
+>   ![colour harmonies](colour-harmonics.png)
 
 Colour Harmonics Dialogue
 

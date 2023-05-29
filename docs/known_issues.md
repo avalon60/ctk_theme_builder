@@ -39,4 +39,7 @@ When this occurs, the *Control Panel* cannot communicate with the *Preview Panel
 
 Depending on your operating system, this means that you will need to use xkill, Task manager etc,  to kill the panel.
 
+#### Copy / Paste
+Linux users should be aware that by default the clipboard contents are emptied if the application is closed. However, there are tools, such as *Clipboard Manager*, which can prevent this.
+
 [<- Back](user_guide.md)

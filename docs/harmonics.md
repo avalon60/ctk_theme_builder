@@ -5,7 +5,9 @@ The *Colour Harmonics* panel, becomes available when you open a theme.
 
 The idea behind it, is that you can generate colours, around which you can base a new theme.
 
-![Colour Harmonics](harmonics.png)
+> ![Colour Harmonics](harmonics.png)
+> 
+> *Colour Harmonics panel.*
 
 Amongst other functions, right clicking the *Keystone Colour* tile, presents a *Paste* option, allowing you to seed a hex colour code, which is then used to generate complementary colours. The core generated colours are rendered below the Keystone Colour* on the left. 
 
