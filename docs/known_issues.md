@@ -42,4 +42,9 @@ Depending on your operating system, this means that you will need to use xkill, 
 #### Copy / Paste
 Linux users should be aware that by default the clipboard contents are emptied if the application is closed. However, there are tools, such as *Clipboard Manager*, which can prevent this.
 
+#### Floating Menu Colour Adjustments
+By using the right mouse click, you can also Copy / Paste colours between tiles. However for widget properties which have a value set to "transparent", for example CTkLabel > fg_color, this functionality is disabled. In addition the Colour Picker is also disabled.
+
+This will likely be addressed in a future version.
+
 [<- Back to Contents](user_guide.md)

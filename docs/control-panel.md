@@ -25,6 +25,8 @@ We will go into detail, on these various regions, in the subsequent sections.
 #### Select Theme
 This is a drop-down menu which allows you to select a theme, on which to begin work. The list is generated based upon entries in your user theme location (please see the Preferences section).
 
+Note that a "TestCard" theme is automatically included when you install CTk Theme Builder. This intentionally includes some gaudy colours. If you are new to CustomTkinter theme files, you can use this as a scratch theme, to experiment and discover how widget property changes, effect changes in the widget rendering. Be aware that this theme will be overwritten whenever you perform an upgrade to the app.
+
 #### Preview Appearance
 This option allows you to switch the *Preview Panel* (covered in a later section)  between the CustomTkinter *Light* and *Dark* modes. 
 
@@ -79,6 +81,15 @@ If you have been working on another theme, and have unsaved changes, a pop-up di
 
 The Sync Modes button, operates against the **displayed** widget colour properties, which you have currently selected via the *Filter View*, and which are rendered in the *Colour Mappings* region. It's effect is to copy the colour properties to the complementary appearance mode. For example, if you have *Dark Mode* selected, the colour properties will be copied over to the *Light Mode* property counter-parts.
 
+Here we see an example, where we have selected the *Categorised* view and filtered based on widgets with borders:  
+  
+ <figure>
+  <img src="sync-modes.png" alt="Categorised View" style="width:60%">
+  <figcaption><i>Sync properties "Categorised / Borders" view display.<br><br></i></figcaption>
+</figure> 
+  
+We can see from the display, that we are working on the *Dark* appearance mode (Dark Mode button is a lighter colour - enabled). The properties showing are all border properties for various widget types. Using the *Sync Modes* here, would result in the border colours on display, being copied to the *Light* mode properties.
+
 This operation does not include the Theme Palette properties.
 
 #### Sync Palette
@@ -124,9 +135,24 @@ As with the *Theme Palette* tiles, floating menus are available, which allow you
   <img src="floating-menu.png" alt="Categorised View" style="width:80%">
   <figcaption><i>Colour Mappings, floating menu.<br><br></i></figcaption>
 </figure> 
-  
+
+#### Shade Adjustment Operations  
 The *Lighter Shade/Darker Shade* options, cause incremental adjustments in the shade of the colour, based upon the *Adjust Shade Step*, setting described under user *Preferences*. 
 
-As you can see there are multiplier options, which allow you to magnify the shade step adjustment.
+As you can see there are multiplier options, which allow you to magnify the shade step adjustment. 
+
+The *Lighter Shade/Darker Shade* controls maintain the differential between the RGB channels. This means that as soon as one of the channels touches the min or max allowed values (decimal 0, 255), further adjustments have no effect.
+
+ <figure>
+  <img src="colour-differental-bound.png" alt="Categorised View" style="width:40%">
+  <figcaption><i>Example of a Lighter Shade adjustment limit.<br><br></i></figcaption>
+</figure> 
+
+So in the colour example above, we can see that the red channel is maxed out (0xff = 255). This would therefore block any Lighter Shade operations from having any effect. This is done, to prevent the colour from mutating.
+
+#### Copying & Pasting Colours
+
+By using the right mouse click, you can also Copy / Paste colours between tiles. 
+  
 
 [<- Back to Contents](user_guide.md)
