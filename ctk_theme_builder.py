@@ -3308,7 +3308,8 @@ class ControlPanel:
                     confirm = CTkMessagebox(master=self.ctk_control_panel,
                                             title='Please Upgrade CustomTkinter',
                                             message=f'TIMEOUT: Waited too long for preview listener!\n\n'
-                                                    f'Ensure that only one instance of {__title__} is running.',
+                                                    f'Ensure that only one instance of {__title__} is running is '
+                                                    f'running and that no other process is using the port..',
                                             option_1='OK')
                     print('ERROR: Waited too long for listener!')
                     print(f'       Ensure that only one instance of {__title__} is running.')
