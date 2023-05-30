@@ -1,7 +1,4 @@
-[<- Back to Contents](user_guide.md)
-# CTk Theme Builder Deployment
-
-## Requirements
+# Requirements
 
 You must have Python installed. The recommended version of Python is 3.10, although anything above Python 3.8 should suffice. 
 
@@ -24,7 +21,7 @@ To obtain a list of options, run the command:
   
 Note that with some Python installations, you may need to run the above command with *python3*, instead of *python*.
 
-### ZIP Package
+## ZIP Packages
 
 To obtain a ZIP package, look at the available releases of CTk Theme Builder, on the GitHub project page. The installable archives start with "ctk\_theme\_builder-", followed by the version, and ending with .zip. For example: <i>ctk\_theme\_builder-2.0.0.zip`</i>
 
@@ -43,7 +40,7 @@ If one doesn't already exist, this will cause a ctk\_theme\_builder directory to
   
   If the installation is already at the same version as that contained in the ZIP archive, the theme\_builder\_setup.py will run in a "fix" mode. For example if you have accidentally removed your venv folder, it will fix it.
   
-### Launching CTk Theme Builder
+# Launching CTk Theme Builder
 There are a number of options, for launching CTk Theme Builder, and these vary slightly depending on the operating system. One common method for them all is to launch using the *ctk\_theme\_builder* command. The most basic way is to open a CMD/Terminal window and type in a command. 
 
 For example, if you had installed CTk Theme Builder in a ``/u01/utilities/ctk_theme_builder`folder, then you could launch, using the following:-  
@@ -70,14 +67,12 @@ OR
 
 `.\ctk_theme_builder` (Windows)
 
-#### PATH Variable
+## PATH Variable
 If you don't want to include the pathname to the CTk Theme Builder script, you can always change your operating system PATH variable, to include the installation directory.
 
-#### Desktop Launchers
+## Desktop Launchers
 Most operating systems, with a Graphical User Interface, tend to provide a launcher mechanism which can be set up on the desktop. 
 
 For example, you can create a desktop shortcut on Windows, in order to launch the *ctk\_theme\_builder* script, described earlier. Linux ports tend to have similar facilities. 
 
 You'll need to Google how to set up a shortcut / launcher for your specific operating system. 
-
-[<- Back to Contents](user_guide.md)
