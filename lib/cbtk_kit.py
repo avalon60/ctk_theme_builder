@@ -301,9 +301,6 @@ class CBtkMenu(tk.Menu):
                        activebackground=hover_color,
                        activeforeground=text_color)
 
-    def destroy(self) -> None:
-        CBtkMenu.widget_registry.remove(self)
-        self.destroy()
 
 class CBtkMenu2(tk.Menu, CTkAppearanceModeBaseClass):
     def __init__(self):
