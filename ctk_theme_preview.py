@@ -1,4 +1,4 @@
-'''A hat tip and thankyou, to Tom Schimansky for is excellent CustomTkinter.'''
+__title__ = 'CTk Theme Builder'
 
 import copy
 import time
@@ -15,6 +15,7 @@ from datetime import datetime
 import lib.cbtk_kit as cbtk
 import lib.ctk_theme_builder_m as mod
 from lib.ctk_tooltip.ctk_tooltip import CTkToolTip
+from CTkMessagebox import CTkMessagebox
 
 PROG = os.path.basename(__file__)
 APP_HOME = Path(os.path.dirname(os.path.realpath(__file__)))
@@ -47,6 +48,8 @@ REGULAR_TEXT = cbtk.REGULAR_TEXT
 SMALL_TEXT = cbtk.SMALL_TEXT
 
 DEFAULT_VIEW = mod.DEFAULT_VIEW
+
+listener_status = 0
 
 
 def update_widget_geometry(widget, widget_property, property_value):
@@ -568,7 +571,7 @@ class PreviewPanel:
             self._save_preview_geometry()
             print('Preview panel quitting...')
             if LISTENER_FILE.exists():
-                os.remove(self._ETC_DIR / 'listener.started')
+                os.remove(LISTENER_FILE)
             exit(0)
         if command == 'refresh':
             ctk.set_default_color_theme(self._theme_file)
@@ -685,10 +688,17 @@ class PreviewPanel:
         sessions (there should normally be only one). Each incoming request, is handed off to the
         handle_client function.
         """
+        global listener_status
         self._client_handlers = {}
         print("Method listener starting...")
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.bind(METHOD_LISTENER_ADDRESS)
+        try:
+            server.bind(METHOD_LISTENER_ADDRESS)
+        except OSError:
+            print(f'Preview Panel, socket bind error. ensure that no other instances of CTk Theme Builder are running '
+                  f'and that port 5051 is free.')
+            listener_status = -1
+            raise
         server.listen()
         # current dateTime
         now = datetime.now()
@@ -725,6 +735,18 @@ class PreviewPanel:
     def start_method_listener(self):
         listener_thread = threading.Thread(target=self._method_listener, daemon=True)
         listener_thread.start()
+        # Give the listener time to attempt to attach to the socket,
+        # and report if it has a problem.
+        time.sleep(0.1)
+        if listener_status == -1:
+            confirm = CTkMessagebox(
+                                    title='Socket Error',
+                                    message=f'The listener failed to bind to port {METHOD_LISTENER_PORT}\n\n'
+                                            f'Ensure that only one instance of {__title__} is running and that no '
+                                            f'other process is using the port.',
+                                    option_1='OK')
+            if confirm.get() == 'OK':
+                exit(1)
 
     def _update_widget_colour(self, widget_type, widget_property, widget_colour):
         print(f'_update_widget_colour: widget_type: {widget_type}; widget_property: {widget_property}')
