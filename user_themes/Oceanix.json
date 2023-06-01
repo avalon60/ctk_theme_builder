@@ -13,10 +13,10 @@
   },
   "CTkFrame": {
     "corner_radius": 6,
-    "border_width": 1,
+    "border_width": 0,
     "fg_color": [
       "#51667e",
-      "#0e283c"
+      "#213844"
     ],
     "top_fg_color": [
       "#455a72",
@@ -359,9 +359,9 @@
   "provenance": {
     "theme author": "Clive Bostock",
     "date created": "Mar 27 2023 18:16:02",
-    "last modified by": "Clive Bostock",
+    "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "May 23 2023 08:14:05",
+    "last modified": "May 30 2023 21:30:58",
     "keystone colour": "#1f3d4c",
     "harmony method": "Split-complementary",
     "harmony differential": 10,
