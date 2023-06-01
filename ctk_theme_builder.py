@@ -183,6 +183,7 @@ class ControlPanel:
     def __init__(self):
         # Grab the JSON for one of the JSON files released with the
         # installed instance of CustomTkinter
+        self._theme_json_data = {}
         green_theme_file = CTK_THEMES / 'green.json'
         with open(green_theme_file) as json_file:
             self._reference_theme_json = json.load(json_file)
@@ -614,6 +615,8 @@ class ControlPanel:
         self.file_menu.add_separator()
         self.file_menu.add_command(label='Delete', command=self._delete_theme)
         self.file_menu.add_separator()
+        self.file_menu.add_command(label='Provenance', command=self._launch_provenance_dialog)
+        self.file_menu.add_separator()
         self.file_menu.add_command(label='Quit', command=self._close_panels)
 
         # Now add a Tools sub-menu option
@@ -891,6 +894,109 @@ class ControlPanel:
         btn_save = ctk.CTkButton(master=frm_buttons, text='Save', command=self._save_preferences)
         btn_save.grid(row=0, column=1, padx=(150, 15), pady=5)
         self._top_prefs.grab_set()
+
+    def _launch_provenance_dialog(self):
+        self._top_prov = ctk.CTkToplevel(self.ctk_control_panel)
+        self._top_prov.title('Theme Provenance')
+        self._top_prov.geometry('580x470')
+        # Make sure we pop up in front of Control Panel
+        self._top_prov.transient(self.ctk_control_panel)
+        self._top_prov.rowconfigure(1, weight=1)
+
+        frm_header = ctk.CTkFrame(master=self._top_prov)
+        frm_header.grid(column=0, row=0, padx=5, pady=5, sticky='nsew')
+
+        frm_widgets = ctk.CTkFrame(master=self._top_prov)
+        frm_widgets.grid(column=0, row=1, padx=5, pady=5, sticky='nsew')
+
+        frm_buttons = ctk.CTkFrame(master=self._top_prov)
+        frm_buttons.grid(column=0, row=2, padx=5, pady=5, sticky='ew')
+
+        theme_name = self._theme_json_data["provenance"]["theme name"]
+        created_with = self._theme_json_data["provenance"]["created with"]
+        created_label = self._theme_json_data["provenance"]["date created"]
+        authors_name = self._theme_json_data["provenance"]["theme author"]
+        last_modified_by = self._theme_json_data["provenance"]["last modified by"]
+        last_modified = self._theme_json_data["provenance"]["last modified"]
+        harmony_method = self._theme_json_data["provenance"]["harmony method"]
+        keystone_colour = self._theme_json_data["provenance"]["keystone colour"]
+
+
+        widget_row = 0
+        # Header -  Theme Name (frm_header)
+        lbl_theme_label = ctk.CTkLabel(master=frm_header, text='Theme:', width=280, anchor="e", font=HEADING4)
+        lbl_theme_label.grid(row=widget_row, column=0, padx=5, pady=10, sticky='e', columnspan=2)
+
+        lbl_theme_name = ctk.CTkLabel(master=frm_header, text=f'{theme_name}', justify="left", font=HEADING4)
+        lbl_theme_name.grid(row=widget_row, column=2, padx=5, pady=10, sticky='w', columnspan=2)
+
+        # Start the main body of the dialog (frm_widgets)
+        # Creation Details
+        widget_row += 1
+        lbl_author_label = ctk.CTkLabel(master=frm_widgets, text='Author:', anchor="e", width=75)
+        lbl_author_label.grid(row=widget_row, column=0, padx=20, pady=10, sticky='e')
+
+        lbl_author_name = ctk.CTkLabel(master=frm_widgets, text=f'{authors_name}', anchor="w")
+        lbl_author_name.grid(row=widget_row, column=1, padx=5, pady=10, sticky='w')
+
+        lbl_created_label = ctk.CTkLabel(master=frm_widgets, text='Created:', width=100, anchor="e")
+        lbl_created_label.grid(row=widget_row, column=2, padx=5, pady=10, sticky='e')
+
+        lbl_created_date = ctk.CTkLabel(master=frm_widgets, text=f'{created_label}',  anchor="w", width=75)
+        lbl_created_date.grid(row=widget_row, column=3, padx=(20, 30), pady=10, sticky='w')
+
+        # Modification Details
+        widget_row += 1
+        lbl_modified_by_label = ctk.CTkLabel(master=frm_widgets, text='Last modified:', anchor="e")
+        lbl_modified_by_label.grid(row=widget_row, column=0, padx=20, pady=10, sticky='e')
+
+        lbl_modified_by_name = ctk.CTkLabel(master=frm_widgets, text=f'{last_modified_by}', anchor="w")
+        lbl_modified_by_name.grid(row=widget_row, column=1, padx=5, pady=10, sticky='w')
+
+        lbl_last_modified_label = ctk.CTkLabel(master=frm_widgets, text='Date:', width=75, anchor="e")
+        lbl_last_modified_label.grid(row=widget_row, column=2, padx=5, pady=10, sticky='e')
+
+        lbl_last_modified_date = ctk.CTkLabel(master=frm_widgets, text=f'{last_modified}',  anchor="w")
+        lbl_last_modified_date.grid(row=widget_row, column=3, padx=20, pady=10, sticky='w')
+
+        # Keystone Details
+        widget_row += 1
+        lbl_keystone_method_label = ctk.CTkLabel(master=frm_widgets, text='Harmony method:', width=75, anchor="e")
+        lbl_keystone_method_label.grid(row=widget_row, column=0, padx=20, pady=10, sticky='e')
+
+        lbl_keystone_method = ctk.CTkLabel(master=frm_widgets, text=f'{harmony_method}', anchor="w")
+        lbl_keystone_method.grid(row=widget_row, column=1, padx=5, pady=10, sticky='w')
+
+        widget_row += 1
+        lbl_keystone_colour_label =  ctk.CTkLabel(master=frm_widgets, text='Keystone colour:', width=75, anchor="e")
+        lbl_keystone_colour_label.grid(row=widget_row, column=0, padx=20, pady=10, sticky='e')
+
+        lbl_keystone_colour = ctk.CTkLabel(master=frm_widgets, text=f'{keystone_colour}',  anchor="w")
+        lbl_keystone_colour.grid(row=widget_row, column=1, padx=5, pady=(10, 5), sticky='w')
+
+        widget_row += 1
+        btn_keystone_colour = ctk.CTkButton(master=frm_widgets,
+                                            fg_color=keystone_colour,
+                                            hover_color=keystone_colour,
+                                            height=70,
+                                            width=50,
+                                            text=keystone_colour)
+        btn_keystone_colour.grid(row=widget_row, column=1, padx=5, pady=(0, 5), sticky='w')
+
+        # Created with...
+        regular_italic = ctk.CTkFont(family="Roboto", size=13, slant="italic")
+        widget_row += 1
+        lbl_created_with_label = ctk.CTkLabel(master=frm_widgets, font=regular_italic,
+                                              text='Built with:', width=75, anchor="e")
+        lbl_created_with_label.grid(row=widget_row, column=2, padx=20, pady=(50, 10), sticky='e')
+
+        lbl_created_with = ctk.CTkLabel(master=frm_widgets, font=regular_italic, text=f'{created_with}', anchor="w")
+        lbl_created_with.grid(row=widget_row, column=3, padx=5, pady=(50, 10), sticky='w')
+
+
+        # Add the close button into the bottom frame (frm_buttons).
+        btn_close = ctk.CTkButton(master=frm_buttons, text='Close', command=self._top_prov.destroy, width=550)
+        btn_close.grid(row=0, column=0, padx=10, pady=(5, 5), sticky='we')
 
     def _save_theme_palette(self, theme_name=None):
         """Save the colour palette colours back to disk."""
@@ -1680,6 +1786,12 @@ class ControlPanel:
         self.file_menu.entryconfig('Sync Modes', state=tk_state)
         self.file_menu.entryconfig('Sync Palette', state=tk_state)
 
+        if 'provenance' in self._theme_json_data:
+            self.file_menu.entryconfig('Provenance', state=tk.NORMAL)
+        else:
+            self.file_menu.entryconfig('Provenance', state=tk.DISABLED)
+
+
         # Non-menu widgets
         self._btn_delete.configure(state=tk_state)
         self._btn_save_as.configure(state=tk_state)
@@ -2074,14 +2186,14 @@ class ControlPanel:
             if reload_preview:
                 self._reload_preview()
 
+            # Here we load in the standard CustomTkinter green.json theme. We use this as a reference theme
+            # file. This is a belt n' braces approach to ensuring that we aren't missing any widget properties,
+            # which may have been introduced, in the event that someone has upgraded to a later version of
+            # CustomTkinter to a version that the app has not been updated to deal with. We can't maintain
+            # the properties but at least we can update the opened theme, to make the JSON is complete.
             for widget, widget_property in self._reference_theme_json.items():
                 if widget not in self._theme_json_data:
                     self._theme_json_data[widget] = widget_property
-
-            if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='auto_save',
-                                               preference_name='selected_theme',
-                                               preference_value=selected_theme):
-                print(f'Row miss: on update of auto save of selected theme.')
 
             self._status_bar.set_status_text(status_text_life=30,
                                              status_text=f'Theme file, {self._theme_file}, loaded. ')
@@ -2782,6 +2894,7 @@ class ControlPanel:
             self.opm_theme.set(new_theme_basename)
             self._load_theme(reload_preview=False)
             self._theme_json_data['provenance']['theme name'] = new_theme_basename
+            self._theme_json_data['provenance']['created with'] = f"CTk Theme Builder v{__version__}"
             # current dateTime
             now = datetime.now()
             # convert to string
@@ -2859,13 +2972,14 @@ class ControlPanel:
                 self._theme_json_data['provenance']['last modified'] = date_saved_as
                 self._theme_json_data['provenance']['theme author'] = theme_author
                 self._theme_json_data['provenance']['last modified by'] = theme_author
+                self._theme_json_data['provenance']['created with'] = f"CTk Theme Builder v{__version__}"
             else:
                 provenance = {"theme name": new_theme,
                               "theme author": theme_author,
                               "date created": date_saved_as,
                               "last modified by": theme_author,
                               "last modified": "Apr 26 2023 14:40:22",
-                              "created with": "CTk Theme Builder",
+                              "created with": f"CTk Theme Builder v{__version__}",
                               "keystone colour": None,
                               "harmony method": None,
                               "harmony differential": None}
