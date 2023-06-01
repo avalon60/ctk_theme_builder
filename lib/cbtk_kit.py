@@ -3,7 +3,6 @@ __author__ = 'Clive Bostock'
 __version__ = "1.0.0"
 __license__ = 'MIT - see LICENSE.md'
 
-import tkinter
 import tkinter as tk
 import customtkinter as ctk
 from customtkinter import ThemeManager
@@ -23,8 +22,9 @@ HEADING3 = ('Roboto', 20)
 HEADING4 = ('Roboto', 18)
 HEADING5 = ('Roboto', 16)
 # HEADING_UL = 'Roboto 11 underline'
-REGULAR_TEXT = ('Roboto', 10)
-SMALL_TEXT = ('Roboto', 7)
+REGULAR_TEXT = ('Roboto', 13)
+
+SMALL_TEXT = ('Roboto', 8)
 TOOLTIP_DELAY = 1
 
 
@@ -617,7 +617,7 @@ class CBtkMessageBox(object):
                 pass
 
 
-def raise_tk_window(window_widget: tkinter.Toplevel):
+def raise_tk_window(window_widget: tk.Toplevel):
     """Brings a window widget to the front (above other windows), but does not lock it there."""
 
     try:
