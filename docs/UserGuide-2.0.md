@@ -4,8 +4,10 @@
 *A thank-you to my ever patient, ever loving, beautiful wife, who has let me hide in my office and beaver away at this project, for many an hour.*
 
 ### A Bit of History
-In case you are wondering, "so where is CTk Theme Builder version 1.0?", well it was never made public. CTk Theme Builder, started with very humble beginnings. In fact it started with a crude CustomTkinter program which was used to display the results of theme file modifications, performed using a Vim editor (yes I use Vim - sue me ;o). Features were added and added, and well, the project grew legs and became a bit of an obsession. Version 1.0 was based on CustomTkinter 4, which had a radically different JSON format for the theme files. So when Tom decided to release v5 with a drastically different format, I decided to take a break and let things with the new version, bed in. Anyway, although the initial CTk Theme Builder was functional, it was never as polished as I would have liked.  The v5 format was actually a game changer - much improved and more object oriented, although it did present some non-trivial re-engineering, but finally, here we are.
+In case you are wondering, "so where is CTk Theme Builder version 1.0?", well it was never made public. CTk Theme Builder, started with very humble beginnings. In fact it started with a crude CustomTkinter program which was used to display the results of theme file modifications, performed using a Vim editor (yes I use Vim - sue me ;o). Features were added and added, and well, the project grew legs and became a bit of an obsession. Version 1.0 was based on CustomTkinter 4, which had a radically different JSON format for the theme files. So when Tom decided to release v5 with a drastically different format, I decided to take a break and let things with the new version, bed in. Anyway, although the initial CTk Theme Builder was functional, it was never as polished as I would have liked.  The v5 format was actually a game changer - much improved and more object oriented, although it did present some non-trivial re-engineering challenges, but finally, here we are.
 
+### CustomTkinter Version
+Version 2.0 of CTk Theme Builder was designed around CustomeTkinter 5.1.3. Any behaviours / features described herein, are based upon this version. When you install CTk Theme Builder, it will install library modules into a virtual environment. Included in this will be CustomTkinter 5.1.3. If you upgrade the installed CustomTkinter version, this may have unpredictable results.
 
 ### Primary Windows
 There are two main windows, the *Control Panel* and the *Preview Panel*. There are a sections in the guide, which cover these panels as well as other dialogues.
@@ -20,8 +22,10 @@ The *Preview Panel* appears when a theme has been opened and then remains when f
 ### Window Positions
 Whenever you drag and release a window into a new location of your display, CTk Theme Builder keeps track of where you place it. So for example you may choose to have the *Preview Panel* on the left and the *Control Panel* to the right of it. When you quit the application, it saves the settings, and will subsequently restore the window positions when CTk Theme Builder next starts up.
 
-### Copy / Paste
+### Copy / Paste Operations
 There are various sets of colour tiles, presented by the application. These appear in the control panel as well as the Colour Harmonics Panel (you will learn about this one later). In most cases, you can copy and paste hex colour codes (#rrggbb), between these. You can even copy hex colour codes based on searches on the Web, and / or by using colour samplers. As long as you have a valid hex colour code in your clipboard, you can paste it onto a colour tile.
+
+Copy and Paste functions are accessible via a floating menu, which activates when you position your mouse pointer over a tile, and right-click.
 
 ### Appearance Modes
 If you are sufficiently acquainted with CustomTkinter, you will be aware that the themes designed for CustomTkinter allow you to switch between a Dark Mode and a Light Mode.
@@ -206,7 +210,7 @@ This allows you to roll back any changes to your last *Save*. When this is done,
 We all make mistakes ;o)
 
 #### New Theme
-As this suggests, this allows you to create a brand new theme. When pressed a pop-up dialogue will be displayed, where you can enter the new theme name.
+As this suggests, this allows you to create a brand new theme. When pressed a pop-up dialogue will be displayed, where you can enter the new theme name. When you click *OK* on the New Theme pop-up dialog, the theme is created and automatically saved. 
 
 If you have been working on another theme, and have unsaved changes, a pop-up dialogue will appear, asking you if you wish to discard your changes.
 
@@ -339,6 +343,17 @@ Aside from a picture of a cute tekno-colour bear, the About dialogue is useful f
 
 If you are creating an issue on GitHub, you should quote the reported versions on the About dialogue.
 
+# Composite Widgets
+This section covers widgets which are composites of other widgets. These are worth mentioning to avoid any confusion.
+
+### CTkScrollableFrame
+
+As you can guess by the name, this is an extension of the CTkFrame widget. With the exception of its label_fg_color property, its other property defaults are taken from CTkFrame and CTkScrollbar. Changing the properties of these widgets, will result in changes to the CTkScrollableFrame widget.
+
+### CTkTabview
+
+The CTkTabview widget is a composite of CTkFrame and CTkSegmentedButton. It has no properties of its own in a theme file and so inherits its defaults from these two widget types.
+
 
 # Known Issues and Behaviours
 
@@ -359,9 +374,7 @@ In respect of number 5, the *Preview Panel* is unable to compensate, as it has n
 
 #### DropdownMenu
 
-In addition, there is the *DropdownMenu* theme property to consider. You can perhaps think of this as a sub-component, used by *CTkComboBox* and *CTkOptionMenu*. The bottom line is that it is not a widget in its own right. This means that to effect any changes made to it in the *Control Panel*, we currently perform a similar action, to that described above - tearing down and rebuilding the widgets in the *Preview Panel*.
-
-This is possibly something that can be improved in a future version of CTk Theme Builder.
+In addition, there is the *DropdownMenu* theme property to consider. You can perhaps think of this as a sub-component, used by *CTkComboBox* and *CTkOptionMenu*. The bottom line is that it is not a widget in its own right. This means that to effect any changes made to it in the *Control Panel*, we currently perform a similar action, to that described above - tearing down and rebuilding the widgets in the *Preview Panel*. Unfortunately these widget types don't currently have configurable properties, allowing the drop-down properties to be changed on the fly.
 
 #### Geometry Updates
 
