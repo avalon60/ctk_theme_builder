@@ -95,7 +95,7 @@ def shade_up(color: str, differential: int = 20, multiplier: int = 1):
         rgb_1 = color_rgb[1]
         rgb_2 = color_rgb[2]
 
-    if color_rgb[0] + compound_differential > 255 or color_rgb[1] + compound_differential > 255 or color_rgb[1] + compound_differential > 255:
+    if color_rgb[0] + compound_differential > 255 or color_rgb[1] + compound_differential > 255 or color_rgb[2] + compound_differential > 255:
         # Don't perturb the colour balance
         return color
 
@@ -127,7 +127,7 @@ def shade_down(color: str, differential: int = 20, multiplier: int = 1):
         rgb_1 = color_rgb[1]
         rgb_2 = color_rgb[2]
 
-    if color_rgb[0] - compound_differential < 0 or color_rgb[1] - compound_differential < 0 or color_rgb[1] - compound_differential < 0:
+    if color_rgb[0] - compound_differential < 0 or color_rgb[1] - compound_differential < 0 or color_rgb[2] - compound_differential < 0:
         # Don't perturb the colour balance
         return color
 
