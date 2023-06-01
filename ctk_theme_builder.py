@@ -1,6 +1,6 @@
 __title__ = 'CTk Theme Builder'
 __author__ = 'Clive Bostock'
-__version__ = "2.0.0"
+__version__ = "2.1.0"
 __license__ = 'MIT - see LICENSE.md'
 
 import configparser
@@ -2941,6 +2941,7 @@ class ControlPanel:
         self._btn_save.configure(state=tk.DISABLED)
         self._status_bar.set_status_text(status_text_life=30,
                                          status_text=f'Theme, "{self._theme}", has been deleted. ')
+        self._json_state = 'clean'
 
     def _save_theme_as(self):
         """Save's the currently selected theme to a new theme. If the current theme has been modified, the modified
