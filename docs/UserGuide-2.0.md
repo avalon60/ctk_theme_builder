@@ -391,7 +391,10 @@ As soon as I spot the workflow which causes this I will fix it (it's a difficult
 #### Listener Timeout
 When this occurs, the *Control Panel* cannot communicate with the *Preview Panel*, leaving it in a "zombie" state. This should be rare, unless you keep attempting to launch the application whilst another instance of it is already running.
 
-Depending on your operating system, this means that you will need to use xkill, Task manager etc,  to kill the panel.
+Depending on your operating system, this means that you will need to use xkill, Task manager etc,  to kill the panel. This is fixed in the next release.
+
+#### CTkScrollableFrame & CTkTabview Preview Updates 
+There is a bug wherein changes to CTkFrame border_color or fg_color properties, is not cascaded to either CTkScrollableFrame or CTkTabview widgets in the _Preview Panel_. This is fixed in the next release. In the meantime, as a workaround, you can use the _Refresh_ button to force an update to these widgets.
 
 #### Copy / Paste
 Linux users should be aware that by default the clipboard contents are emptied if the application is closed. However, there are tools, such as *Clipboard Manager*, which can prevent this.
