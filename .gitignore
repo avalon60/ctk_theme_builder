@@ -10,3 +10,5 @@ tmp/
 *.backup
 
 assets/etc/listener.started
+
+assets/palettes/Wibble.json
