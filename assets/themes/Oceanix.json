@@ -16,7 +16,7 @@
     "border_width": 0,
     "fg_color": [
       "#51667e",
-      "#0e283c"
+      "#213844"
     ],
     "top_fg_color": [
       "#455a72",
@@ -24,7 +24,7 @@
     ],
     "border_color": [
       "#5c7998",
-      "#22333F"
+      "#456582"
     ]
   },
   "CTkButton": {
@@ -39,7 +39,7 @@
       "#0e283c"
     ],
     "border_color": [
-      "#080e18",
+      "#284655",
       "#577584"
     ],
     "text_color": [
@@ -63,7 +63,7 @@
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#78899e",
+      "#7889b3",
       "#112b3f"
     ],
     "border_color": [
@@ -112,8 +112,8 @@
     "border_width": 3,
     "button_length": 0,
     "fg_color": [
-      "#aebdcb",
-      "#3b6260"
+      "#435e74",
+      "#222222"
     ],
     "progress_color": [
       "#248e66",
@@ -121,7 +121,7 @@
     ],
     "button_color": [
       "#173145",
-      "#456582"
+      "#0f293d"
     ],
     "button_hover_color": [
       "#2e4c68",
@@ -134,10 +134,6 @@
     "text_color_disabled": [
       "#aebdcb",
       "#8396a6"
-    ],
-    "fg_color": [
-      "#435e74",
-      "#222222"
     ]
   },
   "CTkRadiobutton": {
@@ -169,7 +165,7 @@
     "corner_radius": 1000,
     "border_width": 0,
     "fg_color": [
-      "#3c5064",
+      "#21375a",
       "#222222"
     ],
     "progress_color": [
@@ -187,7 +183,7 @@
     "border_width": 6,
     "button_length": 0,
     "fg_color": [
-      "#3c5064",
+      "#21375a",
       "#222222"
     ],
     "progress_color": [
@@ -210,7 +206,7 @@
       "#0b2539"
     ],
     "button_color": [
-      "#314c62",
+      "#2d4b5a",
       "#173145"
     ],
     "button_hover_color": [
@@ -230,27 +226,27 @@
     "corner_radius": 6,
     "border_width": 3,
     "fg_color": [
-      "#112b3f",
+      "#0e283c",
       "#0e283c"
     ],
     "border_color": [
-      "#2c4661",
-      "#42627f"
+      "#2b4164",
+      "#3f5d6c"
     ],
     "button_color": [
-      "#233d58",
-      "#456582"
+      "#263c5f",
+      "#42606f"
     ],
     "button_hover_color": [
-      "#12324f",
-      "#1E3F57"
+      "#172d50",
+      "#395766"
     ],
     "text_color": [
-      "white",
+      "#ffffff",
       "#ffffff"
     ],
     "text_color_disabled": [
-      "#aebdcb",
+      "#8396a6",
       "#8396a6"
     ]
   },
@@ -272,7 +268,7 @@
     "border_width": 2,
     "fg_color": [
       "#456582",
-      "#456582"
+      "#547281"
     ],
     "selected_color": [
       "#2d4d6a",
@@ -301,14 +297,14 @@
   },
   "CTkTextbox": {
     "corner_radius": 6,
-    "border_width": 0,
+    "border_width": 1,
     "fg_color": [
-      "#4e637b",
+      "#6e7fa9",
       "#0e283c"
     ],
     "border_color": [
-      "#22333F",
-      "#5fa1cc"
+      "#5c7998",
+      "#456582"
     ],
     "text_color": [
       "white",
@@ -363,10 +359,12 @@
   "provenance": {
     "theme author": "Clive Bostock",
     "date created": "Mar 27 2023 18:16:02",
-    "last modified by": "Clive Bostock",
+    "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "May 05 2023 19:03:33",
-    "keystone colour": "#ac0000",
-    "harmony method": "Split-complementary"
+    "last modified": "May 30 2023 21:30:58",
+    "keystone colour": "#1f3d4c",
+    "harmony method": "Split-complementary",
+    "harmony differential": 10,
+    "theme name": "Oceanix"
   }
 }
