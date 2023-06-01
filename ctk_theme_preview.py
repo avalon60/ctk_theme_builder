@@ -40,13 +40,6 @@ ENCODING_FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 DISCONNECT_JSON = '{"command_type": "program", "command": "' + DISCONNECT_MESSAGE + '", "parameters": [""]}'
 
-HEADING1 = cbtk.HEADING1
-HEADING2 = cbtk.HEADING2
-HEADING3 = cbtk.HEADING3
-HEADING4 = cbtk.HEADING4
-REGULAR_TEXT = cbtk.REGULAR_TEXT
-SMALL_TEXT = cbtk.SMALL_TEXT
-
 DEFAULT_VIEW = mod.DEFAULT_VIEW
 
 listener_status = 0
@@ -488,7 +481,6 @@ class PreviewPanel:
         border_width = cbtk.theme_property(theme_file_path=self._theme_file,
                                            widget_type='CTkFrame',
                                            widget_property='border_width')
-        print(f'DEBUG: render_top_frame; self._ctl_frame_top_fg_color = {self._ctl_frame_top_fg_color}')
         self._frm_preview_top.configure(fg_color=self._ctl_frame_top_fg_color, border_width=border_width)
 
     def _toggle_preview_disabled(self, render_state):
@@ -750,6 +742,8 @@ class PreviewPanel:
 
     def _update_widget_colour(self, widget_type, widget_property, widget_colour):
         print(f'_update_widget_colour: widget_type: {widget_type}; widget_property: {widget_property}')
+        # We lowercase the widget property, due to an issue in CustomTkinter 5.1.2, where there was an fg_Color
+        # property against CTkSwitch. This was fixed to fg_color in 5.1.3.
         widget_property_lower = widget_property.lower()
 
         if widget_type == 'CTkFrame' and widget_property_lower == 'top_fg_color':
@@ -798,12 +792,19 @@ class PreviewPanel:
                 print(f'WARNING: Unrecognised widget property: {widget_property_lower}')
         # Now deal with composite widgets, which share properties with other widget types.
         # Scrollable Frames
-        if widget_type == 'CTkFrame':
+        if widget_type == 'frame_base':
+            print(self._rendered_widgets)
             for widget in self._rendered_widgets['CTkScrollableFrame']:
                 if widget_property_lower == 'fg_color':
                     widget.configure(fg_color=widget_colour)
                 elif widget_property_lower == 'border_color':
                     widget.configure(border_color=widget_colour)
+            for widget in self._rendered_widgets['CTkTabview']:
+                if widget_property_lower == 'fg_color':
+                    widget.configure(fg_color=widget_colour)
+                elif widget_property_lower == 'border_color':
+                    widget.configure(border_color=widget_colour)
+
         elif widget_type == 'CTkScrollbar' and widget_property_lower in ('fg_color', 'button_color',
                                                                          'button_hover_color'):
             for widget in self._rendered_widgets['CTkScrollableFrame']:
