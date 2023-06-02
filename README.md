@@ -1,4 +1,4 @@
-# CTkThemeBuilder
+# CTk Theme Builder
 Hello and welcome to the CTk Theme Builder repository!
 
  <figure>
