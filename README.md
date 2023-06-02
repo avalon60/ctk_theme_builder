@@ -5,7 +5,7 @@ Hello and welcome to the CTk Theme Builder repository!
   <img src="docs/CTkThemeBuilder-about.png" alt="About" style="width:100%">
 </figure> 
 
-CTk Theme Builder provides a WYSIWYG interface for creating and maintaining [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) themes. If you want to build your own CustomKinter themes, CustomTkinter is the way to go, providing an interface which lets you instantly see the effect of widget property settings as they are made.
+CTk Theme Builder provides a WYSIWYG interface for creating and maintaining [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) themes. If you want to build your own CustomTkinter themes, CustomTkinter is the way to go, providing an interface which lets you instantly see the effect of widget property settings as they are made.
 
 Jump straight to the deployment instructions by going [here](https://github.com/avalon60/ctk_theme_builder/wiki/Installing---Upgrading-CTk-Theme-Builder).
 
