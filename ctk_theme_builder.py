@@ -251,7 +251,6 @@ class ControlPanel:
         self._theme_json_dir = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                       preference_name='theme_json_dir')
 
-        print(f'JSON theme dir: {self._theme_json_dir}; Type {type(self._theme_json_dir)}')
         self._last_theme_on_start = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                            preference_name='last_theme_on_start')
 
