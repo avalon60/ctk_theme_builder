@@ -7,6 +7,7 @@ import copy
 import time
 import tkinter as tk
 import customtkinter as ctk
+from customtkinter import ThemeManager
 import json
 import socket
 import os
@@ -312,22 +313,31 @@ class PreviewPanel:
         self._rendered_widgets['CTkComboBox'].append(self.combobox_1)
 
         # CTkButton
-        self.button_1 = ctk.CTkButton(master=widget_frame)
+        # We contrive to always show a contrast of a button widget with and without a border.
+        button_border_width = ThemeManager.theme['CTkButton']['border_width']
+        self.button_1 = ctk.CTkButton(master=widget_frame, border_width=button_border_width)
         self.button_1.grid(row=4, column=2, padx=pad_x, pady=pad_y)
 
         self._rendered_widgets['CTkButton'].append(self.button_1)
         if self._enable_tooltips:
-            button_1_tooltip = CTkToolTip(self.button_1,
-                                          justify="left",
-                                          message='CTkButton default border setting')
+            self.button_1_tooltip = CTkToolTip(self.button_1,
+                                               justify="left",
+                                               x_offset=-70,
+                                               message=f'CTkButton - with default border setting of {button_border_width}')
 
-        self.button_2 = ctk.CTkButton(master=widget_frame, border_width=0)
+        if button_border_width == 0:
+            second_border_width = 2
+        else:
+            second_border_width = 0
+        self.button_2 = ctk.CTkButton(master=widget_frame, border_width=second_border_width)
         self.button_2.grid(row=5, column=2, padx=pad_x, pady=pad_y)
 
         if self._enable_tooltips:
-            button_2_tooltip = CTkToolTip(self.button_2,
-                                          justify="left",
-                                          message='CTkButton border disabled (border_width=0)')
+            self.button_2_tooltip = CTkToolTip(self.button_2,
+                                               border_width=second_border_width,
+                                               justify="left",
+                                               x_offset=-70,
+                                               message=f'TkButton - with border setting of {second_border_width}')
 
         self._rendered_widgets['CTkButton'].append(self.button_2)
 
@@ -358,25 +368,31 @@ class PreviewPanel:
         self._rendered_widgets['CTkRadioButton'].append(self.radiobutton_2)
 
         # CTkEntry
-        self.entry_1 = ctk.CTkEntry(master=widget_frame, placeholder_text="CTkEntry")
+        # We contrive to always show a contrast of an entry widget with and without a border.
+        entry_border_width = ThemeManager.theme['CTkEntry']['border_width']
+        if entry_border_width == 0:
+            second_border_width = 2
+        else:
+            second_border_width = 0
+
+        self.entry_1 = ctk.CTkEntry(master=widget_frame, placeholder_text="CTkEntry", border_width=entry_border_width)
         self.entry_1.grid(row=4, column=0, padx=pad_x, pady=pad_y)
         if self._enable_tooltips:
-            entry_1_tooltip = CTkToolTip(self.entry_1,
+            self.entry_1_tooltip = CTkToolTip(self.entry_1,
                                          justify="left",
                                          wraplength=250,
                                          padding=(5, 5),
-                                         message='CTkEntry border enabled.\n\n NOTE: If your theme border width '
-                                                 'default is set to 0, no border will be visible.')
+                                         message=f'CTkEntry - with default border setting of {entry_border_width}')
 
         self._rendered_widgets['CTkEntry'].append(self.entry_1)
 
-        self.entry_2 = ctk.CTkEntry(master=widget_frame, border_width=0, placeholder_text="CTkEntry2")
+        self.entry_2 = ctk.CTkEntry(master=widget_frame, border_width=second_border_width, placeholder_text="CTkEntry2")
         self.entry_2.grid(row=5, column=0, padx=pad_x, pady=pad_y)
         if self._enable_tooltips:
-            entry_2_tooltip = CTkToolTip(self.entry_2,
+            self.entry_2_tooltip = CTkToolTip(self.entry_2,
                                          justify="left",
                                          wraplength=250,
-                                         message='CTkEntry with border disabled.')
+                                         message=f'CTkEntry - with border setting of {second_border_width}')
         self._rendered_widgets['CTkEntry'].append(self.entry_2)
 
         # CTkTextbox
@@ -628,10 +644,49 @@ class PreviewPanel:
                     update_widget_geometry(widget, widget_property, int(property_value))
                 for widget in self._rendered_widgets['CTkTabview']:
                     update_widget_geometry(widget, widget_property, int(property_value))
+
         else:
             for widget in self._rendered_widgets[widget_type]:
                 json_widget_type = mod.json_widget_type(widget_type=widget)
                 update_widget_geometry(widget, widget_property, int(property_value))
+
+        # We contrive to always show a contrast of a button with and without a border.
+        if widget_type == 'CTkButton' and widget_property == 'border_width':
+            button_border_width = int(property_value)
+            self.button_1.configure(border_width=button_border_width)
+
+            if self._enable_tooltips:
+                self.button_1_tooltip.configure(message=f'CTkButton - with default border setting of '
+                                                        f'{button_border_width}')
+
+            if button_border_width == 0:
+                second_border_width = 2
+            else:
+                second_border_width = 0
+
+            self.button_2.configure(border_width=second_border_width)
+
+            if self._enable_tooltips:
+                self.button_2_tooltip.configure(message=f'TkButton - with border setting of {second_border_width}')
+
+        elif widget_type == 'CTkEntry' and widget_property == 'border_width':
+
+            # We contrive to always show a contrast of an entry widget with and without a border.
+            entry_border_width = int(property_value)
+            self.entry_1.configure(border_width=entry_border_width)
+
+            if self._enable_tooltips:
+                self.entry_1_tooltip.configure(message=f'CTkEntry - with default border setting of '
+                                                       f'{entry_border_width}')
+
+            if entry_border_width == 0:
+                second_border_width = 2
+            else:
+                second_border_width = 0
+
+            self.entry_2.configure(border_width=second_border_width)
+            if self._enable_tooltips:
+                self.entry_2_tooltip.configure(message=f'CTkEntry - with border setting of {second_border_width}')
 
     def _exec_client_command(self, evt):
         command_json = self._command_json
@@ -735,11 +790,11 @@ class PreviewPanel:
         time.sleep(0.1)
         if listener_status == -1:
             confirm = CTkMessagebox(
-                                    title='Socket Error',
-                                    message=f'The listener failed to bind to port {METHOD_LISTENER_PORT}\n\n'
-                                            f'Ensure that only one instance of {__title__} is running and that no '
-                                            f'other process is using the port.',
-                                    option_1='OK')
+                title='Socket Error',
+                message=f'The listener failed to bind to port {METHOD_LISTENER_PORT}\n\n'
+                        f'Ensure that only one instance of {__title__} is running and that no '
+                        f'other process is using the port.',
+                option_1='OK')
             if confirm.get() == 'OK':
                 exit(1)
 
