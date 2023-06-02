@@ -12,3 +12,5 @@ tmp/
 assets/etc/listener.started
 
 assets/palettes/Wibble.json
+
+user_themes/Wibble.json
