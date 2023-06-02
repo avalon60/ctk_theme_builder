@@ -2195,6 +2195,12 @@ class ControlPanel:
                 if widget not in self._theme_json_data:
                     self._theme_json_data[widget] = widget_property
 
+            # Update the auto-save section of the preferences, to record the last theme we opened.
+            # This may be required on the next app startup, if the last_theme_on_start preference is enabled.
+            if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='auto_save',
+                                               preference_name='selected_theme',
+                                               preference_value=selected_theme):
+                print(f'Row miss: on update of auto save of selected theme.')
             self._status_bar.set_status_text(status_text_life=30,
                                              status_text=f'Theme file, {self._theme_file}, loaded. ')
 
