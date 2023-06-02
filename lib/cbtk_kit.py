@@ -280,7 +280,7 @@ class CBtkMenu(tk.Menu):
         for widget in CBtkMenu.widget_registry:
             try:
                 widget.update_appearance_mode()
-            except tkinter.TclError:
+            except tk.TclError:
                 # print(f'Skipping widget configuration')
                 pass
 
