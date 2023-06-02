@@ -92,7 +92,7 @@
     ],
     "hover_color": [
       "#697b88",
-      "#697b88"
+      "#63003d"
     ],
     "checkmark_color": [
       "#ffffff",
@@ -150,7 +150,7 @@
     ],
     "hover_color": [
       "#5c6b78",
-      "#5c6b78"
+      "#63003d"
     ],
     "text_color": [
       "#ffffff",
@@ -206,7 +206,7 @@
       "#748498"
     ],
     "button_color": [
-      "#260063",
+      "#116805",
       "#116805"
     ],
     "button_hover_color": [
@@ -214,27 +214,27 @@
       "#63003d"
     ],
     "text_color": [
-      "#ffffff",
-      "#ffffff"
+      "#212a3f",
+      "#212a3f"
     ],
     "text_color_disabled": [
-      "#5e6b7c",
-      "#5e6b7c"
+      "#b3c0d1",
+      "#b3c0d1"
     ]
   },
   "CTkComboBox": {
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#748498",
-      "#748498"
+      "#a9b8c4",
+      "#a9b8c4"
     ],
     "border_color": [
-      "#000000",
+      "#405366",
       "#405366"
     ],
     "button_color": [
-      "#115605",
+      "#260063",
       "#260063"
     ],
     "button_hover_color": [
@@ -242,8 +242,8 @@
       "#63003d"
     ],
     "text_color": [
-      "#ffffff",
-      "#ffffff"
+      "#2b3449",
+      "#2b3449"
     ],
     "text_color_disabled": [
       "#5e6b7c",
@@ -362,7 +362,7 @@
     "date created": "Jun 02 2023 17:01:42",
     "last modified by": "clive",
     "created with": "CTk Theme Builder v2.1.0",
-    "last modified": "Jun 02 2023 17:27:32",
+    "last modified": "Jun 02 2023 18:26:46",
     "keystone colour": "#0C6300",
     "harmony method": "Split-complementary",
     "harmony differential": 8
