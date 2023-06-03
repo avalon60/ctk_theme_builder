@@ -183,32 +183,33 @@ class ControlPanel:
     def __init__(self):
         # Grab the JSON for one of the JSON files released with the
         # installed instance of CustomTkinter
-        self._theme_json_data = {}
+        self.theme_json_data = {}
+        print('DEBUG - started')
         green_theme_file = CTK_THEMES / 'green.json'
         with open(green_theme_file) as json_file:
-            self._reference_theme_json = json.load(json_file)
+            self.reference_theme_json = json.load(json_file)
 
-        self._theme = None
-        self._ASSETS_DIR = APP_HOME / 'assets'
-        self._log_dir = APP_HOME / 'logs'
-        self._CONFIG_DIR = ASSETS_DIR / 'config'
-        self._ETC_DIR = ASSETS_DIR / 'etc'
-        self._VIEWS_DIR = ASSETS_DIR / 'views'
-        self._palettes_dir = ASSETS_DIR / 'palettes'
+        self.theme = None
+        self.ASSETS_DIR = APP_HOME / 'assets'
+        self.log_dir = APP_HOME / 'logs'
+        self.CONFIG_DIR = ASSETS_DIR / 'config'
+        self.ETC_DIR = ASSETS_DIR / 'etc'
+        self.VIEWS_DIR = ASSETS_DIR / 'views'
+        self.palettes_dir = ASSETS_DIR / 'palettes'
 
         self.ctk_control_panel = ctk.CTk()
         this_platform = platform.system()
         if this_platform == "Darwin":
-            self._platform = "MacOS"
+            self.platform = "MacOS"
 
-        self._new_theme_json_dir = None
+        self.new_theme_json_dir = None
 
         if this_platform == "Windows":
-            self._user_home_dir = os.getenv("UserProfile")
+            self.user_home_dir = os.getenv("UserProfile")
             self.user_name = os.getenv("LOGNAME")
         else:
             self.user_name = os.getenv("USER")
-            self._user_home_dir = os.getenv("HOME")
+            self.user_home_dir = os.getenv("HOME")
 
         if LISTENER_FILE.exists():
             try:
@@ -219,48 +220,48 @@ class ControlPanel:
                 exit(0)
 
         # Initialise class properties
-        self._user_home_dir = Path(self._user_home_dir)
+        self.user_home_dir = Path(self.user_home_dir)
         self.process = None
-        self.ctk_control_panel.protocol("WM_DELETE_WINDOW", self._close_panels)
-        self._json_state = 'clean'
+        self.ctk_control_panel.protocol("WM_DELETE_WINDOW", self.close_panels)
+        self.json_state = 'clean'
         self.widgets = {}
-        self._rendered_harmony_buttons = []
-        self._rendered_harmony_labels = []
-        self._rendered_keystone_shades = []
+        self.rendered_harmony_buttons = []
+        self.rendered_harmony_labels = []
+        self.rendered_keystone_shades = []
         self.harmony_palette_running = False
-        self._keystone_colour = None
+        self.keystone_colour = None
         self.client_socket = None
 
-        self._properties_view = 'All'
-        self._widget_attributes = DEFAULT_VIEW_WIDGET_ATTRIBUTES
+        self.properties_view = 'All'
+        self.widget_attributes = DEFAULT_VIEW_WIDGET_ATTRIBUTES
 
         # If this is the first time the app is run, create an app home directory.
-        if not self._CONFIG_DIR.exists():
-            print(f'Initialising application: {self._CONFIG_DIR}')
-            os.mkdir(self._CONFIG_DIR)
+        if not self.CONFIG_DIR.exists():
+            print(f'Initialising application: {self.CONFIG_DIR}')
+            os.mkdir(self.CONFIG_DIR)
 
-        self._enable_tooltips = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                       preference_name='enable_tooltips')
+        self.enable_tooltips = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                      preference_name='enable_tooltips')
 
-        self._enable_palette_labels = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                             preference_name='enable_palette_labels')
+        self.enable_palette_labels = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                            preference_name='enable_palette_labels')
 
-        self._enable_single_click_paste = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                                 preference_name='enable_single_click_paste')
+        self.enable_single_click_paste = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                                preference_name='enable_single_click_paste')
 
-        self._theme_json_dir = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                      preference_name='theme_json_dir')
+        self.theme_json_dir = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                     preference_name='theme_json_dir')
 
-        self._last_theme_on_start = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                           preference_name='last_theme_on_start')
+        self.last_theme_on_start = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                          preference_name='last_theme_on_start')
 
-        if self._last_theme_on_start == 'NO_DATA_FOUND':
-            self._last_theme_on_start = mod.new_preference_dict(scope='user_preference',
-                                                                preference_name='last_theme_on_start',
-                                                                data_type='int', preference_value=0)
-            mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=self._last_theme_on_start)
-        if not self._theme_json_dir.exists():
-            self._theme_json_dir = APP_HOME / 'user_themes'
+        if self.last_theme_on_start == 'NO_DATA_FOUND':
+            self.last_theme_on_start = mod.new_preference_dict(scope='user_preference',
+                                                               preference_name='last_theme_on_start',
+                                                               data_type='int', preference_value=0)
+            mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=self.last_theme_on_start)
+        if not self.theme_json_dir.exists():
+            self.theme_json_dir = APP_HOME / 'user_themes'
 
         self.shade_adjust_differential = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                                 preference_name='shade_adjust_differential')
@@ -268,19 +269,19 @@ class ControlPanel:
         self.harmony_contrast_differential = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                                     preference_name='harmony_contrast_differential')
 
-        self._render_disabled = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='auto_save',
-                                                       preference_name='render_disabled')
+        self.render_disabled = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='auto_save',
+                                                      preference_name='render_disabled')
 
-        self._theme_author = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                    preference_name='theme_author')
+        self.theme_author = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                   preference_name='theme_author')
 
-        self._min_ctk_version = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='system',
-                                                       preference_name='min_ctk_version')
+        self.min_ctk_version = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='system',
+                                                      preference_name='min_ctk_version')
 
         base_ctk_version = ctk.__version__
         base_ctk_version = base_ctk_version[:base_ctk_version.index('.')]
 
-        base_min_version = self._min_ctk_version
+        base_min_version = self.min_ctk_version
         base_min_version = base_min_version[:base_min_version.index('.')]
 
         control_panel_theme = mod.preference_setting(db_file_path=DB_FILE_PATH,
@@ -288,44 +289,44 @@ class ControlPanel:
 
         control_panel_theme = control_panel_theme + '.json'
 
-        self._control_panel_theme = str(APP_THEMES_DIR / control_panel_theme)
+        self.control_panel_theme = str(APP_THEMES_DIR / control_panel_theme)
         # The control_panel_mode holds the  CustomTkinter appearance mode (Dark / Light)
 
-        self._control_panel_mode = mod.preference_setting(db_file_path=DB_FILE_PATH,
-                                                          scope='user_preference', preference_name='control_panel_mode')
-        self._TEMP_DIR = TEMP_DIR
+        self.control_panel_mode = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                         scope='user_preference', preference_name='control_panel_mode')
+        self.TEMP_DIR = TEMP_DIR
 
-        ctl_mode_idx = cbtk.str_mode_to_int(self._control_panel_mode)
+        ctl_mode_idx = cbtk.str_mode_to_int(self.control_panel_mode)
         control_panel_theme_path = str(APP_THEMES_DIR / control_panel_theme)
 
         # Some widgets we use, by necessity, are not CustomTkinter widgets. We need to colour these
         # based on the control panel's theme.
-        self._ctl_frame_high = cbtk.theme_property_color(theme_file_path=control_panel_theme_path,
-                                                         widget_type="CTkToplevel",
-                                                         widget_property='fg_color',
-                                                         mode=self._control_panel_mode
-                                                         )
+        self.ctl_frame_high = cbtk.theme_property_color(theme_file_path=control_panel_theme_path,
+                                                        widget_type="CTkToplevel",
+                                                        widget_property='fg_color',
+                                                        mode=self.control_panel_mode
+                                                        )
 
-        self._ctl_text = cbtk.theme_property_color(theme_file_path=control_panel_theme_path,
-                                                   widget_type="CTkLabel",
-                                                   widget_property="text_color",
-                                                   mode=self._control_panel_mode
-                                                   )
+        self.ctl_text = cbtk.theme_property_color(theme_file_path=control_panel_theme_path,
+                                                  widget_type="CTkLabel",
+                                                  widget_property="text_color",
+                                                  mode=self.control_panel_mode
+                                                  )
 
-        self._ctl_frame_border = cbtk.theme_property_color(theme_file_path=control_panel_theme_path,
-                                                           widget_type="CTkFrame",
-                                                           widget_property='fg_color',
-                                                           mode=self._control_panel_mode
-                                                           )
+        self.ctl_frame_border = cbtk.theme_property_color(theme_file_path=control_panel_theme_path,
+                                                          widget_type="CTkFrame",
+                                                          widget_property='fg_color',
+                                                          mode=self.control_panel_mode
+                                                          )
 
         try:
-            ctk.set_default_color_theme(self._control_panel_theme)
+            ctk.set_default_color_theme(self.control_panel_theme)
         except FileNotFoundError:
             ctk.set_default_color_theme('blue')
             print(f'Preferred Control Panel, theme file not found. Falling back to "blue" theme.')
-        ctk.set_appearance_mode(self._control_panel_mode)
+        ctk.set_appearance_mode(self.control_panel_mode)
 
-        self._restore_controller_geometry()
+        self.restore_controller_geometry()
 
         self.ctk_control_panel.rowconfigure(3, weight=1)
         self.ctk_control_panel.columnconfigure(0, weight=1)
@@ -336,72 +337,72 @@ class ControlPanel:
         title_frame = ctk.CTkFrame(master=self.ctk_control_panel)
         title_frame.pack(fill="both", expand=0)
 
-        self._frm_control = ctk.CTkFrame(master=self.ctk_control_panel)
-        self._frm_control.columnconfigure(1, weight=1)
-        self._frm_control.pack(fill="both", expand=1)
-        self._frm_control.rowconfigure(2, weight=1)
-        self._frm_button = ctk.CTkFrame(master=self._frm_control)
-        self._frm_geometry = ctk.CTkFrame(master=self._frm_control)
-        self._frm_theme_palette = ctk.CTkFrame(master=self._frm_control)
-        self._frm_colour_edit_widgets = ctk.CTkScrollableFrame(master=self._frm_control)
+        self.frm_control = ctk.CTkFrame(master=self.ctk_control_panel)
+        self.frm_control.columnconfigure(1, weight=1)
+        self.frm_control.pack(fill="both", expand=1)
+        self.frm_control.rowconfigure(2, weight=1)
+        self.frm_button = ctk.CTkFrame(master=self.frm_control)
+        self.frm_geometry = ctk.CTkFrame(master=self.frm_control)
+        self.frm_theme_palette = ctk.CTkFrame(master=self.frm_control)
+        self.frm_colour_edit_widgets = ctk.CTkScrollableFrame(master=self.frm_control)
 
-        button_frame = self._frm_button
+        button_frame = self.frm_button
         button_frame.grid(row=0, column=0, rowspan=3, columnspan=1, sticky='ns', padx=(5, 5), pady=(5, 5))
 
-        self._frm_geometry.grid(row=0, column=1, rowspan=1, sticky='nswe', padx=(0, 5), pady=(5, 5))
-        self._frm_theme_palette.grid(row=1, column=1, rowspan=1, sticky='nswe', padx=(0, 5), pady=(5, 5))
-        self._frm_colour_edit_widgets.grid(row=2, column=1, rowspan=1, sticky='nswe', padx=(0, 5), pady=(5, 5))
-        self._status_bar = cbtk.CBtkStatusBar(master=self.ctk_control_panel,
-                                              status_text_life=30,
-                                              use_grid=False)
-        self.ctk_control_panel.bind("<Configure>", self._status_bar.auto_size_status_bar)
+        self.frm_geometry.grid(row=0, column=1, rowspan=1, sticky='nswe', padx=(0, 5), pady=(5, 5))
+        self.frm_theme_palette.grid(row=1, column=1, rowspan=1, sticky='nswe', padx=(0, 5), pady=(5, 5))
+        self.frm_colour_edit_widgets.grid(row=2, column=1, rowspan=1, sticky='nswe', padx=(0, 5), pady=(5, 5))
+        self.status_bar = cbtk.CBtkStatusBar(master=self.ctk_control_panel,
+                                             status_text_life=30,
+                                             use_grid=False)
+        self.ctk_control_panel.bind("<Configure>", self.status_bar.auto_size_status_bar)
 
         # Populate Frames
         self.lbl_title = ctk.CTkLabel(master=title_frame, text='Control Panel', font=HEADING4, anchor='w')
         self.lbl_title.grid(row=0, column=0, columnspan=2, sticky='w', padx=10, pady=5)
         master = title_frame.columnconfigure(0, weight=1)
 
-        self.lbl_theme = ctk.CTkLabel(master=self._frm_button, text='Select Theme:')
+        self.lbl_theme = ctk.CTkLabel(master=self.frm_button, text='Select Theme:')
         self.lbl_theme.grid(row=1, column=0, sticky='w', pady=(10, 0), padx=(15, 10))
 
-        self._json_files = self._user_themes_list()
-        initial_display = self._user_themes_list()
+        self.json_files = self.user_themes_list()
+        initial_display = self.user_themes_list()
         last_theme = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='auto_save',
                                             preference_name='selected_theme')
         #
-        if self._last_theme_on_start:
+        if self.last_theme_on_start:
             initial_display.insert(0, last_theme)
         else:
             initial_display.insert(0, '-- Select Theme --')
-        self.opm_theme = ctk.CTkOptionMenu(master=self._frm_button,
+        self.opm_theme = ctk.CTkOptionMenu(master=self.frm_button,
                                            values=initial_display,
-                                           command=self._load_theme)
+                                           command=self.load_theme)
         self.opm_theme.grid(row=3, column=0)
 
-        self.lbl_mode = ctk.CTkLabel(master=self._frm_button, text='Preview Appearance:')
+        self.lbl_mode = ctk.CTkLabel(master=self.frm_button, text='Preview Appearance:')
         self.lbl_mode.grid(row=5, column=0, sticky='w', pady=(10, 0), padx=(15, 10))
 
         mode = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='auto_save',
                                       preference_name='appearance_mode')
         self.tk_seg_mode = ctk.StringVar(value=mode + ' Mode')
-        self.seg_mode = ctk.CTkSegmentedButton(self._frm_button,
+        self.seg_mode = ctk.CTkSegmentedButton(self.frm_button,
                                                values=['Light Mode', 'Dark Mode'],
                                                width=30,
                                                border_width=1,
-                                               command=self._switch_preview_appearance_mode,
+                                               command=self.switch_preview_appearance_mode,
                                                variable=self.tk_seg_mode)
         self.seg_mode.grid(row=6, column=0, padx=10, sticky='w')
 
         self.tk_swt_frame_mode = ctk.StringVar(value="top")
-        self.swt_frame_mode = ctk.CTkSwitch(self._frm_button,
+        self.swt_frame_mode = ctk.CTkSwitch(self.frm_button,
                                             state=tk.DISABLED,
                                             text='Top Frame',
                                             onvalue="top", offvalue="base",
-                                            command=self._toggle_frame_mode,
+                                            command=self.toggle_frame_mode,
                                             variable=self.tk_swt_frame_mode)
         self.swt_frame_mode.grid(row=7, column=0, padx=18, pady=(20, 0), sticky='w')
 
-        if self._enable_tooltips:
+        if self.enable_tooltips:
             frame_mode_tooltip = CTkToolTip(self.swt_frame_mode,
                                             wraplength=400,
                                             justify="left",
@@ -412,186 +413,192 @@ class ControlPanel:
                                                     'likelihood, you will want to observe how your other widget '
                                                     'property colours render as a base frame, as well as a top frame.')
 
-        self._tk_render_disabled = tk.IntVar(master=self._frm_button, value=self._render_disabled)
-        self._swt_render_disabled = ctk.CTkSwitch(master=self._frm_button,
-                                                  text='Render Disabled',
-                                                  variable=self._tk_render_disabled,
-                                                  state=tk.DISABLED,
-                                                  command=self._toggle_render_disabled)
-        self._swt_render_disabled.grid(row=8, column=0, padx=10, pady=(10, 0))
+        self.tk_render_disabled = tk.IntVar(master=self.frm_button, value=self.render_disabled)
+        self.swt_render_disabled = ctk.CTkSwitch(master=self.frm_button,
+                                                 text='Render Disabled',
+                                                 variable=self.tk_render_disabled,
+                                                 state=tk.DISABLED,
+                                                 command=self.toggle_render_disabled)
+        self.swt_render_disabled.grid(row=8, column=0, padx=10, pady=(10, 0))
 
-        self.lbl_widget_view = ctk.CTkLabel(master=self._frm_button,
+        self.lbl_widget_view = ctk.CTkLabel(master=self.frm_button,
                                             text='Properties View:')
         self.lbl_widget_view.grid(row=9, column=0, sticky='w', pady=(20, 0), padx=(15, 10))
 
-        self._widget_categories = all_widget_categories(DEFAULT_VIEW_WIDGET_ATTRIBUTES)
-        self._views_list = self._view_list()
+        self.widget_categories = all_widget_categories(DEFAULT_VIEW_WIDGET_ATTRIBUTES)
+        self.views_list = self.view_list()
         self.tk_widget_view = tk.StringVar(value=DEFAULT_VIEW)
-        self._opm_properties_view = ctk.CTkOptionMenu(master=self._frm_button,
-                                                      command=self._update_properties_filter,
-                                                      variable=self.tk_widget_view,
-                                                      values=self._views_list,
-                                                      state=tk.DISABLED)
-        self._opm_properties_view.grid(row=10, column=0)
-        if self._enable_tooltips:
-            filter_view_tooltip = CTkToolTip(self._opm_properties_view,
+        self.opm_properties_view = ctk.CTkOptionMenu(master=self.frm_button,
+                                                     command=self.update_properties_filter,
+                                                     variable=self.tk_widget_view,
+                                                     values=self.views_list,
+                                                     state=tk.DISABLED)
+        self.opm_properties_view.grid(row=10, column=0)
+        if self.enable_tooltips:
+            filter_view_tooltip = CTkToolTip(self.opm_properties_view,
                                              wraplength=400,
                                              justify="left",
                                              message='Views help you to target specific widgets, or groups of  '
                                                      'related widgets, and their associated properties. ')
 
-        self.lbl_filter = ctk.CTkLabel(master=self._frm_button, text='Filter View:')
+        self.lbl_filter = ctk.CTkLabel(master=self.frm_button, text='Filter View:')
         self.lbl_filter.grid(row=11, column=0, sticky='w', pady=(10, 0), padx=(15, 10))
 
-        self._widget_categories = all_widget_categories(DEFAULT_VIEW_WIDGET_ATTRIBUTES)
-        self._opm_properties_filter = ctk.CTkOptionMenu(master=self._frm_button,
-                                                        values=self._widget_categories,
-                                                        command=self.set_filtered_widget_display,
-                                                        state=tk.DISABLED)
-        self._opm_properties_filter.grid(row=12, column=0)
-        if self._enable_tooltips:
-            filter_view_tooltip = CTkToolTip(self._opm_properties_filter,
+        self.widget_categories = all_widget_categories(DEFAULT_VIEW_WIDGET_ATTRIBUTES)
+        self.opm_properties_filter = ctk.CTkOptionMenu(master=self.frm_button,
+                                                       values=self.widget_categories,
+                                                       command=self.set_filtered_widget_display,
+                                                       state=tk.DISABLED)
+        self.opm_properties_filter.grid(row=12, column=0)
+        if self.enable_tooltips:
+            filter_view_tooltip = CTkToolTip(self.opm_properties_filter,
                                              wraplength=400,
                                              justify="left",
                                              message='Within the properties available for the selected view, you can '
                                                      'elect to filter the display further.')
 
-        self._btn_refresh = ctk.CTkButton(master=button_frame, text='Refresh Preview',
-                                          command=self._reload_preview,
-                                          state=tk.DISABLED)
-        self._btn_refresh.grid(row=14, column=0, padx=5, pady=(30, 0))
-        if self._enable_tooltips:
-            sync_tooltip = CTkToolTip(self._btn_refresh,
+        self.btn_refresh = ctk.CTkButton(master=button_frame, text='Refresh Preview',
+                                         command=self.reload_preview,
+                                         state=tk.DISABLED)
+        self.btn_refresh.grid(row=14, column=0, padx=5, pady=(30, 0))
+        if self.enable_tooltips:
+            sync_tooltip = CTkToolTip(self.btn_refresh,
                                       wraplength=250,
                                       justify="left",
                                       message='The "Refresh Preview" button causes a reload of the preview panel, and '
                                               're-paints the preview, with the currently selected theme / appearance '
                                               'mode.')
 
-        self._btn_reset = ctk.CTkButton(master=button_frame,
-                                        text='Reset',
-                                        state=tk.DISABLED,
-                                        command=self._reset_theme)
-        self._btn_reset.grid(row=15, column=0, padx=5, pady=(30, 5))
+        self.btn_reset = ctk.CTkButton(master=button_frame,
+                                       text='Reset',
+                                       state=tk.DISABLED,
+                                       command=self.reset_theme)
+        self.btn_reset.grid(row=15, column=0, padx=5, pady=(30, 5))
 
-        self._btn_create = ctk.CTkButton(master=button_frame,
-                                         text='New Theme',
-                                         command=self._create_theme)
-        self._btn_create.grid(row=16, column=0, padx=5, pady=(5, 5))
+        self.btn_create = ctk.CTkButton(master=button_frame,
+                                        text='New Theme',
+                                        command=self.create_theme)
+        self.btn_create.grid(row=16, column=0, padx=5, pady=(5, 5))
 
-        self._btn_sync_modes = ctk.CTkButton(master=button_frame,
-                                             text='Sync Modes',
-                                             state=tk.DISABLED,
-                                             command=self._sync_appearance_mode)
-        self._btn_sync_modes.grid(row=17, column=0, padx=5, pady=(5, 5))
-        if self._enable_tooltips:
-            sync_tooltip = CTkToolTip(self._btn_sync_modes,
+        self.btn_sync_modes = ctk.CTkButton(master=button_frame,
+                                            text='Sync Modes',
+                                            state=tk.DISABLED,
+                                            command=self.sync_appearance_mode)
+        self.btn_sync_modes.grid(row=17, column=0, padx=5, pady=(5, 5))
+        if self.enable_tooltips:
+            sync_tooltip = CTkToolTip(self.btn_sync_modes,
                                       wraplength=250,
                                       justify="left",
                                       message='Copies the color settings of the selected widget properties, for the '
                                               'currently selected Appearance Mode ("Dark"/"Light"), to its counterpart '
                                               'mode.')
 
-        self._btn_sync_palette = ctk.CTkButton(master=button_frame,
-                                               text='Sync Palette',
-                                               state=tk.DISABLED,
-                                               command=self._sync_theme_palette)
-        self._btn_sync_palette.grid(row=18, column=0, padx=5, pady=(5, 5))
-        if self._enable_tooltips:
-            sync_tooltip = CTkToolTip(self._btn_sync_modes,
+        self.btn_sync_palette = ctk.CTkButton(master=button_frame,
+                                              text='Sync Palette',
+                                              state=tk.DISABLED,
+                                              command=self.sync_theme_palette)
+        self.btn_sync_palette.grid(row=18, column=0, padx=5, pady=(5, 5))
+        if self.enable_tooltips:
+            sync_tooltip = CTkToolTip(self.btn_sync_modes,
                                       wraplength=250,
                                       justify="left",
                                       message='Copies the Theme Palette color settings of the selected appearance '
                                               'mode ("Light"/"Dark") to its counterpart mode')
 
-        self._btn_save = ctk.CTkButton(master=button_frame,
-                                       text='Save',
-                                       state=tk.DISABLED,
-                                       command=self._save_theme)
-        self._btn_save.grid(row=21, column=0, padx=5, pady=(30, 5))
+        self.btn_save = ctk.CTkButton(master=button_frame,
+                                      text='Save',
+                                      state=tk.DISABLED,
+                                      command=self.save_theme)
+        self.btn_save.grid(row=21, column=0, padx=5, pady=(30, 5))
 
-        self._btn_save_as = ctk.CTkButton(master=button_frame,
-                                          text='Save As',
-                                          state=tk.DISABLED,
-                                          command=self._save_theme_as)
-        self._btn_save_as.grid(row=22, column=0, padx=5, pady=(5, 5))
-
-        self._btn_delete = ctk.CTkButton(master=button_frame,
-                                         text='Delete',
+        self.btn_save_as = ctk.CTkButton(master=button_frame,
+                                         text='Save As',
                                          state=tk.DISABLED,
-                                         command=self._delete_theme)
-        self._btn_delete.grid(row=23, column=0, padx=5, pady=(5, 5))
+                                         command=self.save_theme_as)
+        self.btn_save_as.grid(row=22, column=0, padx=5, pady=(5, 5))
 
-        btn_quit = ctk.CTkButton(master=button_frame, text='Quit', command=self._close_panels)
+        self.btn_delete = ctk.CTkButton(master=button_frame,
+                                        text='Delete',
+                                        state=tk.DISABLED,
+                                        command=self.delete_theme)
+        self.btn_delete.grid(row=23, column=0, padx=5, pady=(5, 5))
+
+        btn_quit = ctk.CTkButton(master=button_frame, text='Quit', command=self.close_panels)
         btn_quit.grid(row=30, column=0, padx=5, pady=(60, 5))
 
-        self._create_menu()
+        self.create_menu()
 
         if int(base_min_version) > int(base_ctk_version):
             print(f'WARNING: The version of CustomTkinter, on your system, is incompatible. Please upgrade to '
-                  f'CustomTkinter {self._min_ctk_version} or later.')
+                  f'CustomTkinter {self.min_ctk_version} or later.')
             confirm = CTkMessagebox(master=self.ctk_control_panel,
                                     title='Please Upgrade CustomTkinter',
                                     message=f'The version of CustomTkinter, on your system, is incompatible. '
-                                            f'Please upgrade to CustomTkinter {self._min_ctk_version} or later.',
+                                            f'Please upgrade to CustomTkinter {self.min_ctk_version} or later.',
                                     option_1='OK')
             if confirm.get() == 'OK':
                 exit(1)
 
-        self._load_theme()
+        self.load_theme()
 
         self.ctk_control_panel.mainloop()
 
-    def _set_widget_colour(self, widget_property, new_colour):
+    def flip_appearance_modes(self):
+        confirm = CTkMessagebox(master=self.ctk_control_panel,
+                                title='Confirm Action',
+                                message=f'This will swap around, all of the theme appearance mode colours, between '
+                                        f'Light mode and Dark mode. Are you sure you wish to proceed?',
+                                options=["Yes", "No"])
+        response = confirm.get()
+        if response == 'No':
+            return
+        theme_json_file = self.theme_json_dir / self.theme_file
+        mod.flip_appearance_modes(theme_file_path=theme_json_file)
+        self.load_theme()
+
+
+    def set_widget_colour(self, widget_property, new_colour):
         """Update the widget colour on the preview panel."""
         if not new_colour:
             # We should never see this message, but still...
             print('ERROR: set_widget_colour called without cause.')
             return
         if not cbtk.valid_colour(new_colour):
-            self._status_bar.set_status_text(status_text=f'Paste action ignored - not a valid colour code.')
+            self.status_bar.set_status_text(status_text=f'Paste action ignored - not a valid colour code.')
             return
         prev_colour = self.widgets[widget_property]["colour"]
         self.widgets[widget_property]['button'].configure(fg_color=new_colour)
         self.widgets[widget_property]['colour'] = new_colour
-        appearance_mode_index = cbtk.str_mode_to_int(self._appearance_mode)
+        appearance_mode_index = cbtk.str_mode_to_int(self.appearance_mode)
         # At this point widget_property is a concatenation of the widget type and widget property.
         # We need to split these out. The widget_property_split function, transforms these for us.
         widget_type, split_property = mod.widget_property_split(widget_property=widget_property)
         json_widget_type = mod.json_widget_type(widget_type=widget_type)
-        self._theme_json_data[json_widget_type][split_property][appearance_mode_index] = new_colour
+        self.theme_json_data[json_widget_type][split_property][appearance_mode_index] = new_colour
         parameters = []
 
         if prev_colour != new_colour and widget_property in ControlPanel.FORCE_REFRESH_PROPERTIES:
             # Then either this isn't a real widget, or is a property which cannot be updated
             # dynamically, and so we force a refresh to update the widgets dependent upon its properties.
-            self._refresh_preview()
+            self.refresh_preview()
         elif prev_colour != new_colour:
-            self._json_state = 'dirty'
-            self._set_option_states()
+            self.json_state = 'dirty'
+            self.set_option_states()
             parameters.append(widget_type)
             parameters.append(split_property)
             parameters.append(new_colour)
-            self._send_command_json(command_type='colour',
-                                    command='update_widget_colour',
-                                    parameters=parameters)
+            self.send_command_json(command_type='colour',
+                                   command='update_widget_colour',
+                                   parameters=parameters)
 
-    def colour_picker(self, event, widget_property):
-        prev_colour = self.widgets[widget_property]["colour"]
-        new_colour = askcolor(master=self.ctk_control_panel, title='Pick colour for : ' + widget_property,
-                              initialcolor=prev_colour)
-        if new_colour[1] is not None:
-            new_colour = new_colour[1]
-            self._set_widget_colour(widget_property=widget_property, new_colour=new_colour)
-
-    def _create_theme_palette(self, theme_name):
-        self._theme_palette = mod.json_dict(json_file_path=ETC_DIR / 'default_palette.json')
+    def create_theme_palette(self, theme_name):
+        self.theme_palette = mod.json_dict(json_file_path=ETC_DIR / 'default_palette.json')
         palette_json = theme_name.replace('.json', '') + '.json'
-        self._palette_file = self._palettes_dir / palette_json
-        with open(self._palette_file, "w") as f:
-            json.dump(self._theme_palette, f, indent=2)
+        self.palette_file = self.palettes_dir / palette_json
+        with open(self.palette_file, "w") as f:
+            json.dump(self.theme_palette, f, indent=2)
 
-    def _create_menu(self):
+    def create_menu(self):
         # Set up the core of our menu
         self.des_menu = cbtk.CBtkMenu(self.ctk_control_panel, tearoff=0)
         foreground = cbtk.get_color_from_name(widget_type='CTkLabel', widget_property='text_color')
@@ -601,49 +608,50 @@ class ControlPanel:
         # Now add a File sub-menu option
         self.file_menu = cbtk.CBtkMenu(self.des_menu, tearoff=0)
         self.des_menu.add_cascade(label='File', menu=self.file_menu)
-        self.file_menu.add_command(label='Refresh Preview', command=self._reload_preview)
+        self.file_menu.add_command(label='Refresh Preview', command=self.reload_preview)
         self.file_menu.add_separator()
-        self.file_menu.add_command(label='Reset', command=self._reset_theme)
-        self.file_menu.add_command(label='New Theme', command=self._create_theme)
-        self.file_menu.add_command(label='Sync Modes', command=self._sync_appearance_mode)
-        self.file_menu.add_command(label='Sync Palette', command=self._sync_theme_palette)
+        self.file_menu.add_command(label='Reset', command=self.reset_theme)
+        self.file_menu.add_command(label='New Theme', command=self.create_theme)
+        self.file_menu.add_command(label='Sync Modes', command=self.sync_appearance_mode)
+        self.file_menu.add_command(label='Flip Modes', command=self.flip_appearance_modes)
+        self.file_menu.add_command(label='Sync Palette', command=self.sync_theme_palette)
         self.file_menu.add_separator()
-        self.file_menu.add_command(label='Save', command=self._save_theme)
-        self.file_menu.add_command(label='Save As', command=self._save_theme_as)
+        self.file_menu.add_command(label='Save', command=self.save_theme)
+        self.file_menu.add_command(label='Save As', command=self.save_theme_as)
 
         self.file_menu.add_separator()
-        self.file_menu.add_command(label='Delete', command=self._delete_theme)
+        self.file_menu.add_command(label='Delete', command=self.delete_theme)
         self.file_menu.add_separator()
-        self.file_menu.add_command(label='Provenance', command=self._launch_provenance_dialog)
+        self.file_menu.add_command(label='Provenance', command=self.launch_provenance_dialog)
         self.file_menu.add_separator()
-        self.file_menu.add_command(label='Quit', command=self._close_panels)
+        self.file_menu.add_command(label='Quit', command=self.close_panels)
 
         # Now add a Tools sub-menu option
         self.tools_menu = cbtk.CBtkMenu(self.des_menu, tearoff=0)
         self.des_menu.add_cascade(label='Tools', menu=self.tools_menu)
-        self.tools_menu.add_command(label='Preferences', command=self._launch_preferences_dialog)
-        self.tools_menu.add_command(label='Colour Harmonics', command=self._launch_harmony_dialog, state=tk.DISABLED)
-        self.tools_menu.add_command(label='About', command=self._about)
+        self.tools_menu.add_command(label='Preferences', command=self.launch_preferences_dialog)
+        self.tools_menu.add_command(label='Colour Harmonics', command=self.launch_harmony_dialog, state=tk.DISABLED)
+        self.tools_menu.add_command(label='About', command=self.about)
 
-        self._set_option_states()
+        self.set_option_states()
 
-    def _copy_property_colour(self, event=None, widget_property=None):
+    def copy_property_colour(self, event=None, widget_property=None):
         colour = None
         try:
             colour = self.widgets[widget_property]['button'].cget('fg_color')
         except KeyError:
-            self._status_bar.set_status_text(
+            self.status_bar.set_status_text(
                 status_text=f'ERROR: Key Error on shade copy: Widget Property = {widget_property}')
             print(f'ERROR: Key Error on shade copy: Widget Property = {widget_property}')
         if colour:
             pyperclip.copy(colour)
             message = f'Colour {colour} copied to clipboard.'
-            self._status_bar.set_status_text(status_text=message)
+            self.status_bar.set_status_text(status_text=message)
         elif not colour:
-            self._status_bar.set_status_text(
+            self.status_bar.set_status_text(
                 status_text=f'Copy for {colour} failed!')
 
-    def _about(self):
+    def about(self):
 
         widget_corner_radius = 5
         top_about = ctk.CTkToplevel(self.ctk_control_panel)
@@ -694,24 +702,24 @@ class ControlPanel:
 
         top_about.grab_set()
 
-    def _launch_preferences_dialog(self):
-        self._top_prefs = ctk.CTkToplevel(self.ctk_control_panel)
-        self._top_prefs.title('CTk Theme Builder Preferences')
-        self._top_prefs.geometry('500x550')
+    def launch_preferences_dialog(self):
+        self.top_prefs = ctk.CTkToplevel(self.ctk_control_panel)
+        self.top_prefs.title('CTk Theme Builder Preferences')
+        self.top_prefs.geometry('500x550')
         # Make sure the TopLevel doesn't disappear if we need to
         # open the tk.filedialog.askdirectory dialog to set a new theme folder.
-        self._top_prefs.transient(self.ctk_control_panel)
+        self.top_prefs.transient(self.ctk_control_panel)
         # Make preferences dialog modal
-        self._top_prefs.rowconfigure(0, weight=1)
-        self._top_prefs.rowconfigure(1, weight=0)
-        self._top_prefs.columnconfigure(0, weight=1)
+        self.top_prefs.rowconfigure(0, weight=1)
+        self.top_prefs.rowconfigure(1, weight=0)
+        self.top_prefs.columnconfigure(0, weight=1)
 
-        frm_main = ctk.CTkFrame(master=self._top_prefs, corner_radius=10)
+        frm_main = ctk.CTkFrame(master=self.top_prefs, corner_radius=10)
         frm_main.grid(column=0, row=0, sticky='nsew')
         frm_main.columnconfigure(0, weight=1)
         frm_main.rowconfigure(0, weight=1)
 
-        frm_main = ctk.CTkFrame(master=self._top_prefs, corner_radius=10)
+        frm_main = ctk.CTkFrame(master=self.top_prefs, corner_radius=10)
         frm_main.grid(column=0, row=0, sticky='nsew')
         frm_main.columnconfigure(0, weight=1)
         frm_main.rowconfigure(0, weight=1)
@@ -726,15 +734,15 @@ class ControlPanel:
         lbl_author_name = ctk.CTkLabel(master=frm_widgets, text='Author', justify="right")
         lbl_author_name.grid(row=widget_start_row, column=0, padx=5, pady=(30, 5), sticky='e')
 
-        if not self._theme_author:
-            self._theme_author = self.user_name
-        self.tk_author_name = tk.StringVar(value=self._theme_author)
+        if not self.theme_author:
+            self.theme_author = self.user_name
+        self.tk_author_name = tk.StringVar(value=self.theme_author)
         self.ent_author_name = ctk.CTkEntry(master=frm_widgets,
                                             textvariable=self.tk_author_name,
                                             width=160)
         self.ent_author_name.grid(row=widget_start_row, column=1, padx=(0, 0), pady=(30, 5), sticky='w')
 
-        if self._enable_tooltips:
+        if self.enable_tooltips:
             btn_author_tooltip = CTkToolTip(lbl_author_name,
                                             wraplength=250,
                                             justify="left",
@@ -745,96 +753,96 @@ class ControlPanel:
         lbl_theme = ctk.CTkLabel(master=frm_widgets, text='Cntrl Panel Theme', justify="right")
         lbl_theme.grid(row=widget_start_row, column=0, padx=5, pady=(0, 5), sticky='e')
 
-        if self._enable_tooltips:
+        if self.enable_tooltips:
             btn_author_tooltip = CTkToolTip(lbl_theme,
                                             wraplength=250,
                                             justify="left",
                                             message="The default theme for the CTk Theme Builder control panel, "
                                                     "is GreyGhost, however you can override this here.")
 
-        control_panel_theme = os.path.splitext(self._control_panel_theme)[0]
+        control_panel_theme = os.path.splitext(self.control_panel_theme)[0]
         control_panel_theme = os.path.basename(control_panel_theme)
-        self._tk_control_panel_theme = tk.StringVar(value=control_panel_theme)
-        self._opm_control_panel_theme = ctk.CTkOptionMenu(master=frm_widgets,
-                                                          variable=self._tk_control_panel_theme,
-                                                          values=self._app_themes_list())
-        self._opm_control_panel_theme.grid(row=widget_start_row, column=1, padx=0, pady=5, sticky='w')
+        self.tk_control_panel_theme = tk.StringVar(value=control_panel_theme)
+        self.opm_control_panel_theme = ctk.CTkOptionMenu(master=frm_widgets,
+                                                         variable=self.tk_control_panel_theme,
+                                                         values=self.app_themes_list())
+        self.opm_control_panel_theme.grid(row=widget_start_row, column=1, padx=0, pady=5, sticky='w')
         widget_start_row += 1
 
         lbl_mode = ctk.CTkLabel(master=frm_widgets, text='Appearance Mode', justify="right")
         lbl_mode.grid(row=widget_start_row, column=0, padx=5, sticky='e')
 
         # The control_panel_mode holds the  CustomTkinter appearance mode (Dark / Light)
-        self._tk_appearance_mode_var = tk.StringVar(value=self._control_panel_mode)
-        rdo_light = ctk.CTkRadioButton(master=frm_widgets, text='Light', variable=self._tk_appearance_mode_var,
+        self.tk_appearance_mode_var = tk.StringVar(value=self.control_panel_mode)
+        rdo_light = ctk.CTkRadioButton(master=frm_widgets, text='Light', variable=self.tk_appearance_mode_var,
                                        value='Light')
         rdo_light.grid(row=widget_start_row, column=1, sticky='w')
         widget_start_row += 1
 
-        rdo_dark = ctk.CTkRadioButton(master=frm_widgets, text='Dark', variable=self._tk_appearance_mode_var,
+        rdo_dark = ctk.CTkRadioButton(master=frm_widgets, text='Dark', variable=self.tk_appearance_mode_var,
                                       value='Dark')
         rdo_dark.grid(row=widget_start_row, column=1, pady=5, sticky='w')
         widget_start_row += 1
 
-        if self._control_panel_mode == 'Dark':
+        if self.control_panel_mode == 'Dark':
             rdo_light.deselect()
             rdo_dark.select()
-        elif self._control_panel_mode == 'Light':
+        elif self.control_panel_mode == 'Light':
             rdo_dark.deselect()
             rdo_light.select()
 
         # lbl_enable_tooltips = ctk.CTkLabel(master=frm_widgets, text='Enable tooltips', justify="right")
         # lbl_enable_tooltips.grid(row=widget_start_row, column=0, padx=5, sticky='e')
 
-        self._tk_enable_tooltips = tk.IntVar(master=frm_widgets)
-        self._tk_enable_tooltips.set(self._enable_tooltips)
-        self._swt_enable_tooltips = ctk.CTkSwitch(master=frm_widgets,
-                                                  text='Tooltips',
-                                                  variable=self._tk_enable_tooltips,
-                                                  command=self._get_tooltips_setting)
-        self._swt_enable_tooltips.grid(row=widget_start_row, column=1, padx=(0, 0), pady=10, sticky='w')
+        self.tk_enable_tooltips = tk.IntVar(master=frm_widgets)
+        self.tk_enable_tooltips.set(self.enable_tooltips)
+        self.swt_enable_tooltips = ctk.CTkSwitch(master=frm_widgets,
+                                                 text='Tooltips',
+                                                 variable=self.tk_enable_tooltips,
+                                                 command=self.get_tooltips_setting)
+        self.swt_enable_tooltips.grid(row=widget_start_row, column=1, padx=(0, 0), pady=10, sticky='w')
         widget_start_row += 1
 
-        self._tk_enable_palette_labels = tk.IntVar(master=frm_widgets)
-        self._tk_enable_palette_labels.set(self._enable_palette_labels)
-        self._swt_enable_palette_labels = ctk.CTkSwitch(master=frm_widgets,
-                                                        text='Colour Palette Labels',
-                                                        variable=self._tk_enable_palette_labels,
-                                                        command=self._get_palette_label_setting)
-        self._swt_enable_palette_labels.grid(row=widget_start_row, column=1, padx=(0, 0), pady=10, sticky='w')
+        self.tk_enable_palette_labels = tk.IntVar(master=frm_widgets)
+        self.tk_enable_palette_labels.set(self.enable_palette_labels)
+        self.swt_enable_palette_labels = ctk.CTkSwitch(master=frm_widgets,
+                                                       text='Colour Palette Labels',
+                                                       variable=self.tk_enable_palette_labels,
+                                                       command=self.get_palette_label_setting)
+        self.swt_enable_palette_labels.grid(row=widget_start_row, column=1, padx=(0, 0), pady=10, sticky='w')
 
-        if self._enable_tooltips:
-            btn_enable_palette_labels_tooltip = CTkToolTip(self._swt_enable_palette_labels,
+        if self.enable_tooltips:
+            btn_enable_palette_labels_tooltip = CTkToolTip(self.swt_enable_palette_labels,
                                                            "Enable/disable the rendering of the colour palette "
                                                            "labels.")
 
         widget_start_row += 1
-        self._tk_last_theme_on_start = tk.IntVar(master=frm_widgets)
-        self._tk_last_theme_on_start.set(self._last_theme_on_start)
-        self._swt_last_theme_on_start = ctk.CTkSwitch(master=frm_widgets,
-                                                      text='Load Last Theme',
-                                                      variable=self._tk_last_theme_on_start,
-                                                      command=self._get_last_theme_on_start)
-        self._swt_last_theme_on_start.grid(row=widget_start_row, column=1, padx=(0, 0), pady=10, sticky='w')
-        if self._enable_tooltips:
-            last_theme_on_start_tooltip = CTkToolTip(self._swt_last_theme_on_start,
+        self.tk_last_theme_on_start = tk.IntVar(master=frm_widgets)
+        self.tk_last_theme_on_start.set(self.last_theme_on_start)
+        self.swt_last_theme_on_start = ctk.CTkSwitch(master=frm_widgets,
+                                                     text='Load Last Theme',
+                                                     variable=self.tk_last_theme_on_start,
+                                                     command=self.get_last_theme_on_start)
+        self.swt_last_theme_on_start.grid(row=widget_start_row, column=1, padx=(0, 0), pady=10, sticky='w')
+        if self.enable_tooltips:
+            last_theme_on_start_tooltip = CTkToolTip(self.swt_last_theme_on_start,
                                                      wraplength=250,
                                                      justify="left",
                                                      message="Enable this switch, to auto-select the last theme "
                                                              "you worked on, at application startup.")
 
         widget_start_row += 1
-        self._tk_enable_single_click_paste = tk.IntVar(master=frm_widgets)
-        self._tk_enable_single_click_paste.set(self._enable_single_click_paste)
-        self._swt_enable_single_click_paste = ctk.CTkSwitch(master=frm_widgets,
-                                                            text='Single Click Paste',
-                                                            variable=self._tk_enable_single_click_paste,
-                                                            command=self._get_single_click_paste_setting)
-        self._swt_enable_single_click_paste.grid(row=widget_start_row, column=1, padx=(0, 0), pady=10, sticky='w')
+        self.tk_enable_single_click_paste = tk.IntVar(master=frm_widgets)
+        self.tk_enable_single_click_paste.set(self.enable_single_click_paste)
+        self.swt_enable_single_click_paste = ctk.CTkSwitch(master=frm_widgets,
+                                                           text='Single Click Paste',
+                                                           variable=self.tk_enable_single_click_paste,
+                                                           command=self.get_single_click_paste_setting)
+        self.swt_enable_single_click_paste.grid(row=widget_start_row, column=1, padx=(0, 0), pady=10, sticky='w')
 
         widget_start_row += 1
-        if self._enable_tooltips:
-            btn_enable_tooltips_tooltip = CTkToolTip(self._swt_enable_single_click_paste,
+        if self.enable_tooltips:
+            btn_enable_tooltips_tooltip = CTkToolTip(self.swt_enable_single_click_paste,
                                                      wraplength=400,
                                                      message="Enable/disable colour pasting, via a single click. "
                                                              "Colours can be pasted to the colour palette or the array "
@@ -863,11 +871,11 @@ class ControlPanel:
         self.opm_harmony_contrast_differential.set(str(self.harmony_contrast_differential))
         widget_start_row += 1
 
-        self._folder_image = cbtk.load_image(light_image=APP_IMAGES / 'folder.png', image_size=(20, 20))
+        self.folder_image = cbtk.load_image(light_image=APP_IMAGES / 'folder.png', image_size=(20, 20))
         lbl_theme_json_dir = ctk.CTkLabel(master=frm_widgets, text='Themes Location', justify="right")
         lbl_theme_json_dir.grid(row=widget_start_row, column=0, padx=5, pady=5, sticky='e')
 
-        if self._enable_tooltips:
+        if self.enable_tooltips:
             lbl_theme_json_dir_tooltip = CTkToolTip(lbl_theme_json_dir,
                                                     "Select a location to store your themes.")
 
@@ -876,50 +884,49 @@ class ControlPanel:
                                            width=30,
                                            height=30,
                                            fg_color='#748696',
-                                           image=self._folder_image,
-                                           command=self._preferred_json_location)
+                                           image=self.folder_image,
+                                           command=self.preferred_json_location)
         btn_theme_json_dir.grid(row=widget_start_row, column=1, pady=5, sticky='w')
         widget_start_row += 1
 
-        self._lbl_pref_theme_dir_disp = ctk.CTkLabel(master=frm_widgets, text=self._theme_json_dir, justify="right",
-                                                     font=mod.SMALL_TEXT)
-        self._lbl_pref_theme_dir_disp.grid(row=widget_start_row, column=1, padx=5, pady=5, sticky='e')
+        self.lbl_pref_theme_dir_disp = ctk.CTkLabel(master=frm_widgets, text=self.theme_json_dir, justify="right",
+                                                    font=mod.SMALL_TEXT)
+        self.lbl_pref_theme_dir_disp.grid(row=widget_start_row, column=1, padx=5, pady=5, sticky='e')
         widget_start_row += 1
 
         # Control buttons
-        btn_close = ctk.CTkButton(master=frm_buttons, text='Cancel', command=self._top_prefs.destroy)
+        btn_close = ctk.CTkButton(master=frm_buttons, text='Cancel', command=self.top_prefs.destroy)
         btn_close.grid(row=0, column=0, padx=(15, 35), pady=5)
 
-        btn_save = ctk.CTkButton(master=frm_buttons, text='Save', command=self._save_preferences)
+        btn_save = ctk.CTkButton(master=frm_buttons, text='Save', command=self.save_preferences)
         btn_save.grid(row=0, column=1, padx=(150, 15), pady=5)
-        self._top_prefs.grab_set()
+        self.top_prefs.grab_set()
 
-    def _launch_provenance_dialog(self):
-        self._top_prov = ctk.CTkToplevel(self.ctk_control_panel)
-        self._top_prov.title('Theme Provenance')
-        self._top_prov.geometry('580x470')
+    def launch_provenance_dialog(self):
+        self.top_prov = ctk.CTkToplevel(self.ctk_control_panel)
+        self.top_prov.title('Theme Provenance')
+        self.top_prov.geometry('580x470')
         # Make sure we pop up in front of Control Panel
-        self._top_prov.transient(self.ctk_control_panel)
-        self._top_prov.rowconfigure(1, weight=1)
+        self.top_prov.transient(self.ctk_control_panel)
+        self.top_prov.rowconfigure(1, weight=1)
 
-        frm_header = ctk.CTkFrame(master=self._top_prov)
+        frm_header = ctk.CTkFrame(master=self.top_prov)
         frm_header.grid(column=0, row=0, padx=5, pady=5, sticky='nsew')
 
-        frm_widgets = ctk.CTkFrame(master=self._top_prov)
+        frm_widgets = ctk.CTkFrame(master=self.top_prov)
         frm_widgets.grid(column=0, row=1, padx=5, pady=5, sticky='nsew')
 
-        frm_buttons = ctk.CTkFrame(master=self._top_prov)
+        frm_buttons = ctk.CTkFrame(master=self.top_prov)
         frm_buttons.grid(column=0, row=2, padx=5, pady=5, sticky='ew')
 
-        theme_name = self._theme_json_data["provenance"]["theme name"]
-        created_with = self._theme_json_data["provenance"]["created with"]
-        created_label = self._theme_json_data["provenance"]["date created"]
-        authors_name = self._theme_json_data["provenance"]["theme author"]
-        last_modified_by = self._theme_json_data["provenance"]["last modified by"]
-        last_modified = self._theme_json_data["provenance"]["last modified"]
-        harmony_method = self._theme_json_data["provenance"]["harmony method"]
-        keystone_colour = self._theme_json_data["provenance"]["keystone colour"]
-
+        theme_name = self.theme_json_data["provenance"]["theme name"]
+        created_with = self.theme_json_data["provenance"]["created with"]
+        created_label = self.theme_json_data["provenance"]["date created"]
+        authors_name = self.theme_json_data["provenance"]["theme author"]
+        last_modified_by = self.theme_json_data["provenance"]["last modified by"]
+        last_modified = self.theme_json_data["provenance"]["last modified"]
+        harmony_method = self.theme_json_data["provenance"]["harmony method"]
+        keystone_colour = self.theme_json_data["provenance"]["keystone colour"]
 
         widget_row = 0
         # Header -  Theme Name (frm_header)
@@ -941,7 +948,7 @@ class ControlPanel:
         lbl_created_label = ctk.CTkLabel(master=frm_widgets, text='Created:', width=100, anchor="e")
         lbl_created_label.grid(row=widget_row, column=2, padx=5, pady=10, sticky='e')
 
-        lbl_created_date = ctk.CTkLabel(master=frm_widgets, text=f'{created_label}',  anchor="w", width=75)
+        lbl_created_date = ctk.CTkLabel(master=frm_widgets, text=f'{created_label}', anchor="w", width=75)
         lbl_created_date.grid(row=widget_row, column=3, padx=(20, 30), pady=10, sticky='w')
 
         # Modification Details
@@ -955,7 +962,7 @@ class ControlPanel:
         lbl_last_modified_label = ctk.CTkLabel(master=frm_widgets, text='Date:', width=75, anchor="e")
         lbl_last_modified_label.grid(row=widget_row, column=2, padx=5, pady=10, sticky='e')
 
-        lbl_last_modified_date = ctk.CTkLabel(master=frm_widgets, text=f'{last_modified}',  anchor="w")
+        lbl_last_modified_date = ctk.CTkLabel(master=frm_widgets, text=f'{last_modified}', anchor="w")
         lbl_last_modified_date.grid(row=widget_row, column=3, padx=20, pady=10, sticky='w')
 
         # Keystone Details
@@ -967,10 +974,10 @@ class ControlPanel:
         lbl_keystone_method.grid(row=widget_row, column=1, padx=5, pady=10, sticky='w')
 
         widget_row += 1
-        lbl_keystone_colour_label =  ctk.CTkLabel(master=frm_widgets, text='Keystone colour:', width=75, anchor="e")
+        lbl_keystone_colour_label = ctk.CTkLabel(master=frm_widgets, text='Keystone colour:', width=75, anchor="e")
         lbl_keystone_colour_label.grid(row=widget_row, column=0, padx=20, pady=10, sticky='e')
 
-        lbl_keystone_colour = ctk.CTkLabel(master=frm_widgets, text=f'{keystone_colour}',  anchor="w")
+        lbl_keystone_colour = ctk.CTkLabel(master=frm_widgets, text=f'{keystone_colour}', anchor="w")
         lbl_keystone_colour.grid(row=widget_row, column=1, padx=5, pady=(10, 5), sticky='w')
 
         widget_row += 1
@@ -992,32 +999,31 @@ class ControlPanel:
         lbl_created_with = ctk.CTkLabel(master=frm_widgets, font=regular_italic, text=f'{created_with}', anchor="w")
         lbl_created_with.grid(row=widget_row, column=3, padx=5, pady=(50, 10), sticky='w')
 
-
         # Add the close button into the bottom frame (frm_buttons).
-        btn_close = ctk.CTkButton(master=frm_buttons, text='Close', command=self._top_prov.destroy, width=550)
+        btn_close = ctk.CTkButton(master=frm_buttons, text='Close', command=self.top_prov.destroy, width=550)
         btn_close.grid(row=0, column=0, padx=10, pady=(5, 5), sticky='we')
 
-    def _save_theme_palette(self, theme_name=None):
+    def save_theme_palette(self, theme_name=None):
         """Save the colour palette colours back to disk."""
         if theme_name is None:
-            palette_json = self._palette_file
+            palette_json = self.palette_file
         else:
             palette_json = theme_name.replace('.json', '') + '.json'
 
-        # Update the button colour settings to the self._theme_palette dictionary
-        self._palette_file = self._palettes_dir / palette_json
-        if self._appearance_mode.lower() == 'light':
+        # Update the button colour settings to the self.theme_palette dictionary
+        self.palette_file = self.palettes_dir / palette_json
+        if self.appearance_mode.lower() == 'light':
             mode = 0
         else:
             mode = 1
-        for entry_id, button in enumerate(self._theme_palette_tiles):
-            fg_colour = self._theme_palette_tiles[entry_id].cget('fg_color')
-            self._theme_palette[str(entry_id)][mode] = fg_colour
+        for entry_id, button in enumerate(self.theme_palette_tiles):
+            fg_colour = self.theme_palette_tiles[entry_id].cget('fg_color')
+            self.theme_palette[str(entry_id)][mode] = fg_colour
 
-        with open(self._palette_file, "w") as f:
-            json.dump(self._theme_palette, f, indent=2)
+        with open(self.palette_file, "w") as f:
+            json.dump(self.theme_palette, f, indent=2)
 
-    def _send_command_json(self, command_type: str, command: str, parameters: list = None):
+    def send_command_json(self, command_type: str, command: str, parameters: list = None):
         """Format our command into a JSON payload in string format. We have two command type. These are 'control' and
         'filter'. The parameters' parameter, can be used to accept a list to filter against, of a list to be used to pass
         parameters to a target function/method, in the Preview Panel."""
@@ -1051,18 +1057,17 @@ class ControlPanel:
 
         message_json_str = message_json_str.replace('%command_type%', command_type)
         message_json_str = message_json_str.replace('%command%', command)
-        self._send_message(message=message_json_str)
+        self.send_message(message=message_json_str)
 
     @staticmethod
-    def _prepare_message(message):
+    def prepare_message(message):
         message = message.encode(ENCODING_FORMAT)
         msg_length = len(message)
         send_length = str(msg_length).encode(ENCODING_FORMAT)
         send_length += b' ' * (HEADER_SIZE - len(send_length))
         return send_length, message
 
-
-    def _send_message(self, message):
+    def send_message(self, message):
 
         listener_checks = 0
         listener_started = False
@@ -1090,17 +1095,17 @@ class ControlPanel:
             except ConnectionRefusedError:
                 time.sleep(0.1)
 
-        send_length, message = self._prepare_message(message)
+        send_length, message = self.prepare_message(message)
         client.send(send_length)
         client.send(message)
         # print(f'Message sent: {message.decode(ENCODING_FORMAT)}')
         # The disconnect command has to follow the required JSON command format...
-        send_length, message = self._prepare_message(DISCONNECT_JSON)
+        send_length, message = self.prepare_message(DISCONNECT_JSON)
         client.send(send_length)
         client.send(message)
         client.close()
 
-    def _render_geometry_buttons(self):
+    def render_geometry_buttons(self):
 
         button_height = 40
         button_width = 100
@@ -1109,7 +1114,7 @@ class ControlPanel:
         pad_x = (9, 9)
         pad_y = (5, 5)
 
-        lbl_header = ctk.CTkLabel(master=self._frm_geometry,
+        lbl_header = ctk.CTkLabel(master=self.frm_geometry,
                                   text=f'Widget Geometry',
                                   font=mod.HEADING4)
         lbl_header.grid(row=0,
@@ -1120,52 +1125,52 @@ class ControlPanel:
                         padx=10)
         row = 1
         column = 0
-        btn_geo_button = ctk.CTkButton(master=self._frm_geometry,
+        btn_geo_button = ctk.CTkButton(master=self.frm_geometry,
                                        text='Button',
                                        height=button_height,
                                        width=button_width,
                                        corner_radius=corner_radius,
                                        border_width=border_width,
-                                       command=lambda: self._launch_widget_geometry('CTkButton'))
+                                       command=lambda: self.launch_widget_geometry('CTkButton'))
         btn_geo_button.grid(row=row,
                             column=column,
                             padx=pad_x,
                             pady=pad_y)
         column += 1
 
-        btn_geo_checkbox = ctk.CTkButton(master=self._frm_geometry,
+        btn_geo_checkbox = ctk.CTkButton(master=self.frm_geometry,
                                          text='Checkbox',
                                          height=button_height,
                                          width=button_width,
                                          corner_radius=corner_radius,
                                          border_width=border_width,
-                                         command=lambda: self._launch_widget_geometry('CTkCheckBox'))
+                                         command=lambda: self.launch_widget_geometry('CTkCheckBox'))
         btn_geo_checkbox.grid(row=row,
                               column=column,
                               padx=pad_x,
                               pady=pad_y)
         column += 1
 
-        btn_geo_combobox = ctk.CTkButton(master=self._frm_geometry,
+        btn_geo_combobox = ctk.CTkButton(master=self.frm_geometry,
                                          text='ComboBox',
                                          height=button_height,
                                          width=button_width,
                                          corner_radius=corner_radius,
                                          border_width=border_width,
-                                         command=lambda: self._launch_widget_geometry('CTkComboBox'))
+                                         command=lambda: self.launch_widget_geometry('CTkComboBox'))
         btn_geo_combobox.grid(row=row,
                               column=column,
                               padx=pad_x,
                               pady=pad_y)
         column += 1
 
-        btn_geo_entry = ctk.CTkButton(master=self._frm_geometry,
+        btn_geo_entry = ctk.CTkButton(master=self.frm_geometry,
                                       text='Entry',
                                       height=button_height,
                                       width=button_width,
                                       corner_radius=corner_radius,
                                       border_width=border_width,
-                                      command=lambda: self._launch_widget_geometry('CTkEntry'))
+                                      command=lambda: self.launch_widget_geometry('CTkEntry'))
 
         btn_geo_entry.grid(row=row,
                            column=column,
@@ -1173,39 +1178,39 @@ class ControlPanel:
                            pady=pad_y)
         column += 1
 
-        btn_geo_frame = ctk.CTkButton(master=self._frm_geometry,
+        btn_geo_frame = ctk.CTkButton(master=self.frm_geometry,
                                       text='Frame',
                                       height=button_height,
                                       width=button_width,
                                       corner_radius=corner_radius,
                                       border_width=border_width,
-                                      command=lambda: self._launch_widget_geometry('CTkFrame'))
+                                      command=lambda: self.launch_widget_geometry('CTkFrame'))
         btn_geo_frame.grid(row=row,
                            column=column,
                            padx=pad_x,
                            pady=pad_y)
         column += 1
 
-        btn_geo_label = ctk.CTkButton(master=self._frm_geometry,
+        btn_geo_label = ctk.CTkButton(master=self.frm_geometry,
                                       text='Label',
                                       height=button_height,
                                       width=button_width,
                                       corner_radius=corner_radius,
                                       border_width=border_width,
-                                      command=lambda: self._launch_widget_geometry('CTkLabel'))
+                                      command=lambda: self.launch_widget_geometry('CTkLabel'))
         btn_geo_label.grid(row=row,
                            column=column,
                            padx=pad_x,
                            pady=pad_y)
 
         column += 1
-        btn_geo_option_menu = ctk.CTkButton(master=self._frm_geometry,
+        btn_geo_option_menu = ctk.CTkButton(master=self.frm_geometry,
                                             text='OptionMenu',
                                             height=button_height,
                                             width=button_width,
                                             corner_radius=corner_radius,
                                             border_width=border_width,
-                                            command=lambda: self._launch_widget_geometry('CTkOptionMenu'))
+                                            command=lambda: self.launch_widget_geometry('CTkOptionMenu'))
         btn_geo_option_menu.grid(row=row,
                                  column=column,
                                  padx=pad_x,
@@ -1214,13 +1219,13 @@ class ControlPanel:
         row += 1
         column = 0
 
-        btn_geo_progress = ctk.CTkButton(master=self._frm_geometry,
+        btn_geo_progress = ctk.CTkButton(master=self.frm_geometry,
                                          text='ProgressBar',
                                          height=button_height,
                                          width=button_width,
                                          corner_radius=corner_radius,
                                          border_width=border_width,
-                                         command=lambda: self._launch_widget_geometry('CTkProgressBar'))
+                                         command=lambda: self.launch_widget_geometry('CTkProgressBar'))
         btn_geo_progress.grid(row=row,
                               column=column,
                               padx=pad_x,
@@ -1228,13 +1233,13 @@ class ControlPanel:
 
         column += 1
 
-        btn_geo_radio = ctk.CTkButton(master=self._frm_geometry,
+        btn_geo_radio = ctk.CTkButton(master=self.frm_geometry,
                                       text='RadioButton',
                                       height=button_height,
                                       width=button_width,
                                       corner_radius=corner_radius,
                                       border_width=border_width,
-                                      command=lambda: self._launch_widget_geometry('CTkRadioButton'))
+                                      command=lambda: self.launch_widget_geometry('CTkRadioButton'))
         btn_geo_radio.grid(row=row,
                            column=column,
                            padx=pad_x,
@@ -1242,13 +1247,13 @@ class ControlPanel:
 
         column += 1
 
-        btn_geo_scrollbar = ctk.CTkButton(master=self._frm_geometry,
+        btn_geo_scrollbar = ctk.CTkButton(master=self.frm_geometry,
                                           text='SegButton',
                                           height=button_height,
                                           width=button_width,
                                           corner_radius=corner_radius,
                                           border_width=border_width,
-                                          command=lambda: self._launch_widget_geometry('CTkSegmentedButton'))
+                                          command=lambda: self.launch_widget_geometry('CTkSegmentedButton'))
         btn_geo_scrollbar.grid(row=row,
                                column=column,
                                padx=pad_x,
@@ -1256,66 +1261,66 @@ class ControlPanel:
 
         column += 1
 
-        btn_geo_scrollbar = ctk.CTkButton(master=self._frm_geometry,
+        btn_geo_scrollbar = ctk.CTkButton(master=self.frm_geometry,
                                           text='ScrollBar',
                                           height=button_height,
                                           width=button_width,
                                           corner_radius=corner_radius,
                                           border_width=border_width,
-                                          command=lambda: self._launch_widget_geometry('CTkScrollbar'))
+                                          command=lambda: self.launch_widget_geometry('CTkScrollbar'))
         btn_geo_scrollbar.grid(row=row,
                                column=column,
                                padx=pad_x,
                                pady=pad_y)
         column += 1
 
-        btn_geo_slider = ctk.CTkButton(master=self._frm_geometry,
+        btn_geo_slider = ctk.CTkButton(master=self.frm_geometry,
                                        text='Slider',
                                        height=button_height,
                                        width=button_width,
                                        corner_radius=corner_radius,
                                        border_width=border_width,
-                                       command=lambda: self._launch_widget_geometry('CTkSlider'))
+                                       command=lambda: self.launch_widget_geometry('CTkSlider'))
         btn_geo_slider.grid(row=row,
                             column=column,
                             padx=pad_x,
                             pady=pad_y)
         column += 1
 
-        btn_geo_switch = ctk.CTkButton(master=self._frm_geometry,
+        btn_geo_switch = ctk.CTkButton(master=self.frm_geometry,
                                        text='Switch',
                                        height=button_height,
                                        width=button_width,
                                        corner_radius=corner_radius,
                                        border_width=border_width,
-                                       command=lambda: self._launch_widget_geometry('CTkSwitch'))
+                                       command=lambda: self.launch_widget_geometry('CTkSwitch'))
         btn_geo_switch.grid(row=row,
                             column=column,
                             padx=pad_x,
                             pady=pad_y)
         column += 1
 
-        btn_geo_switch = ctk.CTkButton(master=self._frm_geometry,
+        btn_geo_switch = ctk.CTkButton(master=self.frm_geometry,
                                        text='Textbox',
                                        height=button_height,
                                        width=button_width,
                                        corner_radius=corner_radius,
                                        border_width=border_width,
-                                       command=lambda: self._launch_widget_geometry('CTkTextbox'))
+                                       command=lambda: self.launch_widget_geometry('CTkTextbox'))
         btn_geo_switch.grid(row=row,
                             column=column,
                             padx=pad_x,
                             pady=pad_y)
         column += 1
 
-    def _launch_widget_geometry(self, widget_type):
+    def launch_widget_geometry(self, widget_type):
         def slider_callback(property_name, value):
             label_text = property_name.replace('_', ' ')
             base_label_text = label_text.replace(widget_type.lower(), '') + ': '
             property_value = int(value)
             label_dict[property_name].configure(text=base_label_text + str(property_value))
             config_param = property_name.replace(f'{widget_type.lower()}_', '')
-            self._geometry_edit_values[property_name] = property_value
+            self.geometry_edit_values[property_name] = property_value
 
             if config_param == 'border_width_unchecked':
                 geometry_widget.deselect()
@@ -1327,41 +1332,41 @@ class ControlPanel:
         def deselect_widget(widget_id):
             widget_id.deselect()
 
-        self._geometry_edit_values = {}
-        preview_frame_top = self._theme_json_data['CTkFrame']['top_fg_color'][
-            cbtk.str_mode_to_int(self._appearance_mode)]
+        self.geometry_edit_values = {}
+        preview_frame_top = self.theme_json_data['CTkFrame']['top_fg_color'][
+            cbtk.str_mode_to_int(self.appearance_mode)]
 
-        self._top_geometry = ctk.CTkToplevel(self.ctk_control_panel)
-        self._top_geometry.title(f'{widget_type} Widget Geometry')
+        self.top_geometry = ctk.CTkToplevel(self.ctk_control_panel)
+        self.top_geometry.title(f'{widget_type} Widget Geometry')
 
-        self._restore_geom_geometry()
+        self.restore_geom_geometry()
 
         # Make preferences dialog modal
-        self._top_geometry.rowconfigure(0, weight=1)
-        self._top_geometry.rowconfigure(1, weight=0)
-        # self._top_geometry.columnconfigure(0, weight=0)
-        # self._top_geometry.columnconfigure(1, weight=1)
+        self.top_geometry.rowconfigure(0, weight=1)
+        self.top_geometry.rowconfigure(1, weight=0)
+        # self.top_geometry.columnconfigure(0, weight=0)
+        # self.top_geometry.columnconfigure(1, weight=1)
 
-        preview_text_colour = self._theme_json_data['CTkLabel']['text_color'][
-            cbtk.str_mode_to_int(self._appearance_mode)]
+        preview_text_colour = self.theme_json_data['CTkLabel']['text_color'][
+            cbtk.str_mode_to_int(self.appearance_mode)]
 
-        frm_main = ctk.CTkFrame(master=self._top_geometry, corner_radius=5)
+        frm_main = ctk.CTkFrame(master=self.top_geometry, corner_radius=5)
         frm_main.grid(column=0, row=0, sticky='nsew')
         frm_main.columnconfigure(0, weight=0)
         frm_main.columnconfigure((1, 2), weight=1)
         frm_main.rowconfigure(0, weight=1)
 
-        frame_fg_color = self._theme_json_data['CTkFrame']['fg_color'][
-            cbtk.str_mode_to_int(self._appearance_mode)]
+        frame_fg_color = self.theme_json_data['CTkFrame']['fg_color'][
+            cbtk.str_mode_to_int(self.appearance_mode)]
         json_widget_type = mod.json_widget_type(widget_type=widget_type)
 
-        mode = cbtk.str_mode_to_int(self._appearance_mode)
+        mode = cbtk.str_mode_to_int(self.appearance_mode)
         if widget_type == 'CTkFrame':
-            self._top_geometry.geometry('764x280')
+            self.top_geometry.geometry('764x280')
             frm_widget_preview_low = ctk.CTkFrame(master=frm_main,
                                                   fg_color=cbtk.contrast_colour(preview_frame_top, 20)
                                                   )
-            frm_main.configure(corner_radius=self._theme_json_data[widget_type]['corner_radius'])
+            frm_main.configure(corner_radius=self.theme_json_data[widget_type]['corner_radius'])
         else:
             frm_widget_preview_low = ctk.CTkFrame(master=frm_main,
                                                   corner_radius=5,
@@ -1388,7 +1393,7 @@ class ControlPanel:
         btn_close.grid(row=0, column=0, padx=(25, 35), pady=5)
 
         btn_save = ctk.CTkButton(master=frm_buttons, text='Save',
-                                 command=lambda w_type=widget_type: self._save_geometry_edits(widget_type=w_type))
+                                 command=lambda w_type=widget_type: self.save_geometry_edits(widget_type=w_type))
         btn_save.grid(row=0, column=1, padx=(160, 15), pady=5)
 
         geometry_parameters_file = str(ETC_DIR / 'geometry_parameters.json')
@@ -1396,11 +1401,11 @@ class ControlPanel:
         geometry_parameters_file_json = mod.json_dict(json_file_path=geometry_parameters_file)
 
         if widget_type == 'CTkButton':
-            self._top_geometry.geometry('764x234')
-            button_text_colour = self._theme_json_data[json_widget_type]['text_color'][mode]
-            button_fg_colour = self._theme_json_data[json_widget_type]['fg_color'][mode]
-            button_hover_colour = self._theme_json_data[json_widget_type]['hover_color'][mode]
-            button_border_colour = self._theme_json_data[json_widget_type]['border_color'][mode]
+            self.top_geometry.geometry('764x234')
+            button_text_colour = self.theme_json_data[json_widget_type]['text_color'][mode]
+            button_fg_colour = self.theme_json_data[json_widget_type]['fg_color'][mode]
+            button_hover_colour = self.theme_json_data[json_widget_type]['hover_color'][mode]
+            button_border_colour = self.theme_json_data[json_widget_type]['border_color'][mode]
 
             geometry_widget = ctk.CTkButton(master=frm_widget_preview_low,
                                             text_color=button_text_colour,
@@ -1408,19 +1413,19 @@ class ControlPanel:
                                             hover_color=button_hover_colour,
                                             border_color=button_border_colour,
                                             text='CTkButton',
-                                            corner_radius=self._theme_json_data['CTkButton']['corner_radius'],
-                                            border_width=self._theme_json_data['CTkButton']['border_width'])
+                                            corner_radius=self.theme_json_data['CTkButton']['corner_radius'],
+                                            border_width=self.theme_json_data['CTkButton']['border_width'])
         elif widget_type == 'CTkCheckBox':
-            self._top_geometry.geometry('786x232')
-            checkbox_fg_color = self._theme_json_data['CTkCheckbox']['fg_color'][mode]
+            self.top_geometry.geometry('786x232')
+            checkbox_fg_color = self.theme_json_data['CTkCheckbox']['fg_color'][mode]
 
-            checkbox_border_color = self._theme_json_data['CTkCheckbox']['border_color'][mode]
+            checkbox_border_color = self.theme_json_data['CTkCheckbox']['border_color'][mode]
 
-            checkbox_hover_color = self._theme_json_data['CTkCheckbox']['hover_color'][mode]
+            checkbox_hover_color = self.theme_json_data['CTkCheckbox']['hover_color'][mode]
 
-            checkbox_checkmark_color = self._theme_json_data['CTkCheckbox']['checkmark_color'][mode]
+            checkbox_checkmark_color = self.theme_json_data['CTkCheckbox']['checkmark_color'][mode]
 
-            checkbox_text_color = self._theme_json_data['CTkCheckbox']['text_color'][mode]
+            checkbox_text_color = self.theme_json_data['CTkCheckbox']['text_color'][mode]
 
             geometry_widget = ctk.CTkCheckBox(master=frm_widget_preview_low,
                                               fg_color=checkbox_fg_color,
@@ -1428,26 +1433,26 @@ class ControlPanel:
                                               hover_color=checkbox_hover_color,
                                               checkmark_color=checkbox_checkmark_color,
                                               text_color=checkbox_text_color,
-                                              corner_radius=self._theme_json_data['CTkCheckbox']['corner_radius'],
-                                              border_width=self._theme_json_data['CTkCheckbox']['border_width'])
+                                              corner_radius=self.theme_json_data['CTkCheckbox']['corner_radius'],
+                                              border_width=self.theme_json_data['CTkCheckbox']['border_width'])
         elif widget_type == 'CTkComboBox':
-            self._top_geometry.geometry('795x234')
+            self.top_geometry.geometry('795x234')
 
-            combobox_fg_color = self._theme_json_data['CTkComboBox']['fg_color'][mode]
+            combobox_fg_color = self.theme_json_data['CTkComboBox']['fg_color'][mode]
 
-            combobox_text_color = self._theme_json_data['CTkComboBox']['text_color'][mode]
+            combobox_text_color = self.theme_json_data['CTkComboBox']['text_color'][mode]
 
-            combobox_border_color = self._theme_json_data['CTkComboBox']['border_color'][mode]
+            combobox_border_color = self.theme_json_data['CTkComboBox']['border_color'][mode]
 
-            combobox_button_colour = self._theme_json_data[json_widget_type]['button_color'][mode]
+            combobox_button_colour = self.theme_json_data[json_widget_type]['button_color'][mode]
 
-            combobox_button_hover_colour = self._theme_json_data[json_widget_type]['button_hover_color'][mode]
+            combobox_button_hover_colour = self.theme_json_data[json_widget_type]['button_hover_color'][mode]
 
-            dropdown_fg_colour = self._theme_json_data['DropdownMenu']['fg_color'][mode]
+            dropdown_fg_colour = self.theme_json_data['DropdownMenu']['fg_color'][mode]
 
-            dropdown_hover_colour = self._theme_json_data['DropdownMenu']['hover_color'][mode]
+            dropdown_hover_colour = self.theme_json_data['DropdownMenu']['hover_color'][mode]
 
-            dropdown_text_colour = self._theme_json_data['DropdownMenu']['text_color'][mode]
+            dropdown_text_colour = self.theme_json_data['DropdownMenu']['text_color'][mode]
 
             geometry_widget = ctk.CTkComboBox(master=frm_widget_preview_low,
                                               fg_color=combobox_fg_color,
@@ -1458,73 +1463,73 @@ class ControlPanel:
                                               dropdown_fg_color=dropdown_fg_colour,
                                               dropdown_text_color=dropdown_text_colour,
                                               dropdown_hover_color=dropdown_hover_colour,
-                                              corner_radius=self._theme_json_data['CTkCheckbox']['corner_radius'],
-                                              border_width=self._theme_json_data['CTkCheckbox']['border_width'],
+                                              corner_radius=self.theme_json_data['CTkCheckbox']['corner_radius'],
+                                              border_width=self.theme_json_data['CTkCheckbox']['border_width'],
                                               values=["Option 1", "Option 2", "Option 3", "Option 4..."])
         elif widget_type == 'CTkFrame':
-            self._top_geometry.geometry('764x280')
+            self.top_geometry.geometry('764x280')
             geometry_widget = ctk.CTkFrame(master=frm_widget_preview_low, fg_color=preview_frame_top,
-                                           corner_radius=self._theme_json_data['CTkFrame']['corner_radius'],
-                                           border_width=self._theme_json_data['CTkFrame']['border_width'])
+                                           corner_radius=self.theme_json_data['CTkFrame']['corner_radius'],
+                                           border_width=self.theme_json_data['CTkFrame']['border_width'])
 
             lbl_frame = ctk.CTkLabel(master=geometry_widget, text_color=preview_text_colour, text='CTKFrame')
             lbl_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
         elif widget_type == 'CTkLabel':
-            self._top_geometry.geometry('755x160')
+            self.top_geometry.geometry('755x160')
             geometry_widget = ctk.CTkLabel(master=frm_widget_preview_low,
                                            text_color=preview_text_colour,
                                            fg_color=cbtk.contrast_colour(preview_frame_top, 15),
-                                           corner_radius=self._theme_json_data[widget_type]['corner_radius'])
+                                           corner_radius=self.theme_json_data[widget_type]['corner_radius'])
             widget_tooltip = CTkToolTip(geometry_widget, wraplength=200, justify='left',
                                         message='The CTkLabel widget has been intentionally '
                                                 'rendered with a contrasting fg_color, so that '
                                                 'the corner radius effect may be seen.')
         elif widget_type == 'CTkEntry':
-            fg_color = self._theme_json_data['CTkEntry']['fg_color'][mode]
-            border_color = self._theme_json_data['CTkEntry']['border_color'][mode]
-            self._top_geometry.geometry('754x235')
+            fg_color = self.theme_json_data['CTkEntry']['fg_color'][mode]
+            border_color = self.theme_json_data['CTkEntry']['border_color'][mode]
+            self.top_geometry.geometry('754x235')
             geometry_widget = ctk.CTkEntry(master=frm_widget_preview_low,
                                            placeholder_text="CTkEntry",
                                            fg_color=fg_color,
                                            border_color=border_color)
 
         elif widget_type == 'CTkProgressBar':
-            self._top_geometry.geometry('807x225')
-            progressbar_fg_color = self._theme_json_data['CTkProgressBar']['fg_color'][mode]
+            self.top_geometry.geometry('807x225')
+            progressbar_fg_color = self.theme_json_data['CTkProgressBar']['fg_color'][mode]
 
-            progressbar_progress_color = self._theme_json_data['CTkProgressBar']['progress_color'][mode]
+            progressbar_progress_color = self.theme_json_data['CTkProgressBar']['progress_color'][mode]
 
-            progressbar_border_color = self._theme_json_data['CTkProgressBar']['border_color'][mode]
+            progressbar_border_color = self.theme_json_data['CTkProgressBar']['border_color'][mode]
             geometry_widget = ctk.CTkProgressBar(master=frm_widget_preview_low,
                                                  fg_color=progressbar_fg_color,
                                                  progress_color=progressbar_progress_color,
                                                  border_color=progressbar_border_color,
-                                                 corner_radius=self._theme_json_data[json_widget_type]
+                                                 corner_radius=self.theme_json_data[json_widget_type]
                                                  ['corner_radius'],
-                                                 border_width=self._theme_json_data[json_widget_type]
+                                                 border_width=self.theme_json_data[json_widget_type]
                                                  ['border_width'])
         elif widget_type == 'CTkSlider':
-            self._top_geometry.geometry('760x301')
+            self.top_geometry.geometry('760x301')
             geometry_widget = ctk.CTkSlider(master=frm_widget_preview_low,
-                                            border_width=self._theme_json_data[widget_type]['border_width'])
+                                            border_width=self.theme_json_data[widget_type]['border_width'])
 
         elif widget_type == 'CTkOptionMenu':
-            self._top_geometry.geometry('806x161')
+            self.top_geometry.geometry('806x161')
 
-            optionmenu_fg_colour = self._theme_json_data[json_widget_type]['fg_color'][mode]
+            optionmenu_fg_colour = self.theme_json_data[json_widget_type]['fg_color'][mode]
 
-            optionmenu_button_colour = self._theme_json_data[json_widget_type]['button_color'][mode]
+            optionmenu_button_colour = self.theme_json_data[json_widget_type]['button_color'][mode]
 
-            optionmenu_button_hover_colour = self._theme_json_data[json_widget_type]['button_hover_color'][mode]
+            optionmenu_button_hover_colour = self.theme_json_data[json_widget_type]['button_hover_color'][mode]
 
-            optionmenu_text_color = self._theme_json_data[json_widget_type]['text_color'][mode]
+            optionmenu_text_color = self.theme_json_data[json_widget_type]['text_color'][mode]
 
-            dropdown_fg_colour = self._theme_json_data['DropdownMenu']['fg_color'][mode]
+            dropdown_fg_colour = self.theme_json_data['DropdownMenu']['fg_color'][mode]
 
-            dropdown_hover_colour = self._theme_json_data['DropdownMenu']['hover_color'][mode]
+            dropdown_hover_colour = self.theme_json_data['DropdownMenu']['hover_color'][mode]
 
-            dropdown_text_colour = self._theme_json_data['DropdownMenu']['text_color'][mode]
+            dropdown_text_colour = self.theme_json_data['DropdownMenu']['text_color'][mode]
 
             geometry_widget = ctk.CTkOptionMenu(master=frm_widget_preview_low,
                                                 fg_color=optionmenu_fg_colour,
@@ -1534,33 +1539,33 @@ class ControlPanel:
                                                 dropdown_fg_color=dropdown_fg_colour,
                                                 dropdown_text_color=dropdown_text_colour,
                                                 dropdown_hover_color=dropdown_hover_colour,
-                                                corner_radius=self._theme_json_data['CTkOptionMenu']['corner_radius'],
+                                                corner_radius=self.theme_json_data['CTkOptionMenu']['corner_radius'],
                                                 values=["Option 1", "Option 2", "Option 3..."])
             geometry_widget.set("CTkOptionMenu")
 
 
         elif widget_type == 'CTkRadioButton':
-            self._top_geometry.geometry('800x301')
-            radiobutton_fg_color = self._theme_json_data['CTkRadiobutton']['fg_color'][mode]
+            self.top_geometry.geometry('800x301')
+            radiobutton_fg_color = self.theme_json_data['CTkRadiobutton']['fg_color'][mode]
 
-            radiobutton_border_color = self._theme_json_data['CTkRadiobutton']['border_color'][mode]
+            radiobutton_border_color = self.theme_json_data['CTkRadiobutton']['border_color'][mode]
 
-            radiobutton_hover_color = self._theme_json_data['CTkRadiobutton']['hover_color'][mode]
+            radiobutton_hover_color = self.theme_json_data['CTkRadiobutton']['hover_color'][mode]
 
-            radiobutton_text_color = self._theme_json_data['CTkRadiobutton']['text_color'][mode]
+            radiobutton_text_color = self.theme_json_data['CTkRadiobutton']['text_color'][mode]
 
-            label_text_colour = self._theme_json_data['CTkLabel']['text_color'][mode]
+            label_text_colour = self.theme_json_data['CTkLabel']['text_color'][mode]
 
             geometry_widget = ctk.CTkRadioButton(master=frm_widget_preview_low,
                                                  fg_color=radiobutton_fg_color,
                                                  border_color=radiobutton_border_color,
                                                  hover_color=radiobutton_hover_color,
                                                  text_color=radiobutton_text_color,
-                                                 corner_radius=self._theme_json_data[json_widget_type]
+                                                 corner_radius=self.theme_json_data[json_widget_type]
                                                  ['corner_radius'],
-                                                 border_width_checked=self._theme_json_data[json_widget_type]
+                                                 border_width_checked=self.theme_json_data[json_widget_type]
                                                  ['border_width_checked'],
-                                                 border_width_unchecked=self._theme_json_data[json_widget_type]
+                                                 border_width_unchecked=self.theme_json_data[json_widget_type]
                                                  ['border_width_unchecked'])
             lbl_info = ctk.CTkLabel(master=frm_widget_preview_low,
                                     text_color=label_text_colour,
@@ -1570,16 +1575,16 @@ class ControlPanel:
 
             geometry_widget.bind("<Button-3>", lambda event, widget=geometry_widget: deselect_widget(widget_id=widget))
         elif widget_type == 'CTkSegmentedButton':
-            self._top_geometry.geometry('847x232')
+            self.top_geometry.geometry('847x232')
             # CTkTextbox
-            seg_fg_color = self._theme_json_data[json_widget_type]['fg_color'][mode]
+            seg_fg_color = self.theme_json_data[json_widget_type]['fg_color'][mode]
             print(f'DEBUG: applying colour: {seg_fg_color}')
-            seg_selected_color = self._theme_json_data[json_widget_type]['selected_color'][mode]
-            seg_selected_hover_color = self._theme_json_data[json_widget_type]['selected_hover_color'][mode]
-            seg_unselected_color = self._theme_json_data[json_widget_type]['unselected_color'][mode]
-            seg_unselected_hover_color = self._theme_json_data[json_widget_type]['unselected_hover_color'][mode]
-            seg_text_color = self._theme_json_data[json_widget_type]['text_color'][mode]
-            seg_text_color_disabled = self._theme_json_data[json_widget_type]['text_color_disabled'][mode]
+            seg_selected_color = self.theme_json_data[json_widget_type]['selected_color'][mode]
+            seg_selected_hover_color = self.theme_json_data[json_widget_type]['selected_hover_color'][mode]
+            seg_unselected_color = self.theme_json_data[json_widget_type]['unselected_color'][mode]
+            seg_unselected_hover_color = self.theme_json_data[json_widget_type]['unselected_hover_color'][mode]
+            seg_text_color = self.theme_json_data[json_widget_type]['text_color'][mode]
+            seg_text_color_disabled = self.theme_json_data[json_widget_type]['text_color_disabled'][mode]
 
             geometry_widget = ctk.CTkSegmentedButton(master=frm_widget_preview_low,
                                                      fg_color=seg_fg_color,
@@ -1595,16 +1600,16 @@ class ControlPanel:
             geometry_widget.set("Value 2")
 
         elif widget_type == 'CTkSwitch':
-            self._top_geometry.geometry('766x299')
-            switch_fg_colour = self._theme_json_data[json_widget_type]['fg_color'][mode]
+            self.top_geometry.geometry('766x299')
+            switch_fg_colour = self.theme_json_data[json_widget_type]['fg_color'][mode]
 
-            switch_button_colour = self._theme_json_data[json_widget_type]['button_color'][mode]
+            switch_button_colour = self.theme_json_data[json_widget_type]['button_color'][mode]
 
-            switch_button_hover_colour = self._theme_json_data[json_widget_type]['button_hover_color'][mode]
+            switch_button_hover_colour = self.theme_json_data[json_widget_type]['button_hover_color'][mode]
 
-            switch_progress_colour = self._theme_json_data[json_widget_type]['progress_color'][mode]
+            switch_progress_colour = self.theme_json_data[json_widget_type]['progress_color'][mode]
 
-            switch_text_colour = self._theme_json_data[json_widget_type]['text_color'][mode]
+            switch_text_colour = self.theme_json_data[json_widget_type]['text_color'][mode]
 
             geometry_widget = ctk.CTkSwitch(master=frm_widget_preview_low,
                                             fg_color=switch_fg_colour,
@@ -1612,35 +1617,35 @@ class ControlPanel:
                                             text_color=switch_text_colour,
                                             button_hover_color=switch_button_hover_colour,
                                             progress_color=switch_progress_colour,
-                                            corner_radius=self._theme_json_data[json_widget_type]['corner_radius'],
-                                            border_width=self._theme_json_data[json_widget_type]['border_width']
+                                            corner_radius=self.theme_json_data[json_widget_type]['corner_radius'],
+                                            border_width=self.theme_json_data[json_widget_type]['border_width']
                                             )
         elif widget_type == 'CTkScrollbar':
-            self._top_geometry.geometry('782x267')
+            self.top_geometry.geometry('782x267')
             # Harness the scrollbar incorporated
             # to the CTkScrollableFrame widget.
-            self._top_geometry.geometry('800x280')
-            scrollbar_fg_color = self._theme_json_data[json_widget_type]['fg_color']
+            self.top_geometry.geometry('800x280')
+            scrollbar_fg_color = self.theme_json_data[json_widget_type]['fg_color']
             if not isinstance(scrollbar_fg_color, str):
-                scrollbar_fg_color = scrollbar_fg_color[cbtk.str_mode_to_int(self._appearance_mode)]
+                scrollbar_fg_color = scrollbar_fg_color[cbtk.str_mode_to_int(self.appearance_mode)]
             elif scrollbar_fg_color == "transparent":
-                scrollbar_fg_color = self._theme_json_data['CTkFrame']['fg_color'][
-                    cbtk.str_mode_to_int(self._appearance_mode)]
-            scrollbar_button_color = self._theme_json_data[json_widget_type]['button_color']
-            scrollbar_button_hover_color = self._theme_json_data[json_widget_type]['button_hover_color']
+                scrollbar_fg_color = self.theme_json_data['CTkFrame']['fg_color'][
+                    cbtk.str_mode_to_int(self.appearance_mode)]
+            scrollbar_button_color = self.theme_json_data[json_widget_type]['button_color']
+            scrollbar_button_hover_color = self.theme_json_data[json_widget_type]['button_hover_color']
 
             frm_preview = ctk.CTkFrame(frm_widget_preview_low, corner_radius=0)
             frm_preview.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
 
             # create textbox
-            textbox_fg_color = self._theme_json_data['CTkTextbox']['fg_color'][
-                cbtk.str_mode_to_int(self._appearance_mode)]
+            textbox_fg_color = self.theme_json_data['CTkTextbox']['fg_color'][
+                cbtk.str_mode_to_int(self.appearance_mode)]
             if not isinstance(textbox_fg_color, str):
-                textbox_fg_color = textbox_fg_color[cbtk.str_mode_to_int(self._appearance_mode)]
-            textbox_border_color = self._theme_json_data['CTkTextbox']['border_color'][
-                cbtk.str_mode_to_int(self._appearance_mode)]
-            textbox_text_color = self._theme_json_data['CTkTextbox']['text_color'][
-                cbtk.str_mode_to_int(self._appearance_mode)]
+                textbox_fg_color = textbox_fg_color[cbtk.str_mode_to_int(self.appearance_mode)]
+            textbox_border_color = self.theme_json_data['CTkTextbox']['border_color'][
+                cbtk.str_mode_to_int(self.appearance_mode)]
+            textbox_text_color = self.theme_json_data['CTkTextbox']['text_color'][
+                cbtk.str_mode_to_int(self.appearance_mode)]
             tk_textbox = ctk.CTkTextbox(frm_preview,
                                         activate_scrollbars=False,
                                         fg_color=textbox_fg_color,
@@ -1660,17 +1665,17 @@ class ControlPanel:
             tk_textbox.configure(yscrollcommand=geometry_widget.set)
 
         elif widget_type == 'CTkTextbox':
-            self._top_geometry.geometry('776x243')
+            self.top_geometry.geometry('776x243')
             # CTkTextbox
-            textbox_fg_color = self._theme_json_data[json_widget_type]['fg_color'][mode]
+            textbox_fg_color = self.theme_json_data[json_widget_type]['fg_color'][mode]
             if not isinstance(textbox_fg_color, str):
-                textbox_fg_color = textbox_fg_color[cbtk.str_mode_to_int(self._appearance_mode)][mode]
+                textbox_fg_color = textbox_fg_color[cbtk.str_mode_to_int(self.appearance_mode)][mode]
             elif textbox_fg_color == "transparent":
-                textbox_fg_color = self._theme_json_data['CTkFrame']['fg_color'][mode]
-            textbox_border_color = self._theme_json_data[json_widget_type]['border_color'][mode]
-            textbox_button_color = self._theme_json_data[json_widget_type]['scrollbar_button_color'][mode]
-            textbox_button_hover_color = self._theme_json_data[json_widget_type]['scrollbar_button_hover_color'][mode]
-            textbox_text_color = self._theme_json_data[json_widget_type]['text_color'][mode]
+                textbox_fg_color = self.theme_json_data['CTkFrame']['fg_color'][mode]
+            textbox_border_color = self.theme_json_data[json_widget_type]['border_color'][mode]
+            textbox_button_color = self.theme_json_data[json_widget_type]['scrollbar_button_color'][mode]
+            textbox_button_hover_color = self.theme_json_data[json_widget_type]['scrollbar_button_hover_color'][mode]
+            textbox_text_color = self.theme_json_data[json_widget_type]['text_color'][mode]
 
             geometry_widget = ctk.CTkTextbox(frm_widget_preview_low,
                                              fg_color=textbox_fg_color,
@@ -1681,7 +1686,7 @@ class ControlPanel:
                                              width=190,
                                              height=180)
             geometry_widget.grid(row=10, column=0, padx=(15, 0), pady=(30, 0), sticky="nsew", rowspan=1)
-            if self._enable_tooltips:
+            if self.enable_tooltips:
                 textbox_tooltip = CTkToolTip(geometry_widget,
                                              wraplength=300,
                                              padding=(5, 5),
@@ -1715,7 +1720,7 @@ class ControlPanel:
             # inconsistencies (at least in CTk 5.1.2), between widget names.
             json_widget_type = mod.json_widget_type(widget_type=widget_type)
 
-            current_value = int(self._theme_json_data[json_widget_type][property])
+            current_value = int(self.theme_json_data[json_widget_type][property])
             label_dict[property] = ctk.CTkLabel(master=frm_controls, text=base_label_text.title() + f'{current_value}')
             label_dict[property].grid(row=row, column=0, sticky='ew', pady=(10, 0))
             row += 1
@@ -1729,96 +1734,96 @@ class ControlPanel:
             slider_dict[property].set(current_value)
             row += 1
 
-        self._top_geometry.wait_window()
+        self.top_geometry.wait_window()
 
     def close_geometry_dialog(self):
-        self._save_widget_geom_geometry()
-        self._top_geometry.destroy()
+        self.save_widget_geom_geometry()
+        self.top_geometry.destroy()
 
-    def _save_geometry_edits(self, widget_type):
-        for widget_property, property_value in self._geometry_edit_values.items():
+    def save_geometry_edits(self, widget_type):
+        for widget_property, property_value in self.geometry_edit_values.items():
             parameters = []
             # This function call is necessary, because there are several naming
             # inconsistencies (at least in CTk 5.1.2), between widget names.
             json_widget_type = mod.json_widget_type(widget_type=widget_type)
-            if self._theme_json_data[json_widget_type][widget_property] != property_value:
-                self._theme_json_data[json_widget_type][widget_property] = property_value
-                self._json_state = 'dirty'
+            if self.theme_json_data[json_widget_type][widget_property] != property_value:
+                self.theme_json_data[json_widget_type][widget_property] = property_value
+                self.json_state = 'dirty'
 
                 config_param = widget_property.replace(f'{widget_type.lower()}_', '')
                 parameters.append(widget_type)
                 parameters.append(config_param)
                 parameters.append(str(property_value))
-                with open(self._wip_json, "w") as f:
-                    json.dump(self._theme_json_data, f, indent=2)
-                self._send_command_json(command_type='geometry',
-                                        command='update_widget_geometry',
-                                        parameters=parameters)
+                with open(self.wip_json, "w") as f:
+                    json.dump(self.theme_json_data, f, indent=2)
+                self.send_command_json(command_type='geometry',
+                                       command='update_widget_geometry',
+                                       parameters=parameters)
 
-        if self._json_state == 'dirty':
-            self._set_option_states()
+        if self.json_state == 'dirty':
+            self.set_option_states()
         self.close_geometry_dialog()
 
-    def _set_option_states(self):
+    def set_option_states(self):
         """This function sets the button and menu option states. The states are set based upon a combination of,
         whether a theme is currently selected, and the state of the theme ('dirty'/'clean')"""
-        if self._theme:
+        if self.theme:
             tk_state = tk.NORMAL
         else:
             tk_state = tk.DISABLED
 
-        if self._json_state == 'dirty' and self._theme:
+        if self.json_state == 'dirty' and self.theme:
             self.file_menu.entryconfig('Reset', state=tk_state)
             self.file_menu.entryconfig('Save', state=tk_state)
-            self._btn_reset.configure(state=tk_state)
-            self._btn_save.configure(state=tk_state)
+            self.btn_reset.configure(state=tk_state)
+            self.btn_save.configure(state=tk_state)
         else:
             self.file_menu.entryconfig('Reset', state=tk.DISABLED)
             self.file_menu.entryconfig('Save', state=tk.DISABLED)
-            self._btn_reset.configure(state=tk.DISABLED)
-            self._btn_save.configure(state=tk.DISABLED)
+            self.btn_reset.configure(state=tk.DISABLED)
+            self.btn_save.configure(state=tk.DISABLED)
 
         # Menu entries
         self.file_menu.entryconfig('Refresh Preview', state=tk_state)
         self.file_menu.entryconfig('Save As', state=tk_state)
         self.file_menu.entryconfig('Delete', state=tk_state)
         self.file_menu.entryconfig('Sync Modes', state=tk_state)
+        self.file_menu.entryconfig('Flip Modes', state=tk_state)
         self.file_menu.entryconfig('Sync Palette', state=tk_state)
 
-        if 'provenance' in self._theme_json_data:
+        if 'provenance' in self.theme_json_data:
             self.file_menu.entryconfig('Provenance', state=tk.NORMAL)
         else:
             self.file_menu.entryconfig('Provenance', state=tk.DISABLED)
 
-
         # Non-menu widgets
-        self._btn_delete.configure(state=tk_state)
-        self._btn_save_as.configure(state=tk_state)
+        self.btn_delete.configure(state=tk_state)
+        self.btn_save_as.configure(state=tk_state)
         self.seg_mode.configure(state=tk_state)
-        self._opm_properties_filter.configure(state=tk_state)
-        self._opm_properties_view.configure(state=tk_state)
-        self._swt_render_disabled.configure(state=tk_state)
+        self.opm_properties_filter.configure(state=tk_state)
+        self.opm_properties_view.configure(state=tk_state)
+        self.swt_render_disabled.configure(state=tk_state)
         self.swt_frame_mode.configure(state=tk_state)
-        self._btn_sync_modes.configure(state=tk_state)
-        self._btn_sync_palette.configure(state=tk_state)
-        self._btn_refresh.configure(state=tk_state)
+        self.btn_sync_modes.configure(state=tk_state)
+        self.btn_sync_palette.configure(state=tk_state)
+        self.btn_refresh.configure(state=tk_state)
 
         if self.harmony_palette_running:
             self.tools_menu.entryconfig('Colour Harmonics', state=tk.DISABLED)
-        elif not self.harmony_palette_running and self._theme:
+        elif not self.harmony_palette_running and self.theme:
             self.tools_menu.entryconfig('Colour Harmonics', state=tk.NORMAL)
 
-    def _save_preferences(self):
+    def save_preferences(self):
         """Save the selected preferences."""
         # Save JSON Directory:
-        if self._new_theme_json_dir is not None:
-            self._theme_json_dir = self._new_theme_json_dir
+        if self.new_theme_json_dir is not None:
+            self.theme_json_dir = self.new_theme_json_dir
             if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                preference_name='theme_json_dir',
-                                               preference_value=str(self._theme_json_dir)):
+                                               preference_value=str(self.theme_json_dir)):
                 print(f'Row miss updating preferences theme author.')
-            self._json_files = self._user_themes_list()
-            self.opm_theme.configure(values=self._json_files)
+            self.json_files = self.user_themes_list()
+            self.opm_theme.configure(values=self.json_files)
 
         preferences_dict = {}
         self.user_name = self.tk_author_name.get()
@@ -1829,10 +1834,10 @@ class ControlPanel:
 
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='control_panel_theme',
-                                           preference_value=self._opm_control_panel_theme.get()):
+                                           preference_value=self.opm_control_panel_theme.get()):
             print(f'Row miss updating preferences control panel theme.')
 
-        control_panel_mode = self._tk_appearance_mode_var.get()
+        control_panel_mode = self.tk_appearance_mode_var.get()
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='control_panel_mode',
                                            preference_value=control_panel_mode):
@@ -1840,22 +1845,22 @@ class ControlPanel:
 
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='enable_tooltips',
-                                           preference_value=self._enable_tooltips):
+                                           preference_value=self.enable_tooltips):
             print(f'Row miss updating preferences control panel appearance mode.')
 
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='last_theme_on_start',
-                                           preference_value=self._last_theme_on_start):
+                                           preference_value=self.last_theme_on_start):
             print(f'Row miss updating preferences control panel last theme on start.')
 
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='enable_palette_labels',
-                                           preference_value=self._enable_palette_labels):
+                                           preference_value=self.enable_palette_labels):
             print(f'Row miss updating preferences: enable palette labels.')
 
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='enable_single_click_paste',
-                                           preference_value=self._enable_single_click_paste):
+                                           preference_value=self.enable_single_click_paste):
             print(f'Row miss updating preferences: enable single click paste.')
 
         self.shade_adjust_differential = self.opm_shade_adjust_differential.get()
@@ -1874,47 +1879,47 @@ class ControlPanel:
 
         ctk.set_appearance_mode(control_panel_mode)
         cbtk.CBtkMenu.update_widgets_mode()
-        self._control_panel_mode = control_panel_mode
-        self._tk_appearance_mode_var.set(self._control_panel_mode)
-        self._status_bar.set_status_text(status_text=f'Preferences saved.')
-        self._top_prefs.destroy()
+        self.control_panel_mode = control_panel_mode
+        self.tk_appearance_mode_var.set(self.control_panel_mode)
+        self.status_bar.set_status_text(status_text=f'Preferences saved.')
+        self.top_prefs.destroy()
 
-    def _switch_preview_appearance_mode(self, event='event'):
+    def switch_preview_appearance_mode(self, event='event'):
         """Actions to choice of preview panel's appearance mode (Light / Dark)"""
         preview_appearance_mode = self.tk_seg_mode.get()
         if preview_appearance_mode == 'Light Mode':
-            self._appearance_mode = 'Light'
+            self.appearance_mode = 'Light'
         else:
-            self._appearance_mode = 'Dark'
+            self.appearance_mode = 'Dark'
 
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='auto_save',
                                            preference_name='appearance_mode',
-                                           preference_value=self._appearance_mode):
+                                           preference_value=self.appearance_mode):
             print(f'Row miss: on update of auto save of selected theme.')
 
         self.lbl_palette_header.configure(text=f'Theme Palette ({preview_appearance_mode})')
 
-        self._load_theme_palette()
+        self.load_theme_palette()
         self.render_widget_properties()
 
-        self._send_command_json(command_type='program',
-                                command='set_appearance_mode',
-                                parameters=[self._appearance_mode])
+        self.send_command_json(command_type='program',
+                               command='set_appearance_mode',
+                               parameters=[self.appearance_mode])
 
-        # self._load_theme()
+        # self.load_theme()
 
-    def _render_theme_palette(self):
-        render_labels = self._enable_palette_labels
+    def render_theme_palette(self):
+        render_labels = self.enable_palette_labels
         palette_entries = mod.colour_palette_entries(db_file_path=DB_FILE_PATH)
         menus = []
-        self._theme_palette_tiles = []
+        self.theme_palette_tiles = []
 
         preview_appearance_mode = self.tk_seg_mode.get()
         if preview_appearance_mode == 'Light Mode':
-            self._appearance_mode = 'Light'
+            self.appearance_mode = 'Light'
         else:
-            self._appearance_mode = 'Dark'
-        self.lbl_palette_header = ctk.CTkLabel(master=self._frm_theme_palette,
+            self.appearance_mode = 'Dark'
+        self.lbl_palette_header = ctk.CTkLabel(master=self.frm_theme_palette,
                                                text=f'Theme Palette ({preview_appearance_mode})',
                                                font=HEADING4)
 
@@ -1932,7 +1937,7 @@ class ControlPanel:
             col = int(tile_dict['col'])
             tile_label = tile_dict['label']
             tk_palette_label = tk.StringVar(value=tile_label)
-            lbl_tile_label = ctk.CTkLabel(master=self._frm_theme_palette,
+            lbl_tile_label = ctk.CTkLabel(master=self.frm_theme_palette,
                                           textvariable=tk_palette_label,
                                           width=100,
                                           height=15,
@@ -1947,7 +1952,7 @@ class ControlPanel:
                 label_row = 4
                 lbl_tile_label.grid(row=label_row, column=label_col, padx=0, pady=0)
 
-            btn_colour_tile = ctk.CTkButton(master=self._frm_theme_palette,
+            btn_colour_tile = ctk.CTkButton(master=self.frm_theme_palette,
                                             border_width=2,
                                             width=90,
                                             height=40,
@@ -1960,19 +1965,19 @@ class ControlPanel:
                 padx = 6
 
             btn_colour_tile.grid(row=row, column=col, padx=padx, pady=0)
-            self._theme_palette_tiles.append(btn_colour_tile)
-            # colour_tile = self._theme_palette_tiles[entry_id]
+            self.theme_palette_tiles.append(btn_colour_tile)
+            # colour_tile = self.theme_palette_tiles[entry_id]
 
             # Add pop-up/context menus to each button...
             context_menu = cbtk.CBtkMenu(btn_colour_tile, tearoff=False)
 
             context_menu.add_command(label="Copy",
                                      command=lambda button_id=entry_id:
-                                     self._copy_palette_colour(palette_button_id=button_id))
+                                     self.copy_palette_colour(palette_button_id=button_id))
 
             context_menu.add_command(label="Paste",
                                      command=lambda button_id=entry_id:
-                                     self._paste_palette_colour(event=None, palette_button_id=button_id))
+                                     self.paste_palette_colour(event=None, palette_button_id=button_id))
 
             context_menu.add_separator()
             shade_down_menu = cbtk.CBtkMenu(context_menu, tearoff=False)
@@ -2024,59 +2029,58 @@ class ControlPanel:
             context_menu.add_cascade(label='Darken shade', menu=shade_down_menu)
             context_menu.add_separator()
             context_menu.add_command(label="Colour Picker",
-                                     command=lambda button_id=entry_id: self._colour_picker(button_id))
+                                     command=lambda button_id=entry_id: self.palette_colour_picker(button_id))
             menus.append(context_menu)
 
-            if self._enable_single_click_paste:
+            if self.enable_single_click_paste:
                 btn_colour_tile.bind("<Button-1>",
-                                     lambda event, button_id=entry_id: self._paste_palette_colour(event,
-                                                                                                  button_id))
+                                     lambda event, button_id=entry_id: self.paste_palette_colour(event,
+                                                                                                 button_id))
 
             btn_colour_tile.bind("<Button-3>",
-                                 lambda event, menu=menus[entry_id], button_id=entry_id: self._context_menu(event,
-                                                                                                            menu))
+                                 lambda event, menu=menus[entry_id], button_id=entry_id: self.context_menu(event,
+                                                                                                           menu))
 
-    def _toggle_frame_mode(self):
+    def toggle_frame_mode(self):
         """We need the ability to render the frames in the preview panel as they would appear when we have a top frame
         (a frame whose parent widget is a frame. Conversely, we also need to see how our other widgets render within
         a single frame. This method toggles the preview panel, between the 2 states."""
-        if not self._theme:
+        if not self.theme:
             return
         frame_mode = self.tk_swt_frame_mode.get()
         if frame_mode == 'top':
-            self._send_command_json(command_type='program', command='render_top_frame')
+            self.send_command_json(command_type='program', command='render_top_frame')
         else:
-            self._send_command_json(command_type='program', command='render_base_frame')
+            self.send_command_json(command_type='program', command='render_base_frame')
 
-    def _toggle_render_disabled(self):
-        render_state = self._swt_render_disabled.get()
+    def toggle_render_disabled(self):
+        render_state = self.swt_render_disabled.get()
         if render_state:
-            self._send_command_json(command_type='program', command='render_preview_disabled')
+            self.send_command_json(command_type='program', command='render_preview_disabled')
         else:
-            self._send_command_json(command_type='program', command='render_preview_enabled')
+            self.send_command_json(command_type='program', command='render_preview_enabled')
 
-    def _update_properties_filter(self, view_name):
+    def update_properties_filter(self, view_name):
         """When a different view is selected, we need to update the Properties Filter list accordingly. This method,
         loads the requisite JSON files and derives the new list for us. """
         view_file = str(VIEWS_DIR / view_name) + '.json'
         view_file = Path(view_file)
-        self._widget_attributes = mod.json_dict(json_file_path=view_file)
-        self._widget_categories = all_widget_categories(self._widget_attributes)
-        self._opm_properties_filter.configure(values=self._widget_categories)
+        self.widget_attributes = mod.json_dict(json_file_path=view_file)
+        self.widget_categories = all_widget_categories(self.widget_attributes)
+        self.opm_properties_filter.configure(values=self.widget_categories)
         # Cause the Filters to be set to 'All', for the
         # selected view and update the display accordingly.
-        self._opm_properties_filter.set('All')
+        self.opm_properties_filter.set('All')
         self.set_filtered_widget_display()
-        # self._send_preview_command('Update properties filter...')
+        # self.send_preview_command('Update properties filter...')
 
-    def _preferred_json_location(self):
+    def preferred_json_location(self):
         """A simple method which asks the themes author to navigate to where
          the themes JSON are to be stored/maintained."""
-        self._new_theme_json_dir = Path(tk.filedialog.askdirectory(initialdir=self._theme_json_dir))
-        self._lbl_pref_theme_dir_disp.configure(text=self._new_theme_json_dir)
+        self.new_theme_json_dir = Path(tk.filedialog.askdirectory(initialdir=self.theme_json_dir))
+        self.lbl_pref_theme_dir_disp.configure(text=self.new_theme_json_dir)
 
-
-    def _app_themes_list(self):
+    def app_themes_list(self):
         """This method generates a list of theme names, based on the json files found in the application themes folder
          These are basically the theme file names, with the .json extension stripped out."""
         json_files = list(APP_THEMES_DIR.glob('*.json'))
@@ -2088,10 +2092,10 @@ class ControlPanel:
         theme_names.sort()
         return theme_names
 
-    def _user_themes_list(self):
+    def user_themes_list(self):
         """This method generates a list of theme names, based on the json files found in the user's themes folder
-        (i.e. self._theme_json_dir). These are basically the theme file names, with the .json extension stripped out."""
-        json_files = list(self._theme_json_dir.glob('*.json'))
+        (i.e. self.theme_json_dir). These are basically the theme file names, with the .json extension stripped out."""
+        json_files = list(self.theme_json_dir.glob('*.json'))
         theme_names = []
         for file in json_files:
             file = os.path.basename(file)
@@ -2101,7 +2105,7 @@ class ControlPanel:
         return theme_names
 
     @staticmethod
-    def _view_list():
+    def view_list():
         """This method generates a list of view names, based on the json files found in the assets/views folder.
         These are basically the theme file names, with the .json extension stripped out."""
         json_files = list(VIEWS_DIR.glob('*.json'))
@@ -2113,12 +2117,12 @@ class ControlPanel:
         theme_names.sort()
         return theme_names
 
-    def _load_theme(self, event=None, reload_preview: bool = True):
+    def load_theme(self, event=None, reload_preview: bool = True):
 
-        if self._json_state == 'dirty':
+        if self.json_state == 'dirty':
             confirm = CTkMessagebox(master=self.ctk_control_panel,
                                     title='Confirm Action',
-                                    message=f'You have unsaved changes. Are you sure you wish to switch themes?',
+                                    message=f'You have unsaved changes. Are you sure you wish to proceed?',
                                     options=["Yes", "No"])
             response = confirm.get()
             if response == 'No':
@@ -2128,71 +2132,72 @@ class ControlPanel:
         if selected_theme == '-- Select Theme --':
             return
 
-        self._theme_file = selected_theme + '.json'
-        self._source_json_file = self._theme_json_dir / self._theme_file
-        if not self._source_json_file.exists():
+        self.theme_file = selected_theme + '.json'
+        self.source_json_file = self.theme_json_dir / self.theme_file
+        if not self.source_json_file.exists():
             # Then likely that we are just starting up and last theme
             # opened was probably deleted.
-            self._json_files = self._user_themes_list()
-            initial_display = self._user_themes_list()
+            self.json_files = self.user_themes_list()
+            initial_display = self.user_themes_list()
             self.opm_theme.configure(values=initial_display)
             self.opm_theme.set('-- Select Theme --')
             return
 
-        if self._source_json_file:
-            self._wip_json = self._TEMP_DIR / self._theme_file
-            self._preview_json = self._TEMP_DIR / self._theme_file
-            shutil.copyfile(self._source_json_file, self._wip_json)
-            self._theme_json_data = mod.json_dict(json_file_path=self._wip_json)
+        if self.source_json_file:
+            self.wip_json = self.TEMP_DIR / self.theme_file
+            self.preview_json = self.TEMP_DIR / self.theme_file
+            shutil.copyfile(self.source_json_file, self.wip_json)
+            self.theme_json_data = mod.json_dict(json_file_path=self.wip_json)
 
-            # self._update_config(section='preferences', option='theme_json_dir', value=self._theme_json_dir)
-            self._render_geometry_buttons()
-            self._render_theme_palette()
-            self._load_theme_palette()
+            # self.update_config(section='preferences', option='theme_json_dir', value=self.theme_json_dir)
+            self.render_geometry_buttons()
+            self.render_theme_palette()
+            self.load_theme_palette()
             self.set_filtered_widget_display()
 
             try:
-                self._btn_refresh.configure(state=tk.NORMAL)
+                self.btn_refresh.configure(state=tk.NORMAL)
             except tk.TclError:
                 pass
-            self._btn_refresh.configure(state=tk.NORMAL)
+            self.btn_refresh.configure(state=tk.NORMAL)
             # Enable buttons
             self.seg_mode.configure(state=tk.NORMAL)
-            self._opm_properties_filter.configure(state=tk.NORMAL)
-            self._btn_save_as.configure(state=tk.NORMAL)
-            self._btn_delete.configure(state=tk.NORMAL)
-            self._btn_sync_modes.configure(state=tk.NORMAL)
-            self._opm_properties_view.configure(state=tk.NORMAL)
-            self._swt_render_disabled.configure(state=tk.NORMAL)
+            self.opm_properties_filter.configure(state=tk.NORMAL)
+            self.btn_save_as.configure(state=tk.NORMAL)
+            self.btn_delete.configure(state=tk.NORMAL)
+            self.btn_sync_modes.configure(state=tk.NORMAL)
+            self.opm_properties_view.configure(state=tk.NORMAL)
+            self.swt_render_disabled.configure(state=tk.NORMAL)
             self.file_menu.entryconfig('Save', state=tk.NORMAL)
             self.file_menu.entryconfig('Save As', state=tk.NORMAL)
             self.file_menu.entryconfig('Delete', state=tk.NORMAL)
             self.file_menu.entryconfig('Sync Modes', state=tk.NORMAL)
+            self.file_menu.entryconfig('Flip Modes', state=tk.NORMAL)
 
             self.lbl_title.grid(row=0, column=0, columnspan=2, sticky='ew')
             self.ctk_control_panel.geometry(f'{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}')
-            self.opm_theme.configure(values=self._json_files)
+            self.opm_theme.configure(values=self.json_files)
             palette_file = selected_theme + '.json'
-            self._theme = selected_theme
+            self.theme = selected_theme
 
-            self._json_state = 'clean'
-            self._set_option_states()
+            self.json_state = 'clean'
+            self.set_option_states()
 
-            palette_file = self._palettes_dir / palette_file
+            palette_file = self.palettes_dir / palette_file
             if not palette_file.exists():
-                self._create_theme_palette(selected_theme)
+                self.create_theme_palette(selected_theme)
 
             if reload_preview:
-                self._reload_preview()
+                self.reload_preview()
 
             # Here we load in the standard CustomTkinter green.json theme. We use this as a reference theme
             # file. This is a belt n' braces approach to ensuring that we aren't missing any widget properties,
             # which may have been introduced, in the event that someone has upgraded to a later version of
             # CustomTkinter to a version that the app has not been updated to deal with. We can't maintain
             # the properties but at least we can update the opened theme, to make the JSON is complete.
-            for widget, widget_property in self._reference_theme_json.items():
-                if widget not in self._theme_json_data:
-                    self._theme_json_data[widget] = widget_property
+            for widget, widget_property in self.reference_theme_json.items():
+                if widget not in self.theme_json_data:
+                    self.theme_json_data[widget] = widget_property
 
             # Update the auto-save section of the preferences, to record the last theme we opened.
             # This may be required on the next app startup, if the last_theme_on_start preference is enabled.
@@ -2200,66 +2205,66 @@ class ControlPanel:
                                                preference_name='selected_theme',
                                                preference_value=selected_theme):
                 print(f'Row miss: on update of auto save of selected theme.')
-            self._status_bar.set_status_text(status_text_life=30,
-                                             status_text=f'Theme file, {self._theme_file}, loaded. ')
+            self.status_bar.set_status_text(status_text_life=30,
+                                            status_text=f'Theme file, {self.theme_file}, loaded. ')
 
-    def _save_harmonics_geometry(self):
+    def save_harmonics_geometry(self):
         """Save the harmonics panel geometry to the repo, for the next time the dialog is launched."""
         geometry_row = mod.preference_row(db_file_path=DB_FILE_PATH,
                                           scope='window_geometry',
                                           preference_name='harmonics_panel')
-        panel_geometry = self._top_harmony.geometry()
+        panel_geometry = self.top_harmony.geometry()
         geometry_row["preference_value"] = panel_geometry
         mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
 
-    def _save_widget_geom_geometry(self):
+    def save_widget_geom_geometry(self):
         """Save the widget geometry dialog's geometry to the repo, for the next time the dialog is launched."""
         geometry_row = mod.preference_row(db_file_path=DB_FILE_PATH,
                                           scope='window_geometry',
                                           preference_name='widget_geometry')
-        panel_geometry = self._top_geometry.geometry()
+        panel_geometry = self.top_geometry.geometry()
         geometry_row["preference_value"] = panel_geometry
         mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
 
-    def _on_harmonic_close(self):
-        self._rendered_keystone_shades = []
-        self._save_harmonics_geometry()
-        self._top_harmony.destroy()
+    def on_harmonic_close(self):
+        self.rendered_keystone_shades = []
+        self.save_harmonics_geometry()
+        self.top_harmony.destroy()
         self.harmony_palette_running = False
-        self._set_option_states()
+        self.set_option_states()
 
-    def _restore_geom_geometry(self):
+    def restore_geom_geometry(self):
         """Restore window geometry of the Widget Geometry dialog from auto-saved preferences"""
         saved_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH,
                                                 scope='window_geometry',
                                                 preference_name='widget_geometry')
-        self._top_geometry.geometry(saved_geometry)
-        # self._top_geometry.resizable(False, False)
+        self.top_geometry.geometry(saved_geometry)
+        # self.top_geometry.resizable(False, False)
 
-    def _restore_harmony_geometry(self):
+    def restore_harmony_geometry(self):
         """Restore window geometry from auto-saved preferences"""
         default_geometry = f"{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}+347+93"
         saved_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH,
                                                 scope='window_geometry',
                                                 preference_name='harmonics_panel', default=default_geometry)
-        self._top_harmony.geometry(saved_geometry)
-        self._top_harmony.resizable(False, False)
+        self.top_harmony.geometry(saved_geometry)
+        self.top_harmony.resizable(False, False)
 
-    def _launch_harmony_dialog(self):
+    def launch_harmony_dialog(self):
 
         self.HARMONICS_HEIGHT1 = 550
         self.HARMONICS_HEIGHT2 = 550
         self.HARMONICS_HEIGHT3 = 650
-        self._rendered_harmony_buttons = []
+        self.rendered_harmony_buttons = []
 
-        self._top_harmony = tk.Toplevel(master=self.ctk_control_panel)
-        self._top_harmony.title('Colour Harmonics')
+        self.top_harmony = tk.Toplevel(master=self.ctk_control_panel)
+        self.top_harmony.title('Colour Harmonics')
 
-        self._top_harmony.columnconfigure(0, weight=1)
-        self._top_harmony.rowconfigure(0, weight=1)
-        self._restore_harmony_geometry()
+        self.top_harmony.columnconfigure(0, weight=1)
+        self.top_harmony.rowconfigure(0, weight=1)
+        self.restore_harmony_geometry()
 
-        frm_main = ctk.CTkFrame(master=self._top_harmony, corner_radius=0)
+        frm_main = ctk.CTkFrame(master=self.top_harmony, corner_radius=0)
         frm_main.grid(column=0, row=0, sticky='nsew')
         frm_main.columnconfigure(0, weight=1)
         frm_main.rowconfigure(0, weight=1)
@@ -2267,20 +2272,20 @@ class ControlPanel:
         frm_controls = ctk.CTkFrame(master=frm_main)
         frm_controls.grid(column=0, row=0, padx=10, pady=10, sticky='new')
 
-        self._frm_harmony_colours = ctk.CTkFrame(master=frm_main)
-        self._frm_harmony_colours.grid(column=0, row=1, padx=10, pady=10, sticky='nsew')
+        self.frm_harmony_colours = ctk.CTkFrame(master=frm_main)
+        self.frm_harmony_colours.grid(column=0, row=1, padx=10, pady=10, sticky='nsew')
 
-        self._frm_shades_palette = ctk.CTkFrame(master=frm_main)
-        self._frm_shades_palette.grid(column=2, row=0, padx=(0, 10), pady=10, sticky='nsew', rowspan=2)
+        self.frm_shades_palette = ctk.CTkFrame(master=frm_main)
+        self.frm_shades_palette.grid(column=2, row=0, padx=(0, 10), pady=10, sticky='nsew', rowspan=2)
 
         frm_buttons = ctk.CTkFrame(master=frm_main)
         frm_buttons.grid(column=0, row=2, padx=10, pady=(5, 0), sticky='ew', columnspan=3)
 
-        self._harmony_status_bar = cbtk.CBtkStatusBar(master=self._top_harmony,
-                                                      status_text_life=30,
-                                                      use_grid=True)
+        self.harmony_status_bar = cbtk.CBtkStatusBar(master=self.top_harmony,
+                                                     status_text_life=30,
+                                                     use_grid=True)
 
-        self._new_theme_json_dir = None
+        self.new_theme_json_dir = None
 
         lbl_keystone_header = ctk.CTkLabel(master=frm_controls,
                                            text=f'Keystone Colour',
@@ -2293,7 +2298,7 @@ class ControlPanel:
                                  pady=5,
                                  padx=(25, 25))
 
-        lbl_harmony_header = ctk.CTkLabel(master=self._frm_harmony_colours,
+        lbl_harmony_header = ctk.CTkLabel(master=self.frm_harmony_colours,
                                           text=f'Colour Harmony',
                                           font=HEADING4,
                                           justify=tk.CENTER)
@@ -2313,56 +2318,56 @@ class ControlPanel:
                                  pady=0,
                                  padx=(25, 0))
 
-        bg_colour = self._theme_json_data.get('provenance', {}).get('keystone colour', None)
-        self._btn_keystone_colour = ctk.CTkButton(master=frm_controls,
-                                                  border_width=3,
-                                                  fg_color=bg_colour,
-                                                  width=120,
-                                                  height=90,
-                                                  corner_radius=15,
-                                                  text=''
-                                                  )
+        bg_colour = self.theme_json_data.get('provenance', {}).get('keystone colour', None)
+        self.btn_keystone_colour = ctk.CTkButton(master=frm_controls,
+                                                 border_width=3,
+                                                 fg_color=bg_colour,
+                                                 width=120,
+                                                 height=90,
+                                                 corner_radius=15,
+                                                 text=''
+                                                 )
 
-        self._btn_keystone_colour.grid(row=2, column=0, padx=5, pady=(0, 10))
+        self.btn_keystone_colour.grid(row=2, column=0, padx=5, pady=(0, 10))
 
         self.opm_harmony_method = ctk.CTkOptionMenu(master=frm_controls, values=['Analogous',
                                                                                  'Complementary',
                                                                                  'Split-complementary',
                                                                                  'Triadic',
                                                                                  'Tetradic'],
-                                                    command=self._switch_harmony_method)
+                                                    command=self.switch_harmony_method)
         self.opm_harmony_method.grid(row=3, column=0, padx=(10, 10), pady=(0, 10))
-        harmony_method = self._theme_json_data.get('provenance', {}).get('harmony method', 'Analogous')
+        harmony_method = self.theme_json_data.get('provenance', {}).get('harmony method', 'Analogous')
 
         self.opm_harmony_method.set(harmony_method)
         # self.opm_harmony_method.set('Analogous')
 
-        btn_palette_tooltip = cbtk.CBtkToolTip(self._btn_keystone_colour,
+        btn_palette_tooltip = cbtk.CBtkToolTip(self.btn_keystone_colour,
                                                text='Right click for options.')
-        mnu_keystone = cbtk.CBtkMenu(self._btn_keystone_colour, tearoff=False)
+        mnu_keystone = cbtk.CBtkMenu(self.btn_keystone_colour, tearoff=False)
         mnu_keystone.add_command(label="Copy",
-                                 command=self._copy_harmony_input_colour)
+                                 command=self.copy_harmony_input_colour)
 
         mnu_keystone.add_command(label="Paste",
-                                 command=self._paste_harmony_keystone_colour)
+                                 command=self.paste_harmony_keystone_colour)
 
         mnu_keystone.add_command(label="Colour Picker",
-                                 command=self._harmony_input_colour_picker)
-        # if self._enable_single_click_paste:
-        #    self._btn_keystone_colour.bind("<Button-1>",
-        #                     lambda event, button_id=self._paste_harmony_keystone_colour)
+                                 command=self.harmony_input_colour_picker)
+        # if self.enable_single_click_paste:
+        #    self.btn_keystone_colour.bind("<Button-1>",
+        #                     lambda event, button_id=self.paste_harmony_keystone_colour)
 
-        self._btn_keystone_colour.bind("<Button-3>",
-                                       lambda event, menu=mnu_keystone: self._context_menu(event, menu))
+        self.btn_keystone_colour.bind("<Button-3>",
+                                      lambda event, menu=mnu_keystone: self.context_menu(event, menu))
 
-        if self._theme is not None:
+        if self.theme is not None:
             button_state = ctk.NORMAL
         else:
             button_state = ctk.DISABLED
 
         btn_close = ctk.CTkButton(master=frm_buttons,
                                   text='Close',
-                                  command=self._on_harmonic_close)
+                                  command=self.on_harmonic_close)
 
         btn_close.grid(row=0, column=0, padx=15, pady=5)
 
@@ -2371,7 +2376,7 @@ class ControlPanel:
                                             state=button_state,
                                             command=self.copy_harmonics_to_palette)
 
-        if self._enable_tooltips:
+        if self.enable_tooltips:
             btn_tooltip = CTkToolTip(btn_copy_to_palette,
                                      wraplength=250,
                                      justify="left",
@@ -2380,7 +2385,7 @@ class ControlPanel:
 
         btn_copy_to_palette.grid(row=0, column=1, padx=15, pady=5)
 
-        if 'provenance' in self._theme_json_data:
+        if 'provenance' in self.theme_json_data:
             btn_save_keystone = ctk.CTkButton(master=frm_buttons,
                                               text='Tag Keystone',
                                               state=button_state,
@@ -2388,7 +2393,7 @@ class ControlPanel:
                                               )
             btn_save_keystone.grid(row=0, column=2, padx=15, pady=5)
 
-            if self._enable_tooltips:
+            if self.enable_tooltips:
                 btn_tooltip = CTkToolTip(btn_save_keystone,
                                          wraplength=250,
                                          justify="left",
@@ -2397,15 +2402,15 @@ class ControlPanel:
                                                  'keystone colour to be restored when the theme is opened and the '
                                                  'Colour Harmonics dialog opened.')
 
-        harmony_method = self._theme_json_data.get('provenance', {}).get('harmony method', None)
+        harmony_method = self.theme_json_data.get('provenance', {}).get('harmony method', None)
         self.set_harmony_keystone(colour_code=bg_colour, method=harmony_method)
-        self._switch_harmony_method()
+        self.switch_harmony_method()
         self.harmony_palette_running = True
-        self._set_option_states()
-        self._top_harmony.protocol("WM_DELETE_WINDOW", self._on_harmonic_close)
-        self._top_harmony.grab_set()
+        self.set_option_states()
+        self.top_harmony.protocol("WM_DELETE_WINDOW", self.on_harmonic_close)
+        self.top_harmony.grab_set()
 
-    def _switch_harmony_method(self, event='event'):
+    def switch_harmony_method(self, event='event'):
         """This method updates the rendered buttons, below the keystone colour button, when we change the harmony
         method (complimentary, triadic etc)."""
         harmony_method = self.opm_harmony_method.get()
@@ -2413,9 +2418,9 @@ class ControlPanel:
         row = 1
         column = 0
 
-        for button in self._rendered_harmony_buttons:
+        for button in self.rendered_harmony_buttons:
             button.destroy()
-            self._rendered_harmony_buttons = []
+            self.rendered_harmony_buttons = []
 
         harmony_entries = None
         if harmony_method == 'Analogous':
@@ -2432,18 +2437,18 @@ class ControlPanel:
             print(f'ERROR: Unrecognised harmony colors method: {harmony_method}')
 
         if harmony_entries == 1:
-            self._top_harmony.geometry(f"510x{self.HARMONICS_HEIGHT1}")
+            self.top_harmony.geometry(f"510x{self.HARMONICS_HEIGHT1}")
         elif harmony_entries == 2:
-            self._top_harmony.geometry(f"650x{self.HARMONICS_HEIGHT2}")
+            self.top_harmony.geometry(f"650x{self.HARMONICS_HEIGHT2}")
         elif harmony_entries == 3:
-            self._top_harmony.geometry(f"800x{self.HARMONICS_HEIGHT3}")
+            self.top_harmony.geometry(f"800x{self.HARMONICS_HEIGHT3}")
 
         menus = []
         pad_x = (5, 5)
         # Create the buttons for the generated base colours rendered mid to lower left of
         # the colour harmonics dialog.
         for btn_idx in range(harmony_entries):
-            btn_palette = ctk.CTkButton(master=self._frm_harmony_colours,
+            btn_palette = ctk.CTkButton(master=self.frm_harmony_colours,
                                         border_width=3,
                                         width=120,
                                         height=90,
@@ -2451,7 +2456,7 @@ class ControlPanel:
                                         text=''
                                         )
 
-            self._rendered_harmony_buttons.append(btn_palette)
+            self.rendered_harmony_buttons.append(btn_palette)
 
             btn_palette_tooltip = cbtk.CBtkToolTip(btn_palette,
                                                    text='Right click for copy option.')
@@ -2465,20 +2470,20 @@ class ControlPanel:
 
             row += 1
 
-            palette_button = self._rendered_harmony_buttons[btn_idx]
+            palette_button = self.rendered_harmony_buttons[btn_idx]
             # Add pop-up/context menus to each button...
             menus.append(cbtk.CBtkMenu(palette_button, tearoff=False))
-            menus[btn_idx].config(background=self._ctl_frame_high, foreground=self._ctl_text)
+            menus[btn_idx].config(background=self.ctl_frame_high, foreground=self.ctl_text)
             menus[btn_idx].add_command(label="Copy",
                                        command=lambda button_id=btn_idx:
-                                       self._copy_harmony_colour(harmony_button_id=button_id))
+                                       self.copy_harmony_colour(harmony_button_id=button_id))
 
             btn_palette.bind("<Button-3>",
-                             lambda event, menu=menus[btn_idx], button_id=btn_idx: self._context_menu(event, menu))
-        if self._keystone_colour is not None:
-            self._populate_harmony_colours()
+                             lambda event, menu=menus[btn_idx], button_id=btn_idx: self.context_menu(event, menu))
+        if self.keystone_colour is not None:
+            self.populate_harmony_colours()
             self.render_keystone_shades_palette(
-                keystone_colour=self._btn_keystone_colour.cget('fg_color'),
+                keystone_colour=self.btn_keystone_colour.cget('fg_color'),
                 harmony_method=harmony_method)
 
     def render_keystone_shades_palette(self, keystone_colour: str, harmony_method: str):
@@ -2541,16 +2546,16 @@ class ControlPanel:
         pad_y = 5
         menus = []
 
-        for button in self._rendered_keystone_shades:
+        for button in self.rendered_keystone_shades:
             button.destroy()
-        self._rendered_keystone_shades = []
+        self.rendered_keystone_shades = []
 
         row = 0
         column = 0
         rows_limit = 4
         num_shade_buttons = harmony_entries * 4
         for btn_idx in range(len(shades_list)):
-            btn_keystone_shade = ctk.CTkButton(master=self._frm_shades_palette,
+            btn_keystone_shade = ctk.CTkButton(master=self.frm_shades_palette,
                                                fg_color=shades_list[btn_idx],
                                                hover_color=cbtk.contrast_colour(shades_list[btn_idx], 10),
                                                border_width=3,
@@ -2564,20 +2569,20 @@ class ControlPanel:
                                                    text='Right click for copy option.')
 
             btn_keystone_shade.grid(row=row, column=column, padx=pad_x, pady=pad_y)
-            self._rendered_keystone_shades.append(btn_keystone_shade)
+            self.rendered_keystone_shades.append(btn_keystone_shade)
 
             column += 1
 
-            palette_button = self._rendered_keystone_shades[btn_idx]
+            palette_button = self.rendered_keystone_shades[btn_idx]
             menus.append(cbtk.CBtkMenu(palette_button, tearoff=False))
-            menus[btn_idx].config(background=self._ctl_frame_high, foreground=self._ctl_text)
+            menus[btn_idx].config(background=self.ctl_frame_high, foreground=self.ctl_text)
             menus[btn_idx].add_command(label="Copy",
                                        command=lambda button_id=btn_idx:
-                                       self._copy_keystone_colour(harmony_button_id=button_id))
+                                       self.copy_keystone_colour(harmony_button_id=button_id))
 
             btn_keystone_shade.bind("<Button-3>",
-                                    lambda event, menu=menus[btn_idx], button_id=btn_idx: self._context_menu(event,
-                                                                                                             menu))
+                                    lambda event, menu=menus[btn_idx], button_id=btn_idx: self.context_menu(event,
+                                                                                                            menu))
 
             if column > harmony_entries:
                 column = 0
@@ -2587,14 +2592,14 @@ class ControlPanel:
 
     def copy_harmonics_to_palette(self):
         harmonic_differential = self.harmony_contrast_differential
-        colour_range = [self._btn_keystone_colour.cget('fg_color')]
+        colour_range = [self.btn_keystone_colour.cget('fg_color')]
 
-        for btn_idx in range(len(self._rendered_harmony_buttons)):
-            colour = self._rendered_harmony_buttons[btn_idx].cget('fg_color')
+        for btn_idx in range(len(self.rendered_harmony_buttons)):
+            colour = self.rendered_harmony_buttons[btn_idx].cget('fg_color')
             colour_range.append(colour)
         num_harmony_colours = len(colour_range)
 
-        num_theme_palette_tiles = len(self._theme_palette_tiles)
+        num_theme_palette_tiles = len(self.theme_palette_tiles)
 
         harmony_idx = 0
         contrast_step = 0
@@ -2609,7 +2614,7 @@ class ControlPanel:
             # We want to copy the gemerated colours to the "scratch" tile locations. These are
             # the 1st two tiles (actually buttons) on each of the two palette rows, so...
 
-            self._set_palette_colour(palette_button_id=idx, colour=colour)
+            self.set_palette_colour(palette_button_id=idx, colour=colour)
 
             if harmony_idx < num_harmony_colours - 1:
                 harmony_idx += 1
@@ -2617,61 +2622,61 @@ class ControlPanel:
                 contrast_step += 1
                 harmony_idx = 0
 
-        self._harmony_status_bar.set_status_text(
+        self.harmony_status_bar.set_status_text(
             status_text=f'Keystone and generated colours copied to palette.')
 
-        self._theme_json_data['provenance']['keystone colour'] = colour_range[0]
+        self.theme_json_data['provenance']['keystone colour'] = colour_range[0]
 
         harmony_method = self.opm_harmony_method.get()
-        self._theme_json_data['provenance']['harmony method'] = harmony_method
+        self.theme_json_data['provenance']['harmony method'] = harmony_method
 
-        self._json_state = 'dirty'
-        self._set_option_states()
+        self.json_state = 'dirty'
+        self.set_option_states()
 
     def tag_keystone_colour_to_theme(self):
-        keystone_colour = self._btn_keystone_colour.cget('fg_color')
+        keystone_colour = self.btn_keystone_colour.cget('fg_color')
         harmony_method = self.opm_harmony_method.get()
-        self._theme_json_data['provenance']['keystone colour'] = keystone_colour
-        self._theme_json_data['provenance']['harmony method'] = harmony_method
-        self._theme_json_data['provenance']['harmony differential'] = self.harmony_contrast_differential
-        self._json_state = 'dirty'
-        self._set_option_states()
-        self._harmony_status_bar.set_status_text(
-            status_text=f'Keystone colour tagged to theme {self._theme}.')
+        self.theme_json_data['provenance']['keystone colour'] = keystone_colour
+        self.theme_json_data['provenance']['harmony method'] = harmony_method
+        self.theme_json_data['provenance']['harmony differential'] = self.harmony_contrast_differential
+        self.json_state = 'dirty'
+        self.set_option_states()
+        self.harmony_status_bar.set_status_text(
+            status_text=f'Keystone colour tagged to theme {self.theme}.')
 
     def lighten_palette_tile(self, palette_button: ctk.CTkButton,
                              palette_button_id: int,
                              shade_step: int,
                              multiplier: int = 1):
-        self._set_option_states()
+        self.set_option_states()
         widget_colour = palette_button.cget('fg_color')
         lighter_shade = cbtk.shade_up(color=widget_colour, differential=shade_step, multiplier=multiplier)
         palette_button.configure(fg_color=lighter_shade)
-        if self._appearance_mode == 'Light':
+        if self.appearance_mode == 'Light':
             mode_idx = 0
         else:
             mode_idx = 1
         if lighter_shade != widget_colour:
             pyperclip.copy(lighter_shade)
             # Leverage the _paste_palette_colour method to update the widget and the preview panel.
-            self._paste_palette_colour(event=None, palette_button_id=palette_button_id)
+            self.paste_palette_colour(event=None, palette_button_id=palette_button_id)
 
     def darken_palette_tile(self, palette_button: ctk.CTkButton,
                             palette_button_id: int,
                             shade_step: int,
                             multiplier: int = 1):
-        self._set_option_states()
+        self.set_option_states()
         widget_colour = palette_button.cget('fg_color')
         darker_shade = cbtk.shade_down(color=widget_colour, differential=shade_step, multiplier=multiplier)
         palette_button.configure(fg_color=darker_shade)
-        if self._appearance_mode == 'Light':
+        if self.appearance_mode == 'Light':
             mode_idx = 0
         else:
             mode_idx = 1
         if darker_shade != widget_colour:
             pyperclip.copy(darker_shade)
             # Leverage the _paste_palette_colour method to update the widget and the preview panel.
-            self._paste_palette_colour(event=None, palette_button_id=palette_button_id)
+            self.paste_palette_colour(event=None, palette_button_id=palette_button_id)
 
     def lighten_widget_property_shade(self, property_widget: ctk.CTkButton,
                                       widget_property: str,
@@ -2679,19 +2684,19 @@ class ControlPanel:
                                       multiplier: int = 1):
         """Lighten the specified widget property shade, by a specified shade_step, optionally multiplied by a
         coefficient (multiplier)."""
-        self._set_option_states()
+        self.set_option_states()
         widget_colour = property_widget.cget('fg_color')
 
         lighter_shade = cbtk.shade_up(color=widget_colour, differential=shade_step, multiplier=multiplier)
         property_widget.configure(fg_color=lighter_shade)
-        if self._appearance_mode == 'Light':
+        if self.appearance_mode == 'Light':
             mode_idx = 0
         else:
             mode_idx = 1
         if lighter_shade != widget_colour:
             pyperclip.copy(lighter_shade)
             # Leverage the _paste_color method to update the widget and the preview panel.
-            self._paste_colour(event=None, widget_property=widget_property)
+            self.paste_colour(event=None, widget_property=widget_property)
 
     def darken_widget_property_shade(self, property_widget: ctk.CTkButton,
                                      widget_property: str,
@@ -2699,104 +2704,104 @@ class ControlPanel:
                                      multiplier: int = 1):
         """Darken the specified widget property shade, by a specified shade_step, optionally multiplied by a
         coefficient (multiplier)."""
-        self._set_option_states()
+        self.set_option_states()
         widget_colour = property_widget.cget('fg_color')
 
         darker_shade = cbtk.shade_down(color=widget_colour, differential=shade_step, multiplier=multiplier)
         print(f'Incoming shade: {widget_colour} / Darker shade: {darker_shade}')
         property_widget.configure(fg_color=darker_shade)
-        if self._appearance_mode == 'Light':
+        if self.appearance_mode == 'Light':
             mode_idx = 0
         else:
             mode_idx = 1
         if darker_shade != widget_colour:
             pyperclip.copy(darker_shade)
             # Leverage the _paste_color method to update the widget and the preview panel.
-            self._paste_colour(event=None, widget_property=widget_property)
+            self.paste_colour(event=None, widget_property=widget_property)
 
-    def _copy_harmony_input_colour(self, event=None, shade_copy=False):
-        colour = self._btn_keystone_colour.cget('fg_color')
+    def copy_harmony_input_colour(self, event=None, shade_copy=False):
+        colour = self.btn_keystone_colour.cget('fg_color')
         if shade_copy:
             colour = cbtk.contrast_colour(colour, self.shade_adjust_differential)
         pyperclip.copy(colour)
-        self._harmony_status_bar.set_status_text(
+        self.harmony_status_bar.set_status_text(
             status_text=f'Colour {colour} copied to clipboard.')
 
-    def _paste_harmony_keystone_colour(self):
+    def paste_harmony_keystone_colour(self):
         """Paste the colour currently stored in the paste buffer, to the harmony input button."""
         new_colour = pyperclip.paste()
         if not cbtk.valid_colour(new_colour):
-            self._harmony_status_bar.set_status_text(status_text='Attempted paste of non colour code text - ignored.')
+            self.harmony_status_bar.set_status_text(status_text='Attempted paste of non colour code text - ignored.')
             return
         harmony_method = self.opm_harmony_method.get()
         self.set_harmony_keystone(colour_code=new_colour, method=harmony_method)
-        self._populate_harmony_colours()
-        self._harmony_status_bar.set_status_text(
+        self.populate_harmony_colours()
+        self.harmony_status_bar.set_status_text(
             status_text=f'Colour {new_colour} assigned.')
 
     def set_harmony_keystone(self, colour_code: str, method: str):
         hover_colour = cbtk.contrast_colour(colour_code)
         if colour_code:
-            self._btn_keystone_colour.configure(fg_color=colour_code,
-                                                hover_color=hover_colour)
+            self.btn_keystone_colour.configure(fg_color=colour_code,
+                                               hover_color=hover_colour)
 
         if method:
             # set the harmony method, as tagged in the theme file.
             self.opm_harmony_method.set(method)
-            self._keystone_colour = colour_code
+            self.keystone_colour = colour_code
 
-    def _copy_keystone_colour(self, event=None, harmony_button_id=None, shade_copy=False):
-        colour = self._rendered_keystone_shades[harmony_button_id].cget('fg_color')
+    def copy_keystone_colour(self, event=None, harmony_button_id=None, shade_copy=False):
+        colour = self.rendered_keystone_shades[harmony_button_id].cget('fg_color')
         if shade_copy:
             colour = cbtk.contrast_colour(colour, self.shade_adjust_differential)
         pyperclip.copy(colour)
-        self._harmony_status_bar.set_status_text(
+        self.harmony_status_bar.set_status_text(
             status_text=f'Colour {colour} copied from palette entry {harmony_button_id + 1} to clipboard.')
 
-    def _copy_harmony_colour(self, event=None, harmony_button_id=None, shade_copy=False):
-        colour = self._rendered_harmony_buttons[harmony_button_id].cget('fg_color')
+    def copy_harmony_colour(self, event=None, harmony_button_id=None, shade_copy=False):
+        colour = self.rendered_harmony_buttons[harmony_button_id].cget('fg_color')
         if shade_copy:
             colour = cbtk.contrast_colour(colour, self.shade_adjust_differential)
         if shade_copy:
             colour = cbtk.contrast_colour(colour, self.shade_adjust_differential)
         pyperclip.copy(colour)
 
-        self._harmony_status_bar.set_status_text(
+        self.harmony_status_bar.set_status_text(
             status_text=f'Colour {colour} copied from palette entry {harmony_button_id + 1} to clipboard.')
 
-    def _harmony_input_colour_picker(self):
+    def harmony_input_colour_picker(self):
         # self.harmonics_label_count
-        primary_colour = askcolor(master=self._top_harmony,
-                                  initialcolor=self._keystone_colour,
+        primary_colour = askcolor(master=self.top_harmony,
+                                  initialcolor=self.keystone_colour,
                                   title=f'Harmony Source Colour Selection')
 
         if primary_colour[1] is not None:
             primary_colour = primary_colour[1]
-            self._btn_keystone_colour.configure(fg_color=primary_colour,
-                                                hover_color=primary_colour)
-            self._status_bar.set_status_text(
+            self.btn_keystone_colour.configure(fg_color=primary_colour,
+                                               hover_color=primary_colour)
+            self.status_bar.set_status_text(
                 status_text=f'Colour {primary_colour} assigned.')
-            self._keystone_colour = primary_colour
-            self._populate_harmony_colours()
+            self.keystone_colour = primary_colour
+            self.populate_harmony_colours()
 
-    def _harmony_colour_picker(self, palette_button_id):
+    def harmony_colour_picker(self, palette_button_id):
         # self.harmonics_label_count
-        primary_colour = askcolor(master=self._top_harmony,
+        primary_colour = askcolor(master=self.top_harmony,
                                   title=f'Harmony Source Colour Selection')
 
         if primary_colour[1] is not None:
             primary_colour = primary_colour[1]
-            self._rendered_harmony_buttons[0].configure(fg_color=primary_colour,
-                                                        hover_color=primary_colour)
-            self._status_bar.set_status_text(
+            self.rendered_harmony_buttons[0].configure(fg_color=primary_colour,
+                                                       hover_color=primary_colour)
+            self.status_bar.set_status_text(
                 status_text=f'Colour {primary_colour} assigned to palette entry {palette_button_id + 1}.')
-            self._keystone_colour = primary_colour
-        self._populate_harmony_colours()
+            self.keystone_colour = primary_colour
+        self.populate_harmony_colours()
 
-    def _populate_harmony_colours(self):
-        primary_colour = self._keystone_colour
+    def populate_harmony_colours(self):
+        primary_colour = self.keystone_colour
         harmony_method = self.opm_harmony_method.get()
-        colour_object = ch.Color(hex_to_rgb(self._keystone_colour), "", "")
+        colour_object = ch.Color(hex_to_rgb(self.keystone_colour), "", "")
 
         harmony_entries = 0
         harmony_colours = None
@@ -2825,35 +2830,35 @@ class ControlPanel:
             else:
                 colour = harmony_colours[btn_idx]
             harmony_colour = rgb_to_hex(colour)
-            self._rendered_harmony_buttons[btn_idx].configure(fg_color=harmony_colour,
-                                                              hover_color=harmony_colour)
+            self.rendered_harmony_buttons[btn_idx].configure(fg_color=harmony_colour,
+                                                             hover_color=harmony_colour)
         self.render_keystone_shades_palette(keystone_colour=primary_colour, harmony_method=harmony_method)
 
-    def _load_theme_palette(self, theme_name=None):
+    def load_theme_palette(self, theme_name=None):
         """Determine and open the JSON theme palette file, for the selected theme, and marry the colours mapped in
         the file, to the palette widgets. """
         if theme_name is None:
-            theme_name = self._theme_file
+            theme_name = self.theme_file
         palette_json = theme_name
-        self._palette_file = self._palettes_dir / palette_json
-        if not self._palette_file.exists():
-            self._create_theme_palette(theme_name)
+        self.palette_file = self.palettes_dir / palette_json
+        if not self.palette_file.exists():
+            self.create_theme_palette(theme_name)
 
-        self._theme_palette = mod.json_dict(json_file_path=self._palette_file)
+        self.theme_palette = mod.json_dict(json_file_path=self.palette_file)
 
-        mode = cbtk.str_mode_to_int(self._appearance_mode)
+        mode = cbtk.str_mode_to_int(self.appearance_mode)
 
         # Marry the palette buttons to their palette colours
         try:
-            for entry_id, button in enumerate(self._theme_palette_tiles):
-                colour = self._theme_palette[str(entry_id)][mode]
+            for entry_id, button in enumerate(self.theme_palette_tiles):
+                colour = self.theme_palette[str(entry_id)][mode]
                 hover_colour = cbtk.contrast_colour(colour)
                 # button.configure(fg_color=colour, hover_color=hover_colour)
                 button.configure(fg_color=colour, hover_color=hover_colour)
         except IndexError:
             pass
 
-    def _reset_theme(self):
+    def reset_theme(self):
         """Reset the theme file, to the state of the last save operation, or the state when it was opened,
         if there has been no intervening save. """
         confirm = CTkMessagebox(master=self.ctk_control_panel,
@@ -2862,14 +2867,14 @@ class ControlPanel:
                                 options=["Yes", "No"])
         if confirm.get() == 'No':
             return
-        self._json_state = 'clean'
+        self.json_state = 'clean'
         # TODO: Remove this line below
-        # self._load_theme_palette()
-        self._load_theme()
+        # self.load_theme_palette()
+        self.load_theme()
 
-    def _create_theme(self):
+    def create_theme(self):
         """Create a new theme. This is based on the default.json file."""
-        if self._json_state == 'dirty':
+        if self.json_state == 'dirty':
             confirm = CTkMessagebox(master=self.ctk_control_panel,
                                     title='Confirm Action',
                                     message=f'You have unsaved changes. Are you sure you wish to discard them?',
@@ -2881,104 +2886,104 @@ class ControlPanel:
         new_theme = dialog.get_input()
         if new_theme:
             if not valid_theme_name(new_theme):
-                self._status_bar.set_status_text(
+                self.status_bar.set_status_text(
                     status_text=f'The entered theme name contains disallowed characters - allowed: alphanumeric, '
                                 f'underscores & ()')
                 return
             # If user has included a ".json" extension, remove it, because we add one below.
             new_theme_basename = os.path.splitext(new_theme)[0]
             new_theme = new_theme_basename + '.json'
-            new_theme_path = self._theme_json_dir / new_theme
+            new_theme_path = self.theme_json_dir / new_theme
             if new_theme_path.exists():
-                self._status_bar.set_status_text(status_text=f'Theme {new_theme} already exists - '
-                                                             f'please choose another name!')
+                self.status_bar.set_status_text(status_text=f'Theme {new_theme} already exists - '
+                                                            f'please choose another name!')
                 return
             shutil.copyfile(source_file, new_theme_path)
-            self._json_files = self._user_themes_list()
-            self.opm_theme.configure(values=self._json_files)
+            self.json_files = self.user_themes_list()
+            self.opm_theme.configure(values=self.json_files)
             self.opm_theme.set(new_theme_basename)
-            self._load_theme(reload_preview=False)
-            self._theme_json_data['provenance']['theme name'] = new_theme_basename
-            self._theme_json_data['provenance']['created with'] = f"CTk Theme Builder v{__version__}"
+            self.load_theme(reload_preview=False)
+            self.theme_json_data['provenance']['theme name'] = new_theme_basename
+            self.theme_json_data['provenance']['created with'] = f"CTk Theme Builder v{__version__}"
             # current dateTime
             now = datetime.now()
             # convert to string
             date_created = now.strftime("%b %d %Y %H:%M:%S")
-            self._theme_json_data['provenance']['date created'] = date_created
-            if self._theme_author:
-                self._theme_json_data['provenance']['theme author'] = self._theme_author
+            self.theme_json_data['provenance']['date created'] = date_created
+            if self.theme_author:
+                self.theme_json_data['provenance']['theme author'] = self.theme_author
             else:
-                self._theme_json_data['provenance']['theme author'] = 'Unknown'
-            self._save_theme()
-            self._status_bar.set_status_text(status_text=f'New theme {new_theme} created.')
-            self._reload_preview()
+                self.theme_json_data['provenance']['theme author'] = 'Unknown'
+            self.save_theme()
+            self.status_bar.set_status_text(status_text=f'New theme {new_theme} created.')
+            self.reload_preview()
 
-    def _delete_theme(self):
+    def delete_theme(self):
         """Delete the currently selected theme."""
         confirm = CTkMessagebox(master=self.ctk_control_panel,
                                 title='Confirm Action',
-                                message=f'All data, for theme "{self._theme}", will be '
+                                message=f'All data, for theme "{self.theme}", will be '
                                         f'purged. Are you sure you wish to continue?',
                                 options=["Yes", "No"])
         if confirm.get() == 'No':
-            self.seg_mode.set(self._appearance_mode)
+            self.seg_mode.set(self.appearance_mode)
             return
 
-        os.remove(self._source_json_file)
-        source_palette_file = self._theme + '.json'
-        source_palette_path = self._palettes_dir / source_palette_file
+        os.remove(self.source_json_file)
+        source_palette_file = self.theme + '.json'
+        source_palette_path = self.palettes_dir / source_palette_file
         if source_palette_path.exists():
             os.remove(source_palette_path)
 
-        self._json_files = self._user_themes_list()
-        initial_display = self._user_themes_list()
+        self.json_files = self.user_themes_list()
+        initial_display = self.user_themes_list()
         initial_display.insert(0, '-- Select Theme --')
         self.opm_theme.configure(values=initial_display)
         self.opm_theme.set('-- Select Theme --')
         self.seg_mode.configure(state=tk.DISABLED)
-        self._opm_properties_filter.configure(state=tk.DISABLED)
-        self._btn_save_as.configure(state=tk.DISABLED)
-        self._btn_delete.configure(state=tk.DISABLED)
-        self._btn_sync_modes.configure(state=tk.DISABLED)
-        self._opm_properties_view.configure(state=tk.DISABLED)
-        self._swt_render_disabled.configure(state=tk.DISABLED)
-        self._btn_reset.configure(state=tk.DISABLED)
-        self._btn_save.configure(state=tk.DISABLED)
-        self._status_bar.set_status_text(status_text_life=30,
-                                         status_text=f'Theme, "{self._theme}", has been deleted. ')
-        self._json_state = 'clean'
+        self.opm_properties_filter.configure(state=tk.DISABLED)
+        self.btn_save_as.configure(state=tk.DISABLED)
+        self.btn_delete.configure(state=tk.DISABLED)
+        self.btn_sync_modes.configure(state=tk.DISABLED)
+        self.opm_properties_view.configure(state=tk.DISABLED)
+        self.swt_render_disabled.configure(state=tk.DISABLED)
+        self.btn_reset.configure(state=tk.DISABLED)
+        self.btn_save.configure(state=tk.DISABLED)
+        self.status_bar.set_status_text(status_text_life=30,
+                                        status_text=f'Theme, "{self.theme}", has been deleted. ')
+        self.json_state = 'clean'
 
-    def _save_theme_as(self):
+    def save_theme_as(self):
         """Save's the currently selected theme to a new theme. If the current theme has been modified, the modified
         state is saved. The new "save as" theme, becomes the current theme. This operation, also duplicates the
         palette file, to the new theme. """
         # current dateTime
 
-        source_file = self._source_json_file
+        source_file = self.source_json_file
         dialog = ctk.CTkInputDialog(text="Enter new theme name:", title="Create New Theme")
         new_theme = dialog.get_input()
         if new_theme:
             if not valid_theme_name(new_theme):
-                self._status_bar.set_status_text(status_text=f'The entered theme name contains prohibited characters '
-                                                             f'- allowed: alphanumeric, underscores & ()')
+                self.status_bar.set_status_text(status_text=f'The entered theme name contains prohibited characters '
+                                                            f'- allowed: alphanumeric, underscores & ()')
                 return
             new_theme = os.path.splitext(new_theme)[0]
             now = datetime.now()
             # convert to string
             date_saved_as = now.strftime("%b %d %Y %H:%M:%S")
 
-            if self._theme_author:
-                theme_author = self._theme_author
+            if self.theme_author:
+                theme_author = self.theme_author
             else:
                 theme_author = 'Unknown'
 
-            if 'provenance' in self._theme_json_data:
-                self._theme_json_data['provenance']['theme name'] = new_theme
-                self._theme_json_data['provenance']['date created'] = date_saved_as
-                self._theme_json_data['provenance']['last modified'] = date_saved_as
-                self._theme_json_data['provenance']['theme author'] = theme_author
-                self._theme_json_data['provenance']['last modified by'] = theme_author
-                self._theme_json_data['provenance']['created with'] = f"CTk Theme Builder v{__version__}"
+            if 'provenance' in self.theme_json_data:
+                self.theme_json_data['provenance']['theme name'] = new_theme
+                self.theme_json_data['provenance']['date created'] = date_saved_as
+                self.theme_json_data['provenance']['last modified'] = date_saved_as
+                self.theme_json_data['provenance']['theme author'] = theme_author
+                self.theme_json_data['provenance']['last modified by'] = theme_author
+                self.theme_json_data['provenance']['created with'] = f"CTk Theme Builder v{__version__}"
             else:
                 provenance = {"theme name": new_theme,
                               "theme author": theme_author,
@@ -2989,107 +2994,115 @@ class ControlPanel:
                               "keystone colour": None,
                               "harmony method": None,
                               "harmony differential": None}
-                self._theme_json_data['provenance'] = provenance
+                self.theme_json_data['provenance'] = provenance
 
             # If user has included a ".json" extension, remove it, because we add one below.
-            self._theme_file = new_theme + '.json'
+            self.theme_file = new_theme + '.json'
             # Set the theme source file to the new path, so that when we call save_theme(),
             # it dumps the current WIP to the new theme file.
-            self._source_json_file = self._theme_json_dir / self._theme_file
+            self.source_json_file = self.theme_json_dir / self.theme_file
 
             self.opm_theme.configure(command=None)
             self.opm_theme.set(new_theme)
-            self.opm_theme.configure(command=self._load_theme)
+            self.opm_theme.configure(command=self.load_theme)
             new_theme_json_file = new_theme + '.json'
-            new_theme_path = self._theme_json_dir / new_theme_json_file
+            new_theme_path = self.theme_json_dir / new_theme_json_file
             shutil.copyfile(source_file, new_theme_path)
 
-            new_palette_path = self._palettes_dir / new_theme_json_file
-            source_palette_file = self._theme + '.json'
-            source_palette_path = self._palette_file
+            new_palette_path = self.palettes_dir / new_theme_json_file
+            source_palette_file = self.theme + '.json'
+            source_palette_path = self.palette_file
             shutil.copyfile(source_palette_path, new_palette_path)
-            self._palette_file = new_palette_path
-            self._save_theme()
-            self._json_files = self._user_themes_list()
-            self.opm_theme.configure(values=self._json_files)
-            self._theme = new_theme
+            self.palette_file = new_palette_path
+            self.save_theme()
+            self.json_files = self.user_themes_list()
+            self.opm_theme.configure(values=self.json_files)
+            self.theme = new_theme
 
-    def _paste_colour(self, event, widget_property):
+    def paste_colour(self, event, widget_property):
         """Paste the colour currently stored in the paste buffer, to the selected button, where the paste operation
         was invoked."""
         new_colour = pyperclip.paste()
         if not cbtk.valid_colour(new_colour):
-            self._status_bar.set_status_text(status_text='Attempted paste of non colour code text - ignored.')
+            self.status_bar.set_status_text(status_text='Attempted paste of non colour code text - ignored.')
             return
-        self._set_widget_colour(widget_property=widget_property, new_colour=new_colour)
+        self.set_widget_colour(widget_property=widget_property, new_colour=new_colour)
         hover_colour = cbtk.contrast_colour(new_colour)
         self.widgets[widget_property]['button'].configure(fg_color=new_colour, hover_color=hover_colour)
-        self._status_bar.set_status_text(
+        self.status_bar.set_status_text(
             status_text=f'Colour {new_colour} assigned to widget property {widget_property}.')
         widget_type, base_property = mod.widget_property_split(widget_property=widget_property)
-        self._json_state = 'dirty'
-        self._set_option_states()
+        self.json_state = 'dirty'
+        self.set_option_states()
 
-    def _paste_palette_colour(self, event, palette_button_id):
+    def paste_palette_colour(self, event, palette_button_id):
         new_colour = pyperclip.paste()
         if not cbtk.valid_colour(new_colour):
-            self._status_bar.set_status_text(status_text='Attempted paste of non colour code - pasted text ignored.')
+            self.status_bar.set_status_text(status_text='Attempted paste of non colour code - pasted text ignored.')
             return
-        self._set_palette_colour(palette_button_id=palette_button_id, colour=new_colour)
-        self._status_bar.set_status_text(
+        self.set_palette_colour(palette_button_id=palette_button_id, colour=new_colour)
+        self.status_bar.set_status_text(
             status_text=f'Colour {new_colour} assigned to palette entry {palette_button_id + 1}.')
 
-    def _set_palette_colour(self, palette_button_id, colour):
+    def set_palette_colour(self, palette_button_id, colour):
         hover_colour = cbtk.contrast_colour(colour)
-        self._theme_palette_tiles[palette_button_id].configure(fg_color=colour, hover_color=hover_colour)
-        self._json_state = 'dirty'
-        self._set_option_states()
+        self.theme_palette_tiles[palette_button_id].configure(fg_color=colour, hover_color=hover_colour)
+        self.json_state = 'dirty'
+        self.set_option_states()
 
     def set_filtered_widget_display(self, dummy='dummy'):
-        properties_filter = self._opm_properties_filter.get()
+        properties_filter = self.opm_properties_filter.get()
         if properties_filter == 'All':
             self.ctk_control_panel.geometry(f'{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}')
         else:
             self.ctk_control_panel.geometry(f'{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}')
         self.render_widget_properties()
 
-    def _colour_picker(self, palette_button_id):
-        prev_colour = self._theme_palette_tiles[palette_button_id].cget('fg_color')
-        new_colour = askcolor(master=self._frm_theme_palette,
+    def property_colour_picker(self, event, widget_property):
+        prev_colour = self.widgets[widget_property]["colour"]
+        new_colour = askcolor(master=self.ctk_control_panel, title='Pick colour for : ' + widget_property,
+                              initialcolor=prev_colour)
+        if new_colour[1] is not None:
+            new_colour = new_colour[1]
+            self.set_widget_colour(widget_property=widget_property, new_colour=new_colour)
+
+    def palette_colour_picker(self, palette_button_id):
+        prev_colour = self.theme_palette_tiles[palette_button_id].cget('fg_color')
+        new_colour = askcolor(master=self.frm_theme_palette,
                               title=f'Pick colour for palette entry number {palette_button_id + 1}',
                               initialcolor=prev_colour)
 
         if new_colour[1] is not None:
             new_colour = new_colour[1]
-            self._theme_palette_tiles[palette_button_id].configure(fg_color=new_colour, hover_color=new_colour)
-            self._status_bar.set_status_text(
+            self.theme_palette_tiles[palette_button_id].configure(fg_color=new_colour, hover_color=new_colour)
+            self.status_bar.set_status_text(
                 status_text=f'Colour {new_colour} assigned to palette entry {palette_button_id + 1}.')
-            self._json_state = 'dirty'
-            self._set_option_states()
+            self.json_state = 'dirty'
+            self.set_option_states()
 
     @staticmethod
-    def _context_menu(event: tk.Event = None, menu: cbtk.CBtkMenu = None):
+    def context_menu(event: tk.Event = None, menu: cbtk.CBtkMenu = None):
         menu.tk_popup(event.x_root, event.y_root)
 
-    def _copy_palette_colour(self, event=None, palette_button_id=None, shade_copy=False):
-        colour = self._theme_palette_tiles[palette_button_id].cget('fg_color')
+    def copy_palette_colour(self, event=None, palette_button_id=None, shade_copy=False):
+        colour = self.theme_palette_tiles[palette_button_id].cget('fg_color')
         if shade_copy:
             colour = cbtk.contrast_colour(colour, self.shade_adjust_differential)
         pyperclip.copy(colour)
-        self._status_bar.set_status_text(
+        self.status_bar.set_status_text(
             status_text=f'Colour {colour} copied from palette entry {palette_button_id + 1} to clipboard.')
 
     def render_widget_properties(self, dummy=None):
         """Here we render the widget properties, within the control panel, along with their colour settings."""
-        filter_key = self._opm_properties_filter.get()
-        self._filter_list = self._widget_attributes[filter_key]
-        # self._appearance_mode = self.seg_mode.get()
+        filter_key = self.opm_properties_filter.get()
+        self.filter_list = self.widget_attributes[filter_key]
+        # self.appearance_mode = self.seg_mode.get()
 
-        widget_frame = self._frm_colour_edit_widgets
-        colours = mod.colour_dictionary(self._wip_json)
+        widget_frame = self.frm_colour_edit_widgets
+        colours = mod.colour_dictionary(self.wip_json)
 
-        view_selection = self._opm_properties_view.get()
-        filter_selection = self._opm_properties_filter.get()
+        view_selection = self.opm_properties_view.get()
+        filter_selection = self.opm_properties_filter.get()
 
         view = f'{view_selection} / {filter_selection}'
 
@@ -3125,7 +3138,7 @@ class ControlPanel:
             except ValueError:
                 pass
 
-        appearance_mode_index = cbtk.str_mode_to_int(self._appearance_mode)
+        appearance_mode_index = cbtk.str_mode_to_int(self.appearance_mode)
         menus = []
         btn_idx = 0
         pad_x = 5
@@ -3138,7 +3151,7 @@ class ControlPanel:
             property_value = entry[1]
             rendered_widgets[property_id] = property_value
         # Use a Python generator function to yield successive widgets from the list.
-        member_gen = mod.widget_member(widget_entries=rendered_widgets, filter_list=self._filter_list)
+        member_gen = mod.widget_member(widget_entries=rendered_widgets, filter_list=self.filter_list)
         for row in range(1, 30):
             for column_base in range(0, 3):
                 column = column_base * 2
@@ -3146,7 +3159,7 @@ class ControlPanel:
                     key = next(member_gen)
                     widget_type, widget_property = mod.widget_property_split(key)
                     json_widget_type = mod.json_widget_type(widget_type=widget_type)
-                    colour_value = self._theme_json_data[json_widget_type][widget_property]
+                    colour_value = self.theme_json_data[json_widget_type][widget_property]
                 except StopIteration:
                     break
 
@@ -3178,11 +3191,11 @@ class ControlPanel:
                 self.widgets[key] = {"widget": btn_property, "button": btn_property, "colour": colour,
                                      'label': lbl_property, "light_status": 'clean', "dark_status": 'clean'}
                 # Set a binding so that we can paste a colour, previously copied into our clipboard
-                if self._enable_single_click_paste and colour_value != "transparent":
+                if self.enable_single_click_paste and colour_value != "transparent":
                     self.widgets[key]['widget'].bind("<Button-1>",
-                                                     lambda event, wgt_property=key: self._paste_colour(event,
-                                                                                                        wgt_property))
-                if self._enable_tooltips:
+                                                     lambda event, wgt_property=key: self.paste_colour(event,
+                                                                                                       wgt_property))
+                if self.enable_tooltips:
                     if colour_value != 'transparent':
                         btn_tooltip = cbtk.CBtkToolTip(btn_property,
                                                        text='Right click for colour & clipboard functions.')
@@ -3196,11 +3209,11 @@ class ControlPanel:
                     # menus.append(main_menu)
                     context_menu.add_command(label="Copy",
                                              command=lambda wgt_property=key:
-                                             self._copy_property_colour(event=None, widget_property=wgt_property))
+                                             self.copy_property_colour(event=None, widget_property=wgt_property))
 
                     context_menu.add_command(label="Paste",
                                              command=lambda wgt_property=key:
-                                             self._paste_colour(event=None, widget_property=wgt_property))
+                                             self.paste_colour(event=None, widget_property=wgt_property))
                     context_menu.add_separator()
                     shade_up_menu = cbtk.CBtkMenu(context_menu, tearoff=False)
                     shade_up_menu.add_command(label="Lighter", state="normal",
@@ -3257,14 +3270,15 @@ class ControlPanel:
                     context_menu.add_separator()
                     context_menu.add_command(label="Colour Picker",
                                              command=lambda wgt_property=key:
-                                             self.colour_picker(event=None, widget_property=wgt_property))
+                                             self.property_colour_picker(event=None,
+                                                                         widget_property=wgt_property))
                     self.widgets[key]['widget'].bind("<Button-3>",
                                                      lambda event, menu=context_menu, button_id=btn_idx:
-                                                     self._context_menu(event, menu))
+                                                     self.context_menu(event, menu))
 
                     btn_idx += 1
 
-    def _sync_appearance_mode(self):
+    def sync_appearance_mode(self):
         """This method allows us to copy our Dark configuration (if Sark is our current selection, to our Light and
         vice-versa """
         current_mode = self.seg_mode.get()
@@ -3284,30 +3298,30 @@ class ControlPanel:
         if confirm.get() == 'Cancel':
             return
         counter = 0
-        for property_id in self._filter_list:
+        for property_id in self.filter_list:
             widget_type, widget_property = mod.widget_property_split(property_id)
             json_widget_type = mod.json_widget_type(widget_type=widget_type)
-            if str(self._theme_json_data[json_widget_type][widget_property]) == "transparent":
+            if str(self.theme_json_data[json_widget_type][widget_property]) == "transparent":
                 continue
             try:
-                self._theme_json_data[json_widget_type][widget_property][to_mode] = self.widgets[property_id]["colour"]
+                self.theme_json_data[json_widget_type][widget_property][to_mode] = self.widgets[property_id]["colour"]
                 counter += 1
             except TypeError:
                 print(f"TypeError on: {widget_type} / {widget_property}")
-                print(f"             Current setting: {str(self._theme_json_data[widget_type][widget_property])}")
+                print(f"             Current setting: {str(self.theme_json_data[widget_type][widget_property])}")
                 print(f"             Attempt setting: {str(self.widgets[property_id]['colour'])}")
                 raise
             except KeyError:
                 print(f"KeyError on: {widget_type} / {widget_property}")
-                print(f"             Current setting: {str(self._theme_json_data[widget_type][widget_property])}")
+                print(f"             Current setting: {str(self.theme_json_data[widget_type][widget_property])}")
                 print(f"             Attempt setting: {str(self.widgets[property_id]['colour'])}")
                 raise
         print(f'{counter} properties synchronised.')
-        self._json_state = 'dirty'
-        self._set_option_states()
-        self._reload_preview()
+        self.json_state = 'dirty'
+        self.set_option_states()
+        self.reload_preview()
 
-    def _sync_theme_palette(self):
+    def sync_theme_palette(self):
         """Sync the theme palette for the current appearance mode to its counter-part."""
         current_mode = self.seg_mode.get()
         if current_mode.lower() == 'light':
@@ -3332,55 +3346,55 @@ class ControlPanel:
         if confirm.get() == 'Cancel':
             return
 
-        if self._appearance_mode == 'Light':
-            for entry_id, button in enumerate(self._theme_palette_tiles):
-                fg_colour = self._theme_palette_tiles[entry_id].cget('fg_color')
-                self._theme_palette[str(entry_id)][1] = fg_colour
+        if self.appearance_mode == 'Light':
+            for entry_id, button in enumerate(self.theme_palette_tiles):
+                fg_colour = self.theme_palette_tiles[entry_id].cget('fg_color')
+                self.theme_palette[str(entry_id)][1] = fg_colour
         else:
-            for entry_id, button in enumerate(self._theme_palette_tiles):
-                fg_colour = self._theme_palette_tiles[entry_id].cget('fg_color')
-                self._theme_palette[str(entry_id)][0] = fg_colour
+            for entry_id, button in enumerate(self.theme_palette_tiles):
+                fg_colour = self.theme_palette_tiles[entry_id].cget('fg_color')
+                self.theme_palette[str(entry_id)][0] = fg_colour
 
-        self._save_theme_palette()
-        self._json_state = 'dirty'
-        self._set_option_states()
+        self.save_theme_palette()
+        self.json_state = 'dirty'
+        self.set_option_states()
 
-    def _refresh_preview(self):
+    def refresh_preview(self):
         """The _refresh_preview method, instructs the Preview Panel to perform a re-rendering of all widgets."""
 
-        with open(self._wip_json, "w") as f:
-            json.dump(self._theme_json_data, f, indent=2)
-        self._send_command_json(command_type='program',
-                                command='refresh',
-                                parameters=[self._appearance_mode])
+        with open(self.wip_json, "w") as f:
+            json.dump(self.theme_json_data, f, indent=2)
+        self.send_command_json(command_type='program',
+                               command='refresh',
+                               parameters=[self.appearance_mode])
 
-    def _reload_preview(self):
-        """The _reload_preview method causes a full reload of the preview panel."""
+    def reload_preview(self):
+        """The reload_preview method causes a full reload of the preview panel."""
         if self.process:
-            self._send_command_json(command_type='program',
-                                    command='quit',
-                                    parameters=None)
+            self.send_command_json(command_type='program',
+                                   command='quit',
+                                   parameters=None)
 
-        with open(self._wip_json, "w") as f:
-            json.dump(self._theme_json_data, f, indent=2)
+        with open(self.wip_json, "w") as f:
+            json.dump(self.theme_json_data, f, indent=2)
         self.process = None
         self.launch_preview()
 
-        if self._tk_render_disabled.get():
-            self._send_command_json(command_type='program',
-                                    command='render_preview_disabled',
-                                    parameters=None)
+        if self.tk_render_disabled.get():
+            self.send_command_json(command_type='program',
+                                   command='render_preview_disabled',
+                                   parameters=None)
         else:
-            self._send_command_json(command_type='program',
-                                    command='render_preview_enabled',
-                                    parameters=None)
+            self.send_command_json(command_type='program',
+                                   command='render_preview_enabled',
+                                   parameters=None)
 
         frame_mode = self.tk_swt_frame_mode.get()
         if frame_mode == 'base':
-            self._send_command_json(command_type='program', command='render_base_frame')
+            self.send_command_json(command_type='program', command='render_base_frame')
 
-    def _close_panels(self):
-        if self._json_state == 'dirty':
+    def close_panels(self):
+        if self.json_state == 'dirty':
             confirm = CTkMessagebox(master=self.ctk_control_panel,
                                     title='Confirm Action',
                                     message=f'You have unsaved changes. Do you wish to save these before quitting?',
@@ -3389,20 +3403,20 @@ class ControlPanel:
             if response == 'Cancel':
                 return
             elif response == 'Yes':
-                self._save_theme()
+                self.save_theme()
 
         if self.process:
-            self._send_command_json(command_type='program',
-                                    command='quit',
-                                    parameters=None)
+            self.send_command_json(command_type='program',
+                                   command='quit',
+                                   parameters=None)
 
-        self._save_controller_geometry()
+        self.save_controller_geometry()
         self.ctk_control_panel.destroy()
 
     def launch_preview(self):
-        appearance_mode = self._appearance_mode
-        with open(self._wip_json, "w") as f:
-            json.dump(self._theme_json_data, f, indent=2)
+        appearance_mode_ = self.appearance_mode
+        with open(self.wip_json, "w") as f:
+            json.dump(self.theme_json_data, f, indent=2)
 
         designer = os.path.basename(__file__)
         if platform.system() == 'Windows':
@@ -3412,7 +3426,7 @@ class ControlPanel:
 
         if self.process is None:
             designer = APP_HOME / designer
-            program = [designer, '-a', appearance_mode, '-t', self._wip_json]
+            program = [designer, '-a', appearance_mode_, '-t', self.wip_json]
             print(f'Launching designer: {designer}')
             self.process = sp.Popen(program)
             listener_started = False
@@ -3437,7 +3451,7 @@ class ControlPanel:
                         exit(1)
                 time.sleep(0.1)
 
-    def _restore_controller_geometry(self):
+    def restore_controller_geometry(self):
         default_geometry = f"{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}+347+93"
         controller_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH,
                                                      scope='window_geometry',
@@ -3445,7 +3459,7 @@ class ControlPanel:
         self.ctk_control_panel.geometry(controller_geometry)
         self.ctk_control_panel.resizable(False, True)
 
-    def _save_controller_geometry(self):
+    def save_controller_geometry(self):
         """Save the control panel geometry to the repo, for the next time the program is launched."""
         geometry_row = mod.preference_row(db_file_path=DB_FILE_PATH,
                                           scope='window_geometry',
@@ -3454,43 +3468,43 @@ class ControlPanel:
         geometry_row["preference_value"] = panel_geometry
         mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
 
-    def _save_theme(self):
-        if 'provenance' in self._theme_json_data:
+    def save_theme(self):
+        if 'provenance' in self.theme_json_data:
             # current dateTime
             now = datetime.now()
             # convert to string
             date_modified = now.strftime("%b %d %Y %H:%M:%S")
-            theme_name = self._source_json_file
+            theme_name = self.source_json_file
             theme_name = os.path.splitext(theme_name)[0]
             theme_name = os.path.basename(theme_name)
-            self._theme_json_data['provenance']['theme name'] = theme_name
-            self._theme_json_data['provenance']['last modified'] = date_modified
-            if self._theme_author:
-                self._theme_json_data['provenance']['last modified by'] = self._theme_author
+            self.theme_json_data['provenance']['theme name'] = theme_name
+            self.theme_json_data['provenance']['last modified'] = date_modified
+            if self.theme_author:
+                self.theme_json_data['provenance']['last modified by'] = self.theme_author
             else:
-                self._theme_json_data['provenance']['last modified by'] = 'Unknown'
+                self.theme_json_data['provenance']['last modified by'] = 'Unknown'
 
-        with open(self._wip_json, "w") as f:
-            json.dump(self._theme_json_data, f, indent=2)
-        shutil.copyfile(self._wip_json, self._source_json_file)
-        theme_file = os.path.basename(self._source_json_file)
-        self._json_state = 'clean'
-        self._btn_reset.configure(state=tk.DISABLED)
-        self._btn_save.configure(state=tk.DISABLED)
-        self._status_bar.set_status_text(status_text=f'Theme file, {theme_file}, saved successfully!')
-        self._save_theme_palette()
+        with open(self.wip_json, "w") as f:
+            json.dump(self.theme_json_data, f, indent=2)
+        shutil.copyfile(self.wip_json, self.source_json_file)
+        theme_file_name = os.path.basename(self.source_json_file)
+        self.json_state = 'clean'
+        self.btn_reset.configure(state=tk.DISABLED)
+        self.btn_save.configure(state=tk.DISABLED)
+        self.status_bar.set_status_text(status_text=f'Theme file, {theme_file_name}, saved successfully!')
+        self.save_theme_palette()
 
-    def _get_tooltips_setting(self):
-        self._enable_tooltips = int(self._tk_enable_tooltips.get())
+    def get_tooltips_setting(self):
+        self.enable_tooltips = int(self.tk_enable_tooltips.get())
 
-    def _get_palette_label_setting(self):
-        self._enable_palette_labels = int(self._tk_enable_palette_labels.get())
+    def get_palette_label_setting(self):
+        self.enable_palette_labels = int(self.tk_enable_palette_labels.get())
 
-    def _get_last_theme_on_start(self):
-        self._last_theme_on_start = int(self._tk_last_theme_on_start.get())
+    def get_last_theme_on_start(self):
+        self.last_theme_on_start = int(self.tk_last_theme_on_start.get())
 
-    def _get_single_click_paste_setting(self):
-        self._enable_single_click_paste = int(self._tk_enable_single_click_paste.get())
+    def get_single_click_paste_setting(self):
+        self.enable_single_click_paste = int(self.tk_enable_single_click_paste.get())
 
 
 class AppearanceMode(Enum):
@@ -3533,12 +3547,12 @@ class WidgetType(Enum):
 @dataclass
 class Widget(ABC):
     def __init__(self, widget_type: WidgetType, colours: list):
-        self._widget = {"widget_type": widget_type,
+        self.widget = {"widget_type": widget_type,
                         "widget_properties": {"colours": colours}}
-        self._widget_type = widget_type
+        self.widget_type = widget_type
         self.colours = colours
-        self._light_mode_colour: str = colours[0]
-        self._dark_mode_colour: str = colours[1]
+        self.light_mode_colour: str = colours[0]
+        self.dark_mode_colour: str = colours[1]
 
     @property
     @abstractmethod
@@ -3568,8 +3582,8 @@ class WidgetShape(ABC):
 @dataclass
 class CommandController:
     def __init__(self, control_panel: Type[ControlPanel]):
-        self._control = control_panel
-        self._widgets = list[Widget] = field(default_factory=list)
+        self.control = control_panel
+        self.widgets = list[Widget] = field(default_factory=list)
 
     def execute_command(self, command_type: str, command):
         pass
