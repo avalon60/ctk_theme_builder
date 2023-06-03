@@ -3,6 +3,7 @@ __author__ = 'Clive Bostock'
 __version__ = "1.0.0"
 __license__ = 'MIT - see LICENSE.md'
 
+import copy
 from pathlib import Path
 import json
 import customtkinter as ctk
@@ -181,6 +182,21 @@ def delete_preference(db_file_path: Path, scope: str, preference_name):
                 "and preference_name = :preference_name;", {"scope": scope, "preference_name": preference_name})
     db_conn.commit()
     db_conn.close()
+
+
+def flip_appearance_modes(theme_file_path: Path):
+    """Function, which accepts the pathname to a CustomTkinter theme file. It then proceeds to swap
+    all light (appearance) mode colours, with those of the dark mode."""
+
+    theme_dict = json_dict(theme_file_path)
+    new_theme_dict = copy.deepcopy(theme_dict)
+    for widget_type, dict_ in theme_dict.items():
+        for property_, value_ in dict_.items():
+            if "_color" in property_ and value_ != 'transparent':
+                new_theme_dict[widget_type][property_][0] = theme_dict[widget_type][property_][1]
+                new_theme_dict[widget_type][property_][1] = theme_dict[widget_type][property_][0]
+    with open(theme_file_path, "w") as f:
+        json.dump(new_theme_dict, f, indent=2)
 
 
 def widget_property_split(widget_property: str) -> tuple:
@@ -634,5 +650,4 @@ if __name__ == "__main__":
     print(f'Scope preferences records: {scope_prefs}')
     colour_palettess = colour_palette_entries(db_file_path=db_file)
     print(f'colour_palettess = {colour_palettess}')
-
     pass
