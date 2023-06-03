@@ -563,7 +563,7 @@ class PreviewPanel:
                                                 scope='window_geometry',
                                                 preference_name='preview_panel')
         self.preview.geometry(panel_geometry)
-        self.preview.resizable(False, True)
+        self.preview.resizable(True, True)
 
     def _save_preview_geometry(self):
         # save current geometry to the preferences
