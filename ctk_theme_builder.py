@@ -556,7 +556,6 @@ class ControlPanel:
         mod.flip_appearance_modes(theme_file_path=theme_json_file)
         self.load_theme()
 
-
     def set_widget_colour(self, widget_property, new_colour):
         """Update the widget colour on the preview panel."""
         if not new_colour:
@@ -631,6 +630,8 @@ class ControlPanel:
         self.des_menu.add_cascade(label='Tools', menu=self.tools_menu)
         self.tools_menu.add_command(label='Preferences', command=self.launch_preferences_dialog)
         self.tools_menu.add_command(label='Colour Harmonics', command=self.launch_harmony_dialog, state=tk.DISABLED)
+        self.tools_menu.add_command(label='Merge Themes', command=self.launch_merge_dialog)
+
         self.tools_menu.add_command(label='About', command=self.about)
 
         self.set_option_states()
@@ -701,6 +702,163 @@ class ControlPanel:
         top_about.resizable(False, False)
 
         top_about.grab_set()
+
+    def launch_merge_dialog(self):
+        self.top_merge = ctk.CTkToplevel(self.ctk_control_panel)
+        self.top_merge.title('Merge Themes')
+        self.top_merge.geometry('570x340')
+        # Make sure the TopLevel doesn't disappear if we need to
+        # open the tk.filedialog.askdirectory dialog to set a new theme folder.
+        self.top_merge.transient(self.ctk_control_panel)
+        # Make preferences dialog modal
+        self.top_merge.rowconfigure(0, weight=1)
+        self.top_merge.rowconfigure(1, weight=0)
+        self.top_merge.columnconfigure(0, weight=1)
+
+        frm_main = ctk.CTkFrame(master=self.top_merge, corner_radius=10)
+        frm_main.grid(column=0, row=0, sticky='nsew')
+        frm_main.columnconfigure(0, weight=1)
+        frm_main.rowconfigure(0, weight=1)
+
+        frm_main = ctk.CTkFrame(master=self.top_merge, corner_radius=10)
+        frm_main.grid(column=0, row=0, sticky='nsew')
+        frm_main.columnconfigure(0, weight=1)
+        frm_main.rowconfigure(0, weight=1)
+
+        frm_widgets = ctk.CTkFrame(master=frm_main, corner_radius=10)
+        frm_widgets.grid(column=0, row=0, padx=5, pady=5, sticky='nsew')
+
+        frm_buttons = ctk.CTkFrame(master=frm_main, corner_radius=0)
+        frm_buttons.grid(column=0, row=1, padx=0, pady=(0, 0), sticky='ew')
+
+        widget_start_row = 0
+
+        lbl_primary_theme = ctk.CTkLabel(master=frm_widgets, text='Primary Theme', justify="right")
+        lbl_primary_theme.grid(row=widget_start_row, column=0, padx=5, pady=(20, 5), sticky='e')
+
+        if self.enable_tooltips:
+            btn_author_tooltip = CTkToolTip(lbl_primary_theme,
+                                            wraplength=250,
+                                            justify="left",
+                                            message="The primary theme to merge. The non-colour properties are, "
+                                                    "adopted from the primary theme.")
+
+        self.tk_primary_theme = tk.StringVar()
+        self.opm_primary_theme = ctk.CTkOptionMenu(master=frm_widgets,
+                                                   variable=self.tk_primary_theme,
+                                                   values=self.app_themes_list())
+        self.opm_primary_theme.grid(row=widget_start_row, column=1, padx=(0, 10), pady=(20, 5), sticky='w')
+
+        lbl_primary_mode = ctk.CTkLabel(master=frm_widgets, text='Appearance Mode', justify="right")
+        lbl_primary_mode.grid(row=widget_start_row, column=2, padx=5, pady=(20, 5), sticky='e')
+
+        # The primary_theme_mode holds the CustomTkinter appearance mode (Dark / Light)
+        self.tk_appearance_mode_var = tk.StringVar()
+        rdo_primary_light = ctk.CTkRadioButton(master=frm_widgets, text='Light',
+                                               variable=self.tk_appearance_mode_var,
+                                               value='Light')
+        rdo_primary_light.grid(row=widget_start_row, column=3, pady=(20, 5), sticky='w')
+        widget_start_row += 1
+
+        rdo_primary_dark = ctk.CTkRadioButton(master=frm_widgets, text='Dark', variable=self.tk_appearance_mode_var,
+                                              value='Dark')
+        rdo_primary_dark.grid(row=widget_start_row, column=3, pady=5, sticky='w')
+
+        rdo_primary_dark.deselect()
+        rdo_primary_light.select()
+
+        widget_start_row += 1
+
+        ###
+        lbl_secondary_theme = ctk.CTkLabel(master=frm_widgets, text='Secondary Theme', justify="right")
+        lbl_secondary_theme.grid(row=widget_start_row, column=0, padx=5, pady=(20, 5), sticky='e')
+
+        if self.enable_tooltips:
+            btn_author_tooltip = CTkToolTip(lbl_secondary_theme,
+                                            wraplength=250,
+                                            justify="left",
+                                            message="The secondary theme to merge. The non-colour properties are, "
+                                                    "adopted from the secondary theme.")
+
+        self.tk_secondary_theme = tk.StringVar()
+        self.opm_secondary_theme = ctk.CTkOptionMenu(master=frm_widgets,
+                                                     variable=self.tk_secondary_theme,
+                                                     values=self.app_themes_list())
+        self.opm_secondary_theme.grid(row=widget_start_row, column=1, padx=(0, 10), pady=(20, 5), sticky='w')
+
+        lbl_secondary_mode = ctk.CTkLabel(master=frm_widgets, text='Appearance Mode', justify="right")
+        lbl_secondary_mode.grid(row=widget_start_row, column=2, padx=5, pady=(20, 5), sticky='e')
+
+        # The secondary_theme_mode holds the CustomTkinter appearance mode (Dark / Light)
+        self.tk_appearance_mode_var = tk.StringVar()
+        rdo_secondary_light = ctk.CTkRadioButton(master=frm_widgets, text='Light',
+                                                 variable=self.tk_appearance_mode_var,
+                                                 value='Light')
+        rdo_secondary_light.grid(row=widget_start_row, column=3, pady=(20, 5), sticky='w')
+        widget_start_row += 1
+
+        rdo_secondary_dark = ctk.CTkRadioButton(master=frm_widgets, text='Dark',
+                                                variable=self.tk_appearance_mode_var,
+                                                value='Dark')
+        rdo_secondary_dark.grid(row=widget_start_row, column=3, pady=5, sticky='w')
+
+        rdo_secondary_dark.deselect()
+        rdo_secondary_light.select()
+
+        widget_start_row += 1
+        lbl_new_theme_name = ctk.CTkLabel(master=frm_widgets, text='New theme name', justify="right")
+        lbl_new_theme_name.grid(row=widget_start_row, column=0, padx=5, pady=(30, 5), sticky='e')
+
+        self.tk_theme_name = tk.StringVar()
+        self.ent_theme_name = ctk.CTkEntry(master=frm_widgets,
+                                           textvariable=self.tk_theme_name,
+                                           width=160)
+        self.ent_theme_name.grid(row=widget_start_row, column=1, padx=(0, 0), pady=(30, 5), sticky='w')
+
+        if self.enable_tooltips:
+            btn_author_tooltip = CTkToolTip(lbl_new_theme_name,
+                                            wraplength=250,
+                                            justify="left",
+                                            message="The target theme name is included to the theme JSON, in the "
+                                                    "provenance section.")
+
+        lbl_new_theme_file = ctk.CTkLabel(master=frm_widgets, text='File name', justify="right")
+        lbl_new_theme_file.grid(row=widget_start_row, column=2, padx=5, pady=(30, 5), sticky='e')
+
+        self.tk_theme_file = tk.StringVar()
+        self.ent_theme_file = ctk.CTkEntry(master=frm_widgets,
+                                           textvariable=self.tk_theme_file,
+                                           width=160)
+        self.ent_theme_file.grid(row=widget_start_row, column=3, padx=(0, 0), pady=(30, 5), sticky='w')
+
+        if self.enable_tooltips:
+            btn_author_tooltip = CTkToolTip(lbl_new_theme_file,
+                                            wraplength=250,
+                                            justify="left",
+                                            message="Enter the file name (prefix only), of the new theme file.")
+
+        widget_start_row += 1
+        self.tk_open_on_merge = tk.IntVar(master=frm_widgets)
+        self.swt_open_on_merge = ctk.CTkSwitch(master=frm_widgets,
+                                               text='Open on merge',
+                                               variable=self.tk_open_on_merge,
+                                               command=self.get_single_click_paste_setting)
+        self.swt_open_on_merge.grid(row=widget_start_row, column=3, padx=(0, 0), pady=(20, 10), sticky='w')
+
+        if self.enable_tooltips:
+            btn_enable_tooltips_tooltip = CTkToolTip(self.swt_open_on_merge,
+                                                     wraplength=400,
+                                                     message="Enable this switch, if you wish to open the merged theme.")
+
+        widget_start_row += 1
+
+        # Control buttons
+        btn_close = ctk.CTkButton(master=frm_buttons, text='Cancel', command=self.top_merge.destroy)
+        btn_close.grid(row=0, column=0, padx=(15, 35), pady=5)
+
+        btn_save = ctk.CTkButton(master=frm_buttons, text='Save', command=self.save_preferences)
+        btn_save.grid(row=0, column=1, padx=(150, 15), pady=5)
+        self.top_merge.grab_set()
 
     def launch_preferences_dialog(self):
         self.top_prefs = ctk.CTkToplevel(self.ctk_control_panel)
