@@ -86,7 +86,7 @@ default_view_file = VIEWS_DIR / f'{DEFAULT_VIEW}.json'
 DEFAULT_VIEW_WIDGET_ATTRIBUTES = mod.json_dict(json_file_path=default_view_file)
 
 
-def valid_theme_name(theme_name):
+def valid_theme_file_name(theme_name):
     pattern = re.compile("[A-Za-z0-9_()]+")
     if pattern.fullmatch(theme_name):
         return True
@@ -94,24 +94,12 @@ def valid_theme_name(theme_name):
         return False
 
 
-# TODO - move to cbtk_kit
-
-
-def hex_to_rgb(hex_colour):
-    """ Convert a hex colour code to an RGB tuple."""
-    rgb = []
-    hex_value = hex_colour.replace('#', '')
-    for i in (0, 2, 4):
-        decimal = int(hex_value[i:i + 2], 16)
-        rgb.append(decimal)
-
-    return tuple(rgb)
-
-
-def rgb_to_hex(rgb: tuple):
-    """Convert RGB tuple to a hex colour code."""
-    r, g, b = rgb
-    return '#{:02x}{:02x}{:02x}'.format(r, g, b)
+def valid_theme_name(theme_name):
+    pattern = re.compile("[A-Za-z0-9_()\s]+")
+    if pattern.fullmatch(theme_name):
+        return True
+    else:
+        return False
 
 
 def all_widget_attributes(widget_attributes):
@@ -149,6 +137,225 @@ class SortingHelpFormatter(HelpFormatter):
     def add_arguments(self, actions):
         actions = sorted(actions, key=attrgetter('option_strings'))
         super(SortingHelpFormatter, self).add_arguments(actions)
+
+
+class ThemeMerger(ctk.CTkToplevel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.theme_json_dir = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                     preference_name='theme_json_dir')
+        self.enable_tooltips = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                      preference_name='enable_tooltips')
+        self.master = self.master
+        self.title('Merge Themes')
+        self.geometry('760x350')
+
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=0)
+        self.columnconfigure(0, weight=1)
+
+        frm_main = ctk.CTkFrame(master=self, corner_radius=10)
+        frm_main.grid(column=0, row=0, sticky='nsew')
+        frm_main.columnconfigure(0, weight=1)
+        frm_main.rowconfigure(0, weight=1)
+
+        frm_main = ctk.CTkFrame(master=self, corner_radius=10)
+        frm_main.grid(column=0, row=0, sticky='nsew')
+        frm_main.columnconfigure(0, weight=1)
+        frm_main.rowconfigure(0, weight=1)
+
+        frm_widgets = ctk.CTkFrame(master=frm_main, corner_radius=10)
+        frm_widgets.grid(column=0, row=0, padx=5, pady=5, sticky='nsew')
+
+        frm_buttons = ctk.CTkFrame(master=frm_main, corner_radius=0)
+        frm_buttons.grid(column=0, row=1, padx=0, pady=(0, 0), sticky='ew')
+
+        widget_start_row = 0
+
+        lbl_primary_theme = ctk.CTkLabel(master=frm_widgets, text='Primary theme', justify="right")
+        lbl_primary_theme.grid(row=widget_start_row, column=0, padx=5, pady=(20, 5), sticky='e')
+
+        if self.enable_tooltips:
+            btn_author_tooltip = CTkToolTip(lbl_primary_theme,
+                                            wraplength=250,
+                                            justify="left",
+                                            message="The primary theme to merge. The non-colour properties are, "
+                                                    "adopted from the primary theme.")
+
+        self.tk_primary_theme = tk.StringVar()
+        self.opm_primary_theme = ctk.CTkOptionMenu(master=frm_widgets,
+                                                   variable=self.tk_primary_theme,
+                                                   values=mod.user_themes_list())
+        self.opm_primary_theme.grid(row=widget_start_row, column=1, padx=(0, 10), pady=(20, 5), sticky='w')
+
+        lbl_primary_mode = ctk.CTkLabel(master=frm_widgets, text='Appearance mode', justify="right")
+        lbl_primary_mode.grid(row=widget_start_row, column=2, padx=5, pady=(20, 5), sticky='e')
+        if self.enable_tooltips:
+            btn_author_tooltip = CTkToolTip(lbl_primary_mode,
+                                            wraplength=250,
+                                            justify="left",
+                                            message="Select the appearance mode to be merged from the primary theme.")
+        # The primary_theme_mode holds the CustomTkinter appearance mode (Dark / Light)
+        self.tk_primary_mode = tk.StringVar()
+        rdo_primary_light = ctk.CTkRadioButton(master=frm_widgets, text='Light',
+                                               variable=self.tk_primary_mode,
+                                               value='Light')
+        rdo_primary_light.grid(row=widget_start_row, column=3, pady=(20, 5), sticky='w')
+        widget_start_row += 1
+
+        rdo_primary_dark = ctk.CTkRadioButton(master=frm_widgets, text='Dark', variable=self.tk_primary_mode,
+                                              value='Dark')
+        rdo_primary_dark.grid(row=widget_start_row, column=3, pady=5, sticky='w')
+
+        rdo_primary_dark.deselect()
+        rdo_primary_light.select()
+
+        # We need to determine where the primary theme's appearance mode will be mapped to.
+        widget_start_row = 0
+        lbl_primary_mapped_mode = ctk.CTkLabel(master=frm_widgets, text='Map primary mode to', justify="right")
+        lbl_primary_mapped_mode.grid(row=widget_start_row, column=4, padx=5, pady=(20, 5), sticky='e')
+        if self.enable_tooltips:
+            btn_author_tooltip = CTkToolTip(lbl_primary_mapped_mode,
+                                            wraplength=250,
+                                            justify="left",
+                                            message="Select which appearance mode, the selected primary mode will be"
+                                                    " mapped to. \n\nThe secondary theme's selected appearance mode, "
+                                                    "will be mapped to the unselected mode.")
+        self.tk_primary_mapped_mode = tk.StringVar()
+        rdo_primary_mapped_light = ctk.CTkRadioButton(master=frm_widgets, text='Light',
+                                               variable=self.tk_primary_mapped_mode,
+                                               value='Light')
+        rdo_primary_mapped_light.grid(row=widget_start_row, column=5, pady=(20, 5), sticky='w')
+        widget_start_row += 1
+
+        rdo_primary_mapped_dark = ctk.CTkRadioButton(master=frm_widgets, text='Dark', variable=self.tk_primary_mapped_mode,
+                                              value='Dark')
+        rdo_primary_mapped_dark.grid(row=widget_start_row, column=5, pady=5, sticky='w')
+
+        rdo_primary_mapped_dark.deselect()
+        rdo_primary_mapped_light.select()
+
+        widget_start_row += 1
+
+        lbl_secondary_theme = ctk.CTkLabel(master=frm_widgets, text='Secondary theme', justify="right")
+        lbl_secondary_theme.grid(row=widget_start_row, column=0, padx=15, pady=(20, 5), sticky='e')
+
+        if self.enable_tooltips:
+            btn_author_tooltip = CTkToolTip(lbl_secondary_theme,
+                                            wraplength=250,
+                                            justify="left",
+                                            message="The secondary theme to merge. The non-colour properties are, "
+                                                    "adopted from the secondary theme.")
+
+        self.tk_secondary_theme = tk.StringVar()
+        self.opm_secondary_theme = ctk.CTkOptionMenu(master=frm_widgets,
+                                                     variable=self.tk_secondary_theme,
+                                                     values=mod.user_themes_list())
+        self.opm_secondary_theme.grid(row=widget_start_row, column=1, padx=(0, 10), pady=(20, 5), sticky='w')
+
+        lbl_secondary_mode = ctk.CTkLabel(master=frm_widgets, text='Appearance mode', justify="right")
+        lbl_secondary_mode.grid(row=widget_start_row, column=2, padx=5, pady=(20, 5), sticky='e')
+        if self.enable_tooltips:
+            btn_author_tooltip = CTkToolTip(lbl_secondary_mode,
+                                            wraplength=250,
+                                            justify="left",
+                                            message="Select the appearance mode to be merged from the secondary theme.")
+        # The secondary_theme_mode holds the CustomTkinter appearance mode (Dark / Light)
+        self.tk_secondary_mode = tk.StringVar()
+        rdo_secondary_light = ctk.CTkRadioButton(master=frm_widgets, text='Light',
+                                                 variable=self.tk_secondary_mode,
+                                                 value='Light')
+        rdo_secondary_light.grid(row=widget_start_row, column=3, pady=(20, 5), sticky='w')
+        widget_start_row += 1
+
+        rdo_secondary_dark = ctk.CTkRadioButton(master=frm_widgets, text='Dark',
+                                                variable=self.tk_secondary_mode,
+                                                value='Dark')
+        rdo_secondary_dark.grid(row=widget_start_row, column=3, pady=5, sticky='w')
+
+        rdo_secondary_dark.deselect()
+        rdo_secondary_light.select()
+
+        widget_start_row += 1
+        lbl_new_theme_name = ctk.CTkLabel(master=frm_widgets, text='New theme name', justify="right")
+        lbl_new_theme_name.grid(row=widget_start_row, column=0, padx=5, pady=(30, 5), sticky='e')
+
+        self.tk_new_theme_name = tk.StringVar()
+        self.ent_new_theme_name = ctk.CTkEntry(master=frm_widgets,
+                                               textvariable=self.tk_new_theme_name,
+                                               width=160)
+        self.ent_new_theme_name.grid(row=widget_start_row, column=1, padx=(0, 0), pady=(30, 5), sticky='w')
+
+        if self.enable_tooltips:
+            btn_author_tooltip = CTkToolTip(lbl_new_theme_name,
+                                            wraplength=250,
+                                            justify="left",
+                                            message="Provide a new target theme file name.")
+
+        self.tk_new_theme_file = tk.StringVar()
+        self.ent_new_theme_file = ctk.CTkEntry(master=frm_widgets,
+                                               textvariable=self.tk_new_theme_file,
+                                               width=160)
+        self.ent_new_theme_file.grid(row=widget_start_row, column=1, padx=(0, 0), pady=(30, 5), sticky='w')
+
+        self.tk_open_on_merge = tk.IntVar(master=frm_widgets)
+        self.swt_open_on_merge = ctk.CTkSwitch(master=frm_widgets,
+                                               text='Open on merge',
+                                               variable=self.tk_open_on_merge)
+        # self.swt_open_on_merge.grid(row=widget_start_row, column=3, padx=(0, 0), pady=(30, 10), sticky='w')
+
+        if self.enable_tooltips:
+            btn_enable_tooltips_tooltip = CTkToolTip(self.swt_open_on_merge,
+                                                     wraplength=400,
+                                                     message="Enable this switch, if you wish to open the merged theme.")
+
+        widget_start_row += 1
+
+        # Control buttons
+        btn_close = ctk.CTkButton(master=frm_buttons, text='Cancel', command=self.destroy)
+        btn_close.grid(row=0, column=0, padx=(15, 35), pady=5)
+
+        btn_merge = ctk.CTkButton(master=frm_buttons, text='Merge', command=self.validate_and_merge)
+        btn_merge.grid(row=0, column=1, padx=(415, 15), pady=5)
+
+        self.status_bar = cbtk.CBtkStatusBar(master=self,
+                                             status_text_life=30,
+                                             use_grid=True)
+        self.bind("<Configure>", self.status_bar.auto_size_status_bar)
+
+        self.grab_set()
+
+    def validate_and_merge(self):
+        """This method processes the "Merge Themes" dialog (launch_merge_dialog) submission, and is activated by the
+        Merge button."""
+        primary_theme_name = self.tk_primary_theme.get()
+        primary_appearance_mode = self.tk_primary_mode.get()
+        secondary_theme_name = self.tk_secondary_theme.get()
+        secondary_appearance_mode = self.tk_secondary_mode.get()
+        new_theme_file = self.tk_new_theme_file.get()
+        open_on_merge = self.tk_open_on_merge.get()
+
+        if primary_theme_name == secondary_theme_name and primary_appearance_mode == secondary_appearance_mode:
+            self.status_bar.set_status_text('You cannot merge the same theme / appearance mode to itself.')
+        if not valid_theme_file_name(new_theme_file):
+            self.status_bar.set_status_text('Invalid characters in new theme file name!')
+
+        if len(new_theme_file) == 0:
+            self.status_bar.set_status_text(status_text=f'You must enter a theme name for the new theme.')
+            return
+        # If user has included a ".json" extension, remove it, because we add one below.
+        new_theme_name = new_theme_basename = os.path.splitext(new_theme_file)[0]
+        new_theme = new_theme_basename + '.json'
+        new_theme_path = self.theme_json_dir / new_theme
+        if new_theme_path.exists():
+            self.status_bar.set_status_text(status_text=f'Theme file, {new_theme}, already exists - '
+                                                        f'please choose another name!')
+            return
+        self.status_bar.set_status_text(status_text=f'Creating theme, {new_theme_name}, from {primary_theme_name} '
+                                                    f' and {secondary_theme_name}.')
+        mod.merge_themes(primary_theme_name=primary_theme_name, primary_mode=primary_appearance_mode,
+                         secondary_theme_name=secondary_theme_name, secondary_mode=secondary_appearance_mode,
+                         new_theme_name=new_theme)
 
 
 class ControlPanel:
@@ -365,8 +572,8 @@ class ControlPanel:
         self.lbl_theme = ctk.CTkLabel(master=self.frm_button, text='Select Theme:')
         self.lbl_theme.grid(row=1, column=0, sticky='w', pady=(10, 0), padx=(15, 10))
 
-        self.json_files = self.user_themes_list()
-        initial_display = self.user_themes_list()
+        self.json_files = mod.user_themes_list()
+        initial_display = mod.user_themes_list()
         last_theme = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='auto_save',
                                             preference_name='selected_theme')
         #
@@ -630,11 +837,17 @@ class ControlPanel:
         self.des_menu.add_cascade(label='Tools', menu=self.tools_menu)
         self.tools_menu.add_command(label='Preferences', command=self.launch_preferences_dialog)
         self.tools_menu.add_command(label='Colour Harmonics', command=self.launch_harmony_dialog, state=tk.DISABLED)
-        self.tools_menu.add_command(label='Merge Themes', command=self.launch_merge_dialog)
+        self.tools_menu.add_command(label='Merge Themes', command=self.launch_theme_merger)
 
         self.tools_menu.add_command(label='About', command=self.about)
 
         self.set_option_states()
+
+    def launch_theme_merger(self):
+        theme_merger = ThemeMerger(master=self.ctk_control_panel)
+        self.ctk_control_panel.wait_window(theme_merger)
+        self.json_files = mod.user_themes_list()
+        self.opm_theme.configure(values=self.json_files)
 
     def copy_property_colour(self, event=None, widget_property=None):
         colour = None
@@ -703,363 +916,14 @@ class ControlPanel:
 
         top_about.grab_set()
 
-    def launch_merge_dialog(self):
-        self.top_merge = ctk.CTkToplevel(self.ctk_control_panel)
-        self.top_merge.title('Merge Themes')
-        self.top_merge.geometry('570x340')
-        # Make sure the TopLevel doesn't disappear if we need to
-        # open the tk.filedialog.askdirectory dialog to set a new theme folder.
-        self.top_merge.transient(self.ctk_control_panel)
-        # Make preferences dialog modal
-        self.top_merge.rowconfigure(0, weight=1)
-        self.top_merge.rowconfigure(1, weight=0)
-        self.top_merge.columnconfigure(0, weight=1)
-
-        frm_main = ctk.CTkFrame(master=self.top_merge, corner_radius=10)
-        frm_main.grid(column=0, row=0, sticky='nsew')
-        frm_main.columnconfigure(0, weight=1)
-        frm_main.rowconfigure(0, weight=1)
-
-        frm_main = ctk.CTkFrame(master=self.top_merge, corner_radius=10)
-        frm_main.grid(column=0, row=0, sticky='nsew')
-        frm_main.columnconfigure(0, weight=1)
-        frm_main.rowconfigure(0, weight=1)
-
-        frm_widgets = ctk.CTkFrame(master=frm_main, corner_radius=10)
-        frm_widgets.grid(column=0, row=0, padx=5, pady=5, sticky='nsew')
-
-        frm_buttons = ctk.CTkFrame(master=frm_main, corner_radius=0)
-        frm_buttons.grid(column=0, row=1, padx=0, pady=(0, 0), sticky='ew')
-
-        widget_start_row = 0
-
-        lbl_primary_theme = ctk.CTkLabel(master=frm_widgets, text='Primary Theme', justify="right")
-        lbl_primary_theme.grid(row=widget_start_row, column=0, padx=5, pady=(20, 5), sticky='e')
-
-        if self.enable_tooltips:
-            btn_author_tooltip = CTkToolTip(lbl_primary_theme,
-                                            wraplength=250,
-                                            justify="left",
-                                            message="The primary theme to merge. The non-colour properties are, "
-                                                    "adopted from the primary theme.")
-
-        self.tk_primary_theme = tk.StringVar()
-        self.opm_primary_theme = ctk.CTkOptionMenu(master=frm_widgets,
-                                                   variable=self.tk_primary_theme,
-                                                   values=self.app_themes_list())
-        self.opm_primary_theme.grid(row=widget_start_row, column=1, padx=(0, 10), pady=(20, 5), sticky='w')
-
-        lbl_primary_mode = ctk.CTkLabel(master=frm_widgets, text='Appearance Mode', justify="right")
-        lbl_primary_mode.grid(row=widget_start_row, column=2, padx=5, pady=(20, 5), sticky='e')
-
-        # The primary_theme_mode holds the CustomTkinter appearance mode (Dark / Light)
-        self.tk_appearance_mode_var = tk.StringVar()
-        rdo_primary_light = ctk.CTkRadioButton(master=frm_widgets, text='Light',
-                                               variable=self.tk_appearance_mode_var,
-                                               value='Light')
-        rdo_primary_light.grid(row=widget_start_row, column=3, pady=(20, 5), sticky='w')
-        widget_start_row += 1
-
-        rdo_primary_dark = ctk.CTkRadioButton(master=frm_widgets, text='Dark', variable=self.tk_appearance_mode_var,
-                                              value='Dark')
-        rdo_primary_dark.grid(row=widget_start_row, column=3, pady=5, sticky='w')
-
-        rdo_primary_dark.deselect()
-        rdo_primary_light.select()
-
-        widget_start_row += 1
-
-        ###
-        lbl_secondary_theme = ctk.CTkLabel(master=frm_widgets, text='Secondary Theme', justify="right")
-        lbl_secondary_theme.grid(row=widget_start_row, column=0, padx=5, pady=(20, 5), sticky='e')
-
-        if self.enable_tooltips:
-            btn_author_tooltip = CTkToolTip(lbl_secondary_theme,
-                                            wraplength=250,
-                                            justify="left",
-                                            message="The secondary theme to merge. The non-colour properties are, "
-                                                    "adopted from the secondary theme.")
-
-        self.tk_secondary_theme = tk.StringVar()
-        self.opm_secondary_theme = ctk.CTkOptionMenu(master=frm_widgets,
-                                                     variable=self.tk_secondary_theme,
-                                                     values=self.app_themes_list())
-        self.opm_secondary_theme.grid(row=widget_start_row, column=1, padx=(0, 10), pady=(20, 5), sticky='w')
-
-        lbl_secondary_mode = ctk.CTkLabel(master=frm_widgets, text='Appearance Mode', justify="right")
-        lbl_secondary_mode.grid(row=widget_start_row, column=2, padx=5, pady=(20, 5), sticky='e')
-
-        # The secondary_theme_mode holds the CustomTkinter appearance mode (Dark / Light)
-        self.tk_appearance_mode_var = tk.StringVar()
-        rdo_secondary_light = ctk.CTkRadioButton(master=frm_widgets, text='Light',
-                                                 variable=self.tk_appearance_mode_var,
-                                                 value='Light')
-        rdo_secondary_light.grid(row=widget_start_row, column=3, pady=(20, 5), sticky='w')
-        widget_start_row += 1
-
-        rdo_secondary_dark = ctk.CTkRadioButton(master=frm_widgets, text='Dark',
-                                                variable=self.tk_appearance_mode_var,
-                                                value='Dark')
-        rdo_secondary_dark.grid(row=widget_start_row, column=3, pady=5, sticky='w')
-
-        rdo_secondary_dark.deselect()
-        rdo_secondary_light.select()
-
-        widget_start_row += 1
-        lbl_new_theme_name = ctk.CTkLabel(master=frm_widgets, text='New theme name', justify="right")
-        lbl_new_theme_name.grid(row=widget_start_row, column=0, padx=5, pady=(30, 5), sticky='e')
-
-        self.tk_theme_name = tk.StringVar()
-        self.ent_theme_name = ctk.CTkEntry(master=frm_widgets,
-                                           textvariable=self.tk_theme_name,
-                                           width=160)
-        self.ent_theme_name.grid(row=widget_start_row, column=1, padx=(0, 0), pady=(30, 5), sticky='w')
-
-        if self.enable_tooltips:
-            btn_author_tooltip = CTkToolTip(lbl_new_theme_name,
-                                            wraplength=250,
-                                            justify="left",
-                                            message="The target theme name is included to the theme JSON, in the "
-                                                    "provenance section.")
-
-        lbl_new_theme_file = ctk.CTkLabel(master=frm_widgets, text='File name', justify="right")
-        lbl_new_theme_file.grid(row=widget_start_row, column=2, padx=5, pady=(30, 5), sticky='e')
-
-        self.tk_theme_file = tk.StringVar()
-        self.ent_theme_file = ctk.CTkEntry(master=frm_widgets,
-                                           textvariable=self.tk_theme_file,
-                                           width=160)
-        self.ent_theme_file.grid(row=widget_start_row, column=3, padx=(0, 0), pady=(30, 5), sticky='w')
-
-        if self.enable_tooltips:
-            btn_author_tooltip = CTkToolTip(lbl_new_theme_file,
-                                            wraplength=250,
-                                            justify="left",
-                                            message="Enter the file name (prefix only), of the new theme file.")
-
-        widget_start_row += 1
-        self.tk_open_on_merge = tk.IntVar(master=frm_widgets)
-        self.swt_open_on_merge = ctk.CTkSwitch(master=frm_widgets,
-                                               text='Open on merge',
-                                               variable=self.tk_open_on_merge,
-                                               command=self.get_single_click_paste_setting)
-        self.swt_open_on_merge.grid(row=widget_start_row, column=3, padx=(0, 0), pady=(20, 10), sticky='w')
-
-        if self.enable_tooltips:
-            btn_enable_tooltips_tooltip = CTkToolTip(self.swt_open_on_merge,
-                                                     wraplength=400,
-                                                     message="Enable this switch, if you wish to open the merged theme.")
-
-        widget_start_row += 1
-
-        # Control buttons
-        btn_close = ctk.CTkButton(master=frm_buttons, text='Cancel', command=self.top_merge.destroy)
-        btn_close.grid(row=0, column=0, padx=(15, 35), pady=5)
-
-        btn_save = ctk.CTkButton(master=frm_buttons, text='Save', command=self.save_preferences)
-        btn_save.grid(row=0, column=1, padx=(150, 15), pady=5)
-        self.top_merge.grab_set()
-
     def launch_preferences_dialog(self):
-        self.top_prefs = ctk.CTkToplevel(self.ctk_control_panel)
-        self.top_prefs.title('CTk Theme Builder Preferences')
-        self.top_prefs.geometry('500x550')
-        # Make sure the TopLevel doesn't disappear if we need to
-        # open the tk.filedialog.askdirectory dialog to set a new theme folder.
-        self.top_prefs.transient(self.ctk_control_panel)
-        # Make preferences dialog modal
-        self.top_prefs.rowconfigure(0, weight=1)
-        self.top_prefs.rowconfigure(1, weight=0)
-        self.top_prefs.columnconfigure(0, weight=1)
+        preferences_dialog = PreferencesDialog()
+        self.ctk_control_panel.wait_window(preferences_dialog)
+        action = preferences_dialog.action
+        self.status_bar.set_status_text(status_text=f'Preferences {action}.')
 
-        frm_main = ctk.CTkFrame(master=self.top_prefs, corner_radius=10)
-        frm_main.grid(column=0, row=0, sticky='nsew')
-        frm_main.columnconfigure(0, weight=1)
-        frm_main.rowconfigure(0, weight=1)
-
-        frm_main = ctk.CTkFrame(master=self.top_prefs, corner_radius=10)
-        frm_main.grid(column=0, row=0, sticky='nsew')
-        frm_main.columnconfigure(0, weight=1)
-        frm_main.rowconfigure(0, weight=1)
-
-        frm_widgets = ctk.CTkFrame(master=frm_main, corner_radius=10)
-        frm_widgets.grid(column=0, row=0, padx=5, pady=5, sticky='nsew')
-
-        frm_buttons = ctk.CTkFrame(master=frm_main, corner_radius=0)
-        frm_buttons.grid(column=0, row=1, padx=0, pady=(0, 0), sticky='ew')
-
-        widget_start_row = 0
-        lbl_author_name = ctk.CTkLabel(master=frm_widgets, text='Author', justify="right")
-        lbl_author_name.grid(row=widget_start_row, column=0, padx=5, pady=(30, 5), sticky='e')
-
-        if not self.theme_author:
-            self.theme_author = self.user_name
-        self.tk_author_name = tk.StringVar(value=self.theme_author)
-        self.ent_author_name = ctk.CTkEntry(master=frm_widgets,
-                                            textvariable=self.tk_author_name,
-                                            width=160)
-        self.ent_author_name.grid(row=widget_start_row, column=1, padx=(0, 0), pady=(30, 5), sticky='w')
-
-        if self.enable_tooltips:
-            btn_author_tooltip = CTkToolTip(lbl_author_name,
-                                            wraplength=250,
-                                            justify="left",
-                                            message="The author's name is included to the theme JSON, in the "
-                                                    "provenance section.")
-
-        widget_start_row += 1
-        lbl_theme = ctk.CTkLabel(master=frm_widgets, text='Cntrl Panel Theme', justify="right")
-        lbl_theme.grid(row=widget_start_row, column=0, padx=5, pady=(0, 5), sticky='e')
-
-        if self.enable_tooltips:
-            btn_author_tooltip = CTkToolTip(lbl_theme,
-                                            wraplength=250,
-                                            justify="left",
-                                            message="The default theme for the CTk Theme Builder control panel, "
-                                                    "is GreyGhost, however you can override this here.")
-
-        control_panel_theme = os.path.splitext(self.control_panel_theme)[0]
-        control_panel_theme = os.path.basename(control_panel_theme)
-        self.tk_control_panel_theme = tk.StringVar(value=control_panel_theme)
-        self.opm_control_panel_theme = ctk.CTkOptionMenu(master=frm_widgets,
-                                                         variable=self.tk_control_panel_theme,
-                                                         values=self.app_themes_list())
-        self.opm_control_panel_theme.grid(row=widget_start_row, column=1, padx=0, pady=5, sticky='w')
-        widget_start_row += 1
-
-        lbl_mode = ctk.CTkLabel(master=frm_widgets, text='Appearance Mode', justify="right")
-        lbl_mode.grid(row=widget_start_row, column=0, padx=5, sticky='e')
-
-        # The control_panel_mode holds the  CustomTkinter appearance mode (Dark / Light)
-        self.tk_appearance_mode_var = tk.StringVar(value=self.control_panel_mode)
-        rdo_light = ctk.CTkRadioButton(master=frm_widgets, text='Light', variable=self.tk_appearance_mode_var,
-                                       value='Light')
-        rdo_light.grid(row=widget_start_row, column=1, sticky='w')
-        widget_start_row += 1
-
-        rdo_dark = ctk.CTkRadioButton(master=frm_widgets, text='Dark', variable=self.tk_appearance_mode_var,
-                                      value='Dark')
-        rdo_dark.grid(row=widget_start_row, column=1, pady=5, sticky='w')
-        widget_start_row += 1
-
-        if self.control_panel_mode == 'Dark':
-            rdo_light.deselect()
-            rdo_dark.select()
-        elif self.control_panel_mode == 'Light':
-            rdo_dark.deselect()
-            rdo_light.select()
-
-        # lbl_enable_tooltips = ctk.CTkLabel(master=frm_widgets, text='Enable tooltips', justify="right")
-        # lbl_enable_tooltips.grid(row=widget_start_row, column=0, padx=5, sticky='e')
-
-        self.tk_enable_tooltips = tk.IntVar(master=frm_widgets)
-        self.tk_enable_tooltips.set(self.enable_tooltips)
-        self.swt_enable_tooltips = ctk.CTkSwitch(master=frm_widgets,
-                                                 text='Tooltips',
-                                                 variable=self.tk_enable_tooltips,
-                                                 command=self.get_tooltips_setting)
-        self.swt_enable_tooltips.grid(row=widget_start_row, column=1, padx=(0, 0), pady=10, sticky='w')
-        widget_start_row += 1
-
-        self.tk_enable_palette_labels = tk.IntVar(master=frm_widgets)
-        self.tk_enable_palette_labels.set(self.enable_palette_labels)
-        self.swt_enable_palette_labels = ctk.CTkSwitch(master=frm_widgets,
-                                                       text='Colour Palette Labels',
-                                                       variable=self.tk_enable_palette_labels,
-                                                       command=self.get_palette_label_setting)
-        self.swt_enable_palette_labels.grid(row=widget_start_row, column=1, padx=(0, 0), pady=10, sticky='w')
-
-        if self.enable_tooltips:
-            btn_enable_palette_labels_tooltip = CTkToolTip(self.swt_enable_palette_labels,
-                                                           "Enable/disable the rendering of the colour palette "
-                                                           "labels.")
-
-        widget_start_row += 1
-        self.tk_last_theme_on_start = tk.IntVar(master=frm_widgets, value=self.last_theme_on_start)
-        self.tk_last_theme_on_start.set(self.last_theme_on_start)
-        self.swt_last_theme_on_start = ctk.CTkSwitch(master=frm_widgets,
-                                                     text='Load Last Theme',
-                                                     variable=self.tk_last_theme_on_start,
-                                                     command=self.get_last_theme_on_start)
-        self.swt_last_theme_on_start.grid(row=widget_start_row, column=1, padx=(0, 0), pady=10, sticky='w')
-        if self.enable_tooltips:
-            last_theme_on_start_tooltip = CTkToolTip(self.swt_last_theme_on_start,
-                                                     wraplength=250,
-                                                     justify="left",
-                                                     message="Enable this switch, to auto-select the last theme "
-                                                             "you worked on, at application startup.")
-
-        widget_start_row += 1
-        self.tk_enable_single_click_paste = tk.IntVar(master=frm_widgets)
-        self.tk_enable_single_click_paste.set(self.enable_single_click_paste)
-        self.swt_enable_single_click_paste = ctk.CTkSwitch(master=frm_widgets,
-                                                           text='Single Click Paste',
-                                                           variable=self.tk_enable_single_click_paste,
-                                                           command=self.get_single_click_paste_setting)
-        self.swt_enable_single_click_paste.grid(row=widget_start_row, column=1, padx=(0, 0), pady=10, sticky='w')
-
-        widget_start_row += 1
-        if self.enable_tooltips:
-            btn_enable_tooltips_tooltip = CTkToolTip(self.swt_enable_single_click_paste,
-                                                     wraplength=400,
-                                                     message="Enable/disable colour pasting, via a single click. "
-                                                             "Colours can be pasted to the colour palette or the array "
-                                                             "of widget colour properties.")
-        widget_start_row += 1
-
-        lbl_shade_adjust_differential = ctk.CTkLabel(master=frm_widgets, text='Adjust Shade Step', justify="right")
-        lbl_shade_adjust_differential.grid(row=widget_start_row, column=0, padx=5, pady=(0, 0), sticky='e')
-
-        self.opm_shade_adjust_differential = ctk.CTkOptionMenu(master=frm_widgets,
-                                                               width=12,
-                                                               values=['1', '2', '3', '4', '5', '6', '7', '8', '9'])
-        self.opm_shade_adjust_differential.grid(row=widget_start_row, column=1, padx=0, pady=5, sticky='w')
-        self.opm_shade_adjust_differential.set(str(self.shade_adjust_differential))
-        widget_start_row += 1
-
-        widget_start_row += 1
-
-        lbl_harmony_contrast_differential = ctk.CTkLabel(master=frm_widgets, text='Harmony Shade Step', justify="right")
-        lbl_harmony_contrast_differential.grid(row=widget_start_row, column=0, padx=(30, 5), pady=(0, 0), sticky='e')
-
-        self.opm_harmony_contrast_differential = ctk.CTkOptionMenu(master=frm_widgets,
-                                                                   width=12,
-                                                                   values=['1', '2', '3', '5', '6', '7', '8', '9'])
-        self.opm_harmony_contrast_differential.grid(row=widget_start_row, column=1, padx=0, pady=5, sticky='w')
-        self.opm_harmony_contrast_differential.set(str(self.harmony_contrast_differential))
-        widget_start_row += 1
-
-        self.folder_image = cbtk.load_image(light_image=APP_IMAGES / 'folder.png', image_size=(20, 20))
-        lbl_theme_json_dir = ctk.CTkLabel(master=frm_widgets, text='Themes Location', justify="right")
-        lbl_theme_json_dir.grid(row=widget_start_row, column=0, padx=5, pady=5, sticky='e')
-
-        if self.enable_tooltips:
-            lbl_theme_json_dir_tooltip = CTkToolTip(lbl_theme_json_dir,
-                                                    "Select a location to store your themes.")
-
-        btn_theme_json_dir = ctk.CTkButton(master=frm_widgets,
-                                           text='',
-                                           width=30,
-                                           height=30,
-                                           fg_color='#748696',
-                                           image=self.folder_image,
-                                           command=self.preferred_json_location)
-        btn_theme_json_dir.grid(row=widget_start_row, column=1, pady=5, sticky='w')
-        widget_start_row += 1
-
-        self.lbl_pref_theme_dir_disp = ctk.CTkLabel(master=frm_widgets, text=self.theme_json_dir, justify="right",
-                                                    font=mod.SMALL_TEXT)
-        self.lbl_pref_theme_dir_disp.grid(row=widget_start_row, column=1, padx=5, pady=5, sticky='e')
-        widget_start_row += 1
-
-        # Control buttons
-        btn_close = ctk.CTkButton(master=frm_buttons, text='Cancel', command=self.top_prefs.destroy)
-        btn_close.grid(row=0, column=0, padx=(15, 35), pady=5)
-
-        btn_save = ctk.CTkButton(master=frm_buttons, text='Save', command=self.save_preferences)
-        btn_save.grid(row=0, column=1, padx=(150, 15), pady=5)
-        self.top_prefs.grab_set()
-
+    def launch_provenance_dialogN(self):
+        provenence_dialog = ProvenanceDialog()
     def launch_provenance_dialog(self):
         self.top_prov = ctk.CTkToplevel(self.ctk_control_panel)
         self.top_prov.title('Theme Provenance')
@@ -1971,77 +1835,6 @@ class ControlPanel:
         elif not self.harmony_palette_running and self.theme:
             self.tools_menu.entryconfig('Colour Harmonics', state=tk.NORMAL)
 
-    def save_preferences(self):
-        """Save the selected preferences."""
-        # Save JSON Directory:
-        if self.new_theme_json_dir is not None:
-            self.theme_json_dir = self.new_theme_json_dir
-            if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                               preference_name='theme_json_dir',
-                                               preference_value=str(self.theme_json_dir)):
-                print(f'Row miss updating preferences theme author.')
-            self.json_files = self.user_themes_list()
-            self.opm_theme.configure(values=self.json_files)
-
-        preferences_dict = {}
-        self.user_name = self.tk_author_name.get()
-
-        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                           preference_name='theme_author', preference_value=self.user_name):
-            print(f'Row miss updating preferences theme author.')
-
-        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                           preference_name='control_panel_theme',
-                                           preference_value=self.opm_control_panel_theme.get()):
-            print(f'Row miss updating preferences control panel theme.')
-
-        control_panel_mode = self.tk_appearance_mode_var.get()
-        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                           preference_name='control_panel_mode',
-                                           preference_value=control_panel_mode):
-            print(f'Row miss updating preferences control panel appearance mode.')
-
-        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                           preference_name='enable_tooltips',
-                                           preference_value=self.enable_tooltips):
-            print(f'Row miss updating preferences control panel appearance mode.')
-
-        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                           preference_name='last_theme_on_start',
-                                           preference_value=self.last_theme_on_start):
-            print(f'Row miss updating preferences control panel last theme on start.')
-
-        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                           preference_name='enable_palette_labels',
-                                           preference_value=self.enable_palette_labels):
-            print(f'Row miss updating preferences: enable palette labels.')
-
-        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                           preference_name='enable_single_click_paste',
-                                           preference_value=self.enable_single_click_paste):
-            print(f'Row miss updating preferences: enable single click paste.')
-
-        self.shade_adjust_differential = self.opm_shade_adjust_differential.get()
-        self.shade_adjust_differential = int(self.shade_adjust_differential)
-        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                           preference_name='shade_adjust_differential',
-                                           preference_value=self.shade_adjust_differential):
-            print(f'Row miss updating preferences: shade adjust differential.')
-
-        self.harmony_contrast_differential = self.opm_harmony_contrast_differential.get()
-        self.harmony_contrast_differential = int(self.harmony_contrast_differential)
-        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                           preference_name='harmony_contrast_differential',
-                                           preference_value=self.harmony_contrast_differential):
-            print(f'Row miss updating preferences: harmony contrast differential.')
-
-        ctk.set_appearance_mode(control_panel_mode)
-        cbtk.CBtkMenu.update_widgets_mode()
-        self.control_panel_mode = control_panel_mode
-        self.tk_appearance_mode_var.set(self.control_panel_mode)
-        self.status_bar.set_status_text(status_text=f'Preferences saved.')
-        self.top_prefs.destroy()
-
     def switch_preview_appearance_mode(self, event='event'):
         """Actions to choice of preview panel's appearance mode (Light / Dark)"""
         preview_appearance_mode = self.tk_seg_mode.get()
@@ -2232,36 +2025,6 @@ class ControlPanel:
         self.set_filtered_widget_display()
         # self.send_preview_command('Update properties filter...')
 
-    def preferred_json_location(self):
-        """A simple method which asks the themes author to navigate to where
-         the themes JSON are to be stored/maintained."""
-        self.new_theme_json_dir = Path(tk.filedialog.askdirectory(initialdir=self.theme_json_dir))
-        self.lbl_pref_theme_dir_disp.configure(text=self.new_theme_json_dir)
-
-    def app_themes_list(self):
-        """This method generates a list of theme names, based on the json files found in the application themes folder
-         These are basically the theme file names, with the .json extension stripped out."""
-        json_files = list(APP_THEMES_DIR.glob('*.json'))
-        theme_names = []
-        for file in json_files:
-            file = os.path.basename(file)
-            theme_name = os.path.splitext(file)[0]
-            theme_names.append(theme_name)
-        theme_names.sort()
-        return theme_names
-
-    def user_themes_list(self):
-        """This method generates a list of theme names, based on the json files found in the user's themes folder
-        (i.e. self.theme_json_dir). These are basically the theme file names, with the .json extension stripped out."""
-        json_files = list(self.theme_json_dir.glob('*.json'))
-        theme_names = []
-        for file in json_files:
-            file = os.path.basename(file)
-            theme_name = os.path.splitext(file)[0]
-            theme_names.append(theme_name)
-        theme_names.sort()
-        return theme_names
-
     @staticmethod
     def view_list():
         """This method generates a list of view names, based on the json files found in the assets/views folder.
@@ -2295,8 +2058,8 @@ class ControlPanel:
         if not self.source_json_file.exists():
             # Then likely that we are just starting up and last theme
             # opened was probably deleted.
-            self.json_files = self.user_themes_list()
-            initial_display = self.user_themes_list()
+            self.json_files = mod.user_themes_list()
+            initial_display = mod.user_themes_list()
             self.opm_theme.configure(values=initial_display)
             self.opm_theme.set('-- Select Theme --')
             return
@@ -2648,7 +2411,7 @@ class ControlPanel:
         """Render the "shades palette" which displays the keystone colour, the complementary colours,
         and the contrast shades. """
 
-        colour_object = ch.Color(hex_to_rgb(keystone_colour), "", "")
+        colour_object = ch.Color(mod.hex_to_rgb(keystone_colour), "", "")
 
         harmony_entries = 0
         shade_button_rows = 4
@@ -2672,11 +2435,11 @@ class ControlPanel:
         harmony_colours_list = [keystone_colour]
         if harmony_entries == 1:
             colour = tuple(harmony_colours)
-            harmony_colour = rgb_to_hex(colour)
+            harmony_colour = mod.rgb_to_hex(colour)
             harmony_colours_list.append(harmony_colour)
         else:
             for colour in harmony_colours:
-                harmony_colour = rgb_to_hex(tuple(colour))
+                harmony_colour = mod.rgb_to_hex(tuple(colour))
                 harmony_colours_list.append(harmony_colour)
 
         num_harmony_colours = len(harmony_colours_list)
@@ -2959,7 +2722,7 @@ class ControlPanel:
     def populate_harmony_colours(self):
         primary_colour = self.keystone_colour
         harmony_method = self.opm_harmony_method.get()
-        colour_object = ch.Color(hex_to_rgb(self.keystone_colour), "", "")
+        colour_object = ch.Color(mod.hex_to_rgb(self.keystone_colour), "", "")
 
         harmony_entries = 0
         harmony_colours = None
@@ -2987,7 +2750,7 @@ class ControlPanel:
                 colour = harmony_colours
             else:
                 colour = harmony_colours[btn_idx]
-            harmony_colour = rgb_to_hex(colour)
+            harmony_colour = mod.rgb_to_hex(colour)
             self.rendered_harmony_buttons[btn_idx].configure(fg_color=harmony_colour,
                                                              hover_color=harmony_colour)
         self.render_keystone_shades_palette(keystone_colour=primary_colour, harmony_method=harmony_method)
@@ -3043,7 +2806,7 @@ class ControlPanel:
         dialog = ctk.CTkInputDialog(text="Enter new theme name:", title="Create New Theme")
         new_theme = dialog.get_input()
         if new_theme:
-            if not valid_theme_name(new_theme):
+            if not valid_theme_file_name(new_theme):
                 self.status_bar.set_status_text(
                     status_text=f'The entered theme name contains disallowed characters - allowed: alphanumeric, '
                                 f'underscores & ()')
@@ -3051,13 +2814,14 @@ class ControlPanel:
             # If user has included a ".json" extension, remove it, because we add one below.
             new_theme_basename = os.path.splitext(new_theme)[0]
             new_theme = new_theme_basename + '.json'
+            creanew_theme = new_theme_basename + '.json'
             new_theme_path = self.theme_json_dir / new_theme
             if new_theme_path.exists():
                 self.status_bar.set_status_text(status_text=f'Theme {new_theme} already exists - '
                                                             f'please choose another name!')
                 return
             shutil.copyfile(source_file, new_theme_path)
-            self.json_files = self.user_themes_list()
+            self.json_files = mod.user_themes_list()
             self.opm_theme.configure(values=self.json_files)
             self.opm_theme.set(new_theme_basename)
             self.load_theme(reload_preview=False)
@@ -3093,8 +2857,8 @@ class ControlPanel:
         if source_palette_path.exists():
             os.remove(source_palette_path)
 
-        self.json_files = self.user_themes_list()
-        initial_display = self.user_themes_list()
+        self.json_files = mod.user_themes_list()
+        initial_display = mod.user_themes_list()
         initial_display.insert(0, '-- Select Theme --')
         self.opm_theme.configure(values=initial_display)
         self.opm_theme.set('-- Select Theme --')
@@ -3121,7 +2885,7 @@ class ControlPanel:
         dialog = ctk.CTkInputDialog(text="Enter new theme name:", title="Create New Theme")
         new_theme = dialog.get_input()
         if new_theme:
-            if not valid_theme_name(new_theme):
+            if not valid_theme_file_name(new_theme):
                 self.status_bar.set_status_text(status_text=f'The entered theme name contains prohibited characters '
                                                             f'- allowed: alphanumeric, underscores & ()')
                 return
@@ -3173,7 +2937,7 @@ class ControlPanel:
             shutil.copyfile(source_palette_path, new_palette_path)
             self.palette_file = new_palette_path
             self.save_theme()
-            self.json_files = self.user_themes_list()
+            self.json_files = mod.user_themes_list()
             self.opm_theme.configure(values=self.json_files)
             self.theme = new_theme
 
@@ -3652,6 +3416,252 @@ class ControlPanel:
         self.status_bar.set_status_text(status_text=f'Theme file, {theme_file_name}, saved successfully!')
         self.save_theme_palette()
 
+class PreferencesDialog(ctk.CTkToplevel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        control_panel_theme = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                     scope='user_preference', preference_name='control_panel_theme')
+
+        control_panel_theme = control_panel_theme + '.json'
+
+        self.control_panel_theme = str(APP_THEMES_DIR / control_panel_theme)
+
+        self.control_panel_mode = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                         scope='user_preference', preference_name='control_panel_mode')
+
+        self.last_theme_on_start = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                          preference_name='last_theme_on_start')
+
+        self.theme_author = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                   preference_name='theme_author')
+
+        self.enable_tooltips = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                      preference_name='enable_tooltips')
+
+        self.enable_palette_labels = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                            preference_name='enable_palette_labels')
+
+        self.enable_single_click_paste = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                                preference_name='enable_single_click_paste')
+
+        self.shade_adjust_differential = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                                preference_name='shade_adjust_differential')
+
+        self.harmony_contrast_differential = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                                    preference_name='harmony_contrast_differential')
+
+        self.theme_json_dir = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                     preference_name='theme_json_dir')
+
+        self.action = 'cancelled'
+
+        self.new_theme_json_dir = None
+        this_platform = platform.system()
+        if this_platform == "Windows":
+            self.user_home_dir = os.getenv("UserProfile")
+            self.user_name = os.getenv("LOGNAME")
+        else:
+            self.user_name = os.getenv("USER")
+            self.user_home_dir = os.getenv("HOME")
+
+        self.title('CTk Theme Builder Preferences')
+        self.geometry('500x550')
+        # Make sure the TopLevel doesn't disappear if we need to
+
+        # Make preferences dialog modal
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=0)
+        self.columnconfigure(0, weight=1)
+
+        frm_main = ctk.CTkFrame(master=self, corner_radius=10)
+        frm_main.grid(column=0, row=0, sticky='nsew')
+        frm_main.columnconfigure(0, weight=1)
+        frm_main.rowconfigure(0, weight=1)
+
+        frm_main = ctk.CTkFrame(master=self, corner_radius=10)
+        frm_main.grid(column=0, row=0, sticky='nsew')
+        frm_main.columnconfigure(0, weight=1)
+        frm_main.rowconfigure(0, weight=1)
+
+        frm_widgets = ctk.CTkFrame(master=frm_main, corner_radius=10)
+        frm_widgets.grid(column=0, row=0, padx=5, pady=5, sticky='nsew')
+
+        frm_buttons = ctk.CTkFrame(master=frm_main, corner_radius=0)
+        frm_buttons.grid(column=0, row=1, padx=0, pady=(0, 0), sticky='ew')
+
+        widget_start_row = 0
+        lbl_author_name = ctk.CTkLabel(master=frm_widgets, text='Author', justify="right")
+        lbl_author_name.grid(row=widget_start_row, column=0, padx=5, pady=(30, 5), sticky='e')
+
+        if not self.theme_author:
+            self.theme_author = self.user_name
+        self.tk_author_name = tk.StringVar(value=self.theme_author)
+        self.ent_author_name = ctk.CTkEntry(master=frm_widgets,
+                                            textvariable=self.tk_author_name,
+                                            width=160)
+        self.ent_author_name.grid(row=widget_start_row, column=1, padx=(0, 0), pady=(30, 5), sticky='w')
+
+        if self.enable_tooltips:
+            btn_author_tooltip = CTkToolTip(lbl_author_name,
+                                            wraplength=250,
+                                            justify="left",
+                                            message="The author's name is included to the theme JSON, in the "
+                                                    "provenance section.")
+
+        widget_start_row += 1
+        lbl_theme = ctk.CTkLabel(master=frm_widgets, text='Cntrl Panel Theme', justify="right")
+        lbl_theme.grid(row=widget_start_row, column=0, padx=5, pady=(0, 5), sticky='e')
+
+        if self.enable_tooltips:
+            btn_author_tooltip = CTkToolTip(lbl_theme,
+                                            wraplength=250,
+                                            justify="left",
+                                            message="The default theme for the CTk Theme Builder control panel, "
+                                                    "is GreyGhost, however you can override this here.")
+
+        control_panel_theme = os.path.splitext(self.control_panel_theme)[0]
+        control_panel_theme = os.path.basename(control_panel_theme)
+        self.tk_control_panel_theme = tk.StringVar(value=control_panel_theme)
+        self.opm_control_panel_theme = ctk.CTkOptionMenu(master=frm_widgets,
+                                                         variable=self.tk_control_panel_theme,
+                                                         values=mod.app_themes_list())
+        self.opm_control_panel_theme.grid(row=widget_start_row, column=1, padx=0, pady=5, sticky='w')
+        widget_start_row += 1
+
+        lbl_mode = ctk.CTkLabel(master=frm_widgets, text='Appearance Mode', justify="right")
+        lbl_mode.grid(row=widget_start_row, column=0, padx=5, sticky='e')
+
+        # The control_panel_mode holds the  CustomTkinter appearance mode (Dark / Light)
+        self.tk_appearance_mode_var = tk.StringVar(value=self.control_panel_mode)
+        rdo_light = ctk.CTkRadioButton(master=frm_widgets, text='Light', variable=self.tk_appearance_mode_var,
+                                       value='Light')
+        rdo_light.grid(row=widget_start_row, column=1, sticky='w')
+        widget_start_row += 1
+
+        rdo_dark = ctk.CTkRadioButton(master=frm_widgets, text='Dark', variable=self.tk_appearance_mode_var,
+                                      value='Dark')
+        rdo_dark.grid(row=widget_start_row, column=1, pady=5, sticky='w')
+        widget_start_row += 1
+
+        if self.control_panel_mode == 'Dark':
+            rdo_light.deselect()
+            rdo_dark.select()
+        elif self.control_panel_mode == 'Light':
+            rdo_dark.deselect()
+            rdo_light.select()
+
+        # lbl_enable_tooltips = ctk.CTkLabel(master=frm_widgets, text='Enable tooltips', justify="right")
+        # lbl_enable_tooltips.grid(row=widget_start_row, column=0, padx=5, sticky='e')
+
+        self.tk_enable_tooltips = tk.IntVar(master=frm_widgets)
+        self.tk_enable_tooltips.set(self.enable_tooltips)
+        self.swt_enable_tooltips = ctk.CTkSwitch(master=frm_widgets,
+                                                 text='Tooltips',
+                                                 variable=self.tk_enable_tooltips,
+                                                 command=self.get_tooltips_setting)
+        self.swt_enable_tooltips.grid(row=widget_start_row, column=1, padx=(0, 0), pady=10, sticky='w')
+        widget_start_row += 1
+
+        self.tk_enable_palette_labels = tk.IntVar(master=frm_widgets)
+        self.tk_enable_palette_labels.set(self.enable_palette_labels)
+        self.swt_enable_palette_labels = ctk.CTkSwitch(master=frm_widgets,
+                                                       text='Colour Palette Labels',
+                                                       variable=self.tk_enable_palette_labels,
+                                                       command=self.get_palette_label_setting)
+        self.swt_enable_palette_labels.grid(row=widget_start_row, column=1, padx=(0, 0), pady=10, sticky='w')
+
+        if self.enable_tooltips:
+            btn_enable_palette_labels_tooltip = CTkToolTip(self.swt_enable_palette_labels,
+                                                           "Enable/disable the rendering of the colour palette "
+                                                           "labels.")
+
+        widget_start_row += 1
+        self.tk_last_theme_on_start = tk.IntVar(master=frm_widgets, value=self.last_theme_on_start)
+        self.tk_last_theme_on_start.set(self.last_theme_on_start)
+        self.swt_last_theme_on_start = ctk.CTkSwitch(master=frm_widgets,
+                                                     text='Load Last Theme',
+                                                     variable=self.tk_last_theme_on_start,
+                                                     command=self.get_last_theme_on_start)
+        self.swt_last_theme_on_start.grid(row=widget_start_row, column=1, padx=(0, 0), pady=10, sticky='w')
+        if self.enable_tooltips:
+            last_theme_on_start_tooltip = CTkToolTip(self.swt_last_theme_on_start,
+                                                     wraplength=250,
+                                                     justify="left",
+                                                     message="Enable this switch, to auto-select the last theme "
+                                                             "you worked on, at application startup.")
+
+        widget_start_row += 1
+        self.tk_enable_single_click_paste = tk.IntVar(master=frm_widgets)
+        self.tk_enable_single_click_paste.set(self.enable_single_click_paste)
+        self.swt_enable_single_click_paste = ctk.CTkSwitch(master=frm_widgets,
+                                                           text='Single Click Paste',
+                                                           variable=self.tk_enable_single_click_paste,
+                                                           command=self.get_single_click_paste_setting)
+        self.swt_enable_single_click_paste.grid(row=widget_start_row, column=1, padx=(0, 0), pady=10, sticky='w')
+
+        widget_start_row += 1
+        if self.enable_tooltips:
+            btn_enable_tooltips_tooltip = CTkToolTip(self.swt_enable_single_click_paste,
+                                                     wraplength=400,
+                                                     message="Enable/disable colour pasting, via a single click. "
+                                                             "Colours can be pasted to the colour palette or the array "
+                                                             "of widget colour properties.")
+        widget_start_row += 1
+
+        lbl_shade_adjust_differential = ctk.CTkLabel(master=frm_widgets, text='Adjust Shade Step', justify="right")
+        lbl_shade_adjust_differential.grid(row=widget_start_row, column=0, padx=5, pady=(0, 0), sticky='e')
+
+        self.opm_shade_adjust_differential = ctk.CTkOptionMenu(master=frm_widgets,
+                                                               width=12,
+                                                               values=['1', '2', '3', '4', '5', '6', '7', '8', '9'])
+        self.opm_shade_adjust_differential.grid(row=widget_start_row, column=1, padx=0, pady=5, sticky='w')
+        self.opm_shade_adjust_differential.set(str(self.shade_adjust_differential))
+        widget_start_row += 1
+
+        widget_start_row += 1
+
+        lbl_harmony_contrast_differential = ctk.CTkLabel(master=frm_widgets, text='Harmony Shade Step', justify="right")
+        lbl_harmony_contrast_differential.grid(row=widget_start_row, column=0, padx=(30, 5), pady=(0, 0), sticky='e')
+
+        self.opm_harmony_contrast_differential = ctk.CTkOptionMenu(master=frm_widgets,
+                                                                   width=12,
+                                                                   values=['1', '2', '3', '5', '6', '7', '8', '9'])
+        self.opm_harmony_contrast_differential.grid(row=widget_start_row, column=1, padx=0, pady=5, sticky='w')
+        self.opm_harmony_contrast_differential.set(str(self.harmony_contrast_differential))
+        widget_start_row += 1
+
+        self.folder_image = cbtk.load_image(light_image=APP_IMAGES / 'folder.png', image_size=(20, 20))
+        lbl_theme_json_dir = ctk.CTkLabel(master=frm_widgets, text='Themes Location', justify="right")
+        lbl_theme_json_dir.grid(row=widget_start_row, column=0, padx=5, pady=5, sticky='e')
+
+        if self.enable_tooltips:
+            lbl_theme_json_dir_tooltip = CTkToolTip(lbl_theme_json_dir,
+                                                    "Select a location to store your themes.")
+
+        btn_theme_json_dir = ctk.CTkButton(master=frm_widgets,
+                                           text='',
+                                           width=30,
+                                           height=30,
+                                           fg_color='#748696',
+                                           image=self.folder_image,
+                                           command=self.preferred_json_location)
+        btn_theme_json_dir.grid(row=widget_start_row, column=1, pady=5, sticky='w')
+        widget_start_row += 1
+
+        self.lbl_pref_theme_dir_disp = ctk.CTkLabel(master=frm_widgets, text=self.theme_json_dir, justify="right",
+                                                    font=mod.SMALL_TEXT)
+        self.lbl_pref_theme_dir_disp.grid(row=widget_start_row, column=1, padx=5, pady=5, sticky='e')
+        widget_start_row += 1
+
+        # Control buttons
+        btn_close = ctk.CTkButton(master=frm_buttons, text='Cancel', command=self.destroy)
+        btn_close.grid(row=0, column=0, padx=(15, 35), pady=5)
+
+        btn_save = ctk.CTkButton(master=frm_buttons, text='Save', command=self.save_preferences)
+        btn_save.grid(row=0, column=1, padx=(150, 15), pady=5)
+        self.grab_set()
+
     def get_tooltips_setting(self):
         self.enable_tooltips = int(self.tk_enable_tooltips.get())
 
@@ -3664,6 +3674,185 @@ class ControlPanel:
     def get_single_click_paste_setting(self):
         self.enable_single_click_paste = int(self.tk_enable_single_click_paste.get())
 
+    def save_preferences(self):
+        """Save the selected preferences."""
+        # Save JSON Directory:
+        if self.new_theme_json_dir is not None:
+            self.theme_json_dir = self.new_theme_json_dir
+            if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                               preference_name='theme_json_dir',
+                                               preference_value=str(self.theme_json_dir)):
+                print(f'Row miss updating preferences theme author.')
+            self.json_files = mod.user_themes_list()
+            self.opm_theme.configure(values=self.json_files)
+
+        preferences_dict = {}
+        self.user_name = self.tk_author_name.get()
+
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                           preference_name='theme_author', preference_value=self.user_name):
+            print(f'Row miss updating preferences theme author.')
+
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                           preference_name='control_panel_theme',
+                                           preference_value=self.opm_control_panel_theme.get()):
+            print(f'Row miss updating preferences control panel theme.')
+
+        control_panel_mode = self.tk_appearance_mode_var.get()
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                           preference_name='control_panel_mode',
+                                           preference_value=control_panel_mode):
+            print(f'Row miss updating preferences control panel appearance mode.')
+
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                           preference_name='enable_tooltips',
+                                           preference_value=self.enable_tooltips):
+            print(f'Row miss updating preferences control panel appearance mode.')
+
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                           preference_name='last_theme_on_start',
+                                           preference_value=self.last_theme_on_start):
+            print(f'Row miss updating preferences control panel last theme on start.')
+
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                           preference_name='enable_palette_labels',
+                                           preference_value=self.enable_palette_labels):
+            print(f'Row miss updating preferences: enable palette labels.')
+
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                           preference_name='enable_single_click_paste',
+                                           preference_value=self.enable_single_click_paste):
+            print(f'Row miss updating preferences: enable single click paste.')
+
+        self.shade_adjust_differential = self.opm_shade_adjust_differential.get()
+        self.shade_adjust_differential = int(self.shade_adjust_differential)
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                           preference_name='shade_adjust_differential',
+                                           preference_value=self.shade_adjust_differential):
+            print(f'Row miss updating preferences: shade adjust differential.')
+
+        self.harmony_contrast_differential = self.opm_harmony_contrast_differential.get()
+        self.harmony_contrast_differential = int(self.harmony_contrast_differential)
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                           preference_name='harmony_contrast_differential',
+                                           preference_value=self.harmony_contrast_differential):
+            print(f'Row miss updating preferences: harmony contrast differential.')
+
+        ctk.set_appearance_mode(control_panel_mode)
+        cbtk.CBtkMenu.update_widgets_mode()
+        self.control_panel_mode = control_panel_mode
+        self.tk_appearance_mode_var.set(self.control_panel_mode)
+        self.action = 'saved'
+        # self.status_bar.set_status_text(status_text=f'Preferences saved.')
+        self.destroy()
+
+    def preferred_json_location(self):
+        """A simple method which asks the themes author to navigate to where
+         the themes JSON are to be stored/maintained."""
+        self.new_theme_json_dir = Path(tk.filedialog.askdirectory(initialdir=self.theme_json_dir))
+        self.lbl_pref_theme_dir_disp.configure(text=self.new_theme_json_dir)
+
+class ProvenanceDialog(ctk.CTkToplevel):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.title('Theme Provenance')
+        self.geometry('580x470')
+        # Make sure we pop up in front of Control Panel
+
+        self.rowconfigure(1, weight=1)
+
+        frm_header = ctk.CTkFrame(master=self)
+        frm_header.grid(column=0, row=0, padx=5, pady=5, sticky='nsew')
+
+        frm_widgets = ctk.CTkFrame(master=self)
+        frm_widgets.grid(column=0, row=1, padx=5, pady=5, sticky='nsew')
+
+        frm_buttons = ctk.CTkFrame(master=self)
+        frm_buttons.grid(column=0, row=2, padx=5, pady=5, sticky='ew')
+
+        theme_name = self.master.theme_json_data["provenance"]["theme name"]
+        created_with = self.master.theme_json_data["provenance"]["created with"]
+        created_label = self.master.theme_json_data["provenance"]["date created"]
+        authors_name = self.master.theme_json_data["provenance"]["theme author"]
+        last_modified_by = self.master.theme_json_data["provenance"]["last modified by"]
+        last_modified = self.master.theme_json_data["provenance"]["last modified"]
+        harmony_method = self.master.theme_json_data["provenance"]["harmony method"]
+        keystone_colour = self.master.theme_json_data["provenance"]["keystone colour"]
+
+        widget_row = 0
+        # Header -  Theme Name (frm_header)
+        lbl_theme_label = ctk.CTkLabel(master=frm_header, text='Theme:', width=280, anchor="e", font=HEADING4)
+        lbl_theme_label.grid(row=widget_row, column=0, padx=5, pady=10, sticky='e', columnspan=2)
+
+        lbl_theme_name = ctk.CTkLabel(master=frm_header, text=f'{theme_name}', justify="left", font=HEADING4)
+        lbl_theme_name.grid(row=widget_row, column=2, padx=5, pady=10, sticky='w', columnspan=2)
+
+        # Start the main body of the dialog (frm_widgets)
+        # Creation Details
+        widget_row += 1
+        lbl_author_label = ctk.CTkLabel(master=frm_widgets, text='Author:', anchor="e", width=75)
+        lbl_author_label.grid(row=widget_row, column=0, padx=20, pady=10, sticky='e')
+
+        lbl_author_name = ctk.CTkLabel(master=frm_widgets, text=f'{authors_name}', anchor="w")
+        lbl_author_name.grid(row=widget_row, column=1, padx=5, pady=10, sticky='w')
+
+        lbl_created_label = ctk.CTkLabel(master=frm_widgets, text='Created:', width=100, anchor="e")
+        lbl_created_label.grid(row=widget_row, column=2, padx=5, pady=10, sticky='e')
+
+        lbl_created_date = ctk.CTkLabel(master=frm_widgets, text=f'{created_label}', anchor="w", width=75)
+        lbl_created_date.grid(row=widget_row, column=3, padx=(20, 30), pady=10, sticky='w')
+
+        # Modification Details
+        widget_row += 1
+        lbl_modified_by_label = ctk.CTkLabel(master=frm_widgets, text='Last modified:', anchor="e")
+        lbl_modified_by_label.grid(row=widget_row, column=0, padx=20, pady=10, sticky='e')
+
+        lbl_modified_by_name = ctk.CTkLabel(master=frm_widgets, text=f'{last_modified_by}', anchor="w")
+        lbl_modified_by_name.grid(row=widget_row, column=1, padx=5, pady=10, sticky='w')
+
+        lbl_last_modified_label = ctk.CTkLabel(master=frm_widgets, text='Date:', width=75, anchor="e")
+        lbl_last_modified_label.grid(row=widget_row, column=2, padx=5, pady=10, sticky='e')
+
+        lbl_last_modified_date = ctk.CTkLabel(master=frm_widgets, text=f'{last_modified}', anchor="w")
+        lbl_last_modified_date.grid(row=widget_row, column=3, padx=20, pady=10, sticky='w')
+
+        # Keystone Details
+        widget_row += 1
+        lbl_keystone_method_label = ctk.CTkLabel(master=frm_widgets, text='Harmony method:', width=75, anchor="e")
+        lbl_keystone_method_label.grid(row=widget_row, column=0, padx=20, pady=10, sticky='e')
+
+        lbl_keystone_method = ctk.CTkLabel(master=frm_widgets, text=f'{harmony_method}', anchor="w")
+        lbl_keystone_method.grid(row=widget_row, column=1, padx=5, pady=10, sticky='w')
+
+        widget_row += 1
+        lbl_keystone_colour_label = ctk.CTkLabel(master=frm_widgets, text='Keystone colour:', width=75, anchor="e")
+        lbl_keystone_colour_label.grid(row=widget_row, column=0, padx=20, pady=10, sticky='e')
+
+        lbl_keystone_colour = ctk.CTkLabel(master=frm_widgets, text=f'{keystone_colour}', anchor="w")
+        lbl_keystone_colour.grid(row=widget_row, column=1, padx=5, pady=(10, 5), sticky='w')
+
+        widget_row += 1
+        btn_keystone_colour = ctk.CTkButton(master=frm_widgets,
+                                            fg_color=keystone_colour,
+                                            hover_color=keystone_colour,
+                                            height=70,
+                                            width=50,
+                                            text=keystone_colour)
+        btn_keystone_colour.grid(row=widget_row, column=1, padx=5, pady=(0, 5), sticky='w')
+
+        # Created with...
+        regular_italic = ctk.CTkFont(family="Roboto", size=13, slant="italic")
+        widget_row += 1
+        lbl_created_with_label = ctk.CTkLabel(master=frm_widgets, font=regular_italic,
+                                              text='Built with:', width=75, anchor="e")
+        lbl_created_with_label.grid(row=widget_row, column=2, padx=20, pady=(50, 10), sticky='e')
+
+        lbl_created_with = ctk.CTkLabel(master=frm_widgets, font=regular_italic, text=f'{created_with}', anchor="w")
+        lbl_created_with.grid(row=widget_row, column=3, padx=5, pady=(50, 10), sticky='w')
+
+        # Add the close button into the bottom frame (frm_buttons).
+        btn_close = ctk.CTkButton(master=frm_buttons, text='Close', command=self.destroy, width=550)
+        btn_close.grid(row=0, column=0, padx=10, pady=(5, 5), sticky='we')
 
 class AppearanceMode(Enum):
     LIGHT: int = 0
