@@ -1,7 +1,7 @@
 {
   "CTk": {
     "fg_color": [
-      "#c6ced8",
+      "#030303",
       "#030303"
     ]
   },
@@ -360,9 +360,9 @@
     "theme name": "Ebony",
     "theme author": "Clive Bostock",
     "date created": "Jun 03 2023 10:46:25",
-    "last modified by": "Clive Bostock",
+    "last modified by": "clive",
     "created with": "CTk Theme Builder v2.1.0",
-    "last modified": "Jun 03 2023 10:46:25",
+    "last modified": "Jun 05 2023 11:54:07",
     "keystone colour": "#3c5064",
     "harmony method": "Split-complementary",
     "harmony differential": null
