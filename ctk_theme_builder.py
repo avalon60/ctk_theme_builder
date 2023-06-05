@@ -975,7 +975,7 @@ class ControlPanel:
                                                            "labels.")
 
         widget_start_row += 1
-        self.tk_last_theme_on_start = tk.IntVar(master=frm_widgets)
+        self.tk_last_theme_on_start = tk.IntVar(master=frm_widgets, value=self.last_theme_on_start)
         self.tk_last_theme_on_start.set(self.last_theme_on_start)
         self.swt_last_theme_on_start = ctk.CTkSwitch(master=frm_widgets,
                                                      text='Load Last Theme',
