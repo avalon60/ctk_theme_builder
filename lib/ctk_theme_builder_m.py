@@ -8,8 +8,25 @@ from pathlib import Path
 import json
 import customtkinter as ctk
 import sqlite3
+import os
 
 # Constants
+APP_HOME = os.path.dirname(os.path.realpath(__file__))
+APP_HOME = Path(os.path.dirname(APP_HOME))
+CTK_SITE_PACKAGES = Path(ctk.__file__)
+CTK_SITE_PACKAGES = os.path.dirname(CTK_SITE_PACKAGES)
+CTK_ASSETS = CTK_SITE_PACKAGES / Path('assets')
+CTK_THEMES = CTK_ASSETS / 'themes'
+
+ASSETS_DIR = APP_HOME / 'assets'
+CONFIG_DIR = ASSETS_DIR / 'config'
+ETC_DIR = ASSETS_DIR / 'etc'
+TEMP_DIR = APP_HOME / 'tmp'
+VIEWS_DIR = ASSETS_DIR / 'views'
+APP_THEMES_DIR = ASSETS_DIR / 'themes'
+APP_DATA_DIR = ASSETS_DIR / 'data'
+APP_IMAGES = ASSETS_DIR / 'images'
+DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
 # These aren't true sizes as per WEB design
 HEADING1 = ('Roboto', 26)
 HEADING2 = ('Roboto', 22)
@@ -91,6 +108,33 @@ RENDERED_PREVIEW_WIDGETS = {"CTk": [],
 
 db_file_found = None
 
+
+def app_themes_list():
+    """This method generates a list of theme names, based on the json files found in the application themes folder.
+     These are for use by the control panel, and can be selected in the applications preferences.
+     They comprise the base-names of the theme files, with the .json extension stripped out."""
+    json_files = list(APP_THEMES_DIR.glob('*.json'))
+    theme_names = []
+    for file in json_files:
+        file = os.path.basename(file)
+        theme_name = os.path.splitext(file)[0]
+        theme_names.append(theme_name)
+    theme_names.sort()
+    return theme_names
+
+def user_themes_list():
+    """This method generates a list of theme names, based on the json files found in the user's themes folder
+    (i.e. self.theme_json_dir). These are basically the theme file names, with the .json extension stripped out."""
+    user_themes_dir = preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                        preference_name='theme_json_dir')
+    json_files = list(user_themes_dir.glob('*.json'))
+    theme_names = []
+    for file in json_files:
+        file = os.path.basename(file)
+        theme_name = os.path.splitext(file)[0]
+        theme_names.append(theme_name)
+    theme_names.sort()
+    return theme_names
 
 def db_file_exists(db_file_path: Path):
     global db_file_found
@@ -184,10 +228,39 @@ def delete_preference(db_file_path: Path, scope: str, preference_name):
     db_conn.close()
 
 
+def hex_to_rgb(hex_colour):
+    """ Convert a hex colour code to an RGB tuple."""
+    rgb = []
+    hex_value = hex_colour.replace('#', '')
+    for i in (0, 2, 4):
+        decimal = int(hex_value[i:i + 2], 16)
+        rgb.append(decimal)
+
+    return tuple(rgb)
+
+
+def rgb_to_hex(rgb: tuple):
+    """Convert RGB tuple to a hex colour code."""
+    r, g, b = rgb
+    return '#{:02x}{:02x}{:02x}'.format(r, g, b)
+
+
+def str_mode_to_int(mode=None):
+    """Returns the integer representing the CustomTkinter theme appearance mode, 0 for "Light", 1 for "Dark". If
+    "Dark" or "Light" is not passed as a parameter, the current theme mode is detected and the return value is based
+    upon that. """
+    if mode is not None:
+        appearance_mode = mode
+    else:
+        appearance_mode = ctk.get_appearance_mode()
+    if appearance_mode.lower() == "light":
+        return 0
+    return 1
+
+
 def flip_appearance_modes(theme_file_path: Path):
     """Function, which accepts the pathname to a CustomTkinter theme file. It then proceeds to swap
     all light (appearance) mode colours, with those of the dark mode."""
-
     theme_dict = json_dict(theme_file_path)
     new_theme_dict = copy.deepcopy(theme_dict)
     for widget_type, dict_ in theme_dict.items():
@@ -196,6 +269,35 @@ def flip_appearance_modes(theme_file_path: Path):
                 new_theme_dict[widget_type][property_][0] = theme_dict[widget_type][property_][1]
                 new_theme_dict[widget_type][property_][1] = theme_dict[widget_type][property_][0]
     with open(theme_file_path, "w") as f:
+        json.dump(new_theme_dict, f, indent=2)
+
+
+def merge_themes(primary_theme_name: str, primary_mode: str, secondary_theme_name: str, secondary_mode: str,
+                 new_theme_name: str, mapped_primary_mode: str = 'Light'):
+    """Function, which accepts details of two themes and a new theme name, and merges the two themes, into one new
+    theme."""
+    theme_json_dir = preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                        preference_name='theme_json_dir')
+    primary_file = theme_json_dir / f'{primary_theme_name}.json'
+    secondary_file = theme_json_dir / f'{secondary_theme_name}.json'
+    new_theme_path = theme_json_dir / f'{new_theme_name}'
+    primary_mode_idx = str_mode_to_int(primary_mode)
+    secondary_mode_idx = str_mode_to_int(secondary_mode)
+    primary_theme_dict = json_dict(primary_file)
+    secondary_theme_dict = json_dict(secondary_file)
+    mapped_primary_idx = str_mode_to_int(mapped_primary_mode)
+    if mapped_primary_idx == 0:
+        mapped_secondary_idx = 1
+    else:
+        mapped_secondary_idx = 0
+    new_theme_dict = copy.deepcopy(primary_theme_dict)
+    for widget_type, dict_ in new_theme_dict.items():
+        for property_, value_ in dict_.items():
+            if "_color" in property_ and value_ != 'transparent':
+                new_theme_dict[widget_type][property_][mapped_primary_idx] = primary_theme_dict[widget_type][property_][primary_mode_idx]
+                new_theme_dict[widget_type][property_][mapped_secondary_idx] = secondary_theme_dict[widget_type][property_][secondary_mode_idx]
+    print(f'DEBUG: Writing to {new_theme_path}')
+    with open(new_theme_path, "w") as f:
         json.dump(new_theme_dict, f, indent=2)
 
 
@@ -226,6 +328,7 @@ def widget_member(widget_entries: dict, filter_list: list):
 def json_dict(json_file_path: Path) -> dict:
     """The json_dict function accepts the pathname to a JSON file, loads the file, and returns a dictionary
     representing the JSON content.
+    @rtype: dict
     @param json_file_path:
     @return: dict"""
     with open(json_file_path) as json_file:
