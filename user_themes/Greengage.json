@@ -366,30 +366,5 @@
     "keystone colour": "#74926F",
     "harmony method": "Triadic",
     "harmony differential": 10
-  },
-  "CTkWibble": {
-    "corner_radius": 1000,
-    "border_width_checked": 6,
-    "border_width_unchecked": 3,
-    "fg_color": [
-      "#2FA572",
-      "#2CC985"
-    ],
-    "border_color": [
-      "#949A9F",
-      "#3E454A"
-    ],
-    "hover_color": [
-      "#106A43",
-      "#0C955A"
-    ],
-    "text_color": [
-      "#DCE4EE",
-      "gray10"
-    ],
-    "text_color_disabled": [
-      "gray45",
-      "gray60"
-    ]
   }
 }
