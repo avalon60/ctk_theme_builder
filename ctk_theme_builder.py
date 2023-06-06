@@ -922,108 +922,24 @@ class ControlPanel:
         action = preferences_dialog.action
         self.status_bar.set_status_text(status_text=f'Preferences {action}.')
 
-    def launch_provenance_dialogN(self):
-        provenence_dialog = ProvenanceDialog()
     def launch_provenance_dialog(self):
-        self.top_prov = ctk.CTkToplevel(self.ctk_control_panel)
-        self.top_prov.title('Theme Provenance')
-        self.top_prov.geometry('580x470')
-        # Make sure we pop up in front of Control Panel
-        self.top_prov.transient(self.ctk_control_panel)
-        self.top_prov.rowconfigure(1, weight=1)
-
-        frm_header = ctk.CTkFrame(master=self.top_prov)
-        frm_header.grid(column=0, row=0, padx=5, pady=5, sticky='nsew')
-
-        frm_widgets = ctk.CTkFrame(master=self.top_prov)
-        frm_widgets.grid(column=0, row=1, padx=5, pady=5, sticky='nsew')
-
-        frm_buttons = ctk.CTkFrame(master=self.top_prov)
-        frm_buttons.grid(column=0, row=2, padx=5, pady=5, sticky='ew')
-
+        provenance_dialog = ProvenanceDialog()
         theme_name = self.theme_json_data["provenance"]["theme name"]
         created_with = self.theme_json_data["provenance"]["created with"]
-        created_label = self.theme_json_data["provenance"]["date created"]
+        date_created = self.theme_json_data["provenance"]["date created"]
         authors_name = self.theme_json_data["provenance"]["theme author"]
         last_modified_by = self.theme_json_data["provenance"]["last modified by"]
-        last_modified = self.theme_json_data["provenance"]["last modified"]
+        last_modified_date = self.theme_json_data["provenance"]["last modified"]
         harmony_method = self.theme_json_data["provenance"]["harmony method"]
         keystone_colour = self.theme_json_data["provenance"]["keystone colour"]
-
-        widget_row = 0
-        # Header -  Theme Name (frm_header)
-        lbl_theme_label = ctk.CTkLabel(master=frm_header, text='Theme:', width=280, anchor="e", font=HEADING4)
-        lbl_theme_label.grid(row=widget_row, column=0, padx=5, pady=10, sticky='e', columnspan=2)
-
-        lbl_theme_name = ctk.CTkLabel(master=frm_header, text=f'{theme_name}', justify="left", font=HEADING4)
-        lbl_theme_name.grid(row=widget_row, column=2, padx=5, pady=10, sticky='w', columnspan=2)
-
-        # Start the main body of the dialog (frm_widgets)
-        # Creation Details
-        widget_row += 1
-        lbl_author_label = ctk.CTkLabel(master=frm_widgets, text='Author:', anchor="e", width=75)
-        lbl_author_label.grid(row=widget_row, column=0, padx=20, pady=10, sticky='e')
-
-        lbl_author_name = ctk.CTkLabel(master=frm_widgets, text=f'{authors_name}', anchor="w")
-        lbl_author_name.grid(row=widget_row, column=1, padx=5, pady=10, sticky='w')
-
-        lbl_created_label = ctk.CTkLabel(master=frm_widgets, text='Created:', width=100, anchor="e")
-        lbl_created_label.grid(row=widget_row, column=2, padx=5, pady=10, sticky='e')
-
-        lbl_created_date = ctk.CTkLabel(master=frm_widgets, text=f'{created_label}', anchor="w", width=75)
-        lbl_created_date.grid(row=widget_row, column=3, padx=(20, 30), pady=10, sticky='w')
-
-        # Modification Details
-        widget_row += 1
-        lbl_modified_by_label = ctk.CTkLabel(master=frm_widgets, text='Last modified:', anchor="e")
-        lbl_modified_by_label.grid(row=widget_row, column=0, padx=20, pady=10, sticky='e')
-
-        lbl_modified_by_name = ctk.CTkLabel(master=frm_widgets, text=f'{last_modified_by}', anchor="w")
-        lbl_modified_by_name.grid(row=widget_row, column=1, padx=5, pady=10, sticky='w')
-
-        lbl_last_modified_label = ctk.CTkLabel(master=frm_widgets, text='Date:', width=75, anchor="e")
-        lbl_last_modified_label.grid(row=widget_row, column=2, padx=5, pady=10, sticky='e')
-
-        lbl_last_modified_date = ctk.CTkLabel(master=frm_widgets, text=f'{last_modified}', anchor="w")
-        lbl_last_modified_date.grid(row=widget_row, column=3, padx=20, pady=10, sticky='w')
-
-        # Keystone Details
-        widget_row += 1
-        lbl_keystone_method_label = ctk.CTkLabel(master=frm_widgets, text='Harmony method:', width=75, anchor="e")
-        lbl_keystone_method_label.grid(row=widget_row, column=0, padx=20, pady=10, sticky='e')
-
-        lbl_keystone_method = ctk.CTkLabel(master=frm_widgets, text=f'{harmony_method}', anchor="w")
-        lbl_keystone_method.grid(row=widget_row, column=1, padx=5, pady=10, sticky='w')
-
-        widget_row += 1
-        lbl_keystone_colour_label = ctk.CTkLabel(master=frm_widgets, text='Keystone colour:', width=75, anchor="e")
-        lbl_keystone_colour_label.grid(row=widget_row, column=0, padx=20, pady=10, sticky='e')
-
-        lbl_keystone_colour = ctk.CTkLabel(master=frm_widgets, text=f'{keystone_colour}', anchor="w")
-        lbl_keystone_colour.grid(row=widget_row, column=1, padx=5, pady=(10, 5), sticky='w')
-
-        widget_row += 1
-        btn_keystone_colour = ctk.CTkButton(master=frm_widgets,
-                                            fg_color=keystone_colour,
-                                            hover_color=keystone_colour,
-                                            height=70,
-                                            width=50,
-                                            text=keystone_colour)
-        btn_keystone_colour.grid(row=widget_row, column=1, padx=5, pady=(0, 5), sticky='w')
-
-        # Created with...
-        regular_italic = ctk.CTkFont(family="Roboto", size=13, slant="italic")
-        widget_row += 1
-        lbl_created_with_label = ctk.CTkLabel(master=frm_widgets, font=regular_italic,
-                                              text='Built with:', width=75, anchor="e")
-        lbl_created_with_label.grid(row=widget_row, column=2, padx=20, pady=(50, 10), sticky='e')
-
-        lbl_created_with = ctk.CTkLabel(master=frm_widgets, font=regular_italic, text=f'{created_with}', anchor="w")
-        lbl_created_with.grid(row=widget_row, column=3, padx=5, pady=(50, 10), sticky='w')
-
-        # Add the close button into the bottom frame (frm_buttons).
-        btn_close = ctk.CTkButton(master=frm_buttons, text='Close', command=self.top_prov.destroy, width=550)
-        btn_close.grid(row=0, column=0, padx=10, pady=(5, 5), sticky='we')
+        provenance_dialog.modify_property(property_name='theme_name', value=theme_name)
+        provenance_dialog.modify_property(property_name='authors_name', value=authors_name)
+        provenance_dialog.modify_property(property_name='date_created', value=date_created)
+        provenance_dialog.modify_property(property_name='created_with', value=created_with)
+        provenance_dialog.modify_property(property_name='last_modified_by', value=last_modified_by)
+        provenance_dialog.modify_property(property_name='last_modified_date', value=last_modified_date)
+        provenance_dialog.modify_property(property_name='harmony_method', value=harmony_method)
+        provenance_dialog.modify_property(property_name='keystone_colour', value=keystone_colour)
 
     def save_theme_palette(self, theme_name=None):
         """Save the colour palette colours back to disk."""
@@ -3770,22 +3686,14 @@ class ProvenanceDialog(ctk.CTkToplevel):
         frm_buttons = ctk.CTkFrame(master=self)
         frm_buttons.grid(column=0, row=2, padx=5, pady=5, sticky='ew')
 
-        theme_name = self.master.theme_json_data["provenance"]["theme name"]
-        created_with = self.master.theme_json_data["provenance"]["created with"]
-        created_label = self.master.theme_json_data["provenance"]["date created"]
-        authors_name = self.master.theme_json_data["provenance"]["theme author"]
-        last_modified_by = self.master.theme_json_data["provenance"]["last modified by"]
-        last_modified = self.master.theme_json_data["provenance"]["last modified"]
-        harmony_method = self.master.theme_json_data["provenance"]["harmony method"]
-        keystone_colour = self.master.theme_json_data["provenance"]["keystone colour"]
 
         widget_row = 0
         # Header -  Theme Name (frm_header)
         lbl_theme_label = ctk.CTkLabel(master=frm_header, text='Theme:', width=280, anchor="e", font=HEADING4)
         lbl_theme_label.grid(row=widget_row, column=0, padx=5, pady=10, sticky='e', columnspan=2)
 
-        lbl_theme_name = ctk.CTkLabel(master=frm_header, text=f'{theme_name}', justify="left", font=HEADING4)
-        lbl_theme_name.grid(row=widget_row, column=2, padx=5, pady=10, sticky='w', columnspan=2)
+        self.lbl_theme_name = ctk.CTkLabel(master=frm_header, justify="left", font=HEADING4)
+        self.lbl_theme_name.grid(row=widget_row, column=2, padx=5, pady=10, sticky='w', columnspan=2)
 
         # Start the main body of the dialog (frm_widgets)
         # Creation Details
@@ -3793,52 +3701,49 @@ class ProvenanceDialog(ctk.CTkToplevel):
         lbl_author_label = ctk.CTkLabel(master=frm_widgets, text='Author:', anchor="e", width=75)
         lbl_author_label.grid(row=widget_row, column=0, padx=20, pady=10, sticky='e')
 
-        lbl_author_name = ctk.CTkLabel(master=frm_widgets, text=f'{authors_name}', anchor="w")
-        lbl_author_name.grid(row=widget_row, column=1, padx=5, pady=10, sticky='w')
+        self.lbl_author_name = ctk.CTkLabel(master=frm_widgets,  anchor="w")
+        self.lbl_author_name.grid(row=widget_row, column=1, padx=5, pady=10, sticky='w')
 
         lbl_created_label = ctk.CTkLabel(master=frm_widgets, text='Created:', width=100, anchor="e")
         lbl_created_label.grid(row=widget_row, column=2, padx=5, pady=10, sticky='e')
 
-        lbl_created_date = ctk.CTkLabel(master=frm_widgets, text=f'{created_label}', anchor="w", width=75)
-        lbl_created_date.grid(row=widget_row, column=3, padx=(20, 30), pady=10, sticky='w')
+        self.lbl_created_date = ctk.CTkLabel(master=frm_widgets, anchor="w", width=75)
+        self.lbl_created_date.grid(row=widget_row, column=3, padx=(20, 30), pady=10, sticky='w')
 
         # Modification Details
         widget_row += 1
         lbl_modified_by_label = ctk.CTkLabel(master=frm_widgets, text='Last modified:', anchor="e")
         lbl_modified_by_label.grid(row=widget_row, column=0, padx=20, pady=10, sticky='e')
 
-        lbl_modified_by_name = ctk.CTkLabel(master=frm_widgets, text=f'{last_modified_by}', anchor="w")
-        lbl_modified_by_name.grid(row=widget_row, column=1, padx=5, pady=10, sticky='w')
+        self.lbl_modified_by_name = ctk.CTkLabel(master=frm_widgets, anchor="w")
+        self.lbl_modified_by_name.grid(row=widget_row, column=1, padx=5, pady=10, sticky='w')
 
         lbl_last_modified_label = ctk.CTkLabel(master=frm_widgets, text='Date:', width=75, anchor="e")
         lbl_last_modified_label.grid(row=widget_row, column=2, padx=5, pady=10, sticky='e')
 
-        lbl_last_modified_date = ctk.CTkLabel(master=frm_widgets, text=f'{last_modified}', anchor="w")
-        lbl_last_modified_date.grid(row=widget_row, column=3, padx=20, pady=10, sticky='w')
+        self.lbl_last_modified_date = ctk.CTkLabel(master=frm_widgets, anchor="w")
+        self.lbl_last_modified_date.grid(row=widget_row, column=3, padx=20, pady=10, sticky='w')
 
         # Keystone Details
         widget_row += 1
         lbl_keystone_method_label = ctk.CTkLabel(master=frm_widgets, text='Harmony method:', width=75, anchor="e")
         lbl_keystone_method_label.grid(row=widget_row, column=0, padx=20, pady=10, sticky='e')
 
-        lbl_keystone_method = ctk.CTkLabel(master=frm_widgets, text=f'{harmony_method}', anchor="w")
-        lbl_keystone_method.grid(row=widget_row, column=1, padx=5, pady=10, sticky='w')
+        self.lbl_harmony_method = ctk.CTkLabel(master=frm_widgets, anchor="w")
+        self.lbl_harmony_method.grid(row=widget_row, column=1, padx=5, pady=10, sticky='w')
 
         widget_row += 1
         lbl_keystone_colour_label = ctk.CTkLabel(master=frm_widgets, text='Keystone colour:', width=75, anchor="e")
         lbl_keystone_colour_label.grid(row=widget_row, column=0, padx=20, pady=10, sticky='e')
 
-        lbl_keystone_colour = ctk.CTkLabel(master=frm_widgets, text=f'{keystone_colour}', anchor="w")
-        lbl_keystone_colour.grid(row=widget_row, column=1, padx=5, pady=(10, 5), sticky='w')
+        self.lbl_keystone_colour = ctk.CTkLabel(master=frm_widgets, anchor="w")
+        self.lbl_keystone_colour.grid(row=widget_row, column=1, padx=5, pady=(10, 5), sticky='w')
 
         widget_row += 1
-        btn_keystone_colour = ctk.CTkButton(master=frm_widgets,
-                                            fg_color=keystone_colour,
-                                            hover_color=keystone_colour,
+        self.btn_keystone_colour = ctk.CTkButton(master=frm_widgets,
                                             height=70,
-                                            width=50,
-                                            text=keystone_colour)
-        btn_keystone_colour.grid(row=widget_row, column=1, padx=5, pady=(0, 5), sticky='w')
+                                            width=50)
+        self.btn_keystone_colour.grid(row=widget_row, column=1, padx=5, pady=(0, 5), sticky='w')
 
         # Created with...
         regular_italic = ctk.CTkFont(family="Roboto", size=13, slant="italic")
@@ -3847,12 +3752,36 @@ class ProvenanceDialog(ctk.CTkToplevel):
                                               text='Built with:', width=75, anchor="e")
         lbl_created_with_label.grid(row=widget_row, column=2, padx=20, pady=(50, 10), sticky='e')
 
-        lbl_created_with = ctk.CTkLabel(master=frm_widgets, font=regular_italic, text=f'{created_with}', anchor="w")
-        lbl_created_with.grid(row=widget_row, column=3, padx=5, pady=(50, 10), sticky='w')
+        self.lbl_created_with = ctk.CTkLabel(master=frm_widgets, font=regular_italic, anchor="w")
+        self.lbl_created_with.grid(row=widget_row, column=3, padx=5, pady=(50, 10), sticky='w')
 
         # Add the close button into the bottom frame (frm_buttons).
         btn_close = ctk.CTkButton(master=frm_buttons, text='Close', command=self.destroy, width=550)
         btn_close.grid(row=0, column=0, padx=10, pady=(5, 5), sticky='we')
+
+    def modify_property(self, property_name, value):
+        if property_name == "theme_name":
+            self.lbl_theme_name.configure(text=value)
+        elif property_name == "created_with":
+            self.lbl_created_with.configure(text=value)
+        elif property_name == "date_created":
+            self.lbl_created_date.configure(text=value)
+        elif property_name == 'created_with':
+            self.lbl_created_with.configure(text=value)
+        elif property_name == 'created_date':
+            self.lbl_created_date.configure(text=value)
+        elif property_name == 'authors_name':
+            self.lbl_author_name.configure(text=value)
+        elif property_name == 'last_modified_by':
+            self.lbl_modified_by_name.configure(text=value)
+        elif property_name == 'last_modified_date':
+            self.lbl_last_modified_date.configure(text=value)
+        elif property_name == 'harmony_method':
+            self.lbl_harmony_method.configure(text=value)
+        elif property_name == 'keystone_colour':
+            self.lbl_keystone_colour.configure(text=value)
+            self.btn_keystone_colour.configure(fg_color=value, bg_color=value, text=value)
+
 
 class AppearanceMode(Enum):
     LIGHT: int = 0
