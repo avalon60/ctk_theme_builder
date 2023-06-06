@@ -140,6 +140,7 @@ class SortingHelpFormatter(HelpFormatter):
 
 
 class ThemeMerger(ctk.CTkToplevel):
+    """This class is used to merge two themes, to create an entirely new theme."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.theme_json_dir = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
@@ -298,11 +299,13 @@ class ThemeMerger(ctk.CTkToplevel):
                                                width=160)
         self.ent_new_theme_file.grid(row=widget_start_row, column=1, padx=(0, 0), pady=(30, 5), sticky='w')
 
-        self.tk_open_on_merge = tk.IntVar(master=frm_widgets)
+        self.tk_open_on_merge = tk.IntVar(master=frm_widgets, value=0)
         self.swt_open_on_merge = ctk.CTkSwitch(master=frm_widgets,
                                                text='Open on merge',
+                                               offvalue=0,
+                                               onvalue=1,
                                                variable=self.tk_open_on_merge)
-        # self.swt_open_on_merge.grid(row=widget_start_row, column=3, padx=(0, 0), pady=(30, 10), sticky='w')
+        self.swt_open_on_merge.grid(row=widget_start_row, column=3, padx=(0, 0), pady=(30, 10), sticky='w')
 
         if self.enable_tooltips:
             btn_enable_tooltips_tooltip = CTkToolTip(self.swt_open_on_merge,
@@ -335,6 +338,9 @@ class ThemeMerger(ctk.CTkToplevel):
         new_theme_file = self.tk_new_theme_file.get()
         open_on_merge = self.tk_open_on_merge.get()
 
+        self.open_when_merged = None
+        self.new_theme = None
+
         if primary_theme_name == secondary_theme_name and primary_appearance_mode == secondary_appearance_mode:
             self.status_bar.set_status_text('You cannot merge the same theme / appearance mode to itself.')
         if not valid_theme_file_name(new_theme_file):
@@ -356,9 +362,22 @@ class ThemeMerger(ctk.CTkToplevel):
         mod.merge_themes(primary_theme_name=primary_theme_name, primary_mode=primary_appearance_mode,
                          secondary_theme_name=secondary_theme_name, secondary_mode=secondary_appearance_mode,
                          new_theme_name=new_theme)
+        if open_on_merge:
+            self.destroy()
+            print(f'DEBUG: master = {self.master}')
+            new_theme_name = os.path.splitext(new_theme)[0]
+            self.new_theme = new_theme_name
+            self.open_when_merged = open_on_merge
+
+    def open_on_merge(self):
+        return self.open_when_merged
+
+    def new_theme_name(self):
+        return self.new_theme
 
 
-class ControlPanel:
+
+class ControlPanel(ctk.CTk):
     _theme_json_dir: Path
     PANEL_HEIGHT = 905
     PANEL_WIDTH = 1020
@@ -387,11 +406,13 @@ class ControlPanel:
                                 "Switch: text_color_disabled"
                                 ]
 
-    def __init__(self):
-        # Grab the JSON for one of the JSON files released with the
-        # installed instance of CustomTkinter
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
         self.theme_json_data = {}
-        print('DEBUG - started')
+        # Grab the JSON for one of the JSON files released with the
+        # installed instance of CustomTkinter. We use this later
+        # to back-fill any missing properties when we open a theme.
         green_theme_file = CTK_THEMES / 'green.json'
         with open(green_theme_file) as json_file:
             self.reference_theme_json = json.load(json_file)
@@ -404,19 +425,11 @@ class ControlPanel:
         self.VIEWS_DIR = ASSETS_DIR / 'views'
         self.palettes_dir = ASSETS_DIR / 'palettes'
 
-        self.ctk_control_panel = ctk.CTk()
         this_platform = platform.system()
         if this_platform == "Darwin":
             self.platform = "MacOS"
 
         self.new_theme_json_dir = None
-
-        if this_platform == "Windows":
-            self.user_home_dir = os.getenv("UserProfile")
-            self.user_name = os.getenv("LOGNAME")
-        else:
-            self.user_name = os.getenv("USER")
-            self.user_home_dir = os.getenv("HOME")
 
         if LISTENER_FILE.exists():
             try:
@@ -427,9 +440,8 @@ class ControlPanel:
                 exit(0)
 
         # Initialise class properties
-        self.user_home_dir = Path(self.user_home_dir)
         self.process = None
-        self.ctk_control_panel.protocol("WM_DELETE_WINDOW", self.close_panels)
+        self.protocol("WM_DELETE_WINDOW", self.close_panels)
         self.json_state = 'clean'
         self.widgets = {}
         self.rendered_harmony_buttons = []
@@ -535,16 +547,16 @@ class ControlPanel:
 
         self.restore_controller_geometry()
 
-        self.ctk_control_panel.rowconfigure(3, weight=1)
-        self.ctk_control_panel.columnconfigure(0, weight=1)
+        self.rowconfigure(3, weight=1)
+        self.columnconfigure(0, weight=1)
 
-        self.ctk_control_panel.title('CTk Theme Builder')
+        self.title('CTk Theme Builder')
 
         # Instantiate Frames
-        title_frame = ctk.CTkFrame(master=self.ctk_control_panel)
+        title_frame = ctk.CTkFrame(master=self)
         title_frame.pack(fill="both", expand=0)
 
-        self.frm_control = ctk.CTkFrame(master=self.ctk_control_panel)
+        self.frm_control = ctk.CTkFrame(master=self)
         self.frm_control.columnconfigure(1, weight=1)
         self.frm_control.pack(fill="both", expand=1)
         self.frm_control.rowconfigure(2, weight=1)
@@ -559,10 +571,10 @@ class ControlPanel:
         self.frm_geometry.grid(row=0, column=1, rowspan=1, sticky='nswe', padx=(0, 5), pady=(5, 5))
         self.frm_theme_palette.grid(row=1, column=1, rowspan=1, sticky='nswe', padx=(0, 5), pady=(5, 5))
         self.frm_colour_edit_widgets.grid(row=2, column=1, rowspan=1, sticky='nswe', padx=(0, 5), pady=(5, 5))
-        self.status_bar = cbtk.CBtkStatusBar(master=self.ctk_control_panel,
+        self.status_bar = cbtk.CBtkStatusBar(master=self,
                                              status_text_life=30,
                                              use_grid=False)
-        self.ctk_control_panel.bind("<Configure>", self.status_bar.auto_size_status_bar)
+        self.bind("<Configure>", self.status_bar.auto_size_status_bar)
 
         # Populate Frames
         self.lbl_title = ctk.CTkLabel(master=title_frame, text='Control Panel', font=HEADING4, anchor='w')
@@ -738,7 +750,7 @@ class ControlPanel:
         if int(base_min_version) > int(base_ctk_version):
             print(f'WARNING: The version of CustomTkinter, on your system, is incompatible. Please upgrade to '
                   f'CustomTkinter {self.min_ctk_version} or later.')
-            confirm = CTkMessagebox(master=self.ctk_control_panel,
+            confirm = CTkMessagebox(master=self,
                                     title='Please Upgrade CustomTkinter',
                                     message=f'The version of CustomTkinter, on your system, is incompatible. '
                                             f'Please upgrade to CustomTkinter {self.min_ctk_version} or later.',
@@ -748,10 +760,11 @@ class ControlPanel:
 
         self.load_theme()
 
-        self.ctk_control_panel.mainloop()
+        self.mainloop()
+
 
     def flip_appearance_modes(self):
-        confirm = CTkMessagebox(master=self.ctk_control_panel,
+        confirm = CTkMessagebox(master=self,
                                 title='Confirm Action',
                                 message=f'This will swap around, all of the theme appearance mode colours, between '
                                         f'Light mode and Dark mode. Are you sure you wish to proceed?',
@@ -806,10 +819,10 @@ class ControlPanel:
 
     def create_menu(self):
         # Set up the core of our menu
-        self.des_menu = cbtk.CBtkMenu(self.ctk_control_panel, tearoff=0)
+        self.des_menu = cbtk.CBtkMenu(self, tearoff=0)
         foreground = cbtk.get_color_from_name(widget_type='CTkLabel', widget_property='text_color')
         background = cbtk.get_color_from_name(widget_type='CTkToplevel', widget_property='fg_color')
-        self.ctk_control_panel.config(menu=self.des_menu)
+        self.config(menu=self.des_menu)
 
         # Now add a File sub-menu option
         self.file_menu = cbtk.CBtkMenu(self.des_menu, tearoff=0)
@@ -844,10 +857,14 @@ class ControlPanel:
         self.set_option_states()
 
     def launch_theme_merger(self):
-        theme_merger = ThemeMerger(master=self.ctk_control_panel)
-        self.ctk_control_panel.wait_window(theme_merger)
+        theme_merger = ThemeMerger(master=self)
+        self.wait_window(theme_merger)
         self.json_files = mod.user_themes_list()
         self.opm_theme.configure(values=self.json_files)
+        if theme_merger.open_on_merge():
+            new_theme_name = theme_merger.new_theme_name()
+            self.opm_theme.set(new_theme_name)
+            self.load_theme()
 
     def copy_property_colour(self, event=None, widget_property=None):
         colour = None
@@ -868,7 +885,7 @@ class ControlPanel:
     def about(self):
 
         widget_corner_radius = 5
-        top_about = ctk.CTkToplevel(self.ctk_control_panel)
+        top_about = ctk.CTkToplevel(self)
         top_about.title('About CTk Theme Builder')
         top_about.geometry('380x250')
         logo_image = cbtk.load_image(light_image=APP_IMAGES / 'bear-logo-colour.jpg', image_size=(200, 200))
@@ -918,7 +935,7 @@ class ControlPanel:
 
     def launch_preferences_dialog(self):
         preferences_dialog = PreferencesDialog()
-        self.ctk_control_panel.wait_window(preferences_dialog)
+        self.wait_window(preferences_dialog)
         action = preferences_dialog.action
         self.status_bar.set_status_text(status_text=f'Preferences {action}.')
 
@@ -1267,14 +1284,11 @@ class ControlPanel:
 
             update_widget_geometry(widget=geometry_widget, widget_property=config_param, property_value=property_value)
 
-        def deselect_widget(widget_id):
-            widget_id.deselect()
-
         self.geometry_edit_values = {}
         preview_frame_top = self.theme_json_data['CTkFrame']['top_fg_color'][
             cbtk.str_mode_to_int(self.appearance_mode)]
 
-        self.top_geometry = ctk.CTkToplevel(self.ctk_control_panel)
+        self.top_geometry = ctk.CTkToplevel(self)
         self.top_geometry.title(f'{widget_type} Widget Geometry')
 
         self.restore_geom_geometry()
@@ -1957,7 +1971,7 @@ class ControlPanel:
     def load_theme(self, event=None, reload_preview: bool = True):
 
         if self.json_state == 'dirty':
-            confirm = CTkMessagebox(master=self.ctk_control_panel,
+            confirm = CTkMessagebox(master=self,
                                     title='Confirm Action',
                                     message=f'You have unsaved changes. Are you sure you wish to proceed?',
                                     options=["Yes", "No"])
@@ -2012,7 +2026,7 @@ class ControlPanel:
             self.file_menu.entryconfig('Flip Modes', state=tk.NORMAL)
 
             self.lbl_title.grid(row=0, column=0, columnspan=2, sticky='ew')
-            self.ctk_control_panel.geometry(f'{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}')
+            self.geometry(f'{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}')
             self.opm_theme.configure(values=self.json_files)
             palette_file = selected_theme + '.json'
             self.theme = selected_theme
@@ -2094,7 +2108,7 @@ class ControlPanel:
         self.HARMONICS_HEIGHT3 = 650
         self.rendered_harmony_buttons = []
 
-        self.top_harmony = tk.Toplevel(master=self.ctk_control_panel)
+        self.top_harmony = tk.Toplevel(master=self)
         self.top_harmony.title('Colour Harmonics')
 
         self.top_harmony.columnconfigure(0, weight=1)
@@ -2698,7 +2712,7 @@ class ControlPanel:
     def reset_theme(self):
         """Reset the theme file, to the state of the last save operation, or the state when it was opened,
         if there has been no intervening save. """
-        confirm = CTkMessagebox(master=self.ctk_control_panel,
+        confirm = CTkMessagebox(master=self,
                                 title='Confirm Action',
                                 message=f'You have unsaved changes. Are you sure you wish to discard them?',
                                 options=["Yes", "No"])
@@ -2712,7 +2726,7 @@ class ControlPanel:
     def create_theme(self):
         """Create a new theme. This is based on the default.json file."""
         if self.json_state == 'dirty':
-            confirm = CTkMessagebox(master=self.ctk_control_panel,
+            confirm = CTkMessagebox(master=self,
                                     title='Confirm Action',
                                     message=f'You have unsaved changes. Are you sure you wish to discard them?',
                                     options=["Yes", "No"])
@@ -2758,7 +2772,7 @@ class ControlPanel:
 
     def delete_theme(self):
         """Delete the currently selected theme."""
-        confirm = CTkMessagebox(master=self.ctk_control_panel,
+        confirm = CTkMessagebox(master=self,
                                 title='Confirm Action',
                                 message=f'All data, for theme "{self.theme}", will be '
                                         f'purged. Are you sure you wish to continue?',
@@ -2891,14 +2905,14 @@ class ControlPanel:
     def set_filtered_widget_display(self, dummy='dummy'):
         properties_filter = self.opm_properties_filter.get()
         if properties_filter == 'All':
-            self.ctk_control_panel.geometry(f'{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}')
+            self.geometry(f'{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}')
         else:
-            self.ctk_control_panel.geometry(f'{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}')
+            self.geometry(f'{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}')
         self.render_widget_properties()
 
     def property_colour_picker(self, event, widget_property):
         prev_colour = self.widgets[widget_property]["colour"]
-        new_colour = askcolor(master=self.ctk_control_panel, title='Pick colour for : ' + widget_property,
+        new_colour = askcolor(master=self, title='Pick colour for : ' + widget_property,
                               initialcolor=prev_colour)
         if new_colour[1] is not None:
             new_colour = new_colour[1]
@@ -3128,7 +3142,7 @@ class ControlPanel:
             to_mode_description = 'Light'
             to_mode = 0
 
-        confirm = CTkMessagebox(master=self.ctk_control_panel,
+        confirm = CTkMessagebox(master=self,
                                 title='Confirm Action',
                                 message=f'This will replace the theme\'s "{to_mode_description}" mode settings with '
                                         f'those from the "{current_mode}" configuration.',
@@ -3175,7 +3189,7 @@ class ControlPanel:
             message = "Palette sync: Appearance mode, 'Dark', copied to 'Light'. Changes will take " \
                       "effect on save / reopen."
 
-        confirm = CTkMessagebox(master=self.ctk_control_panel,
+        confirm = CTkMessagebox(master=self,
                                 title='Confirm Action',
                                 message=f'This will replace and save the Theme Palette colours for the theme\'s '
                                         f'"{to_mode_description}" mode settings with '
@@ -3233,7 +3247,7 @@ class ControlPanel:
 
     def close_panels(self):
         if self.json_state == 'dirty':
-            confirm = CTkMessagebox(master=self.ctk_control_panel,
+            confirm = CTkMessagebox(master=self,
                                     title='Confirm Action',
                                     message=f'You have unsaved changes. Do you wish to save these before quitting?',
                                     options=["Yes", "No", "Cancel"])
@@ -3249,7 +3263,7 @@ class ControlPanel:
                                    parameters=None)
 
         self.save_controller_geometry()
-        self.ctk_control_panel.destroy()
+        self.destroy()
 
     def launch_preview(self):
         appearance_mode_ = self.appearance_mode
@@ -3277,7 +3291,7 @@ class ControlPanel:
                 if LISTENER_FILE.exists():
                     listener_started = True
                 if sleep_count > 80:
-                    confirm = CTkMessagebox(master=self.ctk_control_panel,
+                    confirm = CTkMessagebox(master=self,
                                             title='Please Upgrade CustomTkinter',
                                             message=f'TIMEOUT: Waited too long for preview listener!\n\n'
                                                     f'Ensure that only one instance of {__title__} is running is '
@@ -3294,15 +3308,15 @@ class ControlPanel:
         controller_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH,
                                                      scope='window_geometry',
                                                      preference_name='control_panel', default=default_geometry)
-        self.ctk_control_panel.geometry(controller_geometry)
-        self.ctk_control_panel.resizable(False, True)
+        self.geometry(controller_geometry)
+        self.resizable(False, True)
 
     def save_controller_geometry(self):
         """Save the control panel geometry to the repo, for the next time the program is launched."""
         geometry_row = mod.preference_row(db_file_path=DB_FILE_PATH,
                                           scope='window_geometry',
                                           preference_name='control_panel')
-        panel_geometry = self.ctk_control_panel.geometry()
+        panel_geometry = self.geometry()
         geometry_row["preference_value"] = panel_geometry
         mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
 
@@ -3373,6 +3387,7 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.action = 'cancelled'
 
         self.new_theme_json_dir = None
+        # Establish the user login name and home directory.
         this_platform = platform.system()
         if this_platform == "Windows":
             self.user_home_dir = os.getenv("UserProfile")
@@ -3742,6 +3757,7 @@ class ProvenanceDialog(ctk.CTkToplevel):
         widget_row += 1
         self.btn_keystone_colour = ctk.CTkButton(master=frm_widgets,
                                             height=70,
+                                            border_width=2,
                                             width=50)
         self.btn_keystone_colour.grid(row=widget_row, column=1, padx=5, pady=(0, 5), sticky='w')
 
@@ -3780,7 +3796,7 @@ class ProvenanceDialog(ctk.CTkToplevel):
             self.lbl_harmony_method.configure(text=value)
         elif property_name == 'keystone_colour':
             self.lbl_keystone_colour.configure(text=value)
-            self.btn_keystone_colour.configure(fg_color=value, bg_color=value, text=value)
+            self.btn_keystone_colour.configure(fg_color=value, hover_color=value, text=value)
 
 
 class AppearanceMode(Enum):
@@ -3818,52 +3834,6 @@ class WidgetType(Enum):
     CHECKBOX = 13
     RADIOBUTTON = 14
 
-
-"""
-@dataclass
-class Widget(ABC):
-    def __init__(self, widget_type: WidgetType, colours: list):
-        self.widget = {"widget_type": widget_type,
-                        "widget_properties": {"colours": colours}}
-        self.widget_type = widget_type
-        self.colours = colours
-        self.light_mode_colour: str = colours[0]
-        self.dark_mode_colour: str = colours[1]
-
-    @property
-    @abstractmethod
-    def widget(self):
-        pass
-
-    @widget.setter
-    def widget(self, colours: list):
-        pass
-
-
-@dataclass
-class Button(Widget):
-    @property
-    def widget(self, widget_type: WidgetType, colours: list):
-        pass
-
-    widget_type = WidgetType.BUTTON
-
-
-@dataclass
-class WidgetShape(ABC):
-    property: str
-    corner_radius: int
-
-
-@dataclass
-class CommandController:
-    def __init__(self, control_panel: Type[ControlPanel]):
-        self.control = control_panel
-        self.widgets = list[Widget] = field(default_factory=list)
-
-    def execute_command(self, command_type: str, command):
-        pass
-"""
 
 if __name__ == "__main__":
     ap = argparse.ArgumentParser(formatter_class=SortingHelpFormatter
