@@ -693,7 +693,7 @@ class ControlPanel(ctk.CTk):
 
     def about(self):
         about_dialog = About()
-    
+
     def launch_preferences_dialog(self):
         preferences_dialog = PreferencesDialog()
         self.wait_window(preferences_dialog)
@@ -1030,6 +1030,10 @@ class ControlPanel(ctk.CTk):
         column += 1
 
     def launch_widget_geometry(self, widget_type):
+        """This method launches the geometry maintenance dialog from the Control Panel. It allows the user to
+        define the shape (corner radius), border width etc. of a widget."""
+        # The interactions between this dialog and the Control Panel are strongly linked, making it less
+        # straight forward to define as a class.
         def slider_callback(property_name, value):
             label_text = property_name.replace('_', ' ')
             base_label_text = label_text.replace(widget_type.lower(), '') + ': '
@@ -1044,6 +1048,12 @@ class ControlPanel(ctk.CTk):
                 geometry_widget.select()
 
             update_widget_geometry(widget=geometry_widget, widget_property=config_param, property_value=property_value)
+
+        def deselect_widget(widget_id):
+            """This local function is provided as a means to deselect the CTkRadioButton. This is for when the user
+            clicks on the rendered button, in the geometry edit dialogue, and they subsequently need to show it
+            de-selected."""
+            widget_id.deselect()
 
         self.geometry_edit_values = {}
         preview_frame_top = self.theme_json_data['CTkFrame']['top_fg_color'][
