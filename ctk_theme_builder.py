@@ -693,7 +693,7 @@ class ControlPanel(ctk.CTk):
 
     def about(self):
         about_dialog = About()
-    
+
     def launch_preferences_dialog(self):
         preferences_dialog = PreferencesDialog()
         self.wait_window(preferences_dialog)
@@ -822,6 +822,7 @@ class ControlPanel(ctk.CTk):
         client.close()
 
     def render_geometry_buttons(self):
+        """Set up the geometry buttons near the top of the Control Panel"""
 
         button_height = 40
         button_width = 100
@@ -1030,452 +1031,7 @@ class ControlPanel(ctk.CTk):
         column += 1
 
     def launch_widget_geometry(self, widget_type):
-        def slider_callback(property_name, value):
-            label_text = property_name.replace('_', ' ')
-            base_label_text = label_text.replace(widget_type.lower(), '') + ': '
-            property_value = int(value)
-            label_dict[property_name].configure(text=base_label_text + str(property_value))
-            config_param = property_name.replace(f'{widget_type.lower()}_', '')
-            self.geometry_edit_values[property_name] = property_value
-
-            if config_param == 'border_width_unchecked':
-                geometry_widget.deselect()
-            elif config_param == 'border_width_checked':
-                geometry_widget.select()
-
-            update_widget_geometry(widget=geometry_widget, widget_property=config_param, property_value=property_value)
-
-        self.geometry_edit_values = {}
-        preview_frame_top = self.theme_json_data['CTkFrame']['top_fg_color'][
-            cbtk.str_mode_to_int(self.appearance_mode)]
-
-        self.top_geometry = ctk.CTkToplevel(self)
-        self.top_geometry.title(f'{widget_type} Widget Geometry')
-
-        self.restore_geom_geometry()
-
-        # Make preferences dialog modal
-        self.top_geometry.rowconfigure(0, weight=1)
-        self.top_geometry.rowconfigure(1, weight=0)
-        # self.top_geometry.columnconfigure(0, weight=0)
-        # self.top_geometry.columnconfigure(1, weight=1)
-
-        preview_text_colour = self.theme_json_data['CTkLabel']['text_color'][
-            cbtk.str_mode_to_int(self.appearance_mode)]
-
-        frm_main = ctk.CTkFrame(master=self.top_geometry, corner_radius=5)
-        frm_main.grid(column=0, row=0, sticky='nsew')
-        frm_main.columnconfigure(0, weight=0)
-        frm_main.columnconfigure((1, 2), weight=1)
-        frm_main.rowconfigure(0, weight=1)
-
-        frame_fg_color = self.theme_json_data['CTkFrame']['fg_color'][
-            cbtk.str_mode_to_int(self.appearance_mode)]
-        json_widget_type = mod.json_widget_type(widget_type=widget_type)
-
-        mode = cbtk.str_mode_to_int(self.appearance_mode)
-        if widget_type == 'CTkFrame':
-            self.top_geometry.geometry('764x280')
-            frm_widget_preview_low = ctk.CTkFrame(master=frm_main,
-                                                  fg_color=cbtk.contrast_colour(preview_frame_top, 20)
-                                                  )
-            frm_main.configure(corner_radius=self.theme_json_data[widget_type]['corner_radius'])
-        else:
-            frm_widget_preview_low = ctk.CTkFrame(master=frm_main,
-                                                  corner_radius=5,
-                                                  fg_color=preview_frame_top)
-
-        frm_widget_preview_low.grid(column=1, row=0, padx=10, pady=10, sticky='nsew')
-
-        frm_controls = ctk.CTkFrame(master=frm_main)
-        frm_controls.grid(column=0, row=0, padx=10, pady=10, sticky='nsew')
-
-        frm_buttons = ctk.CTkFrame(master=frm_main)
-        frm_buttons.grid(column=0, row=1, padx=10, pady=(0, 10), sticky='ew')
-
-        frm_label = ctk.CTkFrame(master=frm_main)
-        frm_label.grid(column=1, row=1, padx=10, pady=(0, 10), sticky='ew')
-
-        widget_label = ctk.CTkLabel(master=frm_label, text=f'{widget_type} Geometry',
-                                    font=mod.HEADING5,
-                                    justify=ctk.CENTER)
-        widget_label.grid(row=0, column=0, padx=(30, 30), sticky='ew')
-
-        # Control buttons
-        btn_close = ctk.CTkButton(master=frm_buttons, text='Cancel', command=self.close_geometry_dialog)
-        btn_close.grid(row=0, column=0, padx=(25, 35), pady=5)
-
-        btn_save = ctk.CTkButton(master=frm_buttons, text='Save',
-                                 command=lambda w_type=widget_type: self.save_geometry_edits(widget_type=w_type))
-        btn_save.grid(row=0, column=1, padx=(160, 15), pady=5)
-
-        geometry_parameters_file = str(ETC_DIR / 'geometry_parameters.json')
-        geometry_parameters_file = Path(geometry_parameters_file)
-        geometry_parameters_file_json = mod.json_dict(json_file_path=geometry_parameters_file)
-
-        if widget_type == 'CTkButton':
-            self.top_geometry.geometry('764x234')
-            button_text_colour = self.theme_json_data[json_widget_type]['text_color'][mode]
-            button_fg_colour = self.theme_json_data[json_widget_type]['fg_color'][mode]
-            button_hover_colour = self.theme_json_data[json_widget_type]['hover_color'][mode]
-            button_border_colour = self.theme_json_data[json_widget_type]['border_color'][mode]
-
-            geometry_widget = ctk.CTkButton(master=frm_widget_preview_low,
-                                            text_color=button_text_colour,
-                                            fg_color=button_fg_colour,
-                                            hover_color=button_hover_colour,
-                                            border_color=button_border_colour,
-                                            text='CTkButton',
-                                            corner_radius=self.theme_json_data['CTkButton']['corner_radius'],
-                                            border_width=self.theme_json_data['CTkButton']['border_width'])
-        elif widget_type == 'CTkCheckBox':
-            self.top_geometry.geometry('786x232')
-            checkbox_fg_color = self.theme_json_data['CTkCheckbox']['fg_color'][mode]
-
-            checkbox_border_color = self.theme_json_data['CTkCheckbox']['border_color'][mode]
-
-            checkbox_hover_color = self.theme_json_data['CTkCheckbox']['hover_color'][mode]
-
-            checkbox_checkmark_color = self.theme_json_data['CTkCheckbox']['checkmark_color'][mode]
-
-            checkbox_text_color = self.theme_json_data['CTkCheckbox']['text_color'][mode]
-
-            geometry_widget = ctk.CTkCheckBox(master=frm_widget_preview_low,
-                                              fg_color=checkbox_fg_color,
-                                              border_color=checkbox_border_color,
-                                              hover_color=checkbox_hover_color,
-                                              checkmark_color=checkbox_checkmark_color,
-                                              text_color=checkbox_text_color,
-                                              corner_radius=self.theme_json_data['CTkCheckbox']['corner_radius'],
-                                              border_width=self.theme_json_data['CTkCheckbox']['border_width'])
-        elif widget_type == 'CTkComboBox':
-            self.top_geometry.geometry('795x234')
-
-            combobox_fg_color = self.theme_json_data['CTkComboBox']['fg_color'][mode]
-
-            combobox_text_color = self.theme_json_data['CTkComboBox']['text_color'][mode]
-
-            combobox_border_color = self.theme_json_data['CTkComboBox']['border_color'][mode]
-
-            combobox_button_colour = self.theme_json_data[json_widget_type]['button_color'][mode]
-
-            combobox_button_hover_colour = self.theme_json_data[json_widget_type]['button_hover_color'][mode]
-
-            dropdown_fg_colour = self.theme_json_data['DropdownMenu']['fg_color'][mode]
-
-            dropdown_hover_colour = self.theme_json_data['DropdownMenu']['hover_color'][mode]
-
-            dropdown_text_colour = self.theme_json_data['DropdownMenu']['text_color'][mode]
-
-            geometry_widget = ctk.CTkComboBox(master=frm_widget_preview_low,
-                                              fg_color=combobox_fg_color,
-                                              text_color=combobox_text_color,
-                                              border_color=combobox_border_color,
-                                              button_color=combobox_button_colour,
-                                              button_hover_color=combobox_button_hover_colour,
-                                              dropdown_fg_color=dropdown_fg_colour,
-                                              dropdown_text_color=dropdown_text_colour,
-                                              dropdown_hover_color=dropdown_hover_colour,
-                                              corner_radius=self.theme_json_data['CTkCheckbox']['corner_radius'],
-                                              border_width=self.theme_json_data['CTkCheckbox']['border_width'],
-                                              values=["Option 1", "Option 2", "Option 3", "Option 4..."])
-        elif widget_type == 'CTkFrame':
-            self.top_geometry.geometry('764x280')
-            geometry_widget = ctk.CTkFrame(master=frm_widget_preview_low, fg_color=preview_frame_top,
-                                           corner_radius=self.theme_json_data['CTkFrame']['corner_radius'],
-                                           border_width=self.theme_json_data['CTkFrame']['border_width'])
-
-            lbl_frame = ctk.CTkLabel(master=geometry_widget, text_color=preview_text_colour, text='CTKFrame')
-            lbl_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
-
-        elif widget_type == 'CTkLabel':
-            self.top_geometry.geometry('755x160')
-            geometry_widget = ctk.CTkLabel(master=frm_widget_preview_low,
-                                           text_color=preview_text_colour,
-                                           fg_color=cbtk.contrast_colour(preview_frame_top, 15),
-                                           corner_radius=self.theme_json_data[widget_type]['corner_radius'])
-            widget_tooltip = CTkToolTip(geometry_widget, wraplength=200, justify='left',
-                                        message='The CTkLabel widget has been intentionally '
-                                                'rendered with a contrasting fg_color, so that '
-                                                'the corner radius effect may be seen.')
-        elif widget_type == 'CTkEntry':
-            fg_color = self.theme_json_data['CTkEntry']['fg_color'][mode]
-            border_color = self.theme_json_data['CTkEntry']['border_color'][mode]
-            self.top_geometry.geometry('754x235')
-            geometry_widget = ctk.CTkEntry(master=frm_widget_preview_low,
-                                           placeholder_text="CTkEntry",
-                                           fg_color=fg_color,
-                                           border_color=border_color)
-
-        elif widget_type == 'CTkProgressBar':
-            self.top_geometry.geometry('807x225')
-            progressbar_fg_color = self.theme_json_data['CTkProgressBar']['fg_color'][mode]
-
-            progressbar_progress_color = self.theme_json_data['CTkProgressBar']['progress_color'][mode]
-
-            progressbar_border_color = self.theme_json_data['CTkProgressBar']['border_color'][mode]
-            geometry_widget = ctk.CTkProgressBar(master=frm_widget_preview_low,
-                                                 fg_color=progressbar_fg_color,
-                                                 progress_color=progressbar_progress_color,
-                                                 border_color=progressbar_border_color,
-                                                 corner_radius=self.theme_json_data[json_widget_type]
-                                                 ['corner_radius'],
-                                                 border_width=self.theme_json_data[json_widget_type]
-                                                 ['border_width'])
-        elif widget_type == 'CTkSlider':
-            self.top_geometry.geometry('760x301')
-            geometry_widget = ctk.CTkSlider(master=frm_widget_preview_low,
-                                            border_width=self.theme_json_data[widget_type]['border_width'])
-
-        elif widget_type == 'CTkOptionMenu':
-            self.top_geometry.geometry('806x161')
-
-            optionmenu_fg_colour = self.theme_json_data[json_widget_type]['fg_color'][mode]
-
-            optionmenu_button_colour = self.theme_json_data[json_widget_type]['button_color'][mode]
-
-            optionmenu_button_hover_colour = self.theme_json_data[json_widget_type]['button_hover_color'][mode]
-
-            optionmenu_text_color = self.theme_json_data[json_widget_type]['text_color'][mode]
-
-            dropdown_fg_colour = self.theme_json_data['DropdownMenu']['fg_color'][mode]
-
-            dropdown_hover_colour = self.theme_json_data['DropdownMenu']['hover_color'][mode]
-
-            dropdown_text_colour = self.theme_json_data['DropdownMenu']['text_color'][mode]
-
-            geometry_widget = ctk.CTkOptionMenu(master=frm_widget_preview_low,
-                                                fg_color=optionmenu_fg_colour,
-                                                text_color=optionmenu_text_color,
-                                                button_color=optionmenu_button_colour,
-                                                button_hover_color=optionmenu_button_hover_colour,
-                                                dropdown_fg_color=dropdown_fg_colour,
-                                                dropdown_text_color=dropdown_text_colour,
-                                                dropdown_hover_color=dropdown_hover_colour,
-                                                corner_radius=self.theme_json_data['CTkOptionMenu']['corner_radius'],
-                                                values=["Option 1", "Option 2", "Option 3..."])
-            geometry_widget.set("CTkOptionMenu")
-
-
-        elif widget_type == 'CTkRadioButton':
-            self.top_geometry.geometry('800x301')
-            radiobutton_fg_color = self.theme_json_data['CTkRadiobutton']['fg_color'][mode]
-
-            radiobutton_border_color = self.theme_json_data['CTkRadiobutton']['border_color'][mode]
-
-            radiobutton_hover_color = self.theme_json_data['CTkRadiobutton']['hover_color'][mode]
-
-            radiobutton_text_color = self.theme_json_data['CTkRadiobutton']['text_color'][mode]
-
-            label_text_colour = self.theme_json_data['CTkLabel']['text_color'][mode]
-
-            geometry_widget = ctk.CTkRadioButton(master=frm_widget_preview_low,
-                                                 fg_color=radiobutton_fg_color,
-                                                 border_color=radiobutton_border_color,
-                                                 hover_color=radiobutton_hover_color,
-                                                 text_color=radiobutton_text_color,
-                                                 corner_radius=self.theme_json_data[json_widget_type]
-                                                 ['corner_radius'],
-                                                 border_width_checked=self.theme_json_data[json_widget_type]
-                                                 ['border_width_checked'],
-                                                 border_width_unchecked=self.theme_json_data[json_widget_type]
-                                                 ['border_width_unchecked'])
-            lbl_info = ctk.CTkLabel(master=frm_widget_preview_low,
-                                    text_color=label_text_colour,
-                                    text='Use a right button click, to\nuncheck the radio '
-                                         'button.', justify=ctk.CENTER)
-            lbl_info.grid(row=0, column=0, padx=50, pady=10)
-
-            geometry_widget.bind("<Button-3>", lambda event, widget=geometry_widget: deselect_widget(widget_id=widget))
-        elif widget_type == 'CTkSegmentedButton':
-            self.top_geometry.geometry('847x232')
-            # CTkTextbox
-            seg_fg_color = self.theme_json_data[json_widget_type]['fg_color'][mode]
-            print(f'DEBUG: applying colour: {seg_fg_color}')
-            seg_selected_color = self.theme_json_data[json_widget_type]['selected_color'][mode]
-            seg_selected_hover_color = self.theme_json_data[json_widget_type]['selected_hover_color'][mode]
-            seg_unselected_color = self.theme_json_data[json_widget_type]['unselected_color'][mode]
-            seg_unselected_hover_color = self.theme_json_data[json_widget_type]['unselected_hover_color'][mode]
-            seg_text_color = self.theme_json_data[json_widget_type]['text_color'][mode]
-            seg_text_color_disabled = self.theme_json_data[json_widget_type]['text_color_disabled'][mode]
-
-            geometry_widget = ctk.CTkSegmentedButton(master=frm_widget_preview_low,
-                                                     fg_color=seg_fg_color,
-                                                     selected_color=seg_selected_color,
-                                                     selected_hover_color=seg_selected_hover_color,
-                                                     unselected_color=seg_unselected_color,
-                                                     unselected_hover_color=seg_unselected_hover_color,
-                                                     text_color=seg_text_color,
-                                                     text_color_disabled=seg_text_color_disabled)
-            geometry_widget.grid(row=10, column=0, padx=(15, 0), pady=(30, 0), sticky="nsew", rowspan=1)
-
-            geometry_widget.configure(values=["CTkSegmentedButton", "Value 2", "Value 3"])
-            geometry_widget.set("Value 2")
-
-        elif widget_type == 'CTkSwitch':
-            self.top_geometry.geometry('766x299')
-            switch_fg_colour = self.theme_json_data[json_widget_type]['fg_color'][mode]
-
-            switch_button_colour = self.theme_json_data[json_widget_type]['button_color'][mode]
-
-            switch_button_hover_colour = self.theme_json_data[json_widget_type]['button_hover_color'][mode]
-
-            switch_progress_colour = self.theme_json_data[json_widget_type]['progress_color'][mode]
-
-            switch_text_colour = self.theme_json_data[json_widget_type]['text_color'][mode]
-
-            geometry_widget = ctk.CTkSwitch(master=frm_widget_preview_low,
-                                            fg_color=switch_fg_colour,
-                                            button_color=switch_button_colour,
-                                            text_color=switch_text_colour,
-                                            button_hover_color=switch_button_hover_colour,
-                                            progress_color=switch_progress_colour,
-                                            corner_radius=self.theme_json_data[json_widget_type]['corner_radius'],
-                                            border_width=self.theme_json_data[json_widget_type]['border_width']
-                                            )
-        elif widget_type == 'CTkScrollbar':
-            self.top_geometry.geometry('782x267')
-            # Harness the scrollbar incorporated
-            # to the CTkScrollableFrame widget.
-            self.top_geometry.geometry('800x280')
-            scrollbar_fg_color = self.theme_json_data[json_widget_type]['fg_color']
-            if not isinstance(scrollbar_fg_color, str):
-                scrollbar_fg_color = scrollbar_fg_color[cbtk.str_mode_to_int(self.appearance_mode)]
-            elif scrollbar_fg_color == "transparent":
-                scrollbar_fg_color = self.theme_json_data['CTkFrame']['fg_color'][
-                    cbtk.str_mode_to_int(self.appearance_mode)]
-            scrollbar_button_color = self.theme_json_data[json_widget_type]['button_color']
-            scrollbar_button_hover_color = self.theme_json_data[json_widget_type]['button_hover_color']
-
-            frm_preview = ctk.CTkFrame(frm_widget_preview_low, corner_radius=0)
-            frm_preview.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
-
-            # create textbox
-            textbox_fg_color = self.theme_json_data['CTkTextbox']['fg_color'][
-                cbtk.str_mode_to_int(self.appearance_mode)]
-            if not isinstance(textbox_fg_color, str):
-                textbox_fg_color = textbox_fg_color[cbtk.str_mode_to_int(self.appearance_mode)]
-            textbox_border_color = self.theme_json_data['CTkTextbox']['border_color'][
-                cbtk.str_mode_to_int(self.appearance_mode)]
-            textbox_text_color = self.theme_json_data['CTkTextbox']['text_color'][
-                cbtk.str_mode_to_int(self.appearance_mode)]
-            tk_textbox = ctk.CTkTextbox(frm_preview,
-                                        activate_scrollbars=False,
-                                        fg_color=textbox_fg_color,
-                                        border_color=textbox_border_color,
-                                        text_color=textbox_text_color,
-                                        corner_radius=0)
-            tk_textbox.grid(row=0, column=1, sticky="nsew")
-            tk_textbox.insert("0.0", text="CTkScrollBar\n\n" + "Bozzy bear woz here...\n\n" * 20)
-
-            # create CTk scrollbar
-            geometry_widget = ctk.CTkScrollbar(frm_preview,
-                                               command=tk_textbox.yview,
-                                               fg_color=scrollbar_fg_color,
-                                               button_color=scrollbar_button_color,
-                                               button_hover_color=scrollbar_button_hover_color)
-            geometry_widget.grid(row=0, column=2, sticky="ns")
-            tk_textbox.configure(yscrollcommand=geometry_widget.set)
-
-        elif widget_type == 'CTkTextbox':
-            self.top_geometry.geometry('776x243')
-            # CTkTextbox
-            textbox_fg_color = self.theme_json_data[json_widget_type]['fg_color'][mode]
-            if not isinstance(textbox_fg_color, str):
-                textbox_fg_color = textbox_fg_color[cbtk.str_mode_to_int(self.appearance_mode)][mode]
-            elif textbox_fg_color == "transparent":
-                textbox_fg_color = self.theme_json_data['CTkFrame']['fg_color'][mode]
-            textbox_border_color = self.theme_json_data[json_widget_type]['border_color'][mode]
-            textbox_button_color = self.theme_json_data[json_widget_type]['scrollbar_button_color'][mode]
-            textbox_button_hover_color = self.theme_json_data[json_widget_type]['scrollbar_button_hover_color'][mode]
-            textbox_text_color = self.theme_json_data[json_widget_type]['text_color'][mode]
-
-            geometry_widget = ctk.CTkTextbox(frm_widget_preview_low,
-                                             fg_color=textbox_fg_color,
-                                             border_color=textbox_border_color,
-                                             scrollbar_button_color=textbox_button_color,
-                                             scrollbar_button_hover_color=textbox_button_hover_color,
-                                             text_color=textbox_text_color,
-                                             width=190,
-                                             height=180)
-            geometry_widget.grid(row=10, column=0, padx=(15, 0), pady=(30, 0), sticky="nsew", rowspan=1)
-            if self.enable_tooltips:
-                textbox_tooltip = CTkToolTip(geometry_widget,
-                                             wraplength=300,
-                                             padding=(5, 5),
-                                             x_offset=-100,
-                                             justify="left",
-                                             message='CTkTextbox')
-
-            geometry_widget.insert("0.0", "CTkTextbox\n\n" + "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, "
-                                                             "sed diam nonumy eirmod tempor invidunt ut labore et "
-                                                             "dolore magna aliquyam erat, sed diam voluptua.\n\n" * 20)
-
-        else:
-            print(f'WARNING: unimplemented widget type: {widget_type}')
-
-        if widget_type not in ['CTkScrollbar']:
-            # geometry_widget.grid(row=0, column=0)
-            geometry_widget.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
-
-        widget_parameter = geometry_parameters_file_json[widget_type]
-        slider_dict = {}
-        label_dict = {}
-        property_value_dict = {}
-        row = 0
-
-        for property, parameters in widget_parameter.items():
-            lower_value = int(parameters[0])
-            upper_value = int(parameters[1])
-            label_text = property.replace('_', ' ')
-            base_label_text = label_text.replace(widget_type.lower(), '') + ': '
-            # This function call is necessary, because there are several naming
-            # inconsistencies (at least in CTk 5.1.2), between widget names.
-            json_widget_type = mod.json_widget_type(widget_type=widget_type)
-
-            current_value = int(self.theme_json_data[json_widget_type][property])
-            label_dict[property] = ctk.CTkLabel(master=frm_controls, text=base_label_text.title() + f'{current_value}')
-            label_dict[property].grid(row=row, column=0, sticky='ew', pady=(10, 0))
-            row += 1
-
-            slider_dict[property] = ctk.CTkSlider(master=frm_controls,
-                                                  from_=lower_value, to=upper_value,
-                                                  width=450, number_of_steps=100,
-                                                  command=lambda value, label_id=property: slider_callback(label_id,
-                                                                                                           value))
-            slider_dict[property].grid(row=row, column=0, padx=(25, 25), pady=(0, 15))
-            slider_dict[property].set(current_value)
-            row += 1
-
-        self.top_geometry.wait_window()
-
-    def close_geometry_dialog(self):
-        self.save_widget_geom_geometry()
-        self.top_geometry.destroy()
-
-    def save_geometry_edits(self, widget_type):
-        for widget_property, property_value in self.geometry_edit_values.items():
-            parameters = []
-            # This function call is necessary, because there are several naming
-            # inconsistencies (at least in CTk 5.1.2), between widget names.
-            json_widget_type = mod.json_widget_type(widget_type=widget_type)
-            if self.theme_json_data[json_widget_type][widget_property] != property_value:
-                self.theme_json_data[json_widget_type][widget_property] = property_value
-                self.json_state = 'dirty'
-
-                config_param = widget_property.replace(f'{widget_type.lower()}_', '')
-                parameters.append(widget_type)
-                parameters.append(config_param)
-                parameters.append(str(property_value))
-                with open(self.wip_json, "w") as f:
-                    json.dump(self.theme_json_data, f, indent=2)
-                self.send_command_json(command_type='geometry',
-                                       command='update_widget_geometry',
-                                       parameters=parameters)
-
-        if self.json_state == 'dirty':
-            self.set_option_states()
-        self.close_geometry_dialog()
+        geometry_dialog = GeometryDialog(master=self, widget_type=widget_type, theme_json_data=self.theme_json_data)
 
     def set_option_states(self):
         """This function sets the button and menu option states. The states are set based upon a combination of,
@@ -1828,16 +1384,6 @@ class ControlPanel(ctk.CTk):
         panel_geometry = self.top_harmony.geometry()
         geometry_row["preference_value"] = panel_geometry
         mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
-
-    def save_widget_geom_geometry(self):
-        """Save the widget geometry dialog's geometry to the repo, for the next time the dialog is launched."""
-        geometry_row = mod.preference_row(db_file_path=DB_FILE_PATH,
-                                          scope='window_geometry',
-                                          preference_name='widget_geometry')
-        panel_geometry = self.top_geometry.geometry()
-        geometry_row["preference_value"] = panel_geometry
-        mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
-
     def on_harmonic_close(self):
         self.rendered_keystone_shades = []
         self.save_harmonics_geometry()
@@ -1863,416 +1409,9 @@ class ControlPanel(ctk.CTk):
         self.top_harmony.resizable(False, False)
 
     def launch_harmony_dialog(self):
-
-        self.HARMONICS_HEIGHT1 = 550
-        self.HARMONICS_HEIGHT2 = 550
-        self.HARMONICS_HEIGHT3 = 650
-        self.rendered_harmony_buttons = []
-
-        self.top_harmony = tk.Toplevel(master=self)
-        self.top_harmony.title('Colour Harmonics')
-
-        self.top_harmony.columnconfigure(0, weight=1)
-        self.top_harmony.rowconfigure(0, weight=1)
-        self.restore_harmony_geometry()
-
-        frm_main = ctk.CTkFrame(master=self.top_harmony, corner_radius=0)
-        frm_main.grid(column=0, row=0, sticky='nsew')
-        frm_main.columnconfigure(0, weight=1)
-        frm_main.rowconfigure(0, weight=1)
-
-        frm_controls = ctk.CTkFrame(master=frm_main)
-        frm_controls.grid(column=0, row=0, padx=10, pady=10, sticky='new')
-
-        self.frm_harmony_colours = ctk.CTkFrame(master=frm_main)
-        self.frm_harmony_colours.grid(column=0, row=1, padx=10, pady=10, sticky='nsew')
-
-        self.frm_shades_palette = ctk.CTkFrame(master=frm_main)
-        self.frm_shades_palette.grid(column=2, row=0, padx=(0, 10), pady=10, sticky='nsew', rowspan=2)
-
-        frm_buttons = ctk.CTkFrame(master=frm_main)
-        frm_buttons.grid(column=0, row=2, padx=10, pady=(5, 0), sticky='ew', columnspan=3)
-
-        self.harmony_status_bar = cbtk.CBtkStatusBar(master=self.top_harmony,
-                                                     status_text_life=30,
-                                                     use_grid=True)
-
-        self.new_theme_json_dir = None
-
-        lbl_keystone_header = ctk.CTkLabel(master=frm_controls,
-                                           text=f'Keystone Colour',
-                                           font=HEADING4,
-                                           justify=tk.CENTER)
-
-        lbl_keystone_header.grid(row=0,
-                                 column=0,
-                                 sticky='ew',
-                                 pady=5,
-                                 padx=(25, 25))
-
-        lbl_harmony_header = ctk.CTkLabel(master=self.frm_harmony_colours,
-                                          text=f'Colour Harmony',
-                                          font=HEADING4,
-                                          justify=tk.CENTER)
-
-        lbl_harmony_header.grid(row=0,
-                                column=0,
-                                sticky='ew',
-                                pady=5,
-                                padx=(25, 25))
-
-        lbl_keystone_colour = ctk.CTkLabel(master=frm_controls,
-                                           text=f'Paste / select color:',
-                                           font=REGULAR_TEXT)
-        lbl_keystone_colour.grid(row=1,
-                                 column=0,
-                                 sticky='w',
-                                 pady=0,
-                                 padx=(25, 0))
-
-        bg_colour = self.theme_json_data.get('provenance', {}).get('keystone colour', None)
-        self.btn_keystone_colour = ctk.CTkButton(master=frm_controls,
-                                                 border_width=3,
-                                                 fg_color=bg_colour,
-                                                 width=120,
-                                                 height=90,
-                                                 corner_radius=15,
-                                                 text=''
-                                                 )
-
-        self.btn_keystone_colour.grid(row=2, column=0, padx=5, pady=(0, 10))
-
-        self.opm_harmony_method = ctk.CTkOptionMenu(master=frm_controls, values=['Analogous',
-                                                                                 'Complementary',
-                                                                                 'Split-complementary',
-                                                                                 'Triadic',
-                                                                                 'Tetradic'],
-                                                    command=self.switch_harmony_method)
-        self.opm_harmony_method.grid(row=3, column=0, padx=(10, 10), pady=(0, 10))
-        harmony_method = self.theme_json_data.get('provenance', {}).get('harmony method', 'Analogous')
-
-        self.opm_harmony_method.set(harmony_method)
-        # self.opm_harmony_method.set('Analogous')
-
-        btn_palette_tooltip = cbtk.CBtkToolTip(self.btn_keystone_colour,
-                                               text='Right click for options.')
-        mnu_keystone = cbtk.CBtkMenu(self.btn_keystone_colour, tearoff=False)
-        mnu_keystone.add_command(label="Copy",
-                                 command=self.copy_harmony_input_colour)
-
-        mnu_keystone.add_command(label="Paste",
-                                 command=self.paste_harmony_keystone_colour)
-
-        mnu_keystone.add_command(label="Colour Picker",
-                                 command=self.harmony_input_colour_picker)
-        # if self.enable_single_click_paste:
-        #    self.btn_keystone_colour.bind("<Button-1>",
-        #                     lambda event, button_id=self.paste_harmony_keystone_colour)
-
-        self.btn_keystone_colour.bind("<Button-3>",
-                                      lambda event, menu=mnu_keystone: self.context_menu(event, menu))
-
-        if self.theme is not None:
-            button_state = ctk.NORMAL
-        else:
-            button_state = ctk.DISABLED
-
-        btn_close = ctk.CTkButton(master=frm_buttons,
-                                  text='Close',
-                                  command=self.on_harmonic_close)
-
-        btn_close.grid(row=0, column=0, padx=15, pady=5)
-
-        btn_copy_to_palette = ctk.CTkButton(master=frm_buttons,
-                                            text='Copy to Palette',
-                                            state=button_state,
-                                            command=self.copy_harmonics_to_palette)
-
-        if self.enable_tooltips:
-            btn_tooltip = CTkToolTip(btn_copy_to_palette,
-                                     wraplength=250,
-                                     justify="left",
-                                     message='Copy the keystone and harmony colours (not including harmony shades),'
-                                             ' to the theme palette scratch slots.')
-
-        btn_copy_to_palette.grid(row=0, column=1, padx=15, pady=5)
-
-        if 'provenance' in self.theme_json_data:
-            btn_save_keystone = ctk.CTkButton(master=frm_buttons,
-                                              text='Tag Keystone',
-                                              state=button_state,
-                                              command=self.tag_keystone_colour_to_theme
-                                              )
-            btn_save_keystone.grid(row=0, column=2, padx=15, pady=5)
-
-            if self.enable_tooltips:
-                btn_tooltip = CTkToolTip(btn_save_keystone,
-                                         wraplength=250,
-                                         justify="left",
-                                         x_offset=-50,
-                                         message='Tag this keystone colour to the theme.\n\nThis will cause the '
-                                                 'keystone colour to be restored when the theme is opened and the '
-                                                 'Colour Harmonics dialog opened.')
-
-        harmony_method = self.theme_json_data.get('provenance', {}).get('harmony method', None)
-        self.set_harmony_keystone(colour_code=bg_colour, method=harmony_method)
-        self.switch_harmony_method()
-        self.harmony_palette_running = True
-        self.set_option_states()
-        self.top_harmony.protocol("WM_DELETE_WINDOW", self.on_harmonic_close)
-        self.top_harmony.grab_set()
-
-    def switch_harmony_method(self, event='event'):
-        """This method updates the rendered buttons, below the keystone colour button, when we change the harmony
-        method (complimentary, triadic etc)."""
-        harmony_method = self.opm_harmony_method.get()
-
-        row = 1
-        column = 0
-
-        for button in self.rendered_harmony_buttons:
-            button.destroy()
-            self.rendered_harmony_buttons = []
-
-        harmony_entries = None
-        if harmony_method == 'Analogous':
-            harmony_entries = 2
-        elif harmony_method == 'Complementary':
-            harmony_entries = 1
-        elif harmony_method == 'Split-complementary':
-            harmony_entries = 2
-        elif harmony_method == 'Triadic':
-            harmony_entries = 2
-        elif harmony_method == 'Tetradic':
-            harmony_entries = 3
-        else:
-            print(f'ERROR: Unrecognised harmony colors method: {harmony_method}')
-
-        if harmony_entries == 1:
-            self.top_harmony.geometry(f"510x{self.HARMONICS_HEIGHT1}")
-        elif harmony_entries == 2:
-            self.top_harmony.geometry(f"650x{self.HARMONICS_HEIGHT2}")
-        elif harmony_entries == 3:
-            self.top_harmony.geometry(f"800x{self.HARMONICS_HEIGHT3}")
-
-        menus = []
-        pad_x = (5, 5)
-        # Create the buttons for the generated base colours rendered mid to lower left of
-        # the colour harmonics dialog.
-        for btn_idx in range(harmony_entries):
-            btn_palette = ctk.CTkButton(master=self.frm_harmony_colours,
-                                        border_width=3,
-                                        width=120,
-                                        height=90,
-                                        corner_radius=15,
-                                        text=''
-                                        )
-
-            self.rendered_harmony_buttons.append(btn_palette)
-
-            btn_palette_tooltip = cbtk.CBtkToolTip(btn_palette,
-                                                   text='Right click for copy option.')
-
-            if row == 0 and harmony_entries > 1:
-                pad_y = (0, 0)
-            else:
-                pad_y = (0, 10)
-
-            btn_palette.grid(row=row, column=column, padx=pad_x, pady=pad_y)
-
-            row += 1
-
-            palette_button = self.rendered_harmony_buttons[btn_idx]
-            # Add pop-up/context menus to each button...
-            menus.append(cbtk.CBtkMenu(palette_button, tearoff=False))
-            menus[btn_idx].config(background=self.ctl_frame_high, foreground=self.ctl_text)
-            menus[btn_idx].add_command(label="Copy",
-                                       command=lambda button_id=btn_idx:
-                                       self.copy_harmony_colour(harmony_button_id=button_id))
-
-            btn_palette.bind("<Button-3>",
-                             lambda event, menu=menus[btn_idx], button_id=btn_idx: self.context_menu(event, menu))
-        if self.keystone_colour is not None:
-            self.populate_harmony_colours()
-            self.render_keystone_shades_palette(
-                keystone_colour=self.btn_keystone_colour.cget('fg_color'),
-                harmony_method=harmony_method)
-
-    def render_keystone_shades_palette(self, keystone_colour: str, harmony_method: str):
-        """Render the "shades palette" which displays the keystone colour, the complementary colours,
-        and the contrast shades. """
-
-        colour_object = ch.Color(mod.hex_to_rgb(keystone_colour), "", "")
-
-        harmony_entries = 0
-        shade_button_rows = 4
-        harmony_colours = None
-        if harmony_method == 'Analogous':
-            harmony_colours = ch.analogousColor(colour_object)
-            harmony_entries = 2
-        elif harmony_method == 'Complementary':
-            harmony_colours = ch.complementaryColor(colour_object)
-            harmony_entries = 1
-        elif harmony_method == 'Split-complementary':
-            harmony_colours = ch.splitComplementaryColor(colour_object)
-            harmony_entries = 2
-        elif harmony_method == 'Triadic':
-            harmony_colours = ch.triadicColor(colour_object)
-            harmony_entries = 2
-        elif harmony_method == 'Tetradic':
-            harmony_colours = ch.tetradicColor(colour_object)
-            harmony_entries = 3
-
-        harmony_colours_list = [keystone_colour]
-        if harmony_entries == 1:
-            colour = tuple(harmony_colours)
-            harmony_colour = mod.rgb_to_hex(colour)
-            harmony_colours_list.append(harmony_colour)
-        else:
-            for colour in harmony_colours:
-                harmony_colour = mod.rgb_to_hex(tuple(colour))
-                harmony_colours_list.append(harmony_colour)
-
-        num_harmony_colours = len(harmony_colours_list)
-
-        harmonic_differential = self.harmony_contrast_differential
-        num_shade_buttons = num_harmony_colours * shade_button_rows
-
-        harmony_idx = 0
-        contrast_step = 0
-
-        # Create a list of colour shade mappings to assign to the shade buttons that we are about to generate.
-        shades_list = []
-
-        for idx in range(num_shade_buttons):
-            colour = harmony_colours_list[harmony_idx]
-            colour = cbtk.contrast_colour(colour, contrast_step * harmonic_differential)
-            shades_list.append(colour)
-            if harmony_idx < num_harmony_colours - 1:
-                harmony_idx += 1
-            else:
-                contrast_step += 1
-                harmony_idx = 0
-
-        pad_x = 10
-        pad_y = 5
-        menus = []
-
-        for button in self.rendered_keystone_shades:
-            button.destroy()
-        self.rendered_keystone_shades = []
-
-        row = 0
-        column = 0
-        rows_limit = 4
-        num_shade_buttons = harmony_entries * 4
-        for btn_idx in range(len(shades_list)):
-            btn_keystone_shade = ctk.CTkButton(master=self.frm_shades_palette,
-                                               fg_color=shades_list[btn_idx],
-                                               hover_color=cbtk.contrast_colour(shades_list[btn_idx], 10),
-                                               border_width=3,
-                                               width=110,
-                                               height=100,
-                                               corner_radius=10,
-                                               text=shades_list[btn_idx]
-                                               )
-
-            btn_palette_tooltip = cbtk.CBtkToolTip(btn_keystone_shade,
-                                                   text='Right click for copy option.')
-
-            btn_keystone_shade.grid(row=row, column=column, padx=pad_x, pady=pad_y)
-            self.rendered_keystone_shades.append(btn_keystone_shade)
-
-            column += 1
-
-            palette_button = self.rendered_keystone_shades[btn_idx]
-            menus.append(cbtk.CBtkMenu(palette_button, tearoff=False))
-            menus[btn_idx].config(background=self.ctl_frame_high, foreground=self.ctl_text)
-            menus[btn_idx].add_command(label="Copy",
-                                       command=lambda button_id=btn_idx:
-                                       self.copy_keystone_colour(harmony_button_id=button_id))
-
-            btn_keystone_shade.bind("<Button-3>",
-                                    lambda event, menu=menus[btn_idx], button_id=btn_idx: self.context_menu(event,
-                                                                                                            menu))
-
-            if column > harmony_entries:
-                column = 0
-                row += 1
-                if row == rows_limit:
-                    break
-
-    def copy_harmonics_to_palette(self):
-        harmonic_differential = self.harmony_contrast_differential
-        colour_range = [self.btn_keystone_colour.cget('fg_color')]
-
-        for btn_idx in range(len(self.rendered_harmony_buttons)):
-            colour = self.rendered_harmony_buttons[btn_idx].cget('fg_color')
-            colour_range.append(colour)
-        num_harmony_colours = len(colour_range)
-
-        num_theme_palette_tiles = len(self.theme_palette_tiles)
-
-        harmony_idx = 0
-        contrast_step = 0
-
-        num_tiles = ControlPanel.THEME_PALETTE_TILES
-        num_rows = ControlPanel.THEME_PALETTE_ROWS
-
-        for idx in range(num_harmony_colours):
-
-            colour = colour_range[harmony_idx]
-            colour = cbtk.contrast_colour(colour, contrast_step * harmonic_differential)
-            # We want to copy the gemerated colours to the "scratch" tile locations. These are
-            # the 1st two tiles (actually buttons) on each of the two palette rows, so...
-
-            self.set_palette_colour(palette_button_id=idx, colour=colour)
-
-            if harmony_idx < num_harmony_colours - 1:
-                harmony_idx += 1
-            else:
-                contrast_step += 1
-                harmony_idx = 0
-
-        self.harmony_status_bar.set_status_text(
-            status_text=f'Keystone and generated colours copied to palette.')
-
-        self.theme_json_data['provenance']['keystone colour'] = colour_range[0]
-
-        harmony_method = self.opm_harmony_method.get()
-        self.theme_json_data['provenance']['harmony method'] = harmony_method
-
-        self.json_state = 'dirty'
-        self.set_option_states()
-
-    def tag_keystone_colour_to_theme(self):
-        keystone_colour = self.btn_keystone_colour.cget('fg_color')
-        harmony_method = self.opm_harmony_method.get()
-        self.theme_json_data['provenance']['keystone colour'] = keystone_colour
-        self.theme_json_data['provenance']['harmony method'] = harmony_method
-        self.theme_json_data['provenance']['harmony differential'] = self.harmony_contrast_differential
-        self.json_state = 'dirty'
-        self.set_option_states()
-        self.harmony_status_bar.set_status_text(
-            status_text=f'Keystone colour tagged to theme {self.theme}.')
-
-    def lighten_palette_tile(self, palette_button: ctk.CTkButton,
-                             palette_button_id: int,
-                             shade_step: int,
-                             multiplier: int = 1):
-        self.set_option_states()
-        widget_colour = palette_button.cget('fg_color')
-        lighter_shade = cbtk.shade_up(color=widget_colour, differential=shade_step, multiplier=multiplier)
-        palette_button.configure(fg_color=lighter_shade)
-        if self.appearance_mode == 'Light':
-            mode_idx = 0
-        else:
-            mode_idx = 1
-        if lighter_shade != widget_colour:
-            pyperclip.copy(lighter_shade)
-            # Leverage the _paste_palette_colour method to update the widget and the preview panel.
-            self.paste_palette_colour(event=None, palette_button_id=palette_button_id)
-
+        harmonics_dialog = HarmonicsDialog(theme_name=self.theme,
+                                           theme_json_data=self.theme_json_data,
+                                           enable_tooltips=self.enable_tooltips)
     def darken_palette_tile(self, palette_button: ctk.CTkButton,
                             palette_button_id: int,
                             shade_step: int,
@@ -2331,120 +1470,6 @@ class ControlPanel(ctk.CTk):
             # Leverage the _paste_color method to update the widget and the preview panel.
             self.paste_colour(event=None, widget_property=widget_property)
 
-    def copy_harmony_input_colour(self, event=None, shade_copy=False):
-        colour = self.btn_keystone_colour.cget('fg_color')
-        if shade_copy:
-            colour = cbtk.contrast_colour(colour, self.shade_adjust_differential)
-        pyperclip.copy(colour)
-        self.harmony_status_bar.set_status_text(
-            status_text=f'Colour {colour} copied to clipboard.')
-
-    def paste_harmony_keystone_colour(self):
-        """Paste the colour currently stored in the paste buffer, to the harmony input button."""
-        new_colour = pyperclip.paste()
-        if not cbtk.valid_colour(new_colour):
-            self.harmony_status_bar.set_status_text(status_text='Attempted paste of non colour code text - ignored.')
-            return
-        harmony_method = self.opm_harmony_method.get()
-        self.set_harmony_keystone(colour_code=new_colour, method=harmony_method)
-        self.populate_harmony_colours()
-        self.harmony_status_bar.set_status_text(
-            status_text=f'Colour {new_colour} assigned.')
-
-    def set_harmony_keystone(self, colour_code: str, method: str):
-        hover_colour = cbtk.contrast_colour(colour_code)
-        if colour_code:
-            self.btn_keystone_colour.configure(fg_color=colour_code,
-                                               hover_color=hover_colour)
-
-        if method:
-            # set the harmony method, as tagged in the theme file.
-            self.opm_harmony_method.set(method)
-            self.keystone_colour = colour_code
-
-    def copy_keystone_colour(self, event=None, harmony_button_id=None, shade_copy=False):
-        colour = self.rendered_keystone_shades[harmony_button_id].cget('fg_color')
-        if shade_copy:
-            colour = cbtk.contrast_colour(colour, self.shade_adjust_differential)
-        pyperclip.copy(colour)
-        self.harmony_status_bar.set_status_text(
-            status_text=f'Colour {colour} copied from palette entry {harmony_button_id + 1} to clipboard.')
-
-    def copy_harmony_colour(self, event=None, harmony_button_id=None, shade_copy=False):
-        colour = self.rendered_harmony_buttons[harmony_button_id].cget('fg_color')
-        if shade_copy:
-            colour = cbtk.contrast_colour(colour, self.shade_adjust_differential)
-        if shade_copy:
-            colour = cbtk.contrast_colour(colour, self.shade_adjust_differential)
-        pyperclip.copy(colour)
-
-        self.harmony_status_bar.set_status_text(
-            status_text=f'Colour {colour} copied from palette entry {harmony_button_id + 1} to clipboard.')
-
-    def harmony_input_colour_picker(self):
-        # self.harmonics_label_count
-        primary_colour = askcolor(master=self.top_harmony,
-                                  initialcolor=self.keystone_colour,
-                                  title=f'Harmony Source Colour Selection')
-
-        if primary_colour[1] is not None:
-            primary_colour = primary_colour[1]
-            self.btn_keystone_colour.configure(fg_color=primary_colour,
-                                               hover_color=primary_colour)
-            self.status_bar.set_status_text(
-                status_text=f'Colour {primary_colour} assigned.')
-            self.keystone_colour = primary_colour
-            self.populate_harmony_colours()
-
-    def harmony_colour_picker(self, palette_button_id):
-        # self.harmonics_label_count
-        primary_colour = askcolor(master=self.top_harmony,
-                                  title=f'Harmony Source Colour Selection')
-
-        if primary_colour[1] is not None:
-            primary_colour = primary_colour[1]
-            self.rendered_harmony_buttons[0].configure(fg_color=primary_colour,
-                                                       hover_color=primary_colour)
-            self.status_bar.set_status_text(
-                status_text=f'Colour {primary_colour} assigned to palette entry {palette_button_id + 1}.')
-            self.keystone_colour = primary_colour
-        self.populate_harmony_colours()
-
-    def populate_harmony_colours(self):
-        primary_colour = self.keystone_colour
-        harmony_method = self.opm_harmony_method.get()
-        colour_object = ch.Color(mod.hex_to_rgb(self.keystone_colour), "", "")
-
-        harmony_entries = 0
-        harmony_colours = None
-        if harmony_method == 'Analogous':
-            harmony_colours = ch.analogousColor(colour_object)
-            harmony_entries = 2
-        elif harmony_method == 'Complementary':
-            harmony_colours = ch.complementaryColor(colour_object)
-            harmony_entries = 1
-        elif harmony_method == 'Split-complementary':
-            harmony_colours = ch.splitComplementaryColor(colour_object)
-            harmony_entries = 2
-        elif harmony_method == 'Triadic':
-            harmony_colours = ch.triadicColor(colour_object)
-            harmony_entries = 2
-        elif harmony_method == 'Tetradic':
-            harmony_colours = ch.tetradicColor(colour_object)
-            harmony_entries = 3
-        elif harmony_method == 'Monochromatic':
-            harmony_colours = ch.monochromaticColor(colour_object)
-            harmony_entries = 9
-
-        for btn_idx in range(harmony_entries):
-            if harmony_entries == 1:
-                colour = harmony_colours
-            else:
-                colour = harmony_colours[btn_idx]
-            harmony_colour = mod.rgb_to_hex(colour)
-            self.rendered_harmony_buttons[btn_idx].configure(fg_color=harmony_colour,
-                                                             hover_color=harmony_colour)
-        self.render_keystone_shades_palette(keystone_colour=primary_colour, harmony_method=harmony_method)
 
     def load_theme_palette(self, theme_name=None):
         """Determine and open the JSON theme palette file, for the selected theme, and marry the colours mapped in
@@ -3107,6 +2132,580 @@ class ControlPanel(ctk.CTk):
         self.status_bar.set_status_text(status_text=f'Theme file, {theme_file_name}, saved successfully!')
         self.save_theme_palette()
 
+class HarmonicsDialog(ctk.CTkToplevel):
+    def __init__(self, theme_name, theme_json_data: dict, enable_tooltips: bool, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.HARMONICS_HEIGHT1 = 550
+        self.HARMONICS_HEIGHT2 = 550
+        self.HARMONICS_HEIGHT3 = 650
+        self.theme_json_data = theme_json_data
+        self.rendered_harmony_buttons = []
+        self.theme_name = theme_name
+
+        self.harmony_contrast_differential = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                                    preference_name='harmony_contrast_differential')
+
+        control_panel_theme = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                     scope='user_preference', preference_name='control_panel_theme')
+
+        control_panel_theme = control_panel_theme + '.json'
+
+        self.control_panel_theme = str(APP_THEMES_DIR / control_panel_theme)
+        # The control_panel_mode holds the  CustomTkinter appearance mode (Dark / Light)
+
+        self.control_panel_mode = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                         scope='user_preference', preference_name='control_panel_mode')
+        self.TEMP_DIR = TEMP_DIR
+
+        ctl_mode_idx = cbtk.str_mode_to_int(self.control_panel_mode)
+        control_panel_theme_path = str(APP_THEMES_DIR / control_panel_theme)
+
+        # Some widgets we use, by necessity, are not CustomTkinter widgets. We need to colour these
+        # based on the control panel's theme.
+        self.ctl_frame_high = cbtk.theme_property_color(theme_file_path=control_panel_theme_path,
+                                                        widget_type="CTkToplevel",
+                                                        widget_property='fg_color',
+                                                        mode=self.control_panel_mode
+                                                        )
+
+        self.ctl_text = cbtk.theme_property_color(theme_file_path=control_panel_theme_path,
+                                                  widget_type="CTkLabel",
+                                                  widget_property="text_color",
+                                                  mode=self.control_panel_mode
+                                                  )
+
+        self.ctl_frame_border = cbtk.theme_property_color(theme_file_path=control_panel_theme_path,
+                                                          widget_type="CTkFrame",
+                                                          widget_property='fg_color',
+                                                          mode=self.control_panel_mode
+                                                          )
+
+
+
+        self.title('Colour Harmonics')
+
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+        self.restore_harmony_geometry()
+
+        frm_main = ctk.CTkFrame(master=self, corner_radius=0)
+        frm_main.grid(column=0, row=0, sticky='nsew')
+        frm_main.columnconfigure(0, weight=1)
+        frm_main.rowconfigure(0, weight=1)
+
+        frm_controls = ctk.CTkFrame(master=frm_main)
+        frm_controls.grid(column=0, row=0, padx=10, pady=10, sticky='new')
+
+        self.frm_harmony_colours = ctk.CTkFrame(master=frm_main)
+        self.frm_harmony_colours.grid(column=0, row=1, padx=10, pady=10, sticky='nsew')
+
+        self.frm_shades_palette = ctk.CTkFrame(master=frm_main)
+        self.frm_shades_palette.grid(column=2, row=0, padx=(0, 10), pady=10, sticky='nsew', rowspan=2)
+
+        frm_buttons = ctk.CTkFrame(master=frm_main)
+        frm_buttons.grid(column=0, row=2, padx=10, pady=(5, 0), sticky='ew', columnspan=3)
+
+        self.harmony_status_bar = cbtk.CBtkStatusBar(master=self,
+                                                     status_text_life=30,
+                                                     use_grid=True)
+
+        self.new_theme_json_dir = None
+
+        lbl_keystone_header = ctk.CTkLabel(master=frm_controls,
+                                           text=f'Keystone Colour',
+                                           font=HEADING4,
+                                           justify=tk.CENTER)
+
+        lbl_keystone_header.grid(row=0,
+                                 column=0,
+                                 sticky='ew',
+                                 pady=5,
+                                 padx=(25, 25))
+
+        lbl_harmony_header = ctk.CTkLabel(master=self.frm_harmony_colours,
+                                          text=f'Colour Harmony',
+                                          font=HEADING4,
+                                          justify=tk.CENTER)
+
+        lbl_harmony_header.grid(row=0,
+                                column=0,
+                                sticky='ew',
+                                pady=5,
+                                padx=(25, 25))
+
+        lbl_keystone_colour = ctk.CTkLabel(master=frm_controls,
+                                           text=f'Paste / select color:',
+                                           font=REGULAR_TEXT)
+        lbl_keystone_colour.grid(row=1,
+                                 column=0,
+                                 sticky='w',
+                                 pady=0,
+                                 padx=(25, 0))
+
+        bg_colour = self.theme_json_data.get('provenance', {}).get('keystone colour', None)
+        self.btn_keystone_colour = ctk.CTkButton(master=frm_controls,
+                                                 border_width=3,
+                                                 fg_color=bg_colour,
+                                                 width=120,
+                                                 height=90,
+                                                 corner_radius=15,
+                                                 text=''
+                                                 )
+
+        self.btn_keystone_colour.grid(row=2, column=0, padx=5, pady=(0, 10))
+
+        self.opm_harmony_method = ctk.CTkOptionMenu(master=frm_controls, values=['Analogous',
+                                                                                 'Complementary',
+                                                                                 'Split-complementary',
+                                                                                 'Triadic',
+                                                                                 'Tetradic'],
+                                                    command=self.switch_harmony_method)
+        self.opm_harmony_method.grid(row=3, column=0, padx=(10, 10), pady=(0, 10))
+        harmony_method = self.theme_json_data.get('provenance', {}).get('harmony method', 'Analogous')
+
+        self.opm_harmony_method.set(harmony_method)
+
+        btn_palette_tooltip = cbtk.CBtkToolTip(self.btn_keystone_colour,
+                                               text='Right click for options.')
+        mnu_keystone = cbtk.CBtkMenu(self.btn_keystone_colour, tearoff=False)
+        mnu_keystone.add_command(label="Copy",
+                                 command=self.copy_harmony_input_colour)
+
+        mnu_keystone.add_command(label="Paste",
+                                 command=self.paste_harmony_keystone_colour)
+
+        mnu_keystone.add_command(label="Colour Picker",
+                                 command=self.harmony_input_colour_picker)
+        # if self.enable_single_click_paste:
+        #    self.btn_keystone_colour.bind("<Button-1>",
+        #                     lambda event, button_id=self.paste_harmony_keystone_colour)
+
+        self.btn_keystone_colour.bind("<Button-3>",
+                                      lambda event, menu=mnu_keystone: self.context_menu(event, menu))
+
+        if self.theme_name is not None:
+            button_state = ctk.NORMAL
+        else:
+            button_state = ctk.DISABLED
+
+        btn_close = ctk.CTkButton(master=frm_buttons,
+                                  text='Close',
+                                  command=self.on_harmonic_close)
+
+        btn_close.grid(row=0, column=0, padx=15, pady=5)
+
+        btn_copy_to_palette = ctk.CTkButton(master=frm_buttons,
+                                            text='Copy to Palette',
+                                            state=button_state,
+                                            command=self.copy_harmonics_to_palette)
+
+        if enable_tooltips:
+            btn_tooltip = CTkToolTip(btn_copy_to_palette,
+                                     wraplength=250,
+                                     justify="left",
+                                     message='Copy the keystone and harmony colours (not including harmony shades),'
+                                             ' to the theme palette scratch slots.')
+
+        btn_copy_to_palette.grid(row=0, column=1, padx=15, pady=5)
+
+        if 'provenance' in self.theme_json_data:
+            btn_save_keystone = ctk.CTkButton(master=frm_buttons,
+                                              text='Tag Keystone',
+                                              state=button_state,
+                                              command=self.tag_keystone_colour_to_theme
+                                              )
+            btn_save_keystone.grid(row=0, column=2, padx=15, pady=5)
+
+            if enable_tooltips:
+                btn_tooltip = CTkToolTip(btn_save_keystone,
+                                         wraplength=250,
+                                         justify="left",
+                                         x_offset=-50,
+                                         message='Tag this keystone colour to the theme.\n\nThis will cause the '
+                                                 'keystone colour to be restored when the theme is opened and the '
+                                                 'Colour Harmonics dialog opened.')
+
+        harmony_method = self.theme_json_data.get('provenance', {}).get('harmony method', None)
+        self.set_harmony_keystone(colour_code=bg_colour, method=harmony_method)
+        self.switch_harmony_method()
+        self.harmony_palette_running = True
+        self.master.set_option_states()
+        self.protocol("WM_DELETE_WINDOW", self.on_harmonic_close)
+        self.grab_set()
+
+    @staticmethod
+    def context_menu(event: tk.Event = None, menu: cbtk.CBtkMenu = None):
+        menu.tk_popup(event.x_root, event.y_root)
+
+    def restore_harmony_geometry(self):
+        """Restore window geometry from auto-saved preferences"""
+        default_geometry = f"{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}+347+93"
+        saved_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                scope='window_geometry',
+                                                preference_name='harmonics_panel', default=default_geometry)
+        self.geometry(saved_geometry)
+        self.resizable(False, False)
+
+    def copy_harmony_input_colour(self, event=None):
+        colour = self.btn_keystone_colour.cget('fg_color')
+        pyperclip.copy(colour)
+        self.harmony_status_bar.set_status_text(
+            status_text=f'Colour {colour} copied to clipboard.')
+
+    def paste_harmony_keystone_colour(self):
+        """Paste the colour currently stored in the paste buffer, to the harmony input button."""
+        new_colour = pyperclip.paste()
+        if not cbtk.valid_colour(new_colour):
+            self.harmony_status_bar.set_status_text(status_text='Attempted paste of non colour code text - ignored.')
+            return
+        harmony_method = self.opm_harmony_method.get()
+        self.set_harmony_keystone(colour_code=new_colour, method=harmony_method)
+        self.populate_harmony_colours()
+        self.harmony_status_bar.set_status_text(
+            status_text=f'Colour {new_colour} assigned.')
+
+    def set_harmony_keystone(self, colour_code: str, method: str):
+        hover_colour = cbtk.contrast_colour(colour_code)
+        if colour_code:
+            self.btn_keystone_colour.configure(fg_color=colour_code,
+                                               hover_color=hover_colour)
+
+        if method:
+            # set the harmony method, as tagged in the theme file.
+            self.opm_harmony_method.set(method)
+            self.keystone_colour = colour_code
+
+    def copy_keystone_colour(self, event=None, harmony_button_id=None, shade_copy=False):
+        colour = self.rendered_keystone_shades[harmony_button_id].cget('fg_color')
+        if shade_copy:
+            colour = cbtk.contrast_colour(colour, self.shade_adjust_differential)
+        pyperclip.copy(colour)
+        self.harmony_status_bar.set_status_text(
+            status_text=f'Colour {colour} copied from palette entry {harmony_button_id + 1} to clipboard.')
+
+    def copy_harmony_colour(self, event=None, harmony_button_id=None, shade_copy=False):
+        colour = self.rendered_harmony_buttons[harmony_button_id].cget('fg_color')
+        pyperclip.copy(colour)
+
+        self.harmony_status_bar.set_status_text(
+            status_text=f'Colour {colour} copied from palette entry {harmony_button_id + 1} to clipboard.')
+
+    def harmony_input_colour_picker(self):
+        # self.harmonics_label_count
+        primary_colour = askcolor(master=self,
+                                  initialcolor=self.keystone_colour,
+                                  title=f'Harmony Source Colour Selection')
+
+        if primary_colour[1] is not None:
+            primary_colour = primary_colour[1]
+            self.btn_keystone_colour.configure(fg_color=primary_colour,
+                                               hover_color=primary_colour)
+            self.master.status_bar.set_status_text(
+                status_text=f'Colour {primary_colour} assigned.')
+            self.keystone_colour = primary_colour
+            self.populate_harmony_colours()
+
+    def harmony_colour_picker(self, palette_button_id):
+        # self.harmonics_label_count
+        primary_colour = askcolor(master=self,
+                                  title=f'Harmony Source Colour Selection')
+
+        if primary_colour[1] is not None:
+            primary_colour = primary_colour[1]
+            self.rendered_harmony_buttons[0].configure(fg_color=primary_colour,
+                                                       hover_color=primary_colour)
+            self.master.status_bar.set_status_text(
+                status_text=f'Colour {primary_colour} assigned to palette entry {palette_button_id + 1}.')
+            self.keystone_colour = primary_colour
+        self.populate_harmony_colours()
+
+    def populate_harmony_colours(self):
+        primary_colour = self.keystone_colour
+        harmony_method = self.opm_harmony_method.get()
+        colour_object = ch.Color(mod.hex_to_rgb(self.keystone_colour), "", "")
+
+        harmony_entries = 0
+        harmony_colours = None
+        if harmony_method == 'Analogous':
+            harmony_colours = ch.analogousColor(colour_object)
+            harmony_entries = 2
+        elif harmony_method == 'Complementary':
+            harmony_colours = ch.complementaryColor(colour_object)
+            harmony_entries = 1
+        elif harmony_method == 'Split-complementary':
+            harmony_colours = ch.splitComplementaryColor(colour_object)
+            harmony_entries = 2
+        elif harmony_method == 'Triadic':
+            harmony_colours = ch.triadicColor(colour_object)
+            harmony_entries = 2
+        elif harmony_method == 'Tetradic':
+            harmony_colours = ch.tetradicColor(colour_object)
+            harmony_entries = 3
+        elif harmony_method == 'Monochromatic':
+            harmony_colours = ch.monochromaticColor(colour_object)
+            harmony_entries = 9
+
+        for btn_idx in range(harmony_entries):
+            if harmony_entries == 1:
+                colour = harmony_colours
+            else:
+                colour = harmony_colours[btn_idx]
+            harmony_colour = mod.rgb_to_hex(colour)
+            self.rendered_harmony_buttons[btn_idx].configure(fg_color=harmony_colour,
+                                                             hover_color=harmony_colour)
+        self.render_keystone_shades_palette(keystone_colour=primary_colour, harmony_method=harmony_method)
+    def save_harmonics_geometry(self):
+        """Save the harmonics panel geometry to the repo, for the next time the dialog is launched."""
+        geometry_row = mod.preference_row(db_file_path=DB_FILE_PATH,
+                                          scope='window_geometry',
+                                          preference_name='harmonics_panel')
+        panel_geometry = self.geometry()
+        geometry_row["preference_value"] = panel_geometry
+        mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
+
+    def on_harmonic_close(self):
+        self.rendered_keystone_shades = []
+        self.save_harmonics_geometry()
+        self.destroy()
+        self.harmony_palette_running = False
+        self.master.set_option_states()
+    def switch_harmony_method(self, event='event'):
+        """This method updates the rendered buttons, below the keystone colour button, when we change the harmony
+        method (complimentary, triadic etc)."""
+        harmony_method = self.opm_harmony_method.get()
+
+        row = 1
+        column = 0
+
+        for button in self.rendered_harmony_buttons:
+            button.destroy()
+            self.rendered_harmony_buttons = []
+
+        harmony_entries = None
+        if harmony_method == 'Analogous':
+            harmony_entries = 2
+        elif harmony_method == 'Complementary':
+            harmony_entries = 1
+        elif harmony_method == 'Split-complementary':
+            harmony_entries = 2
+        elif harmony_method == 'Triadic':
+            harmony_entries = 2
+        elif harmony_method == 'Tetradic':
+            harmony_entries = 3
+        else:
+            print(f'ERROR: Unrecognised harmony colors method: {harmony_method}')
+
+        if harmony_entries == 1:
+            self.geometry(f"510x{self.HARMONICS_HEIGHT1}")
+        elif harmony_entries == 2:
+            self.geometry(f"650x{self.HARMONICS_HEIGHT2}")
+        elif harmony_entries == 3:
+            self.geometry(f"800x{self.HARMONICS_HEIGHT3}")
+
+        menus = []
+        pad_x = (5, 5)
+        # Create the buttons for the generated base colours rendered mid to lower left of
+        # the colour harmonics dialog.
+        for btn_idx in range(harmony_entries):
+            btn_palette = ctk.CTkButton(master=self.frm_harmony_colours,
+                                        border_width=3,
+                                        width=120,
+                                        height=90,
+                                        corner_radius=15,
+                                        text=''
+                                        )
+
+            self.rendered_harmony_buttons.append(btn_palette)
+
+            btn_palette_tooltip = cbtk.CBtkToolTip(btn_palette,
+                                                   text='Right click for copy option.')
+
+            if row == 0 and harmony_entries > 1:
+                pad_y = (0, 0)
+            else:
+                pad_y = (0, 10)
+
+            btn_palette.grid(row=row, column=column, padx=pad_x, pady=pad_y)
+
+            row += 1
+
+            palette_button = self.rendered_harmony_buttons[btn_idx]
+            # Add pop-up/context menus to each button...
+            menus.append(cbtk.CBtkMenu(palette_button, tearoff=False))
+            menus[btn_idx].config(background=self.ctl_frame_high, foreground=self.ctl_text)
+            menus[btn_idx].add_command(label="Copy",
+                                       command=lambda button_id=btn_idx:
+                                       self.copy_harmony_colour(harmony_button_id=button_id))
+
+            btn_palette.bind("<Button-3>",
+                             lambda event, menu=menus[btn_idx], button_id=btn_idx: self.context_menu(event, menu))
+        if self.keystone_colour is not None:
+            self.populate_harmony_colours()
+            self.render_keystone_shades_palette(
+                keystone_colour=self.btn_keystone_colour.cget('fg_color'),
+                harmony_method=harmony_method)
+
+    def render_keystone_shades_palette(self, keystone_colour: str, harmony_method: str):
+        """Render the "shades palette" which displays the keystone colour, the complementary colours,
+        and the contrast shades. """
+
+        colour_object = ch.Color(mod.hex_to_rgb(keystone_colour), "", "")
+
+        harmony_entries = 0
+        shade_button_rows = 4
+        harmony_colours = None
+        if harmony_method == 'Analogous':
+            harmony_colours = ch.analogousColor(colour_object)
+            harmony_entries = 2
+        elif harmony_method == 'Complementary':
+            harmony_colours = ch.complementaryColor(colour_object)
+            harmony_entries = 1
+        elif harmony_method == 'Split-complementary':
+            harmony_colours = ch.splitComplementaryColor(colour_object)
+            harmony_entries = 2
+        elif harmony_method == 'Triadic':
+            harmony_colours = ch.triadicColor(colour_object)
+            harmony_entries = 2
+        elif harmony_method == 'Tetradic':
+            harmony_colours = ch.tetradicColor(colour_object)
+            harmony_entries = 3
+
+        harmony_colours_list = [keystone_colour]
+        if harmony_entries == 1:
+            colour = tuple(harmony_colours)
+            harmony_colour = mod.rgb_to_hex(colour)
+            harmony_colours_list.append(harmony_colour)
+        else:
+            for colour in harmony_colours:
+                harmony_colour = mod.rgb_to_hex(tuple(colour))
+                harmony_colours_list.append(harmony_colour)
+
+        num_harmony_colours = len(harmony_colours_list)
+
+        harmonic_differential = self.harmony_contrast_differential
+        num_shade_buttons = num_harmony_colours * shade_button_rows
+
+        harmony_idx = 0
+        contrast_step = 0
+
+        # Create a list of colour shade mappings to assign to the shade buttons that we are about to generate.
+        shades_list = []
+
+        for idx in range(num_shade_buttons):
+            colour = harmony_colours_list[harmony_idx]
+            colour = cbtk.contrast_colour(colour, contrast_step * harmonic_differential)
+            shades_list.append(colour)
+            if harmony_idx < num_harmony_colours - 1:
+                harmony_idx += 1
+            else:
+                contrast_step += 1
+                harmony_idx = 0
+
+        pad_x = 10
+        pad_y = 5
+        menus = []
+
+        for button in self.master.rendered_keystone_shades:
+            button.destroy()
+        self.rendered_keystone_shades = []
+
+        row = 0
+        column = 0
+        rows_limit = 4
+        num_shade_buttons = harmony_entries * 4
+        for btn_idx in range(len(shades_list)):
+            btn_keystone_shade = ctk.CTkButton(master=self.frm_shades_palette,
+                                               fg_color=shades_list[btn_idx],
+                                               hover_color=cbtk.contrast_colour(shades_list[btn_idx], 10),
+                                               border_width=3,
+                                               width=110,
+                                               height=100,
+                                               corner_radius=10,
+                                               text=shades_list[btn_idx]
+                                               )
+
+            btn_palette_tooltip = cbtk.CBtkToolTip(btn_keystone_shade,
+                                                   text='Right click for copy option.')
+
+            btn_keystone_shade.grid(row=row, column=column, padx=pad_x, pady=pad_y)
+            self.rendered_keystone_shades.append(btn_keystone_shade)
+
+            column += 1
+
+            palette_button = self.rendered_keystone_shades[btn_idx]
+            menus.append(cbtk.CBtkMenu(palette_button, tearoff=False))
+            menus[btn_idx].config(background=self.ctl_frame_high, foreground=self.ctl_text)
+            menus[btn_idx].add_command(label="Copy",
+                                       command=lambda button_id=btn_idx:
+                                       self.copy_keystone_colour(harmony_button_id=button_id))
+
+            btn_keystone_shade.bind("<Button-3>",
+                                    lambda event, menu=menus[btn_idx], button_id=btn_idx: self.context_menu(event,
+                                                                                                            menu))
+
+            if column > harmony_entries:
+                column = 0
+                row += 1
+                if row == rows_limit:
+                    break
+
+    def copy_harmonics_to_palette(self):
+        harmonic_differential = self.harmony_contrast_differential
+        colour_range = [self.btn_keystone_colour.cget('fg_color')]
+
+        for btn_idx in range(len(self.rendered_harmony_buttons)):
+            colour = self.rendered_harmony_buttons[btn_idx].cget('fg_color')
+            colour_range.append(colour)
+        num_harmony_colours = len(colour_range)
+
+        num_theme_palette_tiles = len(self.master.theme_palette_tiles)
+
+        harmony_idx = 0
+        contrast_step = 0
+
+        num_tiles = ControlPanel.THEME_PALETTE_TILES
+        num_rows = ControlPanel.THEME_PALETTE_ROWS
+
+        for idx in range(num_harmony_colours):
+
+            colour = colour_range[harmony_idx]
+            colour = cbtk.contrast_colour(colour, contrast_step * harmonic_differential)
+            # We want to copy the gemerated colours to the "scratch" tile locations. These are
+            # the 1st two tiles (actually buttons) on each of the two palette rows, so...
+
+            self.master.set_palette_colour(palette_button_id=idx, colour=colour)
+
+            if harmony_idx < num_harmony_colours - 1:
+                harmony_idx += 1
+            else:
+                contrast_step += 1
+                harmony_idx = 0
+
+        self.master.json_state = 'dirty'
+
+        self.harmony_status_bar.set_status_text(
+            status_text=f'Keystone and generated colours copied to palette.')
+
+        self.theme_json_data['provenance']['keystone colour'] = colour_range[0]
+
+        harmony_method = self.opm_harmony_method.get()
+        self.theme_json_data['provenance']['harmony method'] = harmony_method
+
+        self.master.json_state = 'dirty'
+        self.master.set_option_states()
+
+    def tag_keystone_colour_to_theme(self):
+        keystone_colour = self.btn_keystone_colour.cget('fg_color')
+        harmony_method = self.opm_harmony_method.get()
+        self.theme_json_data['provenance']['keystone colour'] = keystone_colour
+        self.theme_json_data['provenance']['harmony method'] = harmony_method
+        self.theme_json_data['provenance']['harmony differential'] = self.harmony_contrast_differential
+        self.master.json_state = 'dirty'
+        self.master.set_option_states()
+        self.harmony_status_bar.set_status_text(
+            status_text=f'Keystone colour tagged to theme {self.theme_name}.')
+
+
 class PreferencesDialog(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -3443,6 +3042,486 @@ class PreferencesDialog(ctk.CTkToplevel):
          the themes JSON are to be stored/maintained."""
         self.new_theme_json_dir = Path(tk.filedialog.askdirectory(initialdir=self.theme_json_dir))
         self.lbl_pref_theme_dir_disp.configure(text=self.new_theme_json_dir)
+
+class GeometryDialog(ctk.CTkToplevel):
+    class ThemeMerger(ctk.CTkToplevel):
+        """This class is used to merge two themes, to create an entirely new theme."""
+        def __init__(self, *args, **kwargs):
+            super().__init__(*args, **kwargs)
+    def __init__(self, widget_type: str, theme_json_data:dict, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # The interactions between this dialog and the Control Panel are strongly linked, making it less
+        # straight forward to define as a class.
+        def slider_callback(property_name, value):
+            label_text = property_name.replace('_', ' ')
+            base_label_text = label_text.replace(widget_type.lower(), '') + ': '
+            property_value = int(value)
+            label_dict[property_name].configure(text=base_label_text + str(property_value))
+            config_param = property_name.replace(f'{widget_type.lower()}_', '')
+            self.geometry_edit_values[property_name] = property_value
+
+            if config_param == 'border_width_unchecked':
+                geometry_widget.deselect()
+            elif config_param == 'border_width_checked':
+                geometry_widget.select()
+
+            update_widget_geometry(widget=geometry_widget, widget_property=config_param, property_value=property_value)
+
+        def deselect_widget(widget_id):
+            """This local function is provided as a means to deselect the CTkRadioButton. This is for when the user
+            clicks on the rendered button, in the geometry edit dialogue, and they subsequently need to show it
+            de-selected."""
+            widget_id.deselect()
+
+        self.theme_json_data = theme_json_data
+        self.geometry_edit_values = {}
+        preview_frame_top = self.theme_json_data['CTkFrame']['top_fg_color'][
+            cbtk.str_mode_to_int(self.master.appearance_mode)]
+
+        self.title(f'{widget_type} Widget Geometry')
+
+        self.restore_geom_geometry()
+
+        # Make preferences dialog modal
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=0)
+        # self.columnconfigure(0, weight=0)
+        # self.columnconfigure(1, weight=1)
+
+        preview_text_colour = self.theme_json_data['CTkLabel']['text_color'][
+            cbtk.str_mode_to_int(self.master.appearance_mode)]
+
+        frm_main = ctk.CTkFrame(master=self, corner_radius=5)
+        frm_main.grid(column=0, row=0, sticky='nsew')
+        frm_main.columnconfigure(0, weight=0)
+        frm_main.columnconfigure((1, 2), weight=1)
+        frm_main.rowconfigure(0, weight=1)
+
+        frame_fg_color = self.theme_json_data['CTkFrame']['fg_color'][
+            cbtk.str_mode_to_int(self.master.appearance_mode)]
+        json_widget_type = mod.json_widget_type(widget_type=widget_type)
+
+        mode = cbtk.str_mode_to_int(self.master.appearance_mode)
+        if widget_type == 'CTkFrame':
+            self.geometry('764x280')
+            frm_widget_preview_low = ctk.CTkFrame(master=frm_main,
+                                                  fg_color=cbtk.contrast_colour(preview_frame_top, 20)
+                                                  )
+            frm_main.configure(corner_radius=self.theme_json_data[widget_type]['corner_radius'])
+        else:
+            frm_widget_preview_low = ctk.CTkFrame(master=frm_main,
+                                                  corner_radius=5,
+                                                  fg_color=preview_frame_top)
+
+        frm_widget_preview_low.grid(column=1, row=0, padx=10, pady=10, sticky='nsew')
+
+        frm_controls = ctk.CTkFrame(master=frm_main)
+        frm_controls.grid(column=0, row=0, padx=10, pady=10, sticky='nsew')
+
+        frm_buttons = ctk.CTkFrame(master=frm_main)
+        frm_buttons.grid(column=0, row=1, padx=10, pady=(0, 10), sticky='ew')
+
+        frm_label = ctk.CTkFrame(master=frm_main)
+        frm_label.grid(column=1, row=1, padx=10, pady=(0, 10), sticky='ew')
+
+        widget_label = ctk.CTkLabel(master=frm_label, text=f'{widget_type} Geometry',
+                                    font=mod.HEADING5,
+                                    justify=ctk.CENTER)
+        widget_label.grid(row=0, column=0, padx=(30, 30), sticky='ew')
+
+        # Control buttons
+        btn_close = ctk.CTkButton(master=frm_buttons, text='Cancel', command=self.close_geometry_dialog)
+        btn_close.grid(row=0, column=0, padx=(25, 35), pady=5)
+
+        btn_save = ctk.CTkButton(master=frm_buttons, text='Save',
+                                 command=lambda w_type=widget_type: self.save_geometry_edits(widget_type=w_type))
+        btn_save.grid(row=0, column=1, padx=(160, 15), pady=5)
+
+        geometry_parameters_file = str(ETC_DIR / 'geometry_parameters.json')
+        geometry_parameters_file = Path(geometry_parameters_file)
+        geometry_parameters_file_json = mod.json_dict(json_file_path=geometry_parameters_file)
+
+        if widget_type == 'CTkButton':
+            self.geometry('764x234')
+            button_text_colour = self.theme_json_data[json_widget_type]['text_color'][mode]
+            button_fg_colour = self.theme_json_data[json_widget_type]['fg_color'][mode]
+            button_hover_colour = self.theme_json_data[json_widget_type]['hover_color'][mode]
+            button_border_colour = self.theme_json_data[json_widget_type]['border_color'][mode]
+
+            geometry_widget = ctk.CTkButton(master=frm_widget_preview_low,
+                                            text_color=button_text_colour,
+                                            fg_color=button_fg_colour,
+                                            hover_color=button_hover_colour,
+                                            border_color=button_border_colour,
+                                            text='CTkButton',
+                                            corner_radius=self.theme_json_data['CTkButton']['corner_radius'],
+                                            border_width=self.theme_json_data['CTkButton']['border_width'])
+        elif widget_type == 'CTkCheckBox':
+            self.geometry('786x232')
+            checkbox_fg_color = self.theme_json_data['CTkCheckbox']['fg_color'][mode]
+
+            checkbox_border_color = self.theme_json_data['CTkCheckbox']['border_color'][mode]
+
+            checkbox_hover_color = self.theme_json_data['CTkCheckbox']['hover_color'][mode]
+
+            checkbox_checkmark_color = self.theme_json_data['CTkCheckbox']['checkmark_color'][mode]
+
+            checkbox_text_color = self.theme_json_data['CTkCheckbox']['text_color'][mode]
+
+            geometry_widget = ctk.CTkCheckBox(master=frm_widget_preview_low,
+                                              fg_color=checkbox_fg_color,
+                                              border_color=checkbox_border_color,
+                                              hover_color=checkbox_hover_color,
+                                              checkmark_color=checkbox_checkmark_color,
+                                              text_color=checkbox_text_color,
+                                              corner_radius=self.theme_json_data['CTkCheckbox']['corner_radius'],
+                                              border_width=self.theme_json_data['CTkCheckbox']['border_width'])
+        elif widget_type == 'CTkComboBox':
+            self.geometry('795x234')
+
+            combobox_fg_color = self.theme_json_data['CTkComboBox']['fg_color'][mode]
+
+            combobox_text_color = self.theme_json_data['CTkComboBox']['text_color'][mode]
+
+            combobox_border_color = self.theme_json_data['CTkComboBox']['border_color'][mode]
+
+            combobox_button_colour = self.theme_json_data[json_widget_type]['button_color'][mode]
+
+            combobox_button_hover_colour = self.theme_json_data[json_widget_type]['button_hover_color'][mode]
+
+            dropdown_fg_colour = self.theme_json_data['DropdownMenu']['fg_color'][mode]
+
+            dropdown_hover_colour = self.theme_json_data['DropdownMenu']['hover_color'][mode]
+
+            dropdown_text_colour = self.theme_json_data['DropdownMenu']['text_color'][mode]
+
+            geometry_widget = ctk.CTkComboBox(master=frm_widget_preview_low,
+                                              fg_color=combobox_fg_color,
+                                              text_color=combobox_text_color,
+                                              border_color=combobox_border_color,
+                                              button_color=combobox_button_colour,
+                                              button_hover_color=combobox_button_hover_colour,
+                                              dropdown_fg_color=dropdown_fg_colour,
+                                              dropdown_text_color=dropdown_text_colour,
+                                              dropdown_hover_color=dropdown_hover_colour,
+                                              corner_radius=self.theme_json_data['CTkCheckbox']['corner_radius'],
+                                              border_width=self.theme_json_data['CTkCheckbox']['border_width'],
+                                              values=["Option 1", "Option 2", "Option 3", "Option 4..."])
+        elif widget_type == 'CTkFrame':
+            self.geometry('764x280')
+            geometry_widget = ctk.CTkFrame(master=frm_widget_preview_low, fg_color=preview_frame_top,
+                                           corner_radius=self.theme_json_data['CTkFrame']['corner_radius'],
+                                           border_width=self.theme_json_data['CTkFrame']['border_width'])
+
+            lbl_frame = ctk.CTkLabel(master=geometry_widget, text_color=preview_text_colour, text='CTKFrame')
+            lbl_frame.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+        elif widget_type == 'CTkLabel':
+            self.geometry('755x160')
+            geometry_widget = ctk.CTkLabel(master=frm_widget_preview_low,
+                                           text_color=preview_text_colour,
+                                           fg_color=cbtk.contrast_colour(preview_frame_top, 15),
+                                           corner_radius=self.theme_json_data[widget_type]['corner_radius'])
+            widget_tooltip = CTkToolTip(geometry_widget, wraplength=200, justify='left',
+                                        message='The CTkLabel widget has been intentionally '
+                                                'rendered with a contrasting fg_color, so that '
+                                                'the corner radius effect may be seen.')
+        elif widget_type == 'CTkEntry':
+            fg_color = self.theme_json_data['CTkEntry']['fg_color'][mode]
+            border_color = self.theme_json_data['CTkEntry']['border_color'][mode]
+            self.geometry('754x235')
+            geometry_widget = ctk.CTkEntry(master=frm_widget_preview_low,
+                                           placeholder_text="CTkEntry",
+                                           fg_color=fg_color,
+                                           border_color=border_color)
+
+        elif widget_type == 'CTkProgressBar':
+            self.geometry('807x225')
+            progressbar_fg_color = self.theme_json_data['CTkProgressBar']['fg_color'][mode]
+
+            progressbar_progress_color = self.theme_json_data['CTkProgressBar']['progress_color'][mode]
+
+            progressbar_border_color = self.theme_json_data['CTkProgressBar']['border_color'][mode]
+            geometry_widget = ctk.CTkProgressBar(master=frm_widget_preview_low,
+                                                 fg_color=progressbar_fg_color,
+                                                 progress_color=progressbar_progress_color,
+                                                 border_color=progressbar_border_color,
+                                                 corner_radius=self.theme_json_data[json_widget_type]
+                                                 ['corner_radius'],
+                                                 border_width=self.theme_json_data[json_widget_type]
+                                                 ['border_width'])
+        elif widget_type == 'CTkSlider':
+            self.geometry('760x301')
+            geometry_widget = ctk.CTkSlider(master=frm_widget_preview_low,
+                                            border_width=self.theme_json_data[widget_type]['border_width'])
+
+        elif widget_type == 'CTkOptionMenu':
+            self.geometry('806x161')
+
+            optionmenu_fg_colour = self.theme_json_data[json_widget_type]['fg_color'][mode]
+
+            optionmenu_button_colour = self.theme_json_data[json_widget_type]['button_color'][mode]
+
+            optionmenu_button_hover_colour = self.theme_json_data[json_widget_type]['button_hover_color'][mode]
+
+            optionmenu_text_color = self.theme_json_data[json_widget_type]['text_color'][mode]
+
+            dropdown_fg_colour = self.theme_json_data['DropdownMenu']['fg_color'][mode]
+
+            dropdown_hover_colour = self.theme_json_data['DropdownMenu']['hover_color'][mode]
+
+            dropdown_text_colour = self.theme_json_data['DropdownMenu']['text_color'][mode]
+
+            geometry_widget = ctk.CTkOptionMenu(master=frm_widget_preview_low,
+                                                fg_color=optionmenu_fg_colour,
+                                                text_color=optionmenu_text_color,
+                                                button_color=optionmenu_button_colour,
+                                                button_hover_color=optionmenu_button_hover_colour,
+                                                dropdown_fg_color=dropdown_fg_colour,
+                                                dropdown_text_color=dropdown_text_colour,
+                                                dropdown_hover_color=dropdown_hover_colour,
+                                                corner_radius=self.theme_json_data['CTkOptionMenu']['corner_radius'],
+                                                values=["Option 1", "Option 2", "Option 3..."])
+            geometry_widget.set("CTkOptionMenu")
+
+
+        elif widget_type == 'CTkRadioButton':
+            self.geometry('800x301')
+            radiobutton_fg_color = self.theme_json_data['CTkRadiobutton']['fg_color'][mode]
+
+            radiobutton_border_color = self.theme_json_data['CTkRadiobutton']['border_color'][mode]
+
+            radiobutton_hover_color = self.theme_json_data['CTkRadiobutton']['hover_color'][mode]
+
+            radiobutton_text_color = self.theme_json_data['CTkRadiobutton']['text_color'][mode]
+
+            label_text_colour = self.theme_json_data['CTkLabel']['text_color'][mode]
+
+            geometry_widget = ctk.CTkRadioButton(master=frm_widget_preview_low,
+                                                 fg_color=radiobutton_fg_color,
+                                                 border_color=radiobutton_border_color,
+                                                 hover_color=radiobutton_hover_color,
+                                                 text_color=radiobutton_text_color,
+                                                 corner_radius=self.theme_json_data[json_widget_type]
+                                                 ['corner_radius'],
+                                                 border_width_checked=self.theme_json_data[json_widget_type]
+                                                 ['border_width_checked'],
+                                                 border_width_unchecked=self.theme_json_data[json_widget_type]
+                                                 ['border_width_unchecked'])
+            lbl_info = ctk.CTkLabel(master=frm_widget_preview_low,
+                                    text_color=label_text_colour,
+                                    text='Use a right button click, to\nuncheck the radio '
+                                         'button.', justify=ctk.CENTER)
+            lbl_info.grid(row=0, column=0, padx=50, pady=10)
+
+            geometry_widget.bind("<Button-3>", lambda event, widget=geometry_widget: deselect_widget(widget_id=widget))
+        elif widget_type == 'CTkSegmentedButton':
+            self.geometry('847x232')
+            # CTkTextbox
+            seg_fg_color = self.theme_json_data[json_widget_type]['fg_color'][mode]
+            print(f'DEBUG: applying colour: {seg_fg_color}')
+            seg_selected_color = self.theme_json_data[json_widget_type]['selected_color'][mode]
+            seg_selected_hover_color = self.theme_json_data[json_widget_type]['selected_hover_color'][mode]
+            seg_unselected_color = self.theme_json_data[json_widget_type]['unselected_color'][mode]
+            seg_unselected_hover_color = self.theme_json_data[json_widget_type]['unselected_hover_color'][mode]
+            seg_text_color = self.theme_json_data[json_widget_type]['text_color'][mode]
+            seg_text_color_disabled = self.theme_json_data[json_widget_type]['text_color_disabled'][mode]
+
+            geometry_widget = ctk.CTkSegmentedButton(master=frm_widget_preview_low,
+                                                     fg_color=seg_fg_color,
+                                                     selected_color=seg_selected_color,
+                                                     selected_hover_color=seg_selected_hover_color,
+                                                     unselected_color=seg_unselected_color,
+                                                     unselected_hover_color=seg_unselected_hover_color,
+                                                     text_color=seg_text_color,
+                                                     text_color_disabled=seg_text_color_disabled)
+            geometry_widget.grid(row=10, column=0, padx=(15, 0), pady=(30, 0), sticky="nsew", rowspan=1)
+
+            geometry_widget.configure(values=["CTkSegmentedButton", "Value 2", "Value 3"])
+            geometry_widget.set("Value 2")
+
+        elif widget_type == 'CTkSwitch':
+            self.geometry('766x299')
+            switch_fg_colour = self.theme_json_data[json_widget_type]['fg_color'][mode]
+
+            switch_button_colour = self.theme_json_data[json_widget_type]['button_color'][mode]
+
+            switch_button_hover_colour = self.theme_json_data[json_widget_type]['button_hover_color'][mode]
+
+            switch_progress_colour = self.theme_json_data[json_widget_type]['progress_color'][mode]
+
+            switch_text_colour = self.theme_json_data[json_widget_type]['text_color'][mode]
+
+            geometry_widget = ctk.CTkSwitch(master=frm_widget_preview_low,
+                                            fg_color=switch_fg_colour,
+                                            button_color=switch_button_colour,
+                                            text_color=switch_text_colour,
+                                            button_hover_color=switch_button_hover_colour,
+                                            progress_color=switch_progress_colour,
+                                            corner_radius=self.theme_json_data[json_widget_type]['corner_radius'],
+                                            border_width=self.theme_json_data[json_widget_type]['border_width']
+                                            )
+        elif widget_type == 'CTkScrollbar':
+            self.geometry('782x267')
+            # Harness the scrollbar incorporated
+            # to the CTkScrollableFrame widget.
+            self.geometry('800x280')
+            scrollbar_fg_color = self.theme_json_data[json_widget_type]['fg_color']
+            if not isinstance(scrollbar_fg_color, str):
+                scrollbar_fg_color = scrollbar_fg_color[cbtk.str_mode_to_int(self.master.appearance_mode)]
+            elif scrollbar_fg_color == "transparent":
+                scrollbar_fg_color = self.theme_json_data['CTkFrame']['fg_color'][
+                    cbtk.str_mode_to_int(self.master.appearance_mode)]
+            scrollbar_button_color = self.theme_json_data[json_widget_type]['button_color']
+            scrollbar_button_hover_color = self.theme_json_data[json_widget_type]['button_hover_color']
+
+            frm_preview = ctk.CTkFrame(frm_widget_preview_low, corner_radius=0)
+            frm_preview.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+            # create textbox
+            textbox_fg_color = self.theme_json_data['CTkTextbox']['fg_color'][
+                cbtk.str_mode_to_int(self.master.appearance_mode)]
+            if not isinstance(textbox_fg_color, str):
+                textbox_fg_color = textbox_fg_color[cbtk.str_mode_to_int(self.master.appearance_mode)]
+            textbox_border_color = self.theme_json_data['CTkTextbox']['border_color'][
+                cbtk.str_mode_to_int(self.master.appearance_mode)]
+            textbox_text_color = self.theme_json_data['CTkTextbox']['text_color'][
+                cbtk.str_mode_to_int(self.master.appearance_mode)]
+            tk_textbox = ctk.CTkTextbox(frm_preview,
+                                        activate_scrollbars=False,
+                                        fg_color=textbox_fg_color,
+                                        border_color=textbox_border_color,
+                                        text_color=textbox_text_color,
+                                        corner_radius=0)
+            tk_textbox.grid(row=0, column=1, sticky="nsew")
+            tk_textbox.insert("0.0", text="CTkScrollBar\n\n" + "Bozzy bear woz here...\n\n" * 20)
+
+            # create CTk scrollbar
+            geometry_widget = ctk.CTkScrollbar(frm_preview,
+                                               command=tk_textbox.yview,
+                                               fg_color=scrollbar_fg_color,
+                                               button_color=scrollbar_button_color,
+                                               button_hover_color=scrollbar_button_hover_color)
+            geometry_widget.grid(row=0, column=2, sticky="ns")
+            tk_textbox.configure(yscrollcommand=geometry_widget.set)
+
+        elif widget_type == 'CTkTextbox':
+            self.geometry('776x243')
+            # CTkTextbox
+            textbox_fg_color = self.theme_json_data[json_widget_type]['fg_color'][mode]
+            if not isinstance(textbox_fg_color, str):
+                textbox_fg_color = textbox_fg_color[cbtk.str_mode_to_int(self.master.appearance_mode)][mode]
+            elif textbox_fg_color == "transparent":
+                textbox_fg_color = self.theme_json_data['CTkFrame']['fg_color'][mode]
+            textbox_border_color = self.theme_json_data[json_widget_type]['border_color'][mode]
+            textbox_button_color = self.theme_json_data[json_widget_type]['scrollbar_button_color'][mode]
+            textbox_button_hover_color = self.theme_json_data[json_widget_type]['scrollbar_button_hover_color'][mode]
+            textbox_text_color = self.theme_json_data[json_widget_type]['text_color'][mode]
+
+            geometry_widget = ctk.CTkTextbox(frm_widget_preview_low,
+                                             fg_color=textbox_fg_color,
+                                             border_color=textbox_border_color,
+                                             scrollbar_button_color=textbox_button_color,
+                                             scrollbar_button_hover_color=textbox_button_hover_color,
+                                             text_color=textbox_text_color,
+                                             width=190,
+                                             height=180)
+            geometry_widget.grid(row=10, column=0, padx=(15, 0), pady=(30, 0), sticky="nsew", rowspan=1)
+            if self.master.enable_tooltips:
+                textbox_tooltip = CTkToolTip(geometry_widget,
+                                             wraplength=300,
+                                             padding=(5, 5),
+                                             x_offset=-100,
+                                             justify="left",
+                                             message='CTkTextbox')
+
+            geometry_widget.insert("0.0", "CTkTextbox\n\n" + "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, "
+                                                             "sed diam nonumy eirmod tempor invidunt ut labore et "
+                                                             "dolore magna aliquyam erat, sed diam voluptua.\n\n" * 20)
+
+        else:
+            print(f'WARNING: unimplemented widget type: {widget_type}')
+
+        if widget_type not in ['CTkScrollbar']:
+            # geometry_widget.grid(row=0, column=0)
+            geometry_widget.place(relx=0.5, rely=0.5, anchor=tk.CENTER)
+
+        widget_parameter = geometry_parameters_file_json[widget_type]
+        slider_dict = {}
+        label_dict = {}
+        property_value_dict = {}
+        row = 0
+
+        for property, parameters in widget_parameter.items():
+            lower_value = int(parameters[0])
+            upper_value = int(parameters[1])
+            label_text = property.replace('_', ' ')
+            base_label_text = label_text.replace(widget_type.lower(), '') + ': '
+            # This function call is necessary, because there are several naming
+            # inconsistencies (at least in CTk 5.1.2), between widget names.
+            json_widget_type = mod.json_widget_type(widget_type=widget_type)
+
+            current_value = int(self.theme_json_data[json_widget_type][property])
+            label_dict[property] = ctk.CTkLabel(master=frm_controls, text=base_label_text.title() + f'{current_value}')
+            label_dict[property].grid(row=row, column=0, sticky='ew', pady=(10, 0))
+            row += 1
+
+            slider_dict[property] = ctk.CTkSlider(master=frm_controls,
+                                                  from_=lower_value, to=upper_value,
+                                                  width=450, number_of_steps=100,
+                                                  command=lambda value, label_id=property: slider_callback(label_id,
+                                                                                                           value))
+            slider_dict[property].grid(row=row, column=0, padx=(25, 25), pady=(0, 15))
+            slider_dict[property].set(current_value)
+            row += 1
+
+        self.wait_window()
+
+    def save_geometry_edits(self, widget_type):
+        for widget_property, property_value in self.geometry_edit_values.items():
+            parameters = []
+            # This function call is necessary, because there are several naming
+            # inconsistencies (at least in CTk 5.1.2), between widget names.
+            json_widget_type = mod.json_widget_type(widget_type=widget_type)
+            if self.theme_json_data[json_widget_type][widget_property] != property_value:
+                self.theme_json_data[json_widget_type][widget_property] = property_value
+                self.master.json_state = 'dirty'
+
+                config_param = widget_property.replace(f'{widget_type.lower()}_', '')
+                parameters.append(widget_type)
+                parameters.append(config_param)
+                parameters.append(str(property_value))
+                with open(self.master.wip_json, "w") as f:
+                    json.dump(self.theme_json_data, f, indent=2)
+                self.master.send_command_json(command_type='geometry',
+                                              command='update_widget_geometry',
+                                              parameters=parameters)
+
+        if self.master.json_state == 'dirty':
+            self.master.set_option_states()
+        self.close_geometry_dialog()
+
+    def close_geometry_dialog(self):
+        self.save_widget_geom_geometry()
+        self.destroy()
+
+    def restore_geom_geometry(self):
+        """Restore window geometry of the Widget Geometry dialog from auto-saved preferences"""
+        saved_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                scope='window_geometry',
+                                                preference_name='widget_geometry')
+        self.geometry(saved_geometry)
+    def save_widget_geom_geometry(self):
+        """Save the widget geometry dialog's geometry to the repo, for the next time the dialog is launched."""
+        geometry_row = mod.preference_row(db_file_path=DB_FILE_PATH,
+                                          scope='window_geometry',
+                                          preference_name='widget_geometry')
+        panel_geometry = self.geometry()
+        geometry_row["preference_value"] = panel_geometry
+        mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
+
+
+
 
 class SortingHelpFormatter(HelpFormatter):
     def add_arguments(self, actions):
