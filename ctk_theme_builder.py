@@ -1,6 +1,6 @@
 __title__ = 'CTk Theme Builder'
 __author__ = 'Clive Bostock'
-__version__ = "2.1.0"
+__version__ = "2.2.0"
 __license__ = 'MIT - see LICENSE.md'
 
 import configparser
@@ -1097,7 +1097,7 @@ class ControlPanel(ctk.CTk):
             print(f'Row miss: on update of auto save of selected theme.')
 
         self.lbl_palette_header.configure(text=f'Theme Palette ({preview_appearance_mode})')
-
+        self.update_wip_file()
         self.load_theme_palette()
         self.render_widget_properties()
 
@@ -1285,6 +1285,10 @@ class ControlPanel(ctk.CTk):
             theme_names.append(theme_name)
         theme_names.sort()
         return theme_names
+
+    def update_wip_file(self):
+        with open(self.wip_json, "w") as f:
+            json.dump(self.theme_json_data, f, indent=2)
 
     def load_theme(self, event=None, reload_preview: bool = True):
 
@@ -2019,8 +2023,7 @@ class ControlPanel(ctk.CTk):
     def refresh_preview(self):
         """The _refresh_preview method, instructs the Preview Panel to perform a re-rendering of all widgets."""
 
-        with open(self.wip_json, "w") as f:
-            json.dump(self.theme_json_data, f, indent=2)
+        self.update_wip_file()
         self.send_command_json(command_type='program',
                                command='refresh',
                                parameters=[self.appearance_mode])
@@ -2032,8 +2035,7 @@ class ControlPanel(ctk.CTk):
                                    command='quit',
                                    parameters=None)
 
-        with open(self.wip_json, "w") as f:
-            json.dump(self.theme_json_data, f, indent=2)
+        self.update_wip_file()
         self.process = None
         self.launch_preview()
 
@@ -2072,8 +2074,7 @@ class ControlPanel(ctk.CTk):
 
     def launch_preview(self):
         appearance_mode_ = self.appearance_mode
-        with open(self.wip_json, "w") as f:
-            json.dump(self.theme_json_data, f, indent=2)
+        self.update_wip_file()
 
         designer = os.path.basename(__file__)
         if platform.system() == 'Windows':
@@ -2141,8 +2142,7 @@ class ControlPanel(ctk.CTk):
             else:
                 self.theme_json_data['provenance']['last modified by'] = 'Unknown'
 
-        with open(self.wip_json, "w") as f:
-            json.dump(self.theme_json_data, f, indent=2)
+        self.update_wip_file()
         shutil.copyfile(self.wip_json, self.source_json_file)
         theme_file_name = os.path.basename(self.source_json_file)
         self.json_state = 'clean'
