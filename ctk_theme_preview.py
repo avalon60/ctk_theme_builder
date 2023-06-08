@@ -432,8 +432,9 @@ class PreviewPanel:
 
         self.scrollable_label = ctk.CTkLabel(master=self.scrollable_frame, text="Bozzy bear woz here...\n\n" * 20)
         self.scrollable_label.grid(row=0, column=0, padx=0, pady=0, sticky='ew')
-        # As of CustomTkinter 5.1.2, the mousewheel bindings aren't in place for Linux.
+        self._rendered_widgets['CTkLabel'].append(self.scrollable_label)
 
+        # As of CustomTkinter 5.1.2, the mousewheel bindings aren't in place for Linux.
         self._rendered_widgets['CTkScrollableFrame'].append(self.scrollable_frame)
         # CTkTabview
         self.tabview = ctk.CTkTabview(master=widget_frame, width=250)
@@ -448,13 +449,18 @@ class PreviewPanel:
                                         text="I've seen things you people\nwouldn't believe...\n\nAttack ships on fire "
                                              "off\nthe shoulder of Orion...")
         self.label_tab_1.grid(row=0, column=2, padx=20, pady=20)
+        self._rendered_widgets['CTkLabel'].append(self.label_tab_1)
+
         self.label_tab_2 = ctk.CTkLabel(self.tabview.tab("Tab 2"), justify='left',
                                         text="I watched C-beams glitter in\nthe dark near the Tannhäuser\nGate.")
         self.label_tab_2.grid(row=0, column=0, padx=20, pady=20)
+        self._rendered_widgets['CTkLabel'].append(self.label_tab_2)
+
         self.label_tab_3 = ctk.CTkLabel(self.tabview.tab("Tab 3"), justify='left',
                                         text="All those moments will be\nlost in time, like tears\nin rain...\n\n\n"
                                              "Time to die.")
         self.label_tab_3.grid(row=0, column=0, padx=20, pady=20, sticky='nsew')
+        self._rendered_widgets['CTkLabel'].append(self.label_tab_3)
         if self._enable_tooltips:
             label_tab_1_tooltip = CTkToolTip(self.label_tab_1,
                                              justify="left",
