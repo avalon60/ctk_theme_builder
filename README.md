@@ -9,6 +9,6 @@ Hello and welcome to the *CTk Theme Builder* repository!
 
 If you want to create and maintain your own CustomTkinter themes, *CTk Theme Builder* is the way to go, providing an interface which lets you instantly see the effect of widget property settings, as they are made.
 
-Jump straight to the deployment instructions by going [here](https://github.com/avalon60/ctk_theme_builder/wiki/Installing---Upgrading-CTk-Theme-Builder).
+Jump straight to the deployment instructions by going [here](https://github.com/avalon60/ctk_theme_builder/wiki/Installing-&-Upgrading-CTk-Theme-Builder).
 
 The user guides for respective versions, can be found [here](https://github.com/avalon60/ctk_theme_builder/wiki).
