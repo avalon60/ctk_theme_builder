@@ -428,7 +428,9 @@ class PreviewPanel:
                                                           'With the exception of the label_fg_color, '
                                                           'theme file property, its other colour '
                                                           'properties, are defaulted from CTkFrame, '
-                                                          'CTkScrollbar and CTkLabel.')
+                                                          'CTkScrollbar and CTkLabel.\n\n'
+                                                          'The text in the main body of the CTkScrollableFrame '
+                                                          'preview, is produced via an embedded CTkLabel.')
 
         self.scrollable_label = ctk.CTkLabel(master=self.scrollable_frame, text="Bozzy bear woz here...\n\n" * 20)
         self.scrollable_label.grid(row=0, column=0, padx=0, pady=0, sticky='ew')
@@ -469,7 +471,9 @@ class PreviewPanel:
                                              padding=(5, 5),
                                              message='The CTkTabview is a composite widget. As of CustomTkinter 5.1.2, '
                                                      'it has no direct default properties. instead it borrows from '
-                                                     'CTkFrame and CTkSegmentedButton.')
+                                                     'CTkFrame and CTkSegmentedButton.\n\n'
+                                                     'The text in the main body of the CTkTabview preview, '
+                                                     'is produced via an embedded CTkLabel.')
             label_tab_2_tooltip = CTkToolTip(self.label_tab_2,
                                              justify="left",
                                              wraplength=250,
@@ -477,7 +481,9 @@ class PreviewPanel:
                                              padding=(5, 5),
                                              message='The CTkTabview is a composite widget. As of CustomTkinter 5.1.2, '
                                                      'it has no direct default properties. instead it borrows from '
-                                                     'CTkFrame and CTkSegmentedButton.')
+                                                     'CTkFrame and CTkSegmentedButton.\n\n'
+                                                     'The text in the main body of the preview is produced '
+                                                     'via an embedded CTkLabel.')
             label_tab_3_tooltip = CTkToolTip(self.label_tab_3,
                                              justify="left",
                                              wraplength=250,
@@ -485,7 +491,9 @@ class PreviewPanel:
                                              padding=(5, 5),
                                              message='The CTkTabview is a composite widget. As of CustomTkinter 5.1.2, '
                                                      'it has no direct default properties. instead it borrows from '
-                                                     'CTkFrame and CTkSegmentedButton.')
+                                                     'CTkFrame and CTkSegmentedButton.\n\n'
+                                                     'The text in the main body of the preview is produced '
+                                                     'via an embedded CTkLabel.')
 
     def _render_preview_disabled(self):
         self._toggle_preview_disabled(render_state=tk.DISABLED)
