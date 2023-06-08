@@ -23,4 +23,19 @@ elif [ -f ${APP_ENV}/Scripts/activate ]
 then
   source ${APP_ENV}/Scripts/activate
 fi 
-python ${DCCM_PY} $*
+type python 2> /dev/null
+if [ $? -eq 0 ]
+then
+  PYTHON="python"
+else
+  type python3 2> /dev/null
+  if [ $? -eq 0 ]
+  then
+    PYTHON="python3"
+  else
+    echo -e "Cannot find a Python interpreter. Please ensure that you have Python installed and that it can be found via \$PATH"
+    exit 1
+  fi
+fi
+${PYTHON} ${DCCM_PY} $*
+
