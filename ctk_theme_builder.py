@@ -133,7 +133,6 @@ def run_preview_panel(appearance_mode, theme_file):
     preview_panel = PreviewPanel(appearance_mode=appearance_mode, theme_file=theme_file)
 
 
-
 class About(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -185,6 +184,7 @@ class About(ctk.CTkToplevel):
         self.resizable(False, False)
 
         self.grab_set()
+
 
 class ControlPanel(ctk.CTk):
     _theme_json_dir: Path
@@ -570,7 +570,6 @@ class ControlPanel(ctk.CTk):
         self.load_theme()
 
         self.mainloop()
-
 
     def flip_appearance_modes(self):
         confirm = CTkMessagebox(master=self,
@@ -1031,7 +1030,9 @@ class ControlPanel(ctk.CTk):
         column += 1
 
     def launch_widget_geometry(self, widget_type):
-        geometry_dialog = GeometryDialog(master=self, widget_type=widget_type, theme_json_data=self.theme_json_data)
+        geometry_dialog = GeometryDialog(master=self, widget_type=widget_type,
+                                         theme_json_data=self.theme_json_data,
+                                         appearance_mode=self.appearance_mode)
 
     def set_option_states(self):
         """This function sets the button and menu option states. The states are set based upon a combination of,
@@ -1384,6 +1385,7 @@ class ControlPanel(ctk.CTk):
         panel_geometry = self.top_harmony.geometry()
         geometry_row["preference_value"] = panel_geometry
         mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
+
     def on_harmonic_close(self):
         self.rendered_keystone_shades = []
         self.save_harmonics_geometry()
@@ -1412,6 +1414,7 @@ class ControlPanel(ctk.CTk):
         harmonics_dialog = HarmonicsDialog(theme_name=self.theme,
                                            theme_json_data=self.theme_json_data,
                                            enable_tooltips=self.enable_tooltips)
+
     def darken_palette_tile(self, palette_button: ctk.CTkButton,
                             palette_button_id: int,
                             shade_step: int,
@@ -1426,6 +1429,23 @@ class ControlPanel(ctk.CTk):
             mode_idx = 1
         if darker_shade != widget_colour:
             pyperclip.copy(darker_shade)
+            # Leverage the _paste_palette_colour method to update the widget and the preview panel.
+            self.paste_palette_colour(event=None, palette_button_id=palette_button_id)
+
+    def lighten_palette_tile(self, palette_button: ctk.CTkButton,
+                             palette_button_id: int,
+                             shade_step: int,
+                             multiplier: int = 1):
+        self.set_option_states()
+        widget_colour = palette_button.cget('fg_color')
+        lighter_shade = cbtk.shade_up(color=widget_colour, differential=shade_step, multiplier=multiplier)
+        palette_button.configure(fg_color=lighter_shade)
+        if self.appearance_mode == 'Light':
+            mode_idx = 0
+        else:
+            mode_idx = 1
+        if lighter_shade != widget_colour:
+            pyperclip.copy(lighter_shade)
             # Leverage the _paste_palette_colour method to update the widget and the preview panel.
             self.paste_palette_colour(event=None, palette_button_id=palette_button_id)
 
@@ -1469,7 +1489,6 @@ class ControlPanel(ctk.CTk):
             pyperclip.copy(darker_shade)
             # Leverage the _paste_color method to update the widget and the preview panel.
             self.paste_colour(event=None, widget_property=widget_property)
-
 
     def load_theme_palette(self, theme_name=None):
         """Determine and open the JSON theme palette file, for the selected theme, and marry the colours mapped in
@@ -2132,6 +2151,7 @@ class ControlPanel(ctk.CTk):
         self.status_bar.set_status_text(status_text=f'Theme file, {theme_file_name}, saved successfully!')
         self.save_theme_palette()
 
+
 class HarmonicsDialog(ctk.CTkToplevel):
     def __init__(self, theme_name, theme_json_data: dict, enable_tooltips: bool, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -2179,8 +2199,6 @@ class HarmonicsDialog(ctk.CTkToplevel):
                                                           widget_property='fg_color',
                                                           mode=self.control_panel_mode
                                                           )
-
-
 
         self.title('Colour Harmonics')
 
@@ -2329,7 +2347,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
         self.set_harmony_keystone(colour_code=bg_colour, method=harmony_method)
         self.switch_harmony_method()
         self.harmony_palette_running = True
-        self.master.set_option_states()
+        # self.master.set_option_states()
         self.protocol("WM_DELETE_WINDOW", self.on_harmonic_close)
         self.grab_set()
 
@@ -2400,7 +2418,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
             primary_colour = primary_colour[1]
             self.btn_keystone_colour.configure(fg_color=primary_colour,
                                                hover_color=primary_colour)
-            self.master.status_bar.set_status_text(
+            self.harmony_status_bar.set_status_text(
                 status_text=f'Colour {primary_colour} assigned.')
             self.keystone_colour = primary_colour
             self.populate_harmony_colours()
@@ -2414,7 +2432,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
             primary_colour = primary_colour[1]
             self.rendered_harmony_buttons[0].configure(fg_color=primary_colour,
                                                        hover_color=primary_colour)
-            self.master.status_bar.set_status_text(
+            self.harmony_status_bar.set_status_text(
                 status_text=f'Colour {primary_colour} assigned to palette entry {palette_button_id + 1}.')
             self.keystone_colour = primary_colour
         self.populate_harmony_colours()
@@ -2454,6 +2472,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
             self.rendered_harmony_buttons[btn_idx].configure(fg_color=harmony_colour,
                                                              hover_color=harmony_colour)
         self.render_keystone_shades_palette(keystone_colour=primary_colour, harmony_method=harmony_method)
+
     def save_harmonics_geometry(self):
         """Save the harmonics panel geometry to the repo, for the next time the dialog is launched."""
         geometry_row = mod.preference_row(db_file_path=DB_FILE_PATH,
@@ -2469,6 +2488,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
         self.destroy()
         self.harmony_palette_running = False
         self.master.set_option_states()
+
     def switch_harmony_method(self, event='event'):
         """This method updates the rendered buttons, below the keystone colour button, when we change the harmony
         method (complimentary, triadic etc)."""
@@ -3043,13 +3063,17 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.new_theme_json_dir = Path(tk.filedialog.askdirectory(initialdir=self.theme_json_dir))
         self.lbl_pref_theme_dir_disp.configure(text=self.new_theme_json_dir)
 
+
 class GeometryDialog(ctk.CTkToplevel):
     class ThemeMerger(ctk.CTkToplevel):
         """This class is used to merge two themes, to create an entirely new theme."""
+
         def __init__(self, *args, **kwargs):
             super().__init__(*args, **kwargs)
-    def __init__(self, widget_type: str, theme_json_data:dict, *args, **kwargs):
+
+    def __init__(self, widget_type: str, theme_json_data: dict, appearance_mode: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
         # The interactions between this dialog and the Control Panel are strongly linked, making it less
         # straight forward to define as a class.
         def slider_callback(property_name, value):
@@ -3073,10 +3097,11 @@ class GeometryDialog(ctk.CTkToplevel):
             de-selected."""
             widget_id.deselect()
 
+        self.appearance_mode = appearance_mode
         self.theme_json_data = theme_json_data
         self.geometry_edit_values = {}
         preview_frame_top = self.theme_json_data['CTkFrame']['top_fg_color'][
-            cbtk.str_mode_to_int(self.master.appearance_mode)]
+            cbtk.str_mode_to_int(self.appearance_mode)]
 
         self.title(f'{widget_type} Widget Geometry')
 
@@ -3089,7 +3114,7 @@ class GeometryDialog(ctk.CTkToplevel):
         # self.columnconfigure(1, weight=1)
 
         preview_text_colour = self.theme_json_data['CTkLabel']['text_color'][
-            cbtk.str_mode_to_int(self.master.appearance_mode)]
+            cbtk.str_mode_to_int(self.appearance_mode)]
 
         frm_main = ctk.CTkFrame(master=self, corner_radius=5)
         frm_main.grid(column=0, row=0, sticky='nsew')
@@ -3098,10 +3123,10 @@ class GeometryDialog(ctk.CTkToplevel):
         frm_main.rowconfigure(0, weight=1)
 
         frame_fg_color = self.theme_json_data['CTkFrame']['fg_color'][
-            cbtk.str_mode_to_int(self.master.appearance_mode)]
+            cbtk.str_mode_to_int(self.appearance_mode)]
         json_widget_type = mod.json_widget_type(widget_type=widget_type)
 
-        mode = cbtk.str_mode_to_int(self.master.appearance_mode)
+        mode = cbtk.str_mode_to_int(self.appearance_mode)
         if widget_type == 'CTkFrame':
             self.geometry('764x280')
             frm_widget_preview_low = ctk.CTkFrame(master=frm_main,
@@ -3368,10 +3393,10 @@ class GeometryDialog(ctk.CTkToplevel):
             self.geometry('800x280')
             scrollbar_fg_color = self.theme_json_data[json_widget_type]['fg_color']
             if not isinstance(scrollbar_fg_color, str):
-                scrollbar_fg_color = scrollbar_fg_color[cbtk.str_mode_to_int(self.master.appearance_mode)]
+                scrollbar_fg_color = scrollbar_fg_color[cbtk.str_mode_to_int(self.appearance_mode)]
             elif scrollbar_fg_color == "transparent":
                 scrollbar_fg_color = self.theme_json_data['CTkFrame']['fg_color'][
-                    cbtk.str_mode_to_int(self.master.appearance_mode)]
+                    cbtk.str_mode_to_int(self.appearance_mode)]
             scrollbar_button_color = self.theme_json_data[json_widget_type]['button_color']
             scrollbar_button_hover_color = self.theme_json_data[json_widget_type]['button_hover_color']
 
@@ -3380,13 +3405,13 @@ class GeometryDialog(ctk.CTkToplevel):
 
             # create textbox
             textbox_fg_color = self.theme_json_data['CTkTextbox']['fg_color'][
-                cbtk.str_mode_to_int(self.master.appearance_mode)]
+                cbtk.str_mode_to_int(self.appearance_mode)]
             if not isinstance(textbox_fg_color, str):
-                textbox_fg_color = textbox_fg_color[cbtk.str_mode_to_int(self.master.appearance_mode)]
+                textbox_fg_color = textbox_fg_color[cbtk.str_mode_to_int(self.appearance_mode)]
             textbox_border_color = self.theme_json_data['CTkTextbox']['border_color'][
-                cbtk.str_mode_to_int(self.master.appearance_mode)]
+                cbtk.str_mode_to_int(self.appearance_mode)]
             textbox_text_color = self.theme_json_data['CTkTextbox']['text_color'][
-                cbtk.str_mode_to_int(self.master.appearance_mode)]
+                cbtk.str_mode_to_int(self.appearance_mode)]
             tk_textbox = ctk.CTkTextbox(frm_preview,
                                         activate_scrollbars=False,
                                         fg_color=textbox_fg_color,
@@ -3410,7 +3435,7 @@ class GeometryDialog(ctk.CTkToplevel):
             # CTkTextbox
             textbox_fg_color = self.theme_json_data[json_widget_type]['fg_color'][mode]
             if not isinstance(textbox_fg_color, str):
-                textbox_fg_color = textbox_fg_color[cbtk.str_mode_to_int(self.master.appearance_mode)][mode]
+                textbox_fg_color = textbox_fg_color[cbtk.str_mode_to_int(self.appearance_mode)][mode]
             elif textbox_fg_color == "transparent":
                 textbox_fg_color = self.theme_json_data['CTkFrame']['fg_color'][mode]
             textbox_border_color = self.theme_json_data[json_widget_type]['border_color'][mode]
@@ -3511,6 +3536,7 @@ class GeometryDialog(ctk.CTkToplevel):
                                                 scope='window_geometry',
                                                 preference_name='widget_geometry')
         self.geometry(saved_geometry)
+
     def save_widget_geom_geometry(self):
         """Save the widget geometry dialog's geometry to the repo, for the next time the dialog is launched."""
         geometry_row = mod.preference_row(db_file_path=DB_FILE_PATH,
@@ -3521,8 +3547,6 @@ class GeometryDialog(ctk.CTkToplevel):
         mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
 
 
-
-
 class SortingHelpFormatter(HelpFormatter):
     def add_arguments(self, actions):
         actions = sorted(actions, key=attrgetter('option_strings'))
@@ -3531,12 +3555,15 @@ class SortingHelpFormatter(HelpFormatter):
 
 class ThemeMerger(ctk.CTkToplevel):
     """This class is used to merge two themes, to create an entirely new theme."""
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.theme_json_dir = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                      preference_name='theme_json_dir')
         self.enable_tooltips = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                       preference_name='enable_tooltips')
+        self.open_when_merged = 0
+
         self.master = self.master
         self.title('Merge Themes')
         self.geometry('760x350')
@@ -3614,13 +3641,14 @@ class ThemeMerger(ctk.CTkToplevel):
                                                     "will be mapped to the unselected mode.")
         self.tk_primary_mapped_mode = tk.StringVar()
         rdo_primary_mapped_light = ctk.CTkRadioButton(master=frm_widgets, text='Light',
-                                               variable=self.tk_primary_mapped_mode,
-                                               value='Light')
+                                                      variable=self.tk_primary_mapped_mode,
+                                                      value='Light')
         rdo_primary_mapped_light.grid(row=widget_start_row, column=5, pady=(20, 5), sticky='w')
         widget_start_row += 1
 
-        rdo_primary_mapped_dark = ctk.CTkRadioButton(master=frm_widgets, text='Dark', variable=self.tk_primary_mapped_mode,
-                                              value='Dark')
+        rdo_primary_mapped_dark = ctk.CTkRadioButton(master=frm_widgets, text='Dark',
+                                                     variable=self.tk_primary_mapped_mode,
+                                                     value='Dark')
         rdo_primary_mapped_dark.grid(row=widget_start_row, column=5, pady=5, sticky='w')
 
         rdo_primary_mapped_dark.deselect()
@@ -3765,6 +3793,7 @@ class ThemeMerger(ctk.CTkToplevel):
     def new_theme_name(self):
         return self.new_theme
 
+
 class ProvenanceDialog(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -3783,7 +3812,6 @@ class ProvenanceDialog(ctk.CTkToplevel):
         frm_buttons = ctk.CTkFrame(master=self)
         frm_buttons.grid(column=0, row=2, padx=5, pady=5, sticky='ew')
 
-
         widget_row = 0
         # Header -  Theme Name (frm_header)
         lbl_theme_label = ctk.CTkLabel(master=frm_header, text='Theme:', width=280, anchor="e", font=HEADING4)
@@ -3798,7 +3826,7 @@ class ProvenanceDialog(ctk.CTkToplevel):
         lbl_author_label = ctk.CTkLabel(master=frm_widgets, text='Author:', anchor="e", width=75)
         lbl_author_label.grid(row=widget_row, column=0, padx=20, pady=10, sticky='e')
 
-        self.lbl_author_name = ctk.CTkLabel(master=frm_widgets,  anchor="w")
+        self.lbl_author_name = ctk.CTkLabel(master=frm_widgets, anchor="w")
         self.lbl_author_name.grid(row=widget_row, column=1, padx=5, pady=10, sticky='w')
 
         lbl_created_label = ctk.CTkLabel(master=frm_widgets, text='Created:', width=100, anchor="e")
@@ -3838,9 +3866,9 @@ class ProvenanceDialog(ctk.CTkToplevel):
 
         widget_row += 1
         self.btn_keystone_colour = ctk.CTkButton(master=frm_widgets,
-                                            height=70,
-                                            border_width=2,
-                                            width=50)
+                                                 height=70,
+                                                 border_width=2,
+                                                 width=50)
         self.btn_keystone_colour.grid(row=widget_row, column=1, padx=5, pady=(0, 5), sticky='w')
 
         # Created with...
