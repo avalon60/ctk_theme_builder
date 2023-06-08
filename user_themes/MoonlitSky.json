@@ -299,8 +299,8 @@
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#4d5390",
-      "#363d6b"
+      "#7083b4",
+      "#57639D"
     ],
     "border_color": [
       "#4e5894",
@@ -359,9 +359,9 @@
   "provenance": {
     "theme author": "Clive Bostock",
     "date created": "Mar 27 2023 18:16:02",
-    "last modified by": "Clive Bostock",
+    "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "May 22 2023 21:23:53",
+    "last modified": "Jun 08 2023 19:44:01",
     "keystone colour": "#57639D",
     "harmony method": "Complementary",
     "harmony differential": 5,
