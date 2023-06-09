@@ -67,8 +67,8 @@
       "#a9b8c4"
     ],
     "border_color": [
-      "#000000",
-      "#000000"
+      "#464f64",
+      "#464f64"
     ],
     "text_color": [
       "#2b3449",
@@ -226,12 +226,12 @@
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#748498",
-      "#748498"
+      "#9dacb8",
+      "#97a6b2"
     ],
     "border_color": [
-      "#000000",
-      "#000000"
+      "#464f64",
+      "#464f64"
     ],
     "button_color": [
       "#1e2e3c",
@@ -359,9 +359,9 @@
   "provenance": {
     "theme author": "Clive Bostock",
     "date created": "Mar 27 2023 18:16:02",
-    "last modified by": "Clive Bostock",
+    "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "May 13 2023 10:51:16",
+    "last modified": "Jun 09 2023 09:31:31",
     "keystone colour": "#3c5064",
     "harmony method": "Split-complementary",
     "harmony differential": null,

@@ -226,7 +226,7 @@
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#313B6E",
+      "#7083b4",
       "#4b5791"
     ],
     "border_color": [
@@ -361,7 +361,7 @@
     "date created": "Mar 27 2023 18:16:02",
     "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "Jun 08 2023 19:44:01",
+    "last modified": "Jun 09 2023 09:34:14",
     "keystone colour": "#57639D",
     "harmony method": "Complementary",
     "harmony differential": 5,

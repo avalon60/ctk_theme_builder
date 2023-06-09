@@ -203,7 +203,7 @@
     "corner_radius": 6,
     "fg_color": [
       "#748498",
-      "#2e435c"
+      "#163048"
     ],
     "button_color": [
       "#3c5163",
@@ -226,8 +226,8 @@
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#748498",
-      "#163048"
+      "#a3b2be",
+      "#2e435c"
     ],
     "border_color": [
       "#000000",
@@ -359,9 +359,9 @@
   "provenance": {
     "theme author": "Clive Bostock",
     "date created": "May 03 2023 09:03:28",
-    "last modified by": "Clive Bostock",
+    "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "May 18 2023 18:54:25",
+    "last modified": "Jun 09 2023 09:27:22",
     "keystone colour": "#3c5064",
     "harmony method": "Tetradic",
     "harmony differential": null,
