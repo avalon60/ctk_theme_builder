@@ -2410,6 +2410,8 @@ class HarmonicsDialog(ctk.CTkToplevel):
 
     def harmony_input_colour_picker(self):
         # self.harmonics_label_count
+        self.lift()
+        self.transient()
         primary_colour = askcolor(master=self,
                                   initialcolor=self.keystone_colour,
                                   title=f'Harmony Source Colour Selection')
