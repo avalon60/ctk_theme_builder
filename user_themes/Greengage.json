@@ -67,8 +67,8 @@
       "#a9b8c4"
     ],
     "border_color": [
-      "#002e2d",
-      "#000000"
+      "#586b78",
+      "#586b78"
     ],
     "text_color": [
       "#040d22",
@@ -297,14 +297,14 @@
   },
   "CTkTextbox": {
     "corner_radius": 6,
-    "border_width": 0,
+    "border_width": 1,
     "fg_color": [
       "#05403F",
       "#1e2341"
     ],
     "border_color": [
-      "#000000",
-      "#000000"
+      "#586b78",
+      "#586b78"
     ],
     "text_color": [
       "#d0d8de",
@@ -362,7 +362,7 @@
     "date created": "May 13 2023 18:09:42",
     "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "Jun 09 2023 09:32:46",
+    "last modified": "Jun 09 2023 19:50:10",
     "keystone colour": "#74926F",
     "harmony method": "Triadic",
     "harmony differential": 10
