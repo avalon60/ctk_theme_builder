@@ -813,7 +813,7 @@ class PreviewPanel:
                 exit(1)
 
     def _update_widget_colour(self, widget_type, widget_property, widget_colour):
-        print(f'_update_widget_colour: widget_type: {widget_type}; widget_property: {widget_property}')
+        # print(f'_update_widget_colour: widget_type: {widget_type}; widget_property: {widget_property}')
         # We lowercase the widget property, due to an issue in CustomTkinter 5.1.2, where there was an fg_Color
         # property against CTkSwitch. This was fixed to fg_color in 5.1.3.
         widget_property_lower = widget_property.lower()
@@ -825,7 +825,7 @@ class PreviewPanel:
             widget_type = 'frame_base'
 
         for widget in self._rendered_widgets[widget_type]:
-            print(f'Updating {widget_property_lower} for widget of type "{widget_type}"')
+            # print(f'Updating {widget_property_lower} for widget of type "{widget_type}"')
             if widget_property_lower == 'border_color':
                 widget.configure(border_color=widget_colour)
             elif widget_property_lower == 'button_color':
@@ -865,7 +865,6 @@ class PreviewPanel:
         # Now deal with composite widgets, which share properties with other widget types.
         # Scrollable Frames
         if widget_type == 'frame_base':
-            print(self._rendered_widgets)
             for widget in self._rendered_widgets['CTkScrollableFrame']:
                 if widget_property_lower == 'fg_color':
                     widget.configure(fg_color=widget_colour)
