@@ -200,11 +200,13 @@ class ControlPanel(ctk.CTk):
     #   CTk 5.1.2: Omission: Theme JSON property checkmark_color of CTkCheckBox has no configure option #1586
     #   CTk 5.1.2: CTkSegmentedButton property setting issues #1562
     #   CTk 5.1.2: CTkOptionMenu.configure(text_color_disabled=...) raises exception #1559
+    #   CTk 5.1.3: CTkCheckBox has no supporting configure option for checkmark_color #1703
     # The DropdownMenu is a different case. This is not a widget in its own right and so has no methods to
     # update the widgets which utilise it. E.g. CTkComboBox, CTkOptionMenu.
     # In any case, any entries in the list, require a full preview panel refresh, to work around the respective
     # challenges.
-    FORCE_REFRESH_PROPERTIES = ["DropdownMenu: fg_color",
+    FORCE_REFRESH_PROPERTIES = ["CheckBox: checkmark_color",
+                                "DropdownMenu: fg_color",
                                 "DropdownMenu: hover_color",
                                 "DropdownMenu: text_color",
                                 "Frame: top_fg_color",
