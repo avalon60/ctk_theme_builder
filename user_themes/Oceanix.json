@@ -112,7 +112,7 @@
     "border_width": 3,
     "button_length": 0,
     "fg_color": [
-      "#435e74",
+      "#21375a",
       "#222222"
     ],
     "progress_color": [
@@ -361,7 +361,7 @@
     "date created": "Mar 27 2023 18:16:02",
     "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "Jun 09 2023 09:35:59",
+    "last modified": "Jun 10 2023 10:58:21",
     "keystone colour": "#1f3d4c",
     "harmony method": "Split-complementary",
     "harmony differential": 10,
