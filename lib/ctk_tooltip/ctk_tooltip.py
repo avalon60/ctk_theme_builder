@@ -49,7 +49,7 @@ class CTkToolTip(customtkinter.CTkToplevel):
             corner_radius = 0
             
         if not resampling: self.resizable(width=True, height=True)
-        self.transient(self.master)
+        # self.transient(self.master)
         
         # Make the background transparent
         self.config(background=self.transparent_color)

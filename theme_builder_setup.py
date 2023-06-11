@@ -409,7 +409,7 @@ if __name__ == "__main__":
 
     # Perform initial checks
     print('Checking Python interpreter version...')
-    if not (version_scalar('3.8.0') <= version_scalar(python_version) <= version_scalar('3.10.9')):
+    if not (version_scalar('3.8.0') <= version_scalar(python_version) <= version_scalar('3.10.99')):
         print(f'ERROR: Python interpreter version, {python_version}, is unsupported.\n'
               f'Only Python versions between 3.8 and 3.10 are supported')
         exit(1)
@@ -504,7 +504,7 @@ if __name__ == "__main__":
     apply_repo_updates(data_directory=data_location, app_file_version=app_version, db_file_path=db_file)
     print(f'App Home for {PRODUCT}: ' + str(os.path.abspath(app_home)))
 
-    print(f'\nTo launch the application run the ctk_theme_builder command script, located at:\n{app_home}')
+    print(f'\nTo launch the application run the ctk_theme_builder command script, located at:\n{app_home}/ctk_theme_builder')
 
     print("\nDone.")
 

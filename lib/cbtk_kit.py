@@ -3,7 +3,6 @@ __author__ = 'Clive Bostock'
 __version__ = "1.0.0"
 __license__ = 'MIT - see LICENSE.md'
 
-import tkinter
 import tkinter as tk
 import customtkinter as ctk
 from customtkinter import ThemeManager
@@ -23,8 +22,9 @@ HEADING3 = ('Roboto', 20)
 HEADING4 = ('Roboto', 18)
 HEADING5 = ('Roboto', 16)
 # HEADING_UL = 'Roboto 11 underline'
-REGULAR_TEXT = ('Roboto', 10)
-SMALL_TEXT = ('Roboto', 7)
+REGULAR_TEXT = ('Roboto', 13)
+
+SMALL_TEXT = ('Roboto', 8)
 TOOLTIP_DELAY = 1
 
 
@@ -95,7 +95,7 @@ def shade_up(color: str, differential: int = 20, multiplier: int = 1):
         rgb_1 = color_rgb[1]
         rgb_2 = color_rgb[2]
 
-    if color_rgb[0] + compound_differential > 255 or color_rgb[1] + compound_differential > 255 or color_rgb[1] + compound_differential > 255:
+    if color_rgb[0] + compound_differential > 255 or color_rgb[1] + compound_differential > 255 or color_rgb[2] + compound_differential > 255:
         # Don't perturb the colour balance
         return color
 
@@ -127,7 +127,7 @@ def shade_down(color: str, differential: int = 20, multiplier: int = 1):
         rgb_1 = color_rgb[1]
         rgb_2 = color_rgb[2]
 
-    if color_rgb[0] - compound_differential < 0 or color_rgb[1] - compound_differential < 0 or color_rgb[1] - compound_differential < 0:
+    if color_rgb[0] - compound_differential < 0 or color_rgb[1] - compound_differential < 0 or color_rgb[2] - compound_differential < 0:
         # Don't perturb the colour balance
         return color
 
@@ -276,14 +276,16 @@ class CBtkMenu(tk.Menu):
 
     @classmethod
     def update_widgets_mode(cls):
+        """Method to update all menu widgets following an appearance mode change."""
         for widget in CBtkMenu.widget_registry:
             try:
                 widget.update_appearance_mode()
-            except tkinter.TclError:
+            except tk.TclError:
                 # print(f'Skipping widget configuration')
                 pass
 
     def update_appearance_mode(self):
+        """Method called to scan through rendered widgets and update to a new appearance mode setting."""
         mode = ctk.get_appearance_mode()
         if mode == 'Light':
             mode = 0
@@ -298,6 +300,7 @@ class CBtkMenu(tk.Menu):
                        fg=text_color,
                        activebackground=hover_color,
                        activeforeground=text_color)
+
 
 class CBtkMenu2(tk.Menu, CTkAppearanceModeBaseClass):
     def __init__(self):
@@ -614,7 +617,7 @@ class CBtkMessageBox(object):
                 pass
 
 
-def raise_tk_window(window_widget: tkinter.Toplevel):
+def raise_tk_window(window_widget: tk.Toplevel):
     """Brings a window widget to the front (above other windows), but does not lock it there."""
 
     try:

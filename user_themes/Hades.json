@@ -149,8 +149,8 @@
       "#f0e9b6"
     ],
     "hover_color": [
-      "#000000",
-      "#000000"
+      "#d37612",
+      "#d37612"
     ],
     "text_color": [
       "#f0e9b6",
@@ -359,9 +359,9 @@
   "provenance": {
     "theme author": "Clive Bostock",
     "date created": "Apr 29 2023 14:39:51",
-    "last modified by": "Clive Bostock",
+    "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "May 19 2023 18:52:04",
+    "last modified": "May 28 2023 15:40:15",
     "keystone colour": "#ac0000",
     "harmony method": "Split-complementary",
     "harmony differential": null,

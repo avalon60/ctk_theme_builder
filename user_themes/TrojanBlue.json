@@ -153,8 +153,8 @@
       "#3F5EA8"
     ],
     "text_color": [
-      "#112c7c",
-      "#112c7c"
+      "#d9d9d9",
+      "#d9d9d9"
     ],
     "text_color_disabled": [
       "#b1d9ff",
@@ -202,7 +202,7 @@
   "CTkOptionMenu": {
     "corner_radius": 6,
     "fg_color": [
-      "#283e7b",
+      "#374d8a",
       "#283e7b"
     ],
     "button_color": [
@@ -214,8 +214,8 @@
       "#112c7c"
     ],
     "text_color": [
-      "#a3c8ff",
-      "#a3c8ff"
+      "#ffffff",
+      "#ffffff"
     ],
     "text_color_disabled": [
       "#b1d9ff",
@@ -227,7 +227,7 @@
     "border_width": 2,
     "fg_color": [
       "#283e7b",
-      "#283e7b"
+      "#1e326e"
     ],
     "border_color": [
       "#37559b",
@@ -359,9 +359,9 @@
   "provenance": {
     "theme author": "Clive Bostock",
     "date created": "Mar 27 2023 18:16:02",
-    "last modified by": "Clive Bostock",
+    "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "May 22 2023 21:10:46",
+    "last modified": "Jun 09 2023 09:40:07",
     "keystone colour": "#1f3572",
     "harmony method": "Complementary",
     "harmony differential": 5,

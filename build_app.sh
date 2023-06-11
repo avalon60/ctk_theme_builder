@@ -35,10 +35,28 @@ echo "CTK Theme Builder build started..."
 fix_eols
 
 PROG_PATH=`dirname $0`
-python3 -m venv venv
+
+type python 2> /dev/null
+if [ $? -eq 0 ]
+then
+  PYTHON="python"
+else
+  type python3 2> /dev/null
+  if [ $? -eq 0 ]
+  then
+    PYTHON="python3"
+  else
+    echo -e "Cannot find a Python interpreter. Please ensure that you have Python installed and that it can be found via \$PATH"
+    exit 1
+  fi
+fi
+
+
+${PYTHON} -m venv venv
 APP_ENV=${PROG_PATH}/venv
 source ${APP_ENV}/bin/activate
-python get-pip.py
+${PYTHON} get-pip.py
+
 ${APP_ENV}/bin/pip install -r requirements.txt
 if [ ! -f "ctk_theme_builder" ]
 then

@@ -1,9 +1,9 @@
 #!/usr/bin/env bash
 ##############################################################################
 # Author: Clive Bostock
-#   Date: 8 Apr 2023
-#   Name: ctk_theme_builder.sh
-#  Descr: CustomTkinter Theme Builder Launcher (Linux/Mac)
+#   Date: 10 June 2023
+#   Name: ctk_theme_builder_test_app.sh
+#  Descr: CustomTkinter Theme Builder Test App Launcher (Linux/Mac)
 ##############################################################################
 PROG=`basename $0`
 PROG_PATH=`dirname $0`

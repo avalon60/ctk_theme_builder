@@ -1,9 +1,13 @@
-'''A hat tip and thankyou, to Tom Schimansky for is excellent CustomTkinter.'''
+__title__ = 'CTk Theme Builder'
+__author__ = 'Clive Bostock'
+__version__ = "2.2.0"
+__license__ = 'MIT - see LICENSE.md'
 
 import copy
 import time
 import tkinter as tk
 import customtkinter as ctk
+from customtkinter import ThemeManager
 import json
 import socket
 import os
@@ -15,6 +19,7 @@ from datetime import datetime
 import lib.cbtk_kit as cbtk
 import lib.ctk_theme_builder_m as mod
 from lib.ctk_tooltip.ctk_tooltip import CTkToolTip
+from CTkMessagebox import CTkMessagebox
 
 PROG = os.path.basename(__file__)
 APP_HOME = Path(os.path.dirname(os.path.realpath(__file__)))
@@ -32,22 +37,16 @@ DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
 DEBUG = 0
 HEADER_SIZE = 64
 METHOD_LISTENER_PORT = 5051
-ACK_LISTENER_PORT = 5052
 SERVER = '127.0.0.1'
 METHOD_LISTENER_ADDRESS = (SERVER, METHOD_LISTENER_PORT)
-CONTROLLER_ACK_ADDRESS = (SERVER, ACK_LISTENER_PORT)
+
 ENCODING_FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 DISCONNECT_JSON = '{"command_type": "program", "command": "' + DISCONNECT_MESSAGE + '", "parameters": [""]}'
 
-HEADING1 = cbtk.HEADING1
-HEADING2 = cbtk.HEADING2
-HEADING3 = cbtk.HEADING3
-HEADING4 = cbtk.HEADING4
-REGULAR_TEXT = cbtk.REGULAR_TEXT
-SMALL_TEXT = cbtk.SMALL_TEXT
-
 DEFAULT_VIEW = mod.DEFAULT_VIEW
+
+listener_status = 0
 
 
 def update_widget_geometry(widget, widget_property, property_value):
@@ -212,6 +211,7 @@ class PreviewPanel:
         # We need a double entry. This is a bit of a cludge for dealing
         # with the top_fg_color property, which has no configure option.
         self._rendered_widgets['frame_base'].append(self._frm_preview_base)
+        self._rendered_widgets['CTkFrame'].append(self._frm_preview_base)
 
         # This is a top frame for contrast purposes, when placed within another frame.
         self._frm_preview_top = ctk.CTkFrame(master=self._frm_preview_base)
@@ -221,6 +221,7 @@ class PreviewPanel:
         # We need a double entry. This is a bit of a cludge for dealing
         # with the top_fg_color property, which has no configure option.
         self._rendered_widgets['frame_top'].append(self._frm_preview_top)
+        self._rendered_widgets['CTkFrame'].append(self._frm_preview_top)
 
         self._render_frame_top_preview()
 
@@ -314,22 +315,31 @@ class PreviewPanel:
         self._rendered_widgets['CTkComboBox'].append(self.combobox_1)
 
         # CTkButton
-        self.button_1 = ctk.CTkButton(master=widget_frame)
+        # We contrive to always show a contrast of a button widget with and without a border.
+        button_border_width = ThemeManager.theme['CTkButton']['border_width']
+        self.button_1 = ctk.CTkButton(master=widget_frame, border_width=button_border_width)
         self.button_1.grid(row=4, column=2, padx=pad_x, pady=pad_y)
 
         self._rendered_widgets['CTkButton'].append(self.button_1)
         if self._enable_tooltips:
-            button_1_tooltip = CTkToolTip(self.button_1,
-                                          justify="left",
-                                          message='CTkButton default border setting')
+            self.button_1_tooltip = CTkToolTip(self.button_1,
+                                               justify="left",
+                                               x_offset=-70,
+                                               message=f'CTkButton - with default border setting of {button_border_width}')
 
-        self.button_2 = ctk.CTkButton(master=widget_frame, border_width=0)
+        if button_border_width == 0:
+            second_border_width = 2
+        else:
+            second_border_width = 0
+        self.button_2 = ctk.CTkButton(master=widget_frame, border_width=second_border_width)
         self.button_2.grid(row=5, column=2, padx=pad_x, pady=pad_y)
 
         if self._enable_tooltips:
-            button_2_tooltip = CTkToolTip(self.button_2,
-                                          justify="left",
-                                          message='CTkButton border disabled (border_width=0)')
+            self.button_2_tooltip = CTkToolTip(self.button_2,
+                                               border_width=second_border_width,
+                                               justify="left",
+                                               x_offset=-70,
+                                               message=f'TkButton - with border setting of {second_border_width}')
 
         self._rendered_widgets['CTkButton'].append(self.button_2)
 
@@ -360,25 +370,31 @@ class PreviewPanel:
         self._rendered_widgets['CTkRadioButton'].append(self.radiobutton_2)
 
         # CTkEntry
-        self.entry_1 = ctk.CTkEntry(master=widget_frame, placeholder_text="CTkEntry")
+        # We contrive to always show a contrast of an entry widget with and without a border.
+        entry_border_width = ThemeManager.theme['CTkEntry']['border_width']
+        if entry_border_width == 0:
+            second_border_width = 2
+        else:
+            second_border_width = 0
+
+        self.entry_1 = ctk.CTkEntry(master=widget_frame, placeholder_text="CTkEntry", border_width=entry_border_width)
         self.entry_1.grid(row=4, column=0, padx=pad_x, pady=pad_y)
         if self._enable_tooltips:
-            entry_1_tooltip = CTkToolTip(self.entry_1,
+            self.entry_1_tooltip = CTkToolTip(self.entry_1,
                                          justify="left",
                                          wraplength=250,
                                          padding=(5, 5),
-                                         message='CTkEntry border enabled.\n\n NOTE: If your theme border width '
-                                                 'default is set to 0, no border will be visible.')
+                                         message=f'CTkEntry - with default border setting of {entry_border_width}')
 
         self._rendered_widgets['CTkEntry'].append(self.entry_1)
 
-        self.entry_2 = ctk.CTkEntry(master=widget_frame, border_width=0, placeholder_text="CTkEntry2")
+        self.entry_2 = ctk.CTkEntry(master=widget_frame, border_width=second_border_width, placeholder_text="CTkEntry2")
         self.entry_2.grid(row=5, column=0, padx=pad_x, pady=pad_y)
         if self._enable_tooltips:
-            entry_2_tooltip = CTkToolTip(self.entry_2,
+            self.entry_2_tooltip = CTkToolTip(self.entry_2,
                                          justify="left",
                                          wraplength=250,
-                                         message='CTkEntry with border disabled.')
+                                         message=f'CTkEntry - with border setting of {second_border_width}')
         self._rendered_widgets['CTkEntry'].append(self.entry_2)
 
         # CTkTextbox
@@ -414,12 +430,15 @@ class PreviewPanel:
                                                           'With the exception of the label_fg_color, '
                                                           'theme file property, its other colour '
                                                           'properties, are defaulted from CTkFrame, '
-                                                          'CTkScrollbar and CTkLabel.')
+                                                          'CTkScrollbar and CTkLabel.\n\n'
+                                                          'The text in the main body of the CTkScrollableFrame '
+                                                          'preview, is produced via an embedded CTkLabel.')
 
         self.scrollable_label = ctk.CTkLabel(master=self.scrollable_frame, text="Bozzy bear woz here...\n\n" * 20)
         self.scrollable_label.grid(row=0, column=0, padx=0, pady=0, sticky='ew')
-        # As of CustomTkinter 5.1.2, the mousewheel bindings aren't in place for Linux.
+        self._rendered_widgets['CTkLabel'].append(self.scrollable_label)
 
+        # As of CustomTkinter 5.1.2, the mousewheel bindings aren't in place for Linux.
         self._rendered_widgets['CTkScrollableFrame'].append(self.scrollable_frame)
         # CTkTabview
         self.tabview = ctk.CTkTabview(master=widget_frame, width=250)
@@ -434,13 +453,18 @@ class PreviewPanel:
                                         text="I've seen things you people\nwouldn't believe...\n\nAttack ships on fire "
                                              "off\nthe shoulder of Orion...")
         self.label_tab_1.grid(row=0, column=2, padx=20, pady=20)
+        self._rendered_widgets['CTkLabel'].append(self.label_tab_1)
+
         self.label_tab_2 = ctk.CTkLabel(self.tabview.tab("Tab 2"), justify='left',
                                         text="I watched C-beams glitter in\nthe dark near the Tannhäuser\nGate.")
         self.label_tab_2.grid(row=0, column=0, padx=20, pady=20)
+        self._rendered_widgets['CTkLabel'].append(self.label_tab_2)
+
         self.label_tab_3 = ctk.CTkLabel(self.tabview.tab("Tab 3"), justify='left',
                                         text="All those moments will be\nlost in time, like tears\nin rain...\n\n\n"
                                              "Time to die.")
         self.label_tab_3.grid(row=0, column=0, padx=20, pady=20, sticky='nsew')
+        self._rendered_widgets['CTkLabel'].append(self.label_tab_3)
         if self._enable_tooltips:
             label_tab_1_tooltip = CTkToolTip(self.label_tab_1,
                                              justify="left",
@@ -449,7 +473,9 @@ class PreviewPanel:
                                              padding=(5, 5),
                                              message='The CTkTabview is a composite widget. As of CustomTkinter 5.1.2, '
                                                      'it has no direct default properties. instead it borrows from '
-                                                     'CTkFrame and CTkSegmentedButton.')
+                                                     'CTkFrame and CTkSegmentedButton.\n\n'
+                                                     'The text in the main body of the CTkTabview preview, '
+                                                     'is produced via an embedded CTkLabel.')
             label_tab_2_tooltip = CTkToolTip(self.label_tab_2,
                                              justify="left",
                                              wraplength=250,
@@ -457,7 +483,9 @@ class PreviewPanel:
                                              padding=(5, 5),
                                              message='The CTkTabview is a composite widget. As of CustomTkinter 5.1.2, '
                                                      'it has no direct default properties. instead it borrows from '
-                                                     'CTkFrame and CTkSegmentedButton.')
+                                                     'CTkFrame and CTkSegmentedButton.\n\n'
+                                                     'The text in the main body of the preview is produced '
+                                                     'via an embedded CTkLabel.')
             label_tab_3_tooltip = CTkToolTip(self.label_tab_3,
                                              justify="left",
                                              wraplength=250,
@@ -465,7 +493,9 @@ class PreviewPanel:
                                              padding=(5, 5),
                                              message='The CTkTabview is a composite widget. As of CustomTkinter 5.1.2, '
                                                      'it has no direct default properties. instead it borrows from '
-                                                     'CTkFrame and CTkSegmentedButton.')
+                                                     'CTkFrame and CTkSegmentedButton.\n\n'
+                                                     'The text in the main body of the preview is produced '
+                                                     'via an embedded CTkLabel.')
 
     def _render_preview_disabled(self):
         self._toggle_preview_disabled(render_state=tk.DISABLED)
@@ -486,7 +516,6 @@ class PreviewPanel:
         border_width = cbtk.theme_property(theme_file_path=self._theme_file,
                                            widget_type='CTkFrame',
                                            widget_property='border_width')
-        print(f'DEBUG: render_top_frame; self._ctl_frame_top_fg_color = {self._ctl_frame_top_fg_color}')
         self._frm_preview_top.configure(fg_color=self._ctl_frame_top_fg_color, border_width=border_width)
 
     def _toggle_preview_disabled(self, render_state):
@@ -550,7 +579,7 @@ class PreviewPanel:
                                                 scope='window_geometry',
                                                 preference_name='preview_panel')
         self.preview.geometry(panel_geometry)
-        self.preview.resizable(False, True)
+        self.preview.resizable(True, True)
 
     def _save_preview_geometry(self):
         # save current geometry to the preferences
@@ -569,7 +598,7 @@ class PreviewPanel:
             self._save_preview_geometry()
             print('Preview panel quitting...')
             if LISTENER_FILE.exists():
-                os.remove(self._ETC_DIR / 'listener.started')
+                os.remove(LISTENER_FILE)
             exit(0)
         if command == 'refresh':
             ctk.set_default_color_theme(self._theme_file)
@@ -622,19 +651,56 @@ class PreviewPanel:
         property_value = parameters[2]
 
         if widget_type == 'CTkFrame':
-            for widget in self._rendered_widgets['frame_base']:
-                update_widget_geometry(widget, widget_property, int(property_value))
-            for widget in self._rendered_widgets['frame_top']:
+            for widget in self._rendered_widgets['CTkFrame']:
                 update_widget_geometry(widget, widget_property, int(property_value))
             if widget_property in ("corner_radius", "border_width"):
                 for widget in self._rendered_widgets['CTkScrollableFrame']:
                     update_widget_geometry(widget, widget_property, int(property_value))
                 for widget in self._rendered_widgets['CTkTabview']:
                     update_widget_geometry(widget, widget_property, int(property_value))
+
         else:
             for widget in self._rendered_widgets[widget_type]:
                 json_widget_type = mod.json_widget_type(widget_type=widget)
                 update_widget_geometry(widget, widget_property, int(property_value))
+
+        # We contrive to always show a contrast of a button with and without a border.
+        if widget_type == 'CTkButton' and widget_property == 'border_width':
+            button_border_width = int(property_value)
+            self.button_1.configure(border_width=button_border_width)
+
+            if self._enable_tooltips:
+                self.button_1_tooltip.configure(message=f'CTkButton - with default border setting of '
+                                                        f'{button_border_width}')
+
+            if button_border_width == 0:
+                second_border_width = 2
+            else:
+                second_border_width = 0
+
+            self.button_2.configure(border_width=second_border_width)
+
+            if self._enable_tooltips:
+                self.button_2_tooltip.configure(message=f'TkButton - with border setting of {second_border_width}')
+
+        elif widget_type == 'CTkEntry' and widget_property == 'border_width':
+
+            # We contrive to always show a contrast of an entry widget with and without a border.
+            entry_border_width = int(property_value)
+            self.entry_1.configure(border_width=entry_border_width)
+
+            if self._enable_tooltips:
+                self.entry_1_tooltip.configure(message=f'CTkEntry - with default border setting of '
+                                                       f'{entry_border_width}')
+
+            if entry_border_width == 0:
+                second_border_width = 2
+            else:
+                second_border_width = 0
+
+            self.entry_2.configure(border_width=second_border_width)
+            if self._enable_tooltips:
+                self.entry_2_tooltip.configure(message=f'CTkEntry - with border setting of {second_border_width}')
 
     def _exec_client_command(self, evt):
         command_json = self._command_json
@@ -672,7 +738,8 @@ class PreviewPanel:
                 if command == DISCONNECT_MESSAGE and command_type == 'program':
                     if DEBUG:
                         print(f'[{address}] Session disconnected')
-                    del self._client_handlers[conn]
+                    if conn in self._client_handlers:
+                        del self._client_handlers[conn]
                     connected = False
                 else:
                     self._command_json = command_json
@@ -686,10 +753,17 @@ class PreviewPanel:
         sessions (there should normally be only one). Each incoming request, is handed off to the
         handle_client function.
         """
+        global listener_status
         self._client_handlers = {}
         print("Method listener starting...")
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        server.bind(METHOD_LISTENER_ADDRESS)
+        try:
+            server.bind(METHOD_LISTENER_ADDRESS)
+        except OSError:
+            print(f'Preview Panel, socket bind error. ensure that no other instances of CTk Theme Builder are running '
+                  f'and that port 5051 is free.')
+            listener_status = -1
+            raise
         server.listen()
         # current dateTime
         now = datetime.now()
@@ -726,10 +800,31 @@ class PreviewPanel:
     def start_method_listener(self):
         listener_thread = threading.Thread(target=self._method_listener, daemon=True)
         listener_thread.start()
+        # Give the listener time to attempt to attach to the socket,
+        # and report if it has a problem.
+        time.sleep(0.1)
+        if listener_status == -1:
+            confirm = CTkMessagebox(
+                title='Socket Error',
+                message=f'The listener failed to bind to port {METHOD_LISTENER_PORT}\n\n'
+                        f'Ensure that only one instance of {__title__} is running and that no '
+                        f'other process is using the port.',
+                option_1='OK')
+            if confirm.get() == 'OK':
+                exit(1)
 
     def _update_widget_colour(self, widget_type, widget_property, widget_colour):
-        print(f'_update_widget_colour: widget_type: {widget_type}; widget_property: {widget_property}')
+        # print(f'_update_widget_colour: widget_type: {widget_type}; widget_property: {widget_property}')
+        # We lowercase the widget property, due to an issue in CustomTkinter 5.1.2, where there was an fg_Color
+        # property against CTkSwitch. This was fixed to fg_color in 5.1.3.
         widget_property_lower = widget_property.lower()
+
+        if widget_type == 'CTkFrame' and widget_property_lower not in ['fg_color', 'top_fg_color']:
+            for widget in self._rendered_widgets['CTkScrollableFrame']:
+                widget.configure(border_color=widget_colour)
+            for widget in self._rendered_widgets['CTkTabview']:
+                widget.configure(border_color=widget_colour)
+
 
         if widget_type == 'CTkFrame' and widget_property_lower == 'top_fg_color':
             widget_type = 'frame_top'
@@ -738,7 +833,7 @@ class PreviewPanel:
             widget_type = 'frame_base'
 
         for widget in self._rendered_widgets[widget_type]:
-            print(f'Updating {widget_property_lower} for widget of type "{widget_type}"')
+            # print(f'Updating {widget_property_lower} for widget of type "{widget_type}"')
             if widget_property_lower == 'border_color':
                 widget.configure(border_color=widget_colour)
             elif widget_property_lower == 'button_color':
@@ -777,12 +872,18 @@ class PreviewPanel:
                 print(f'WARNING: Unrecognised widget property: {widget_property_lower}')
         # Now deal with composite widgets, which share properties with other widget types.
         # Scrollable Frames
-        if widget_type == 'CTkFrame':
+        if widget_type == 'frame_base':
             for widget in self._rendered_widgets['CTkScrollableFrame']:
                 if widget_property_lower == 'fg_color':
                     widget.configure(fg_color=widget_colour)
                 elif widget_property_lower == 'border_color':
                     widget.configure(border_color=widget_colour)
+            for widget in self._rendered_widgets['CTkTabview']:
+                if widget_property_lower == 'fg_color':
+                    widget.configure(fg_color=widget_colour)
+                elif widget_property_lower == 'border_color':
+                    widget.configure(border_color=widget_colour)
+
         elif widget_type == 'CTkScrollbar' and widget_property_lower in ('fg_color', 'button_color',
                                                                          'button_hover_color'):
             for widget in self._rendered_widgets['CTkScrollableFrame']:

@@ -2,7 +2,7 @@
   "CTk": {
     "fg_color": [
       "#ae5e7d",
-      "#ae5e7d"
+      "#823251"
     ]
   },
   "CTkToplevel": {
@@ -16,11 +16,11 @@
     "border_width": 2,
     "fg_color": [
       "#c0708f",
-      "#c0708f"
+      "#964665"
     ],
     "top_fg_color": [
       "#db8baa",
-      "#db8baa"
+      "#a55574"
     ],
     "border_color": [
       "#000000",
@@ -327,16 +327,16 @@
   },
   "DropdownMenu": {
     "fg_color": [
-      "#414343",
-      "#414343"
+      "#b6ffff",
+      "#b6ffff"
     ],
     "hover_color": [
-      "#747676",
-      "#747676"
+      "#964665",
+      "#964665"
     ],
     "text_color": [
-      "#2e2829",
-      "#2e2829"
+      "#000000",
+      "#000000"
     ]
   },
   "CTkFont": {
@@ -361,35 +361,10 @@
     "date created": "Mar 27 2023 18:16:02",
     "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "May 25 2023 09:21:37",
+    "last modified": "May 29 2023 15:16:11",
     "keystone colour": "#263b2b",
     "harmony method": "Tetradic",
     "harmony differential": null,
     "theme name": "TestCard"
-  },
-  "CTkWibble": {
-    "corner_radius": 1000,
-    "border_width_checked": 6,
-    "border_width_unchecked": 3,
-    "fg_color": [
-      "#2CC985",
-      "#2FA572"
-    ],
-    "border_color": [
-      "#3E454A",
-      "#949A9F"
-    ],
-    "hover_color": [
-      "#0C955A",
-      "#106A43"
-    ],
-    "text_color": [
-      "gray10",
-      "#DCE4EE"
-    ],
-    "text_color_disabled": [
-      "gray60",
-      "gray45"
-    ]
   }
 }
