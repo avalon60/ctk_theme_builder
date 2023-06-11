@@ -2184,6 +2184,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
         self.HARMONICS_HEIGHT3 = 650
         self.theme_json_data = theme_json_data
         self.rendered_harmony_buttons = []
+        self.rendered_keystone_shades = []
         self.theme_name = theme_name
 
         self.harmony_contrast_differential = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
@@ -2525,7 +2526,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
 
         for button in self.rendered_harmony_buttons:
             button.destroy()
-            self.rendered_harmony_buttons = []
+        self.rendered_harmony_buttons = []
 
         harmony_entries = None
         if harmony_method == 'Analogous':
@@ -2542,11 +2543,11 @@ class HarmonicsDialog(ctk.CTkToplevel):
             print(f'ERROR: Unrecognised harmony colors method: {harmony_method}')
 
         if harmony_entries == 1:
-            self.geometry(f"510x{self.HARMONICS_HEIGHT1}")
+            self.geometry(f"600x{self.HARMONICS_HEIGHT1}")
         elif harmony_entries == 2:
             self.geometry(f"650x{self.HARMONICS_HEIGHT2}")
         elif harmony_entries == 3:
-            self.geometry(f"800x{self.HARMONICS_HEIGHT3}")
+            self.geometry(f"760x{self.HARMONICS_HEIGHT3}")
 
         menus = []
         pad_x = (5, 5)
@@ -2592,9 +2593,8 @@ class HarmonicsDialog(ctk.CTkToplevel):
                 harmony_method=harmony_method)
 
     def render_keystone_shades_palette(self, keystone_colour: str, harmony_method: str):
-        """Render the "shades palette" which displays the keystone colour, the complementary colours,
+        """Render the "shades palette" (right hand side), which displays the keystone colour, the complementary colours,
         and the contrast shades. """
-
         colour_object = ch.Color(mod.hex_to_rgb(keystone_colour), "", "")
 
         harmony_entries = 0
@@ -2651,7 +2651,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
         pad_y = 5
         menus = []
 
-        for button in self.master.rendered_keystone_shades:
+        for button in self.rendered_keystone_shades:
             button.destroy()
         self.rendered_keystone_shades = []
 
