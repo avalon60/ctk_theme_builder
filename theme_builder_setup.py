@@ -504,7 +504,7 @@ if __name__ == "__main__":
     apply_repo_updates(data_directory=data_location, app_file_version=app_version, db_file_path=db_file)
     print(f'App Home for {PRODUCT}: ' + str(os.path.abspath(app_home)))
 
-    print(f'\nTo launch the application run the ctk_theme_builder command script, located at:\n{app_home}')
+    print(f'\nTo launch the application run the ctk_theme_builder command script, located at:\n{app_home}/ctk_theme_builder')
 
     print("\nDone.")
 
