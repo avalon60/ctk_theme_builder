@@ -7,8 +7,8 @@
   },
   "CTkToplevel": {
     "fg_color": [
-      "#c6ced8",
-      "#c6ced8"
+      "#002524",
+      "#272c4a"
     ]
   },
   "CTkFrame": {
@@ -362,7 +362,7 @@
     "date created": "May 13 2023 18:09:42",
     "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "Jun 09 2023 19:50:10",
+    "last modified": "Jun 11 2023 14:47:58",
     "keystone colour": "#74926F",
     "harmony method": "Triadic",
     "harmony differential": 10
