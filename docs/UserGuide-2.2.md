@@ -78,7 +78,9 @@ When you select this menu option, the QA app is launched, and renders based upon
 
 ![qa_application](https://github.com/avalon60/ctk_theme_builder/assets/89534395/2a713404-38f4-43c2-a474-12c18d0558ef)
 
-As you can see the UI Scaling has been set to 80%. The QA application has been enhanced to remember the last scaling setting selection as well as the placement of the window on your desktop.
+As you can see the UI Scaling has been set to 80%. The QA application has been enhanced to remember the last scaling selection as well as the placement of the window on your desktop.
+
+**The QA application, once launched is autonomous; you will need to close it yourself, once it has served its purpose.**
 
 
 ## Tools Menu
