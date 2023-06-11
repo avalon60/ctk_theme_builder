@@ -211,6 +211,7 @@ class PreviewPanel:
         # We need a double entry. This is a bit of a cludge for dealing
         # with the top_fg_color property, which has no configure option.
         self._rendered_widgets['frame_base'].append(self._frm_preview_base)
+        self._rendered_widgets['CTkFrame'].append(self._frm_preview_base)
 
         # This is a top frame for contrast purposes, when placed within another frame.
         self._frm_preview_top = ctk.CTkFrame(master=self._frm_preview_base)
@@ -220,6 +221,7 @@ class PreviewPanel:
         # We need a double entry. This is a bit of a cludge for dealing
         # with the top_fg_color property, which has no configure option.
         self._rendered_widgets['frame_top'].append(self._frm_preview_top)
+        self._rendered_widgets['CTkFrame'].append(self._frm_preview_top)
 
         self._render_frame_top_preview()
 
@@ -649,9 +651,7 @@ class PreviewPanel:
         property_value = parameters[2]
 
         if widget_type == 'CTkFrame':
-            for widget in self._rendered_widgets['frame_base']:
-                update_widget_geometry(widget, widget_property, int(property_value))
-            for widget in self._rendered_widgets['frame_top']:
+            for widget in self._rendered_widgets['CTkFrame']:
                 update_widget_geometry(widget, widget_property, int(property_value))
             if widget_property in ("corner_radius", "border_width"):
                 for widget in self._rendered_widgets['CTkScrollableFrame']:
@@ -738,7 +738,8 @@ class PreviewPanel:
                 if command == DISCONNECT_MESSAGE and command_type == 'program':
                     if DEBUG:
                         print(f'[{address}] Session disconnected')
-                    del self._client_handlers[conn]
+                    if conn in self._client_handlers:
+                        del self._client_handlers[conn]
                     connected = False
                 else:
                     self._command_json = command_json
@@ -817,6 +818,13 @@ class PreviewPanel:
         # We lowercase the widget property, due to an issue in CustomTkinter 5.1.2, where there was an fg_Color
         # property against CTkSwitch. This was fixed to fg_color in 5.1.3.
         widget_property_lower = widget_property.lower()
+
+        if widget_type == 'CTkFrame' and widget_property_lower not in ['fg_color', 'top_fg_color']:
+            for widget in self._rendered_widgets['CTkScrollableFrame']:
+                widget.configure(border_color=widget_colour)
+            for widget in self._rendered_widgets['CTkTabview']:
+                widget.configure(border_color=widget_colour)
+
 
         if widget_type == 'CTkFrame' and widget_property_lower == 'top_fg_color':
             widget_type = 'frame_top'
