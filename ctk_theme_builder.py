@@ -66,11 +66,6 @@ preview_panel = None
 PROG = os.path.basename(__file__)
 APP_HOME = Path(os.path.dirname(os.path.realpath(__file__)))
 
-CTK_SITE_PACKAGES = Path(ctk.__file__)
-CTK_SITE_PACKAGES = os.path.dirname(CTK_SITE_PACKAGES)
-CTK_ASSETS = CTK_SITE_PACKAGES / Path('assets')
-CTK_THEMES = CTK_ASSETS / 'themes'
-
 ASSETS_DIR = APP_HOME / 'assets'
 CONFIG_DIR = ASSETS_DIR / 'config'
 ETC_DIR = ASSETS_DIR / 'etc'
@@ -80,6 +75,12 @@ APP_THEMES_DIR = ASSETS_DIR / 'themes'
 APP_DATA_DIR = ASSETS_DIR / 'data'
 APP_IMAGES = ASSETS_DIR / 'images'
 DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
+
+
+CTK_SITE_PACKAGES = Path(ctk.__file__)
+CTK_SITE_PACKAGES = os.path.dirname(CTK_SITE_PACKAGES)
+CTK_ASSETS = CTK_SITE_PACKAGES / Path('assets')
+CTK_THEMES = CTK_ASSETS / 'themes'
 
 # Grab the JSON for the default view.
 default_view_file = VIEWS_DIR / f'{DEFAULT_VIEW}.json'
@@ -235,12 +236,13 @@ class ControlPanel(ctk.CTk):
         self.ETC_DIR = ASSETS_DIR / 'etc'
         self.VIEWS_DIR = ASSETS_DIR / 'views'
         self.palettes_dir = ASSETS_DIR / 'palettes'
-
+        # ctk.set_widget_scaling(0.8)
         this_platform = platform.system()
         if this_platform == "Darwin":
             self.platform = "MacOS"
 
         self.new_theme_json_dir = None
+        self.wip_json = None
 
         if LISTENER_FILE.exists():
             try:
@@ -290,6 +292,7 @@ class ControlPanel(ctk.CTk):
                                                                preference_name='last_theme_on_start',
                                                                data_type='int', preference_value=0)
             mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=self.last_theme_on_start)
+
         if not self.theme_json_dir.exists():
             self.theme_json_dir = APP_HOME / 'user_themes'
 
@@ -653,6 +656,8 @@ class ControlPanel(ctk.CTk):
         self.file_menu.add_separator()
         self.file_menu.add_command(label='Provenance', command=self.launch_provenance_dialog)
         self.file_menu.add_separator()
+        self.file_menu.add_command(label='Launch QA App', command=self.launch_qa_app, state=tk.DISABLED)
+        self.file_menu.add_separator()
         self.file_menu.add_command(label='Quit', command=self.close_panels)
 
         # Now add a Tools sub-menu option
@@ -720,6 +725,19 @@ class ControlPanel(ctk.CTk):
         provenance_dialog.modify_property(property_name='harmony_method', value=harmony_method)
         provenance_dialog.modify_property(property_name='keystone_colour', value=keystone_colour)
 
+    def launch_qa_app(self):
+        if self.wip_json is None:
+            return
+        self.update_wip_file()
+        if platform.system() == 'Windows':
+            qa_app_launcher = 'ctk_theme_builder_qa_app.bat'
+        else:
+            qa_app_launcher = 'ctk_theme_builder_qa_app.sh'
+
+            qa_app = APP_HOME / qa_app_launcher
+            program = [qa_app, '-a', self.appearance_mode, '-t', self.wip_json]
+            print(f'Launching designer: {qa_app_launcher}')
+            self.process = sp.Popen(program)
     def save_theme_palette(self, theme_name=None):
         """Save the colour palette colours back to disk."""
         if theme_name is None:
@@ -1049,6 +1067,7 @@ class ControlPanel(ctk.CTk):
             self.file_menu.entryconfig('Save', state=tk_state)
             self.btn_reset.configure(state=tk_state)
             self.btn_save.configure(state=tk_state)
+
         else:
             self.file_menu.entryconfig('Reset', state=tk.DISABLED)
             self.file_menu.entryconfig('Save', state=tk.DISABLED)
@@ -1062,6 +1081,7 @@ class ControlPanel(ctk.CTk):
         self.file_menu.entryconfig('Sync Modes', state=tk_state)
         self.file_menu.entryconfig('Flip Modes', state=tk_state)
         self.file_menu.entryconfig('Sync Palette', state=tk_state)
+        self.file_menu.entryconfig('Launch QA App', state=tk_state)
 
         if 'provenance' in self.theme_json_data:
             self.file_menu.entryconfig('Provenance', state=tk.NORMAL)
@@ -1106,6 +1126,7 @@ class ControlPanel(ctk.CTk):
         self.send_command_json(command_type='program',
                                command='set_appearance_mode',
                                parameters=[self.appearance_mode])
+        self.toggle_frame_mode()
 
         # self.load_theme()
 
@@ -1253,6 +1274,7 @@ class ControlPanel(ctk.CTk):
             self.send_command_json(command_type='program', command='render_top_frame')
         else:
             self.send_command_json(command_type='program', command='render_base_frame')
+
 
     def toggle_render_disabled(self):
         render_state = self.swt_render_disabled.get()
@@ -3069,12 +3091,6 @@ class PreferencesDialog(ctk.CTkToplevel):
 
 
 class GeometryDialog(ctk.CTkToplevel):
-    class ThemeMerger(ctk.CTkToplevel):
-        """This class is used to merge two themes, to create an entirely new theme."""
-
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-
     def __init__(self, widget_type: str, theme_json_data: dict, appearance_mode: str, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
