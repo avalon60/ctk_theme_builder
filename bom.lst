@@ -9,6 +9,9 @@ ctk_theme_migrate.bat
 ctk_theme_migrate.py
 ctk_theme_preview.py
 ctk_theme_viewgen.py
+ctk_theme_builder_qa_app.bat
+ctk_theme_builder_qa_app.py
+ctk_theme_builder_qa_app.sh
 get-pip.py
 requirements.txt
 tb-artefact.sh
