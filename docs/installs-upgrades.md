@@ -8,6 +8,13 @@ The application has been tested on Linux Mint and Windows 10, although there is 
 
 You will require around 160MB of disk space.
 
+## Ubuntu Based Linux Distributions
+
+For Ubuntu based distros (e.g. Linux Mint, Elementary OS, Zorin OS...), ,
+Please ensure that you have ensurepip installed. This can be installed via the command:
+
+`apt install python3.10-venv`
+
 ## Installation
 
 ### The theme\_builder\_setup.py Utility
@@ -28,13 +35,19 @@ To obtain a ZIP package, look at the available releases of CTk Theme Builder, on
 Install using the following steps:  
   
 1. From the zip file, extract the theme\_builder\_setup.py file.
-2. Run the install command using both the -a and -h flags.
+2. Run the install command using both the -i and -a flags.
+
+You need a command window to run the setup utility. On windows, you should be able to right click a folder in Windows Explorer, and select _CMD Prompt Here_. Another option is to click the Windows search (bottom left) and where it says _Type search here_, enter the commend _CMD_ and press _Enter_. There is also a further option, simply enter the text _CMD_, into the navigation field at the top of Windows Explorer and press Enter.
+
+For Linux, you can open a Terminal. This is often available as a menu option, but if not, you may need to Google the subject for your specific Linux distribution. 
 
 Example:
 
 `python theme_builder_setup.py -i /home/clive/utilities -a /tmp/ctk_theme_builder-2.0.0.zip`
 
-If one doesn't already exist, this will cause a ctk\_theme\_builder directory to be created, below the utilities folder. The ZIP file will be unpacked to the folder and the application will be set up into a runnable state. 
+In the example, the utilities folder, is just an arbitrary parent folder location, which must be created in advance.
+
+If one doesn't already exist, this will cause a ctk\_theme\_builder directory to be created, below the utilities folder. The ZIP file will be unpacked to the folder and the application will be set up into an executable state. 
 
   If there is already an installation of ctk\_theme\_builder, below the specified installation location, theme\_builder\_setup.py will attempt an upgrade.   
   
@@ -68,11 +81,11 @@ OR
 `.\ctk_theme_builder` (Windows)
 
 ## PATH Variable
-If you don't want to include the pathname to the CTk Theme Builder script, you can always change your operating system PATH variable, to include the installation directory.
+If you don't want to include the path-name to the CTk Theme Builder script, you can always change your operating system PATH variable, to include the installation directory. You may need to Google how to do this, based on whichever operating system you are using.
 
 ## Desktop Launchers
 Most operating systems, with a Graphical User Interface, tend to provide a launcher mechanism which can be set up on the desktop. 
 
-For example, you can create a desktop shortcut on Windows, in order to launch the *ctk\_theme\_builder* script, described earlier. Linux ports tend to have similar facilities. 
+For example, you can create a desktop shortcut on Windows, in order to launch the *ctk\_theme\_builder* script described earlier. Linux ports tend to have similar(ish) facilities. 
 
 You'll need to Google how to set up a shortcut / launcher for your specific operating system. 
