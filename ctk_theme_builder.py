@@ -1,6 +1,6 @@
 __title__ = 'CTk Theme Builder'
 __author__ = 'Clive Bostock'
-__version__ = "2.2.0"
+__version__ = "2.3.0"
 __license__ = 'MIT - see LICENSE.md'
 
 import configparser
@@ -75,7 +75,6 @@ APP_THEMES_DIR = ASSETS_DIR / 'themes'
 APP_DATA_DIR = ASSETS_DIR / 'data'
 APP_IMAGES = ASSETS_DIR / 'images'
 DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
-
 
 CTK_SITE_PACKAGES = Path(ctk.__file__)
 CTK_SITE_PACKAGES = os.path.dirname(CTK_SITE_PACKAGES)
@@ -182,7 +181,7 @@ class About(ctk.CTkToplevel):
                                corner_radius=widget_corner_radius,
                                command=self.destroy)
         btn_ok.grid(row=0, column=0, padx=(5, 5), pady=10)
-        self.resizable(False, False)
+        # self.resizable(False, False)
 
         self.grab_set()
 
@@ -292,6 +291,20 @@ class ControlPanel(ctk.CTk):
                                                                preference_name='last_theme_on_start',
                                                                data_type='int', preference_value=0)
             mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=self.last_theme_on_start)
+
+        control_panel_scale_pct = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                         scope='scaling',
+                                                         preference_name='control_panel')
+        scaling_float = mod.scaling_float(scale_pct=control_panel_scale_pct)
+        ctk.set_widget_scaling(scaling_float)
+
+        self.preview_panel_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                            scope='scaling',
+                                                            preference_name='preview_panel')
+
+        self.qa_application_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                             scope='scaling',
+                                                             preference_name='qa_application')
 
         if not self.theme_json_dir.exists():
             self.theme_json_dir = APP_HOME / 'user_themes'
@@ -738,6 +751,7 @@ class ControlPanel(ctk.CTk):
             program = [qa_app, '-a', self.appearance_mode, '-t', self.wip_json]
             print(f'Launching designer: {qa_app_launcher}')
             self.process = sp.Popen(program)
+
     def save_theme_palette(self, theme_name=None):
         """Save the colour palette colours back to disk."""
         if theme_name is None:
@@ -1275,7 +1289,6 @@ class ControlPanel(ctk.CTk):
         else:
             self.send_command_json(command_type='program', command='render_base_frame')
 
-
     def toggle_render_disabled(self):
         render_state = self.swt_render_disabled.get()
         if render_state:
@@ -1372,7 +1385,7 @@ class ControlPanel(ctk.CTk):
             self.file_menu.entryconfig('Flip Modes', state=tk.NORMAL)
 
             self.lbl_title.grid(row=0, column=0, columnspan=2, sticky='ew')
-            self.geometry(f'{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}')
+            # self.geometry(f'{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}')
             self.opm_theme.configure(values=self.json_files)
             palette_file = selected_theme + '.json'
             self.theme = selected_theme
@@ -1507,7 +1520,6 @@ class ControlPanel(ctk.CTk):
         widget_colour = property_widget.cget('fg_color')
 
         darker_shade = cbtk.shade_down(color=widget_colour, differential=shade_step, multiplier=multiplier)
-        print(f'Incoming shade: {widget_colour} / Darker shade: {darker_shade}')
         property_widget.configure(fg_color=darker_shade)
         if self.appearance_mode == 'Light':
             mode_idx = 0
@@ -2139,7 +2151,7 @@ class ControlPanel(ctk.CTk):
                                                      scope='window_geometry',
                                                      preference_name='control_panel', default=default_geometry)
         self.geometry(controller_geometry)
-        self.resizable(False, True)
+        # self.resizable(False, True)
 
     def save_controller_geometry(self):
         """Save the control panel geometry to the repo, for the next time the program is launched."""
@@ -2790,6 +2802,18 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.theme_json_dir = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                      preference_name='theme_json_dir')
 
+        self.control_panel_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                            scope='scaling',
+                                                            preference_name='control_panel')
+
+        self.preview_panel_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                            scope='scaling',
+                                                            preference_name='preview_panel')
+
+        self.qa_application_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                             scope='scaling',
+                                                             preference_name='qa_application')
+
         self.action = 'cancelled'
 
         self.new_theme_json_dir = None
@@ -2803,7 +2827,7 @@ class PreferencesDialog(ctk.CTkToplevel):
             self.user_home_dir = os.getenv("HOME")
 
         self.title('CTk Theme Builder Preferences')
-        self.geometry('500x550')
+        # self.geometry('820x550')
         # Make sure the TopLevel doesn't disappear if we need to
 
         # Make preferences dialog modal
@@ -2947,30 +2971,55 @@ class PreferencesDialog(ctk.CTkToplevel):
         widget_start_row += 1
 
         lbl_shade_adjust_differential = ctk.CTkLabel(master=frm_widgets, text='Adjust Shade Step', justify="right")
-        lbl_shade_adjust_differential.grid(row=widget_start_row, column=0, padx=5, pady=(0, 0), sticky='e')
+        lbl_shade_adjust_differential.grid(row=widget_start_row, column=0, padx=5, pady=10, sticky='e')
 
         self.opm_shade_adjust_differential = ctk.CTkOptionMenu(master=frm_widgets,
                                                                width=12,
                                                                values=['1', '2', '3', '4', '5', '6', '7', '8', '9'])
-        self.opm_shade_adjust_differential.grid(row=widget_start_row, column=1, padx=0, pady=5, sticky='w')
+        self.opm_shade_adjust_differential.grid(row=widget_start_row, column=1, padx=0, pady=10, sticky='w')
         self.opm_shade_adjust_differential.set(str(self.shade_adjust_differential))
-        widget_start_row += 1
-
-        widget_start_row += 1
 
         lbl_harmony_contrast_differential = ctk.CTkLabel(master=frm_widgets, text='Harmony Shade Step', justify="right")
-        lbl_harmony_contrast_differential.grid(row=widget_start_row, column=0, padx=(30, 5), pady=(0, 0), sticky='e')
+        lbl_harmony_contrast_differential.grid(row=widget_start_row, column=2, padx=(10, 5), pady=(0, 0), sticky='e')
 
         self.opm_harmony_contrast_differential = ctk.CTkOptionMenu(master=frm_widgets,
                                                                    width=12,
                                                                    values=['1', '2', '3', '5', '6', '7', '8', '9'])
-        self.opm_harmony_contrast_differential.grid(row=widget_start_row, column=1, padx=0, pady=5, sticky='w')
+        self.opm_harmony_contrast_differential.grid(row=widget_start_row, column=3, padx=0, pady=5, sticky='w')
         self.opm_harmony_contrast_differential.set(str(self.harmony_contrast_differential))
-        widget_start_row += 1
 
+        widget_start_row += 1
+        lbl_control_panel_scaling = ctk.CTkLabel(master=frm_widgets, text='Control Panel Scaling', justify="left")
+        lbl_control_panel_scaling.grid(row=widget_start_row, column=0, padx=(10, 5), pady=10, sticky='e')
+
+        self.opm_control_panel_scaling = ctk.CTkOptionMenu(master=frm_widgets,
+                                                           width=12,
+                                                           values=mod.ui_scaling_list())
+        self.opm_control_panel_scaling.grid(row=widget_start_row, column=1, padx=0, pady=10, sticky='w')
+        self.opm_control_panel_scaling.set(self.control_panel_scaling)
+
+        lbl_preview_panel_scaling = ctk.CTkLabel(master=frm_widgets, text='Preview Panel Scaling', justify="left")
+        lbl_preview_panel_scaling.grid(row=widget_start_row, column=2, padx=(0, 5), pady=10, sticky='e')
+
+        self.opm_preview_panel_scaling = ctk.CTkOptionMenu(master=frm_widgets,
+                                                           width=12,
+                                                           values=mod.ui_scaling_list())
+        self.opm_preview_panel_scaling.grid(row=widget_start_row, column=3, padx=0, pady=10, sticky='w')
+        self.opm_preview_panel_scaling.set(self.preview_panel_scaling)
+
+        lbl_qa_application_scaling = ctk.CTkLabel(master=frm_widgets, text='QA App Scaling', justify="right")
+        lbl_qa_application_scaling.grid(row=widget_start_row, column=4, padx=(90, 5), pady=10, sticky='e')
+
+        self.opm_qa_application_scaling = ctk.CTkOptionMenu(master=frm_widgets,
+                                                            width=12,
+                                                            values=mod.ui_scaling_list())
+        self.opm_qa_application_scaling.grid(row=widget_start_row, column=5, padx=0, pady=10, sticky='w')
+        self.opm_qa_application_scaling.set(self.qa_application_scaling)
+
+        widget_start_row += 1
         self.folder_image = cbtk.load_image(light_image=APP_IMAGES / 'folder.png', image_size=(20, 20))
         lbl_theme_json_dir = ctk.CTkLabel(master=frm_widgets, text='Themes Location', justify="right")
-        lbl_theme_json_dir.grid(row=widget_start_row, column=0, padx=5, pady=5, sticky='e')
+        lbl_theme_json_dir.grid(row=widget_start_row, column=0, padx=5, pady=(15, 5), sticky='e')
 
         if self.enable_tooltips:
             lbl_theme_json_dir_tooltip = CTkToolTip(lbl_theme_json_dir,
@@ -2983,12 +3032,12 @@ class PreferencesDialog(ctk.CTkToplevel):
                                            fg_color='#748696',
                                            image=self.folder_image,
                                            command=self.preferred_json_location)
-        btn_theme_json_dir.grid(row=widget_start_row, column=1, pady=5, sticky='w')
+        btn_theme_json_dir.grid(row=widget_start_row, column=1, pady=(10, 0), sticky='w')
         widget_start_row += 1
 
-        self.lbl_pref_theme_dir_disp = ctk.CTkLabel(master=frm_widgets, text=self.theme_json_dir, justify="right",
+        self.lbl_pref_theme_dir_disp = ctk.CTkLabel(master=frm_widgets, text=self.theme_json_dir, justify="left",
                                                     font=mod.SMALL_TEXT)
-        self.lbl_pref_theme_dir_disp.grid(row=widget_start_row, column=1, padx=5, pady=5, sticky='e')
+        self.lbl_pref_theme_dir_disp.grid(row=widget_start_row, column=1, columnspan=5, padx=5, pady=5, sticky='w')
         widget_start_row += 1
 
         # Control buttons
@@ -2996,7 +3045,7 @@ class PreferencesDialog(ctk.CTkToplevel):
         btn_close.grid(row=0, column=0, padx=(15, 35), pady=5)
 
         btn_save = ctk.CTkButton(master=frm_buttons, text='Save', command=self.save_preferences)
-        btn_save.grid(row=0, column=1, padx=(150, 15), pady=5)
+        btn_save.grid(row=0, column=1, padx=(475, 15), pady=5)
         self.grab_set()
 
     def get_tooltips_setting(self):
@@ -3074,6 +3123,26 @@ class PreferencesDialog(ctk.CTkToplevel):
                                            preference_name='harmony_contrast_differential',
                                            preference_value=self.harmony_contrast_differential):
             print(f'Row miss updating preferences: harmony contrast differential.')
+
+        control_panel_scale_pct = self.opm_control_panel_scaling.get()
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='scaling',
+                                           preference_name='control_panel',
+                                           preference_value=control_panel_scale_pct):
+            print(f'Row miss updating preferences: control panel scaling.')
+        scaling_float = mod.scaling_float(scale_pct=control_panel_scale_pct)
+        ctk.set_widget_scaling(scaling_float)
+
+        preview_panel_scale_pct = self.opm_preview_panel_scaling.get()
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='scaling',
+                                           preference_name='preview_panel',
+                                           preference_value=preview_panel_scale_pct):
+            print(f'Row miss updating preferences: preview panel scaling.')
+
+        qa_application_scale_pct = self.opm_preview_panel_scaling.get()
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='scaling',
+                                           preference_name='qa_application',
+                                           preference_value=qa_application_scale_pct):
+            print(f'Row miss updating preferences: QA application scaling.')
 
         ctk.set_appearance_mode(control_panel_mode)
         cbtk.CBtkMenu.update_widgets_mode()
