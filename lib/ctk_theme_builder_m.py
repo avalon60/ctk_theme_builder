@@ -257,6 +257,10 @@ def str_mode_to_int(mode=None):
         return 0
     return 1
 
+def scaling_float(scale_pct: str) -> float:
+    """Expects a scaling percentage, including the % symbol and converts to a fractional decimal."""
+    scaling_float = int(scale_pct.replace("%", "")) / 100
+    return scaling_float
 
 def flip_appearance_modes(theme_file_path: Path):
     """Function, which accepts the pathname to a CustomTkinter theme file. It then proceeds to swap
@@ -271,6 +275,8 @@ def flip_appearance_modes(theme_file_path: Path):
     with open(theme_file_path, "w") as f:
         json.dump(new_theme_dict, f, indent=2)
 
+def ui_scaling_list():
+    return ['80%', '90%', '100%', '110%', '120%']
 
 def merge_themes(primary_theme_name: str, primary_mode: str, secondary_theme_name: str, secondary_mode: str,
                  new_theme_name: str, mapped_primary_mode: str = 'Light'):
