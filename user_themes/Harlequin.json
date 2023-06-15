@@ -1,13 +1,13 @@
 {
   "CTk": {
     "fg_color": [
-      "#2b3449",
-      "#1c253a"
+      "#1e2736",
+      "#0d162b"
     ]
   },
   "CTkToplevel": {
     "fg_color": [
-      "#252e43",
+      "#1e2736",
       "#c6ced8"
     ]
   },
@@ -15,12 +15,12 @@
     "corner_radius": 6,
     "border_width": 1,
     "fg_color": [
-      "#2b3449",
+      "#262f44",
       "#1c253a"
     ],
     "top_fg_color": [
-      "#323b50",
-      "#212a3f"
+      "#1e2736",
+      "#0d162b"
     ],
     "border_color": [
       "#586b78",
@@ -112,15 +112,15 @@
     "border_width": 3,
     "button_length": 0,
     "progress_color": [
-      "#116805",
-      "#116805"
+      "#2a6f1e",
+      "#1b720f"
     ],
     "button_color": [
       "#260063",
       "#260063"
     ],
     "fg_color": [
-      "#623c9f",
+      "#714bae",
       "#623c9f"
     ],
     "button_hover_color": [
@@ -141,8 +141,8 @@
     "border_width_checked": 6,
     "border_width_unchecked": 3,
     "fg_color": [
-      "#0c6300",
-      "#0c6300"
+      "#1b720f",
+      "#1b720f"
     ],
     "border_color": [
       "#116805",
@@ -165,12 +165,12 @@
     "corner_radius": 1000,
     "border_width": 0,
     "fg_color": [
-      "#623c9f",
+      "#714bae",
       "#623c9f"
     ],
     "progress_color": [
-      "#1b600f",
-      "#116805"
+      "#2a6f1e",
+      "#1b720f"
     ],
     "border_color": [
       "#000000",
@@ -183,12 +183,12 @@
     "border_width": 6,
     "button_length": 0,
     "fg_color": [
-      "#623c9f",
+      "#714bae",
       "#623c9f"
     ],
     "progress_color": [
-      "#1b600f",
-      "#116805"
+      "#2a6f1e",
+      "#1b720f"
     ],
     "button_color": [
       "#260063",
@@ -362,7 +362,7 @@
     "date created": "Jun 02 2023 17:01:42",
     "last modified by": "clive",
     "created with": "CTk Theme Builder v2.1.0",
-    "last modified": "Jun 10 2023 19:01:49",
+    "last modified": "Jun 15 2023 21:35:01",
     "keystone colour": "#0C6300",
     "harmony method": "Split-complementary",
     "harmony differential": 8

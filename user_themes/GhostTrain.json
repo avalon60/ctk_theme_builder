@@ -31,7 +31,7 @@
     "corner_radius": 6,
     "border_width": 1,
     "fg_color": [
-      "#11202b",
+      "#25343f",
       "#11202b"
     ],
     "hover_color": [
@@ -116,7 +116,7 @@
       "#c0c1c0"
     ],
     "button_color": [
-      "#11202b",
+      "#25343f",
       "#11202b"
     ],
     "fg_color": [
@@ -191,7 +191,7 @@
       "#cccbc9"
     ],
     "button_color": [
-      "#11202b",
+      "#25343f",
       "#11202b"
     ],
     "button_hover_color": [
@@ -234,7 +234,7 @@
       "#11202b"
     ],
     "button_color": [
-      "#1e2e3c",
+      "#25343f",
       "#11202b"
     ],
     "button_hover_color": [
@@ -311,11 +311,11 @@
       "#ffffff"
     ],
     "scrollbar_button_color": [
-      "#11202b",
+      "#4e5c6e",
       "#1f2733"
     ],
     "scrollbar_button_hover_color": [
-      "#404c59",
+      "#12140e",
       "#110e19"
     ]
   },
@@ -361,7 +361,7 @@
     "date created": "May 03 2023 09:03:28",
     "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "Jun 09 2023 09:27:22",
+    "last modified": "Jun 15 2023 21:21:26",
     "keystone colour": "#3c5064",
     "harmony method": "Tetradic",
     "harmony differential": null,

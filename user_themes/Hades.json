@@ -15,11 +15,11 @@
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#121522",
-      "#000000"
+      "#171a27",
+      "#0f0f0f"
     ],
     "top_fg_color": [
-      "#181b28",
+      "#121522",
       "#0e0b0e"
     ],
     "border_color": [
@@ -361,7 +361,7 @@
     "date created": "Apr 29 2023 14:39:51",
     "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "May 28 2023 15:40:15",
+    "last modified": "Jun 15 2023 21:25:47",
     "keystone colour": "#ac0000",
     "harmony method": "Split-complementary",
     "harmony differential": null,

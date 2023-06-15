@@ -15,7 +15,7 @@
     "corner_radius": 6,
     "border_width": 0,
     "fg_color": [
-      "#083058",
+      "#0d355d",
       "#121424"
     ],
     "top_fg_color": [
@@ -361,7 +361,7 @@
     "date created": "Mar 27 2023 18:16:02",
     "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "Jun 10 2023 21:20:19",
+    "last modified": "Jun 15 2023 21:43:38",
     "keystone colour": "#1e214b",
     "harmony method": "Triadic",
     "harmony differential": 5,
