@@ -24,3 +24,7 @@ complex_example.py
 assets/palettes/
 
 simple_example.py
+
+*.db
+
+ctk_theme_builder
