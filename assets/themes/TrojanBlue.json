@@ -141,11 +141,11 @@
     "border_width_checked": 6,
     "border_width_unchecked": 3,
     "fg_color": [
-      "#283e7b",
+      "#49b25e",
       "#142864"
     ],
     "border_color": [
-      "#3FA854",
+      "#359e4a",
       "#3FA854"
     ],
     "hover_color": [
@@ -153,8 +153,8 @@
       "#3F5EA8"
     ],
     "text_color": [
-      "#112c7c",
-      "#112c7c"
+      "#d9d9d9",
+      "#d9d9d9"
     ],
     "text_color_disabled": [
       "#b1d9ff",
@@ -202,7 +202,7 @@
   "CTkOptionMenu": {
     "corner_radius": 6,
     "fg_color": [
-      "#283e7b",
+      "#374d8a",
       "#283e7b"
     ],
     "button_color": [
@@ -214,8 +214,8 @@
       "#112c7c"
     ],
     "text_color": [
-      "#a3c8ff",
-      "#a3c8ff"
+      "#ffffff",
+      "#ffffff"
     ],
     "text_color_disabled": [
       "#b1d9ff",
@@ -227,7 +227,7 @@
     "border_width": 2,
     "fg_color": [
       "#283e7b",
-      "#283e7b"
+      "#1e326e"
     ],
     "border_color": [
       "#37559b",
@@ -255,12 +255,12 @@
     "border_spacing": 4,
     "fg_color": "transparent",
     "button_color": [
-      "#283e7b",
-      "#142864"
+      "#8c6b3f",
+      "#8c6b3f"
     ],
     "button_hover_color": [
-      "#112c7c",
-      "#3F5EA8"
+      "#967549",
+      "#967549"
     ]
   },
   "CTkSegmentedButton": {
@@ -300,7 +300,7 @@
     "border_width": 0,
     "fg_color": [
       "#283e7b",
-      "#1e326e"
+      "#283e7b"
     ],
     "border_color": [
       "#3F5EA8",
@@ -311,12 +311,12 @@
       "#ffffff"
     ],
     "scrollbar_button_color": [
-      "#283e7b",
-      "#142864"
+      "#8c6b3f",
+      "#8c6b3f"
     ],
     "scrollbar_button_hover_color": [
-      "#112c7c",
-      "#112c7c"
+      "#967549",
+      "#967549"
     ]
   },
   "CTkScrollableFrame": {
@@ -359,12 +359,12 @@
   "provenance": {
     "theme author": "Clive Bostock",
     "date created": "Mar 27 2023 18:16:02",
-    "last modified by": "Unknown",
-    "last modified date": null,
+    "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "keystone method": null,
-    "keystone colour": "#ac0000",
-    "last modified": "Apr 12 2023 11:42:54",
-    "harmony method": "Split-complementary"
+    "last modified": "Jun 15 2023 19:15:06",
+    "keystone colour": "#1f3572",
+    "harmony method": "Complementary",
+    "harmony differential": 5,
+    "theme name": "TrojanBlue"
   }
 }
