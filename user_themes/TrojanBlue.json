@@ -255,11 +255,11 @@
     "border_spacing": 4,
     "fg_color": "transparent",
     "button_color": [
-      "#283e7b",
-      "#142864"
+      "#6c8bd5",
+      "#6c8bd5"
     ],
     "button_hover_color": [
-      "#112c7c",
+      "#8c6b3f",
       "#8c6b3f"
     ]
   },
@@ -311,12 +311,12 @@
       "#ffffff"
     ],
     "scrollbar_button_color": [
-      "#283e7b",
-      "#8c6b3f"
+      "#6c8bd5",
+      "#6c8bd5"
     ],
     "scrollbar_button_hover_color": [
-      "#112c7c",
-      "#112c7c"
+      "#8c6b3f",
+      "#8c6b3f"
     ]
   },
   "CTkScrollableFrame": {
@@ -361,7 +361,7 @@
     "date created": "Mar 27 2023 18:16:02",
     "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "Jun 15 2023 21:46:58",
+    "last modified": "Jun 16 2023 11:02:32",
     "keystone colour": "#1f3572",
     "harmony method": "Complementary",
     "harmony differential": 5,
