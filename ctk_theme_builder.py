@@ -235,6 +235,8 @@ class ControlPanel(ctk.CTk):
         self.ETC_DIR = ASSETS_DIR / 'etc'
         self.VIEWS_DIR = ASSETS_DIR / 'views'
         self.palettes_dir = ASSETS_DIR / 'palettes'
+
+        self.qa_launched = False
         # ctk.set_widget_scaling(0.8)
         this_platform = platform.system()
         if this_platform == "Darwin":
@@ -751,6 +753,7 @@ class ControlPanel(ctk.CTk):
             program = [qa_app, '-a', self.appearance_mode, '-t', self.wip_json]
             print(f'Launching designer: {qa_app_launcher}')
             self.process = sp.Popen(program)
+        self.qa_launched = True
 
     def save_theme_palette(self, theme_name=None):
         """Save the colour palette colours back to disk."""
@@ -2100,6 +2103,8 @@ class ControlPanel(ctk.CTk):
             elif response == 'Yes':
                 self.save_theme()
 
+        if self.qa_launched:
+            mod.request_close_qa_app()
         if self.process:
             self.send_command_json(command_type='program',
                                    command='quit',

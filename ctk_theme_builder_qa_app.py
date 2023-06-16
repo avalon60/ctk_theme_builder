@@ -5,6 +5,8 @@ import argparse
 import os
 from pathlib import Path
 import lib.ctk_theme_builder_m as mod
+import threading
+import time
 
 prog_path = os.path.realpath(__file__)
 app_home = Path(os.path.dirname(os.path.realpath(__file__)))
@@ -195,6 +197,16 @@ class App(customtkinter.CTk):
         self.change_scaling_event(self.qa_app_scaling)
         self.protocol("WM_DELETE_WINDOW", self.close_app)
 
+        # Signal that we have started the app
+        mod.qa_app_started()
+        self.close_request_listener()
+
+
+    def close_request_listener(self):
+        """Listener, which checks to see if a close request file has been created."""
+        client_thread = threading.Thread(target=self.listen_for_close,
+                                         daemon=True)
+        client_thread.start()
     def open_input_dialog_event(self):
         dialog = customtkinter.CTkInputDialog(text="Type in a number:", title="CTkInputDialog")
         print("CTkInputDialog:", dialog.get_input())
@@ -208,9 +220,15 @@ class App(customtkinter.CTk):
 
     def close_app(self):
         self.save_app_geometry()
-        self.save_app_scaling()
+        mod.complete_qa_stop()
         self.destroy()
 
+    def listen_for_close(self):
+        while 1:
+            if mod.close_qa_app_requested():
+                mod.complete_qa_stop()
+                self.close_app()
+            time.sleep(0.1)
     def save_app_geometry(self):
         """Save the control panel geometry to the repo, for the next time the program is launched."""
         geometry_row = mod.preference_row(db_file_path=DB_FILE_PATH,
@@ -219,14 +237,6 @@ class App(customtkinter.CTk):
         qa_geometry = self.geometry()
         geometry_row["preference_value"] = qa_geometry
         mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
-
-    def save_app_scaling(self):
-        app_scaling_row = mod.preference_row(db_file_path=DB_FILE_PATH,
-                                             scope='scaling',
-                                             preference_name='qa_application')
-        app_scaling = self.scaling_optionemenu.get()
-        app_scaling_row["preference_value"] = app_scaling
-        mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=app_scaling_row)
 
 
     def sidebar_button_event(self):

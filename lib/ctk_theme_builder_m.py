@@ -4,11 +4,13 @@ __version__ = "1.0.0"
 __license__ = 'MIT - see LICENSE.md'
 
 import copy
+import time
 from pathlib import Path
 import json
 import customtkinter as ctk
 import sqlite3
 import os
+from datetime import datetime
 
 # Constants
 APP_HOME = os.path.dirname(os.path.realpath(__file__))
@@ -27,6 +29,9 @@ APP_THEMES_DIR = ASSETS_DIR / 'themes'
 APP_DATA_DIR = ASSETS_DIR / 'data'
 APP_IMAGES = ASSETS_DIR / 'images'
 DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
+QA_STOP_FILE = ETC_DIR / 'qa_application.stop'
+QA_STARTED_FILE = ETC_DIR / 'qa_application.started'
+
 # These aren't true sizes as per WEB design
 HEADING1 = ('Roboto', 26)
 HEADING2 = ('Roboto', 22)
@@ -122,11 +127,56 @@ def app_themes_list():
     theme_names.sort()
     return theme_names
 
+
+def close_qa_app_requested():
+    """Used to determine whether the QA application has been requested to close."""
+    if QA_STOP_FILE.exists():
+        return True
+    else:
+        return False
+
+
+def complete_qa_stop():
+    time.sleep(0.5)
+    remove_qa_status_files()
+
+
+def remove_qa_status_files():
+    if QA_STOP_FILE.exists():
+        try:
+            os.remove(QA_STOP_FILE)
+        except FileNotFoundError:
+            pass
+    if QA_STARTED_FILE.exists():
+        try:
+            os.remove(QA_STARTED_FILE)
+        except FileNotFoundError:
+            pass
+
+def qa_app_started():
+    # current dateTime
+    now = datetime.now()
+    # convert to string
+    date_started = now.strftime("%b %d %Y %H:%M:%S")
+    with open(QA_STARTED_FILE, 'w') as f:
+        pid = os.getpid()
+        f.write(f'[{pid}] CTk Theme Builder QA app started at: {date_started}')
+
+def request_close_qa_app():
+    # current dateTime
+    now = datetime.now()
+    # convert to string
+    date_started = now.strftime("%b %d %Y %H:%M:%S")
+    with open(QA_STOP_FILE, 'w') as f:
+        pid = os.getpid()
+        f.write(f'[{pid}] CTk Theme Builder QA app close requested at: {date_started}')
+
+
 def user_themes_list():
     """This method generates a list of theme names, based on the json files found in the user's themes folder
     (i.e. self.theme_json_dir). These are basically the theme file names, with the .json extension stripped out."""
     user_themes_dir = preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                        preference_name='theme_json_dir')
+                                         preference_name='theme_json_dir')
     json_files = list(user_themes_dir.glob('*.json'))
     theme_names = []
     for file in json_files:
@@ -135,6 +185,7 @@ def user_themes_list():
         theme_names.append(theme_name)
     theme_names.sort()
     return theme_names
+
 
 def db_file_exists(db_file_path: Path):
     global db_file_found
@@ -257,10 +308,12 @@ def str_mode_to_int(mode=None):
         return 0
     return 1
 
+
 def scaling_float(scale_pct: str) -> float:
     """Expects a scaling percentage, including the % symbol and converts to a fractional decimal."""
     scaling_float = int(scale_pct.replace("%", "")) / 100
     return scaling_float
+
 
 def flip_appearance_modes(theme_file_path: Path):
     """Function, which accepts the pathname to a CustomTkinter theme file. It then proceeds to swap
@@ -275,8 +328,10 @@ def flip_appearance_modes(theme_file_path: Path):
     with open(theme_file_path, "w") as f:
         json.dump(new_theme_dict, f, indent=2)
 
+
 def ui_scaling_list():
     return ['80%', '90%', '100%', '110%', '120%']
+
 
 def merge_themes(primary_theme_name: str, primary_mode: str, secondary_theme_name: str, secondary_mode: str,
                  new_theme_name: str, mapped_primary_mode: str = 'Light'):
@@ -300,8 +355,10 @@ def merge_themes(primary_theme_name: str, primary_mode: str, secondary_theme_nam
     for widget_type, dict_ in new_theme_dict.items():
         for property_, value_ in dict_.items():
             if "_color" in property_ and value_ != 'transparent':
-                new_theme_dict[widget_type][property_][mapped_primary_idx] = primary_theme_dict[widget_type][property_][primary_mode_idx]
-                new_theme_dict[widget_type][property_][mapped_secondary_idx] = secondary_theme_dict[widget_type][property_][secondary_mode_idx]
+                new_theme_dict[widget_type][property_][mapped_primary_idx] = primary_theme_dict[widget_type][property_][
+                    primary_mode_idx]
+                new_theme_dict[widget_type][property_][mapped_secondary_idx] = \
+                    secondary_theme_dict[widget_type][property_][secondary_mode_idx]
     print(f'DEBUG: Writing to {new_theme_path}')
     with open(new_theme_path, "w") as f:
         json.dump(new_theme_dict, f, indent=2)
