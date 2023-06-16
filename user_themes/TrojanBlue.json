@@ -16,7 +16,7 @@
     "border_width": 0,
     "fg_color": [
       "#3c528f",
-      "#344e88"
+      "#2a447e"
     ],
     "top_fg_color": [
       "#2d4380",
@@ -203,7 +203,7 @@
     "corner_radius": 6,
     "fg_color": [
       "#233976",
-      "#21408a"
+      "#192f6c"
     ],
     "button_color": [
       "#36a450",
@@ -361,7 +361,7 @@
     "date created": "Mar 27 2023 18:16:02",
     "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "Jun 16 2023 11:02:32",
+    "last modified": "Jun 16 2023 11:14:28",
     "keystone colour": "#1f3572",
     "harmony method": "Complementary",
     "harmony differential": 5,
