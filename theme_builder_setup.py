@@ -30,8 +30,10 @@ python_version = platform.python_version()
 
 prog_path = os.path.realpath(__file__)
 prog = os.path.basename(__file__)
-
-os_user_name = os.getenv("LOGNAME")
+if platform.system() == 'Windows':
+    os_user_name = os.getlogin()
+else:
+    os_user_name = os.getenv("LOGNAME")
 
 
 # Get the data location, required for the config file etc
