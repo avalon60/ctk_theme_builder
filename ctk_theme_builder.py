@@ -2772,7 +2772,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
 class PreferencesDialog(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
+        self.lift()
         control_panel_theme = mod.preference_setting(db_file_path=DB_FILE_PATH,
                                                      scope='user_preference', preference_name='control_panel_theme')
 
