@@ -2203,6 +2203,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
         self.rendered_harmony_buttons = []
         self.rendered_keystone_shades = []
         self.theme_name = theme_name
+        self.lift()
 
         self.harmony_contrast_differential = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                                     preference_name='harmony_contrast_differential')
@@ -3657,6 +3658,7 @@ class ThemeMerger(ctk.CTkToplevel):
         self.enable_tooltips = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                       preference_name='enable_tooltips')
         self.open_when_merged = 0
+        self.lift()
 
         self.master = self.master
         self.title('Merge Themes')
