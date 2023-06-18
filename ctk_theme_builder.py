@@ -184,6 +184,8 @@ class About(ctk.CTkToplevel):
         # self.resizable(False, False)
 
         self.grab_set()
+        self.lift()
+
 
 
 class ControlPanel(ctk.CTk):
@@ -2203,7 +2205,6 @@ class HarmonicsDialog(ctk.CTkToplevel):
         self.rendered_harmony_buttons = []
         self.rendered_keystone_shades = []
         self.theme_name = theme_name
-        self.lift()
 
         self.harmony_contrast_differential = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                                     preference_name='harmony_contrast_differential')
@@ -2393,6 +2394,8 @@ class HarmonicsDialog(ctk.CTkToplevel):
         # self.master.set_option_states()
         self.protocol("WM_DELETE_WINDOW", self.on_harmonic_close)
         self.grab_set()
+        self.lift()
+
 
     @staticmethod
     def context_menu(event: tk.Event = None, menu: cbtk.CBtkMenu = None):
@@ -2773,7 +2776,6 @@ class HarmonicsDialog(ctk.CTkToplevel):
 class PreferencesDialog(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.lift()
         control_panel_theme = mod.preference_setting(db_file_path=DB_FILE_PATH,
                                                      scope='user_preference', preference_name='control_panel_theme')
 
@@ -3053,6 +3055,8 @@ class PreferencesDialog(ctk.CTkToplevel):
         btn_save = ctk.CTkButton(master=frm_buttons, text='Save', command=self.save_preferences)
         btn_save.grid(row=0, column=1, padx=(475, 15), pady=5)
         self.grab_set()
+        self.lift()
+
 
     def get_tooltips_setting(self):
         self.enable_tooltips = int(self.tk_enable_tooltips.get())
@@ -3658,7 +3662,7 @@ class ThemeMerger(ctk.CTkToplevel):
         self.enable_tooltips = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                       preference_name='enable_tooltips')
         self.open_when_merged = 0
-        self.lift()
+
 
         self.master = self.master
         self.title('Merge Themes')
@@ -3841,6 +3845,8 @@ class ThemeMerger(ctk.CTkToplevel):
         self.bind("<Configure>", self.status_bar.auto_size_status_bar)
 
         self.grab_set()
+        self.lift()
+
 
     def validate_and_merge(self):
         """This method processes the "Merge Themes" dialog (launch_merge_dialog) submission, and is activated by the
