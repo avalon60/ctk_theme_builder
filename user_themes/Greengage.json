@@ -121,7 +121,7 @@
     ],
     "fg_color": [
       "#242e2d",
-      "#030826"
+      "#181d3b"
     ],
     "button_hover_color": [
       "#748498",
@@ -166,7 +166,7 @@
     "border_width": 0,
     "fg_color": [
       "#1b776c",
-      "#0c112f"
+      "#181d3b"
     ],
     "progress_color": [
       "#75D1C6",
@@ -174,7 +174,7 @@
     ],
     "border_color": [
       "#000000",
-      "#000000"
+      "#181d3b"
     ]
   },
   "CTkSlider": {
@@ -184,7 +184,7 @@
     "button_length": 0,
     "fg_color": [
       "#1b776c",
-      "#0c112f"
+      "#181d3b"
     ],
     "progress_color": [
       "#75D1C6",
@@ -312,7 +312,7 @@
     ],
     "scrollbar_button_color": [
       "#091c1b",
-      "#11202b"
+      "#0c112f"
     ],
     "scrollbar_button_hover_color": [
       "#6cc8bd",
@@ -362,7 +362,7 @@
     "date created": "May 13 2023 18:09:42",
     "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "Jun 11 2023 14:47:58",
+    "last modified": "Jun 16 2023 20:13:14",
     "keystone colour": "#74926F",
     "harmony method": "Triadic",
     "harmony differential": 10
