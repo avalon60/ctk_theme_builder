@@ -1,14 +1,14 @@
 {
   "CTk": {
     "fg_color": [
-      "#c6ced8",
-      "#030303"
+      "#9ea6b0",
+      "#000000"
     ]
   },
   "CTkToplevel": {
     "fg_color": [
-      "#c6ced8",
-      "#030303"
+      "#99a1ab",
+      "#000000"
     ]
   },
   "CTkFrame": {
@@ -16,11 +16,11 @@
     "border_width": 1,
     "fg_color": [
       "#c6ced8",
-      "#030303"
+      "#080808"
     ],
     "top_fg_color": [
-      "#d3dbe1",
-      "#060606"
+      "#b7bfc9",
+      "#000000"
     ],
     "border_color": [
       "#586b78",
@@ -362,7 +362,7 @@
     "date created": "Jun 10 2023 19:15:05",
     "last modified by": "clive",
     "created with": "CTk Theme Builder v2.2.0",
-    "last modified": "Jun 10 2023 20:53:56",
+    "last modified": "Jun 16 2023 20:05:05",
     "keystone colour": "#3c5064",
     "harmony method": "Split-complementary",
     "harmony differential": null

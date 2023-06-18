@@ -229,6 +229,9 @@ class App(customtkinter.CTk):
                 mod.complete_qa_stop()
                 self.close_app()
             time.sleep(0.1)
+
+
+
     def save_app_geometry(self):
         """Save the control panel geometry to the repo, for the next time the program is launched."""
         geometry_row = mod.preference_row(db_file_path=DB_FILE_PATH,
