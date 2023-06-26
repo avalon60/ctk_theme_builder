@@ -20,6 +20,7 @@ import lib.cbtk_kit as cbtk
 import lib.ctk_theme_builder_m as mod
 from lib.ctk_tooltip.ctk_tooltip import CTkToolTip
 from CTkMessagebox import CTkMessagebox
+from PIL import Image
 
 PROG = os.path.basename(__file__)
 APP_HOME = Path(os.path.dirname(os.path.realpath(__file__)))
@@ -228,7 +229,7 @@ class PreviewPanel:
             self._render_preview_disabled()
         else:
             self._render_preview_enabled()
-            
+
         self.frm_preview_base.columnconfigure(0, weight=1)
         self.frm_preview_base.rowconfigure(1, weight=1)
         self.frm_preview_top.columnconfigure(0, weight=1)
@@ -318,10 +319,14 @@ class PreviewPanel:
         self._rendered_widgets['CTkComboBox'].append(self.combobox_1)
 
         # CTkButton
+        eye_con = ctk.CTkImage(light_image=Image.open(APP_IMAGES / 'eye_lm.png'),
+                               dark_image=Image.open(APP_IMAGES / 'eye_dm.png'),
+                               size=(20, 20))
         # We contrive to always show a contrast of a button widget with and without a border.
         button_border_width = ThemeManager.theme['CTkButton']['border_width']
         self.button_1 = ctk.CTkButton(master=widget_frame, border_width=button_border_width)
         self.button_1.grid(row=4, column=2, padx=pad_x, pady=pad_y)
+
 
         self._rendered_widgets['CTkButton'].append(self.button_1)
         if self._enable_tooltips:
@@ -334,7 +339,7 @@ class PreviewPanel:
             second_border_width = 2
         else:
             second_border_width = 0
-        self.button_2 = ctk.CTkButton(master=widget_frame, border_width=second_border_width)
+        self.button_2 = ctk.CTkButton(master=widget_frame, image=eye_con, border_width=second_border_width)
         self.button_2.grid(row=5, column=2, padx=pad_x, pady=pad_y)
 
         if self._enable_tooltips:
@@ -384,10 +389,10 @@ class PreviewPanel:
         self.entry_1.grid(row=4, column=0, padx=pad_x, pady=pad_y)
         if self._enable_tooltips:
             self.entry_1_tooltip = CTkToolTip(self.entry_1,
-                                         justify="left",
-                                         wraplength=250,
-                                         padding=(5, 5),
-                                         message=f'CTkEntry - with default border setting of {entry_border_width}')
+                                              justify="left",
+                                              wraplength=250,
+                                              padding=(5, 5),
+                                              message=f'CTkEntry - with default border setting of {entry_border_width}')
 
         self._rendered_widgets['CTkEntry'].append(self.entry_1)
 
@@ -395,9 +400,9 @@ class PreviewPanel:
         self.entry_2.grid(row=5, column=0, padx=pad_x, pady=pad_y)
         if self._enable_tooltips:
             self.entry_2_tooltip = CTkToolTip(self.entry_2,
-                                         justify="left",
-                                         wraplength=250,
-                                         message=f'CTkEntry - with border setting of {second_border_width}')
+                                              justify="left",
+                                              wraplength=250,
+                                              message=f'CTkEntry - with border setting of {second_border_width}')
         self._rendered_widgets['CTkEntry'].append(self.entry_2)
 
         # CTkTextbox
@@ -832,7 +837,6 @@ class PreviewPanel:
                 widget.configure(border_color=widget_colour)
             for widget in self._rendered_widgets['CTkTabview']:
                 widget.configure(border_color=widget_colour)
-
 
         if widget_type == 'CTkFrame' and widget_property_lower == 'top_fg_color':
             widget_type = 'frame_top'
