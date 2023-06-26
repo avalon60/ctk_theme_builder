@@ -1,26 +1,26 @@
 {
   "CTk": {
     "fg_color": [
-      "#3c5f96",
-      "#283e7b"
+      "#2d4380",
+      "#233976"
     ]
   },
   "CTkToplevel": {
     "fg_color": [
-      "#3c5f96",
-      "#283e7b"
+      "#324885",
+      "#233976"
     ]
   },
   "CTkFrame": {
     "corner_radius": 6,
     "border_width": 0,
     "fg_color": [
-      "#3c5f96",
-      "#283e7b"
+      "#3c528f",
+      "#2a447e"
     ],
     "top_fg_color": [
-      "#43639b",
-      "#344e88"
+      "#2d4380",
+      "#233976"
     ],
     "border_color": [
       "#283e7b",
@@ -31,12 +31,12 @@
     "corner_radius": 6,
     "border_width": 0,
     "fg_color": [
-      "#283e7b",
+      "#5170ba",
       "#142864"
     ],
     "hover_color": [
-      "#112c7c",
-      "#112c7c"
+      "#8c6b3f",
+      "#8c6b3f"
     ],
     "border_color": [
       "#3F5EA8",
@@ -124,8 +124,8 @@
       "#142864"
     ],
     "button_hover_color": [
-      "#112c7c",
-      "#112c7c"
+      "#8c6b3f",
+      "#8c6b3f"
     ],
     "text_color": [
       "#ffffff",
@@ -141,19 +141,19 @@
     "border_width_checked": 6,
     "border_width_unchecked": 3,
     "fg_color": [
-      "#49b25e",
-      "#142864"
-    ],
-    "border_color": [
-      "#359e4a",
+      "#3FA854",
       "#3FA854"
     ],
+    "border_color": [
+      "#218a36",
+      "#218a36"
+    ],
     "hover_color": [
-      "#283e7b",
-      "#3F5EA8"
+      "#8c6b3f",
+      "#8c6b3f"
     ],
     "text_color": [
-      "#d9d9d9",
+      "#ffffff",
       "#d9d9d9"
     ],
     "text_color_disabled": [
@@ -191,27 +191,27 @@
       "#3FA854"
     ],
     "button_color": [
-      "#283e7b",
-      "#142864"
+      "#3F5EA8",
+      "#3F5EA8"
     ],
     "button_hover_color": [
-      "#283e7b",
-      "#3F5EA8"
+      "#8c6b3f",
+      "#8c6b3f"
     ]
   },
   "CTkOptionMenu": {
     "corner_radius": 6,
     "fg_color": [
-      "#374d8a",
-      "#283e7b"
+      "#233976",
+      "#192f6c"
     ],
     "button_color": [
       "#36a450",
       "#36a450"
     ],
     "button_hover_color": [
-      "#112c7c",
-      "#112c7c"
+      "#8c6b3f",
+      "#8c6b3f"
     ],
     "text_color": [
       "#ffffff",
@@ -227,14 +227,14 @@
     "border_width": 2,
     "fg_color": [
       "#283e7b",
-      "#1e326e"
+      "#233773"
     ],
     "border_color": [
-      "#37559b",
+      "#5170ba",
       "#3F5EA8"
     ],
     "button_color": [
-      "#283e7b",
+      "#5170ba",
       "#142864"
     ],
     "button_hover_color": [
@@ -255,12 +255,12 @@
     "border_spacing": 4,
     "fg_color": "transparent",
     "button_color": [
-      "#8c6b3f",
-      "#8c6b3f"
+      "#6c8bd5",
+      "#6c8bd5"
     ],
     "button_hover_color": [
-      "#967549",
-      "#967549"
+      "#8c6b3f",
+      "#8c6b3f"
     ]
   },
   "CTkSegmentedButton": {
@@ -271,20 +271,20 @@
       "#142864"
     ],
     "selected_color": [
+      "#3F5EA8",
+      "#3F5EA8"
+    ],
+    "selected_hover_color": [
+      "#8c6b3f",
+      "#8c6b3f"
+    ],
+    "unselected_color": [
       "#112c7c",
       "#112c7c"
     ],
-    "selected_hover_color": [
-      "#43639b",
-      "#344e88"
-    ],
-    "unselected_color": [
-      "#3c5f96",
-      "#283e7b"
-    ],
     "unselected_hover_color": [
-      "#283e7b",
-      "#3F5EA8"
+      "#8c6b3f",
+      "#8c6b3f"
     ],
     "text_color": [
       "#ffffff",
@@ -300,7 +300,7 @@
     "border_width": 0,
     "fg_color": [
       "#283e7b",
-      "#283e7b"
+      "#1e326e"
     ],
     "border_color": [
       "#3F5EA8",
@@ -311,12 +311,12 @@
       "#ffffff"
     ],
     "scrollbar_button_color": [
-      "#8c6b3f",
-      "#8c6b3f"
+      "#6c8bd5",
+      "#6c8bd5"
     ],
     "scrollbar_button_hover_color": [
-      "#967549",
-      "#967549"
+      "#8c6b3f",
+      "#8c6b3f"
     ]
   },
   "CTkScrollableFrame": {
@@ -361,7 +361,7 @@
     "date created": "Mar 27 2023 18:16:02",
     "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "Jun 15 2023 19:15:06",
+    "last modified": "Jun 23 2023 19:37:27",
     "keystone colour": "#1f3572",
     "harmony method": "Complementary",
     "harmony differential": 5,

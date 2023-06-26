@@ -31,15 +31,15 @@
     "corner_radius": 6,
     "border_width": 0,
     "fg_color": [
-      "#173145",
+      "#31516e",
       "#142e42"
     ],
     "hover_color": [
-      "#0e283c",
+      "#375774",
       "#0e283c"
     ],
     "border_color": [
-      "#284655",
+      "#5c7998",
       "#577584"
     ],
     "text_color": [
@@ -211,7 +211,7 @@
     ],
     "button_hover_color": [
       "#2b465c",
-      "gray70"
+      "#112b3f"
     ],
     "text_color": [
       "#DCE4EE",
@@ -361,7 +361,7 @@
     "date created": "Mar 27 2023 18:16:02",
     "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "Jun 15 2023 21:45:15",
+    "last modified": "Jun 21 2023 22:16:12",
     "keystone colour": "#1f3d4c",
     "harmony method": "Split-complementary",
     "harmony differential": 10,

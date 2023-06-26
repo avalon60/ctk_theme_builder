@@ -15,8 +15,8 @@
     "corner_radius": 6,
     "border_width": 0,
     "fg_color": [
-      "#022a52",
-      "#030515"
+      "#0d355d",
+      "#121424"
     ],
     "top_fg_color": [
       "#05335b",
@@ -31,15 +31,15 @@
     "corner_radius": 6,
     "border_width": 0,
     "fg_color": [
-      "#021840",
+      "#407996",
       "#21244e"
     ],
     "hover_color": [
-      "#000c36",
-      "#0a3e6e"
+      "#49829f",
+      "#1b1e48"
     ],
     "border_color": [
-      "#104474",
+      "#02244c",
       "#565B5E"
     ],
     "text_color": [
@@ -230,11 +230,11 @@
       "#1b1e48"
     ],
     "border_color": [
-      "#104474",
+      "#407996",
       "#565B5E"
     ],
     "button_color": [
-      "#051b43",
+      "#407996",
       "#1e214b"
     ],
     "button_hover_color": [
@@ -359,37 +359,12 @@
   "provenance": {
     "theme author": "Clive Bostock",
     "date created": "Mar 27 2023 18:16:02",
-    "last modified by": "Clive Bostock",
+    "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "May 13 2023 18:06:05",
+    "last modified": "Jun 23 2023 19:35:16",
     "keystone colour": "#1e214b",
-    "harmony method": "Split-complementary",
-    "harmony differential": null,
+    "harmony method": "Triadic",
+    "harmony differential": 5,
     "theme name": "NightTrain"
-  },
-  "CTkWibble": {
-    "corner_radius": 1000,
-    "border_width_checked": 6,
-    "border_width_unchecked": 3,
-    "fg_color": [
-      "#2CC985",
-      "#2FA572"
-    ],
-    "border_color": [
-      "#3E454A",
-      "#949A9F"
-    ],
-    "hover_color": [
-      "#0C955A",
-      "#106A43"
-    ],
-    "text_color": [
-      "gray10",
-      "#DCE4EE"
-    ],
-    "text_color_disabled": [
-      "gray60",
-      "gray45"
-    ]
   }
 }

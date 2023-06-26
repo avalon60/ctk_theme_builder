@@ -31,11 +31,11 @@
     "corner_radius": 6,
     "border_width": 1,
     "fg_color": [
-      "#11202b",
+      "#697b88",
       "#11202b"
     ],
     "hover_color": [
-      "#000000",
+      "#728491",
       "#404c59"
     ],
     "border_color": [
@@ -116,7 +116,7 @@
       "#c0c1c0"
     ],
     "button_color": [
-      "#11202b",
+      "#25343f",
       "#11202b"
     ],
     "fg_color": [
@@ -191,7 +191,7 @@
       "#cccbc9"
     ],
     "button_color": [
-      "#11202b",
+      "#25343f",
       "#11202b"
     ],
     "button_hover_color": [
@@ -203,7 +203,7 @@
     "corner_radius": 6,
     "fg_color": [
       "#748498",
-      "#2e435c"
+      "#163048"
     ],
     "button_color": [
       "#3c5163",
@@ -226,15 +226,15 @@
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#748498",
-      "#163048"
+      "#a3b2be",
+      "#2e435c"
     ],
     "border_color": [
       "#000000",
       "#11202b"
     ],
     "button_color": [
-      "#1e2e3c",
+      "#25343f",
       "#11202b"
     ],
     "button_hover_color": [
@@ -311,11 +311,11 @@
       "#ffffff"
     ],
     "scrollbar_button_color": [
-      "#11202b",
+      "#4e5c6e",
       "#1f2733"
     ],
     "scrollbar_button_hover_color": [
-      "#404c59",
+      "#12140e",
       "#110e19"
     ]
   },
@@ -359,9 +359,9 @@
   "provenance": {
     "theme author": "Clive Bostock",
     "date created": "May 03 2023 09:03:28",
-    "last modified by": "Clive Bostock",
+    "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "May 18 2023 18:54:25",
+    "last modified": "Jun 23 2023 19:15:22",
     "keystone colour": "#3c5064",
     "harmony method": "Tetradic",
     "harmony differential": null,
