@@ -203,19 +203,6 @@ def db_file_exists(db_file_path: Path):
     return db_file_found
 
 
-def json_widget_type(widget_type: str) -> str:
-    """Function receives a CTk widget type and returns the
-    name used in the theme JSON. This function is necessary, because
-    there are several naming inconsistencies (at least in CTk 5.1.2),
-    between widget name the name used in the JSON."""
-    if widget_type == 'CTkCheckBox':
-        return_widget_type = 'CTkCheckbox'
-    elif widget_type == 'CTkRadioButton':
-        return_widget_type = 'CTkRadiobutton'
-    else:
-        return_widget_type = widget_type
-    return return_widget_type
-
 def patch_theme(theme_json: dict):
     """The patch_theme function, checks for incorrect theme properties. These were fixed in CustomTkinter 5.2.0.
     However, the fix in CustomTkinter included an allowance for the older, wrong names. We correct the older property
@@ -268,7 +255,7 @@ def colour_dictionary(theme_file: Path) -> dict:
     js = open(theme_file)
     theme_dict = json.load(js)
     for widget_type in SUPPORTED_WIDGETS:
-        j_widget_type = json_widget_type(widget_type=widget_type)
+        j_widget_type = widget_type
         for widget_property in COLOUR_PROPERTIES:
             if keys_exist(theme_dict, j_widget_type, widget_property):
                 disp_widget = widget_type
