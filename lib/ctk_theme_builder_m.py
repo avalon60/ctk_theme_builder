@@ -158,6 +158,12 @@ def qa_app_started():
     now = datetime.now()
     # convert to string
     date_started = now.strftime("%b %d %Y %H:%M:%S")
+    # Ensure we don't have a stop file lying around
+    if QA_STOP_FILE.exists():
+        try:
+            os.remove(QA_STOP_FILE)
+        except FileNotFoundError:
+            pass
     with open(QA_STARTED_FILE, 'w') as f:
         pid = os.getpid()
         f.write(f'[{pid}] CTk Theme Builder QA app started at: {date_started}')
@@ -209,6 +215,22 @@ def json_widget_type(widget_type: str) -> str:
     else:
         return_widget_type = widget_type
     return return_widget_type
+
+def patch_theme(theme_json: dict):
+    """The patch_theme function, checks for incorrect theme properties. These were fixed in CustomTkinter 5.2.0.
+    However, the fix in CustomTkinter included an allowance for the older, wrong names. We correct the older property
+    names here."""
+    if 'CTkCheckbox' in theme_json or 'CTkRadiobutton' in theme_json:
+        _theme_json = copy.deepcopy(theme_json)
+    else:
+        return theme_json
+    if 'CTkCheckbox' in _theme_json:
+        _theme_json['CTkCheckBox'] = _theme_json.pop('CTkCheckbox')
+
+    if 'CTkRadiobutton' in _theme_json:
+        _theme_json['CTkRadioButton'] = _theme_json.pop('CTkRadiobutton')
+
+    return _theme_json
 
 
 def keys_exist(element, *keys):
@@ -465,8 +487,8 @@ def preferences_scope_list(db_file_path: Path, scope: str):
 
 def preference_setting(db_file_path: Path, scope: str, preference_name,
                        default: [str, int, Path] = 'NO_DATA_FOUND') -> any:
-    """The preference_setting function accepts a preference scope and preference name, and returns the associated preference
-    value.
+    """The preference_setting function accepts a preference scope and preference name, and returns the associated
+    preference value.
     :param default:
     :param preference_name:
     :param scope: Preference scope / domain code.
