@@ -189,8 +189,6 @@ class About(ctk.CTkToplevel):
 
 class ControlPanel(ctk.CTk):
     _theme_json_dir: Path
-    PANEL_HEIGHT = 905
-    PANEL_WIDTH = 1020
     THEME_PALETTE_TILES = 16
     THEME_PALETTE_TILE_WIDTH = 8
     THEME_PALETTE_ROWS = 2
@@ -1148,7 +1146,6 @@ class ControlPanel(ctk.CTk):
                                parameters=[self.appearance_mode])
         self.toggle_frame_mode()
 
-        # self.load_theme()
 
     def render_theme_palette(self):
         render_labels = self.enable_palette_labels
@@ -1396,7 +1393,6 @@ class ControlPanel(ctk.CTk):
             self.file_menu.entryconfig('Flip Modes', state=tk.NORMAL)
 
             self.lbl_title.grid(row=0, column=0, columnspan=2, sticky='ew')
-            # self.geometry(f'{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}')
             self.opm_theme.configure(values=self.json_files)
             palette_file = selected_theme + '.json'
             self.theme = selected_theme
@@ -1408,6 +1404,10 @@ class ControlPanel(ctk.CTk):
             if not palette_file.exists():
                 self.create_theme_palette(selected_theme)
 
+            # Force the Control Panel to complete rendering here,
+            # otherwise if we are auto-loading the last theme at app startup,
+            # the preview panel renders, before the Control Panel finishes - looks messy.
+            self.update()
             if reload_preview:
                 self.reload_preview()
 
@@ -1455,10 +1455,9 @@ class ControlPanel(ctk.CTk):
 
     def restore_harmony_geometry(self):
         """Restore window geometry from auto-saved preferences"""
-        default_geometry = f"{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}+347+93"
         saved_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH,
                                                 scope='window_geometry',
-                                                preference_name='harmonics_panel', default=default_geometry)
+                                                preference_name='harmonics_panel')
         self.top_harmony.geometry(saved_geometry)
         self.top_harmony.resizable(False, False)
 
@@ -1759,11 +1758,6 @@ class ControlPanel(ctk.CTk):
         self.set_option_states()
 
     def set_filtered_widget_display(self, dummy='dummy'):
-        properties_filter = self.opm_properties_filter.get()
-        if properties_filter == 'All':
-            self.geometry(f'{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}')
-        else:
-            self.geometry(f'{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}')
         self.render_widget_properties()
 
     def property_colour_picker(self, event, widget_property):
@@ -2161,10 +2155,9 @@ class ControlPanel(ctk.CTk):
                 time.sleep(0.1)
 
     def restore_controller_geometry(self):
-        default_geometry = f"{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}+347+93"
         controller_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH,
                                                      scope='window_geometry',
-                                                     preference_name='control_panel', default=default_geometry)
+                                                     preference_name='control_panel')
         self.geometry(controller_geometry)
         # self.resizable(False, True)
 
@@ -2410,10 +2403,9 @@ class HarmonicsDialog(ctk.CTkToplevel):
 
     def restore_harmony_geometry(self):
         """Restore window geometry from auto-saved preferences"""
-        default_geometry = f"{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}+347+93"
         saved_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH,
                                                 scope='window_geometry',
-                                                preference_name='harmonics_panel', default=default_geometry)
+                                                preference_name='harmonics_panel')
         self.geometry(saved_geometry)
         self.resizable(False, False)
 
@@ -3417,13 +3409,13 @@ class GeometryDialog(ctk.CTkToplevel):
 
         elif widget_type == 'CTkRadioButton':
             self.geometry('800x301')
-            radiobutton_fg_color = self.theme_json_data['CTkRadiobutton']['fg_color'][mode]
+            radiobutton_fg_color = self.theme_json_data['CTkRadioButton']['fg_color'][mode]
 
-            radiobutton_border_color = self.theme_json_data['CTkRadiobutton']['border_color'][mode]
+            radiobutton_border_color = self.theme_json_data['CTkRadioButton']['border_color'][mode]
 
-            radiobutton_hover_color = self.theme_json_data['CTkRadiobutton']['hover_color'][mode]
+            radiobutton_hover_color = self.theme_json_data['CTkRadioButton']['hover_color'][mode]
 
-            radiobutton_text_color = self.theme_json_data['CTkRadiobutton']['text_color'][mode]
+            radiobutton_text_color = self.theme_json_data['CTkRadioButton']['text_color'][mode]
 
             label_text_colour = self.theme_json_data['CTkLabel']['text_color'][mode]
 
