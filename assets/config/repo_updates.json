@@ -61,7 +61,7 @@
  
    "016":{ "sql_apply_version":"2.0.0",
       "description": "Control panel geometry",
-      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('window_geometry', 'control_panel', 'str', '1050x905+10+30');" },
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('window_geometry', 'control_panel', 'str', '960x905+10+30');" },
 
    "017":{ "sql_apply_version":"2.0.0",
       "description": "Widget Geometry dialog geometry",
