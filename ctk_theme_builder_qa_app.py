@@ -197,16 +197,25 @@ class App(customtkinter.CTk):
         self.change_scaling_event(self.qa_app_scaling)
         self.protocol("WM_DELETE_WINDOW", self.close_app)
 
+        self.keep_running = True
+
         # Signal that we have started the app
         mod.qa_app_started()
-        self.close_request_listener()
+        self.after(100, self.check_for_running)
+        self.start_requested_close_listener()
 
+    def check_for_running(self):
+        if not self.keep_running:
+            self.close_app()
+        else:
+            self.after(100, self.check_for_running)
 
-    def close_request_listener(self):
+    def start_requested_close_listener(self):
         """Listener, which checks to see if a close request file has been created."""
         client_thread = threading.Thread(target=self.listen_for_close,
                                          daemon=True)
         client_thread.start()
+
     def open_input_dialog_event(self):
         dialog = customtkinter.CTkInputDialog(text="Type in a number:", title="CTkInputDialog")
         print("CTkInputDialog:", dialog.get_input())
@@ -227,10 +236,8 @@ class App(customtkinter.CTk):
         while 1:
             if mod.close_qa_app_requested():
                 mod.complete_qa_stop()
-                self.close_app()
+                self.keep_running = False
             time.sleep(0.1)
-
-
 
     def save_app_geometry(self):
         """Save the control panel geometry to the repo, for the next time the program is launched."""
@@ -240,7 +247,6 @@ class App(customtkinter.CTk):
         qa_geometry = self.geometry()
         geometry_row["preference_value"] = qa_geometry
         mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
-
 
     def sidebar_button_event(self):
         print("sidebar_button click")
@@ -263,7 +269,6 @@ theme_json_file = args_list["theme_json_file"]
 
 customtkinter.set_appearance_mode(appearance_mode)  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme(theme_json_file)
-
 
 if __name__ == "__main__":
     app = App()
