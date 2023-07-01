@@ -187,7 +187,6 @@ class About(ctk.CTkToplevel):
         self.lift()
 
 
-
 class ControlPanel(ctk.CTk):
     _theme_json_dir: Path
     PANEL_HEIGHT = 905
@@ -207,6 +206,7 @@ class ControlPanel(ctk.CTk):
     # update the widgets which utilise it. E.g. CTkComboBox, CTkOptionMenu.
     # In any case, any entries in the list, require a full preview panel refresh, to work around the respective
     # challenges.
+    # Here we key the properties requiring refresh, based on a CustomTkinter release range.
     FORCE_REFRESH_PROPERTIES = ["CheckBox: checkmark_color",
                                 "DropdownMenu: fg_color",
                                 "DropdownMenu: hover_color",
@@ -622,7 +622,8 @@ class ControlPanel(ctk.CTk):
         # At this point widget_property is a concatenation of the widget type and widget property.
         # We need to split these out. The widget_property_split function, transforms these for us.
         widget_type, split_property = mod.widget_property_split(widget_property=widget_property)
-        json_widget_type = mod.json_widget_type(widget_type=widget_type)
+        # json_widget_type = mod.json_widget_type(widget_type=widget_type)
+        json_widget_type = widget_type
         self.theme_json_data[json_widget_type][split_property][appearance_mode_index] = new_colour
         parameters = []
 
@@ -894,7 +895,7 @@ class ControlPanel(ctk.CTk):
         column += 1
 
         btn_geo_checkbox = ctk.CTkButton(master=self.frm_geometry,
-                                         text='Checkbox',
+                                         text='CheckBox',
                                          height=button_height,
                                          width=button_width,
                                          corner_radius=corner_radius,
@@ -1363,6 +1364,11 @@ class ControlPanel(ctk.CTk):
             self.preview_json = self.TEMP_DIR / self.theme_file
             shutil.copyfile(self.source_json_file, self.wip_json)
             self.theme_json_data = mod.json_dict(json_file_path=self.wip_json)
+            # The patch function checks to see if the theme, has wrong, pre CustomTkinter 5.2.0 property names.
+            # If so, it patches up the theme JSON. These should be CTkCheckBox and CTkRadioButton.
+            self.theme_json_data = mod.patch_theme(theme_json=self.theme_json_data)
+            with open(self.wip_json, "w") as f:
+                json.dump(self.theme_json_data, f, indent=2)
 
             # self.update_config(section='preferences', option='theme_json_dir', value=self.theme_json_dir)
             self.render_geometry_buttons()
@@ -1860,7 +1866,8 @@ class ControlPanel(ctk.CTk):
                 try:
                     key = next(member_gen)
                     widget_type, widget_property = mod.widget_property_split(key)
-                    json_widget_type = mod.json_widget_type(widget_type=widget_type)
+                    # json_widget_type = mod.json_widget_type(widget_type=widget_type)
+                    json_widget_type = widget_type
                     colour_value = self.theme_json_data[json_widget_type][widget_property]
                 except StopIteration:
                     break
@@ -2002,7 +2009,8 @@ class ControlPanel(ctk.CTk):
         counter = 0
         for property_id in self.filter_list:
             widget_type, widget_property = mod.widget_property_split(property_id)
-            json_widget_type = mod.json_widget_type(widget_type=widget_type)
+            # json_widget_type = mod.json_widget_type(widget_type=widget_type)
+            json_widget_type = widget_type
             if str(self.theme_json_data[json_widget_type][widget_property]) == "transparent":
                 continue
             try:
@@ -2395,7 +2403,6 @@ class HarmonicsDialog(ctk.CTkToplevel):
         self.protocol("WM_DELETE_WINDOW", self.on_harmonic_close)
         self.grab_set()
         self.lift()
-
 
     @staticmethod
     def context_menu(event: tk.Event = None, menu: cbtk.CBtkMenu = None):
@@ -3057,7 +3064,6 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.grab_set()
         self.lift()
 
-
     def get_tooltips_setting(self):
         self.enable_tooltips = int(self.tk_enable_tooltips.get())
 
@@ -3223,8 +3229,8 @@ class GeometryDialog(ctk.CTkToplevel):
 
         frame_fg_color = self.theme_json_data['CTkFrame']['fg_color'][
             cbtk.str_mode_to_int(self.appearance_mode)]
-        json_widget_type = mod.json_widget_type(widget_type=widget_type)
-
+        # json_widget_type = mod.json_widget_type(widget_type=widget_type)
+        json_widget_type = widget_type
         mode = cbtk.str_mode_to_int(self.appearance_mode)
         if widget_type == 'CTkFrame':
             self.geometry('764x280')
@@ -3282,15 +3288,15 @@ class GeometryDialog(ctk.CTkToplevel):
                                             border_width=self.theme_json_data['CTkButton']['border_width'])
         elif widget_type == 'CTkCheckBox':
             self.geometry('786x232')
-            checkbox_fg_color = self.theme_json_data['CTkCheckbox']['fg_color'][mode]
+            checkbox_fg_color = self.theme_json_data['CTkCheckBox']['fg_color'][mode]
 
-            checkbox_border_color = self.theme_json_data['CTkCheckbox']['border_color'][mode]
+            checkbox_border_color = self.theme_json_data['CTkCheckBox']['border_color'][mode]
 
-            checkbox_hover_color = self.theme_json_data['CTkCheckbox']['hover_color'][mode]
+            checkbox_hover_color = self.theme_json_data['CTkCheckBox']['hover_color'][mode]
 
-            checkbox_checkmark_color = self.theme_json_data['CTkCheckbox']['checkmark_color'][mode]
+            checkbox_checkmark_color = self.theme_json_data['CTkCheckBox']['checkmark_color'][mode]
 
-            checkbox_text_color = self.theme_json_data['CTkCheckbox']['text_color'][mode]
+            checkbox_text_color = self.theme_json_data['CTkCheckBox']['text_color'][mode]
 
             geometry_widget = ctk.CTkCheckBox(master=frm_widget_preview_low,
                                               fg_color=checkbox_fg_color,
@@ -3298,8 +3304,8 @@ class GeometryDialog(ctk.CTkToplevel):
                                               hover_color=checkbox_hover_color,
                                               checkmark_color=checkbox_checkmark_color,
                                               text_color=checkbox_text_color,
-                                              corner_radius=self.theme_json_data['CTkCheckbox']['corner_radius'],
-                                              border_width=self.theme_json_data['CTkCheckbox']['border_width'])
+                                              corner_radius=self.theme_json_data['CTkCheckBox']['corner_radius'],
+                                              border_width=self.theme_json_data['CTkCheckBox']['border_width'])
         elif widget_type == 'CTkComboBox':
             self.geometry('795x234')
 
@@ -3328,8 +3334,8 @@ class GeometryDialog(ctk.CTkToplevel):
                                               dropdown_fg_color=dropdown_fg_colour,
                                               dropdown_text_color=dropdown_text_colour,
                                               dropdown_hover_color=dropdown_hover_colour,
-                                              corner_radius=self.theme_json_data['CTkCheckbox']['corner_radius'],
-                                              border_width=self.theme_json_data['CTkCheckbox']['border_width'],
+                                              corner_radius=self.theme_json_data['CTkCheckBox']['corner_radius'],
+                                              border_width=self.theme_json_data['CTkCheckBox']['border_width'],
                                               values=["Option 1", "Option 2", "Option 3", "Option 4..."])
         elif widget_type == 'CTkFrame':
             self.geometry('764x280')
@@ -3583,7 +3589,8 @@ class GeometryDialog(ctk.CTkToplevel):
             base_label_text = label_text.replace(widget_type.lower(), '') + ': '
             # This function call is necessary, because there are several naming
             # inconsistencies (at least in CTk 5.1.2), between widget names.
-            json_widget_type = mod.json_widget_type(widget_type=widget_type)
+            # json_widget_type = mod.json_widget_type(widget_type=widget_type)
+            json_widget_type = widget_type
 
             current_value = int(self.theme_json_data[json_widget_type][property])
             label_dict[property] = ctk.CTkLabel(master=frm_controls, text=base_label_text.title() + f'{current_value}')
@@ -3606,7 +3613,8 @@ class GeometryDialog(ctk.CTkToplevel):
             parameters = []
             # This function call is necessary, because there are several naming
             # inconsistencies (at least in CTk 5.1.2), between widget names.
-            json_widget_type = mod.json_widget_type(widget_type=widget_type)
+            # json_widget_type = mod.json_widget_type(widget_type=widget_type)
+            json_widget_type = widget_type
             if self.theme_json_data[json_widget_type][widget_property] != property_value:
                 self.theme_json_data[json_widget_type][widget_property] = property_value
                 self.master.json_state = 'dirty'
@@ -3662,7 +3670,6 @@ class ThemeMerger(ctk.CTkToplevel):
         self.enable_tooltips = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                       preference_name='enable_tooltips')
         self.open_when_merged = 0
-
 
         self.master = self.master
         self.title('Merge Themes')
@@ -3846,7 +3853,6 @@ class ThemeMerger(ctk.CTkToplevel):
 
         self.grab_set()
         self.lift()
-
 
     def validate_and_merge(self):
         """This method processes the "Merge Themes" dialog (launch_merge_dialog) submission, and is activated by the
