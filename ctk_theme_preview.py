@@ -20,6 +20,7 @@ import lib.cbtk_kit as cbtk
 import lib.ctk_theme_builder_m as mod
 from lib.ctk_tooltip.ctk_tooltip import CTkToolTip
 from CTkMessagebox import CTkMessagebox
+from PIL import Image
 
 PROG = os.path.basename(__file__)
 APP_HOME = Path(os.path.dirname(os.path.realpath(__file__)))
@@ -134,7 +135,7 @@ class PreviewPanel:
         self.preview.protocol("WM_DELETE_WINDOW", self.block_closing)
         self._restore_preview_geometry()
 
-        self.preview.columnconfigure(1, weight=1)
+        self.preview.columnconfigure(0, weight=1)
         self.preview.rowconfigure(0, weight=1)
 
         static_corner_radius = 5
@@ -202,26 +203,25 @@ class PreviewPanel:
         self._tooltip_bg = self._ctl_frame_top_fg_color
 
         # This is a base frame for contrast purposes, against a top frame.
-        self._frm_preview_base = ctk.CTkFrame(master=self.preview)
-        self._frm_preview_base.grid(row=0, column=0, ipadx=ipadx, ipady=ipady, padx=10, pady=10, sticky='nsew')
-        self._frm_preview_base.columnconfigure(0, weight=1)
-        self.refresh_widgets.append(self._frm_preview_base)
+        self.frm_preview_base = ctk.CTkFrame(master=self.preview)
+        self.frm_preview_base.grid(row=0, column=0, ipadx=ipadx, ipady=ipady, padx=10, pady=(10, 20), sticky='nsew')
+        self.refresh_widgets.append(self.frm_preview_base)
 
-        self._rendered_widgets['CTkFrame'].append(self._frm_preview_base)
+        self._rendered_widgets['CTkFrame'].append(self.frm_preview_base)
         # We need a double entry. This is a bit of a cludge for dealing
         # with the top_fg_color property, which has no configure option.
-        self._rendered_widgets['frame_base'].append(self._frm_preview_base)
-        self._rendered_widgets['CTkFrame'].append(self._frm_preview_base)
+        self._rendered_widgets['frame_base'].append(self.frm_preview_base)
+        self._rendered_widgets['CTkFrame'].append(self.frm_preview_base)
 
         # This is a top frame for contrast purposes, when placed within another frame.
-        self._frm_preview_top = ctk.CTkFrame(master=self._frm_preview_base)
+        self.frm_preview_top = ctk.CTkFrame(master=self.frm_preview_base)
 
-        self._frm_preview_top.grid(row=1, column=0, ipadx=ipadx, ipady=ipady, padx=10, pady=(10, 25), sticky='nsew')
-        self._rendered_widgets['CTkFrame'].append(self._frm_preview_top)
+        self.frm_preview_top.grid(row=1, column=0, ipadx=ipadx, ipady=ipady, padx=10, pady=(10, 10), sticky='nsew')
+        self._rendered_widgets['CTkFrame'].append(self.frm_preview_top)
         # We need a double entry. This is a bit of a cludge for dealing
         # with the top_fg_color property, which has no configure option.
-        self._rendered_widgets['frame_top'].append(self._frm_preview_top)
-        self._rendered_widgets['CTkFrame'].append(self._frm_preview_top)
+        self._rendered_widgets['frame_top'].append(self.frm_preview_top)
+        self._rendered_widgets['CTkFrame'].append(self.frm_preview_top)
 
         self._render_frame_top_preview()
 
@@ -229,6 +229,10 @@ class PreviewPanel:
             self._render_preview_disabled()
         else:
             self._render_preview_enabled()
+
+        self.frm_preview_base.columnconfigure(0, weight=1)
+        self.frm_preview_base.rowconfigure(1, weight=1)
+        self.frm_preview_top.columnconfigure(0, weight=1)
 
     def _switch_theme(self, theme_file: Path):
         self._theme_file = theme_file
@@ -254,7 +258,7 @@ class PreviewPanel:
                 property = f"{item.replace('CTk', '')}/{value}"
                 colours[property] = value
 
-        widget_frame = self._frm_preview_top
+        widget_frame = self.frm_preview_top
 
         theme_name = cbtk.theme_provenence_attribute(theme_file_path=self._theme_file,
                                                      attribute="theme name",
@@ -264,7 +268,7 @@ class PreviewPanel:
         pad_x = 10
         pad_y = 10
 
-        self.lbl_preview_heading = ctk.CTkLabel(master=self._frm_preview_top,
+        self.lbl_preview_heading = ctk.CTkLabel(master=self.frm_preview_top,
                                                 text='Frame (Top) Preview',
                                                 font=mod.HEADING4,
                                                 anchor="w")
@@ -295,7 +299,7 @@ class PreviewPanel:
 
         # CTkSegmentedButton
         self.seg_button = ctk.CTkSegmentedButton(master=widget_frame)
-        self.seg_button.grid(row=3, column=1, padx=(25, 0), pady=pad_y, sticky="ew", columnspan=2)
+        self.seg_button.grid(row=3, column=1, padx=(25, 10), pady=pad_y, sticky="ew", columnspan=2)
 
         self.seg_button.configure(values=["CTkSegmentedButton", "Value 2", "Value 3"])
         self.seg_button.set("Value 2")
@@ -315,10 +319,14 @@ class PreviewPanel:
         self._rendered_widgets['CTkComboBox'].append(self.combobox_1)
 
         # CTkButton
+        eye_con = ctk.CTkImage(light_image=Image.open(APP_IMAGES / 'eye_lm.png'),
+                               dark_image=Image.open(APP_IMAGES / 'eye_dm.png'),
+                               size=(20, 20))
         # We contrive to always show a contrast of a button widget with and without a border.
         button_border_width = ThemeManager.theme['CTkButton']['border_width']
         self.button_1 = ctk.CTkButton(master=widget_frame, border_width=button_border_width)
         self.button_1.grid(row=4, column=2, padx=pad_x, pady=pad_y)
+
 
         self._rendered_widgets['CTkButton'].append(self.button_1)
         if self._enable_tooltips:
@@ -331,7 +339,7 @@ class PreviewPanel:
             second_border_width = 2
         else:
             second_border_width = 0
-        self.button_2 = ctk.CTkButton(master=widget_frame, border_width=second_border_width)
+        self.button_2 = ctk.CTkButton(master=widget_frame, image=eye_con, border_width=second_border_width)
         self.button_2.grid(row=5, column=2, padx=pad_x, pady=pad_y)
 
         if self._enable_tooltips:
@@ -381,10 +389,10 @@ class PreviewPanel:
         self.entry_1.grid(row=4, column=0, padx=pad_x, pady=pad_y)
         if self._enable_tooltips:
             self.entry_1_tooltip = CTkToolTip(self.entry_1,
-                                         justify="left",
-                                         wraplength=250,
-                                         padding=(5, 5),
-                                         message=f'CTkEntry - with default border setting of {entry_border_width}')
+                                              justify="left",
+                                              wraplength=250,
+                                              padding=(5, 5),
+                                              message=f'CTkEntry - with default border setting of {entry_border_width}')
 
         self._rendered_widgets['CTkEntry'].append(self.entry_1)
 
@@ -392,9 +400,9 @@ class PreviewPanel:
         self.entry_2.grid(row=5, column=0, padx=pad_x, pady=pad_y)
         if self._enable_tooltips:
             self.entry_2_tooltip = CTkToolTip(self.entry_2,
-                                         justify="left",
-                                         wraplength=250,
-                                         message=f'CTkEntry - with border setting of {second_border_width}')
+                                              justify="left",
+                                              wraplength=250,
+                                              message=f'CTkEntry - with border setting of {second_border_width}')
         self._rendered_widgets['CTkEntry'].append(self.entry_2)
 
         # CTkTextbox
@@ -442,7 +450,7 @@ class PreviewPanel:
         self._rendered_widgets['CTkScrollableFrame'].append(self.scrollable_frame)
         # CTkTabview
         self.tabview = ctk.CTkTabview(master=widget_frame, width=250)
-        self.tabview.grid(row=10, column=2, padx=(20, 0), pady=(20, 10), sticky="nsew")
+        self.tabview.grid(row=10, column=2, padx=(20, 10), pady=(20, 10), sticky="nsew")
         self.tabview.add("CTkTabview")
         self.tabview.add("Tab 2")
         self.tabview.add("Tab 3")
@@ -505,7 +513,7 @@ class PreviewPanel:
 
     def render_base_frame(self):
         self.lbl_preview_heading.configure(text='Frame (Base) Preview')
-        self._frm_preview_top.configure(fg_color="transparent", border_width=0)
+        self.frm_preview_top.configure(fg_color="transparent", border_width=0)
 
     def render_top_frame(self):
         self.lbl_preview_heading.configure(text='Frame (Top) Preview')
@@ -516,7 +524,7 @@ class PreviewPanel:
         border_width = cbtk.theme_property(theme_file_path=self._theme_file,
                                            widget_type='CTkFrame',
                                            widget_property='border_width')
-        self._frm_preview_top.configure(fg_color=self._ctl_frame_top_fg_color, border_width=border_width)
+        self.frm_preview_top.configure(fg_color=self._ctl_frame_top_fg_color, border_width=border_width)
 
     def _toggle_preview_disabled(self, render_state):
         """Toggle between the normal and disabled states for the previewed widgets. Here we take advantage of the
@@ -579,7 +587,7 @@ class PreviewPanel:
                                                 scope='window_geometry',
                                                 preference_name='preview_panel')
         self.preview.geometry(panel_geometry)
-        self.preview.resizable(True, True)
+        # self.preview.resizable(True, True)
 
     def _save_preview_geometry(self):
         # save current geometry to the preferences
@@ -614,6 +622,11 @@ class PreviewPanel:
             mode = parameters[0]
             self._appearance_mode = mode
             self._switch_appearance_mode(appearance_mode=mode)
+        if command == 'set_widget_scaling':
+            scaling_pct = parameters[0]
+            scaling_float = mod.scaling_float(scaling_pct)
+            print(f'DEBUG: Widget Scaling Pct: {scaling_pct}')
+            ctk.set_widget_scaling(scaling_float)
         elif command == 'render_preview_disabled':
             self._render_preview_disabled()
         elif command == 'render_preview_enabled':
@@ -824,7 +837,6 @@ class PreviewPanel:
                 widget.configure(border_color=widget_colour)
             for widget in self._rendered_widgets['CTkTabview']:
                 widget.configure(border_color=widget_colour)
-
 
         if widget_type == 'CTkFrame' and widget_property_lower == 'top_fg_color':
             widget_type = 'frame_top'

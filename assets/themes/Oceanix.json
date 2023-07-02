@@ -1,13 +1,13 @@
 {
   "CTk": {
     "fg_color": [
-      "#5b738d",
+      "#3b5068",
       "#3e5365"
     ]
   },
   "CTkToplevel": {
     "fg_color": [
-      "#51667e",
+      "#4c6179",
       "#29404C"
     ]
   },
@@ -19,7 +19,7 @@
       "#213844"
     ],
     "top_fg_color": [
-      "#455a72",
+      "#3b5068",
       "#263d49"
     ],
     "border_color": [
@@ -31,15 +31,15 @@
     "corner_radius": 6,
     "border_width": 0,
     "fg_color": [
-      "#173145",
+      "#31516e",
       "#142e42"
     ],
     "hover_color": [
-      "#0e283c",
+      "#375774",
       "#0e283c"
     ],
     "border_color": [
-      "#284655",
+      "#5c7998",
       "#577584"
     ],
     "text_color": [
@@ -61,21 +61,21 @@
   },
   "CTkEntry": {
     "corner_radius": 6,
-    "border_width": 2,
+    "border_width": 1,
     "fg_color": [
-      "#7889b3",
-      "#112b3f"
+      "#375774",
+      "#173145"
     ],
     "border_color": [
-      "#22333F",
-      "#1b3c54"
+      "#5c7998",
+      "#3f5d6c"
     ],
     "text_color": [
       "white",
       "#ffffff"
     ],
     "placeholder_text_color": [
-      "#263238",
+      "#718ead",
       "#5c9ec9"
     ]
   },
@@ -112,7 +112,7 @@
     "border_width": 3,
     "button_length": 0,
     "fg_color": [
-      "#435e74",
+      "#21375a",
       "#222222"
     ],
     "progress_color": [
@@ -211,7 +211,7 @@
     ],
     "button_hover_color": [
       "#2b465c",
-      "gray70"
+      "#112b3f"
     ],
     "text_color": [
       "#DCE4EE",
@@ -224,13 +224,13 @@
   },
   "CTkComboBox": {
     "corner_radius": 6,
-    "border_width": 3,
+    "border_width": 1,
     "fg_color": [
-      "#0e283c",
+      "#375774",
       "#0e283c"
     ],
     "border_color": [
-      "#2b4164",
+      "#5c7998",
       "#3f5d6c"
     ],
     "button_color": [
@@ -271,12 +271,12 @@
       "#547281"
     ],
     "selected_color": [
-      "#2d4d6a",
-      "#335370"
+      "#375774",
+      "#385875"
     ],
     "selected_hover_color": [
-      "#274764",
-      "#30506d"
+      "#31516e",
+      "#355572"
     ],
     "unselected_color": [
       "#1e3e5b",
@@ -299,8 +299,8 @@
     "corner_radius": 6,
     "border_width": 1,
     "fg_color": [
-      "#6e7fa9",
-      "#0e283c"
+      "#375774",
+      "#173145"
     ],
     "border_color": [
       "#5c7998",
@@ -361,7 +361,7 @@
     "date created": "Mar 27 2023 18:16:02",
     "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "May 30 2023 21:30:58",
+    "last modified": "Jun 21 2023 22:16:12",
     "keystone colour": "#1f3d4c",
     "harmony method": "Split-complementary",
     "harmony differential": 10,

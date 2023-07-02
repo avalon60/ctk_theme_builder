@@ -31,11 +31,11 @@
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#11202b",
+      "#697b88",
       "#11202b"
     ],
     "hover_color": [
-      "#404c59",
+      "#758794",
       "#404c59"
     ],
     "border_color": [
@@ -362,7 +362,7 @@
     "date created": "Jun 10 2023 12:22:59",
     "last modified by": "clive",
     "created with": "CTk Theme Builder v2.2.0",
-    "last modified": "Jun 10 2023 19:23:41",
+    "last modified": "Jun 23 2023 19:13:53",
     "keystone colour": "#3c5064",
     "harmony method": "Split-complementary",
     "harmony differential": null

@@ -4,11 +4,13 @@ __version__ = "1.0.0"
 __license__ = 'MIT - see LICENSE.md'
 
 import copy
+import time
 from pathlib import Path
 import json
 import customtkinter as ctk
 import sqlite3
 import os
+from datetime import datetime
 
 # Constants
 APP_HOME = os.path.dirname(os.path.realpath(__file__))
@@ -27,6 +29,9 @@ APP_THEMES_DIR = ASSETS_DIR / 'themes'
 APP_DATA_DIR = ASSETS_DIR / 'data'
 APP_IMAGES = ASSETS_DIR / 'images'
 DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
+QA_STOP_FILE = ETC_DIR / 'qa_application.stop'
+QA_STARTED_FILE = ETC_DIR / 'qa_application.started'
+
 # These aren't true sizes as per WEB design
 HEADING1 = ('Roboto', 26)
 HEADING2 = ('Roboto', 22)
@@ -122,11 +127,62 @@ def app_themes_list():
     theme_names.sort()
     return theme_names
 
+
+def close_qa_app_requested():
+    """Used to determine whether the QA application has been requested to close."""
+    if QA_STOP_FILE.exists():
+        return True
+    else:
+        return False
+
+
+def complete_qa_stop():
+    time.sleep(0.5)
+    remove_qa_status_files()
+
+
+def remove_qa_status_files():
+    if QA_STOP_FILE.exists():
+        try:
+            os.remove(QA_STOP_FILE)
+        except FileNotFoundError:
+            pass
+    if QA_STARTED_FILE.exists():
+        try:
+            os.remove(QA_STARTED_FILE)
+        except FileNotFoundError:
+            pass
+
+def qa_app_started():
+    # current dateTime
+    now = datetime.now()
+    # convert to string
+    date_started = now.strftime("%b %d %Y %H:%M:%S")
+    # Ensure we don't have a stop file lying around
+    if QA_STOP_FILE.exists():
+        try:
+            os.remove(QA_STOP_FILE)
+        except FileNotFoundError:
+            pass
+    with open(QA_STARTED_FILE, 'w') as f:
+        pid = os.getpid()
+        f.write(f'[{pid}] CTk Theme Builder QA app started at: {date_started}')
+
+def request_close_qa_app():
+    # current dateTime
+    now = datetime.now()
+    # convert to string
+    date_started = now.strftime("%b %d %Y %H:%M:%S")
+    with open(QA_STOP_FILE, 'w') as f:
+        pid = os.getpid()
+        f.write(f'[{pid}] CTk Theme Builder QA app close requested at: {date_started}')
+
+
 def user_themes_list():
     """This method generates a list of theme names, based on the json files found in the user's themes folder
     (i.e. self.theme_json_dir). These are basically the theme file names, with the .json extension stripped out."""
     user_themes_dir = preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                        preference_name='theme_json_dir')
+                                         preference_name='theme_json_dir')
     json_files = list(user_themes_dir.glob('*.json'))
     theme_names = []
     for file in json_files:
@@ -135,6 +191,7 @@ def user_themes_list():
         theme_names.append(theme_name)
     theme_names.sort()
     return theme_names
+
 
 def db_file_exists(db_file_path: Path):
     global db_file_found
@@ -146,18 +203,21 @@ def db_file_exists(db_file_path: Path):
     return db_file_found
 
 
-def json_widget_type(widget_type: str) -> str:
-    """Function receives a CTk widget type and returns the
-    name used in the theme JSON. This function is necessary, because
-    there are several naming inconsistencies (at least in CTk 5.1.2),
-    between widget name the name used in the JSON."""
-    if widget_type == 'CTkCheckBox':
-        return_widget_type = 'CTkCheckbox'
-    elif widget_type == 'CTkRadioButton':
-        return_widget_type = 'CTkRadiobutton'
+def patch_theme(theme_json: dict):
+    """The patch_theme function, checks for incorrect theme properties. These were fixed in CustomTkinter 5.2.0.
+    However, the fix in CustomTkinter included an allowance for the older, wrong names. We correct the older property
+    names here."""
+    if 'CTkCheckbox' in theme_json or 'CTkRadiobutton' in theme_json:
+        _theme_json = copy.deepcopy(theme_json)
     else:
-        return_widget_type = widget_type
-    return return_widget_type
+        return theme_json
+    if 'CTkCheckbox' in _theme_json:
+        _theme_json['CTkCheckBox'] = _theme_json.pop('CTkCheckbox')
+
+    if 'CTkRadiobutton' in _theme_json:
+        _theme_json['CTkRadioButton'] = _theme_json.pop('CTkRadiobutton')
+
+    return _theme_json
 
 
 def keys_exist(element, *keys):
@@ -195,7 +255,7 @@ def colour_dictionary(theme_file: Path) -> dict:
     js = open(theme_file)
     theme_dict = json.load(js)
     for widget_type in SUPPORTED_WIDGETS:
-        j_widget_type = json_widget_type(widget_type=widget_type)
+        j_widget_type = widget_type
         for widget_property in COLOUR_PROPERTIES:
             if keys_exist(theme_dict, j_widget_type, widget_property):
                 disp_widget = widget_type
@@ -258,6 +318,12 @@ def str_mode_to_int(mode=None):
     return 1
 
 
+def scaling_float(scale_pct: str) -> float:
+    """Expects a scaling percentage, including the % symbol and converts to a fractional decimal."""
+    scaling_float = int(scale_pct.replace("%", "")) / 100
+    return scaling_float
+
+
 def flip_appearance_modes(theme_file_path: Path):
     """Function, which accepts the pathname to a CustomTkinter theme file. It then proceeds to swap
     all light (appearance) mode colours, with those of the dark mode."""
@@ -270,6 +336,10 @@ def flip_appearance_modes(theme_file_path: Path):
                 new_theme_dict[widget_type][property_][1] = theme_dict[widget_type][property_][0]
     with open(theme_file_path, "w") as f:
         json.dump(new_theme_dict, f, indent=2)
+
+
+def ui_scaling_list():
+    return ['80%', '90%', '100%', '110%', '120%']
 
 
 def merge_themes(primary_theme_name: str, primary_mode: str, secondary_theme_name: str, secondary_mode: str,
@@ -294,8 +364,10 @@ def merge_themes(primary_theme_name: str, primary_mode: str, secondary_theme_nam
     for widget_type, dict_ in new_theme_dict.items():
         for property_, value_ in dict_.items():
             if "_color" in property_ and value_ != 'transparent':
-                new_theme_dict[widget_type][property_][mapped_primary_idx] = primary_theme_dict[widget_type][property_][primary_mode_idx]
-                new_theme_dict[widget_type][property_][mapped_secondary_idx] = secondary_theme_dict[widget_type][property_][secondary_mode_idx]
+                new_theme_dict[widget_type][property_][mapped_primary_idx] = primary_theme_dict[widget_type][property_][
+                    primary_mode_idx]
+                new_theme_dict[widget_type][property_][mapped_secondary_idx] = \
+                    secondary_theme_dict[widget_type][property_][secondary_mode_idx]
     print(f'DEBUG: Writing to {new_theme_path}')
     with open(new_theme_path, "w") as f:
         json.dump(new_theme_dict, f, indent=2)
@@ -402,8 +474,8 @@ def preferences_scope_list(db_file_path: Path, scope: str):
 
 def preference_setting(db_file_path: Path, scope: str, preference_name,
                        default: [str, int, Path] = 'NO_DATA_FOUND') -> any:
-    """The preference_setting function accepts a preference scope and preference name, and returns the associated preference
-    value.
+    """The preference_setting function accepts a preference scope and preference name, and returns the associated
+    preference value.
     :param default:
     :param preference_name:
     :param scope: Preference scope / domain code.

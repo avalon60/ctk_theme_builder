@@ -7,7 +7,7 @@
   },
   "CTkToplevel": {
     "fg_color": [
-      "#505693",
+      "#4b518e",
       "#39406e"
     ]
   },
@@ -15,23 +15,23 @@
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#505693",
-      "#39406e"
+      "#565c99",
+      "#424977"
     ],
     "top_fg_color": [
-      "#57639D",
-      "#313B6E"
+      "#4b518e",
+      "#333a68"
     ],
     "border_color": [
-      "#4e4994",
-      "#5963B6"
+      "#313B6E",
+      "#283564"
     ]
   },
   "CTkButton": {
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#313B6E",
+      "#354888",
       "#1c2958"
     ],
     "hover_color": [
@@ -39,8 +39,8 @@
       "#3b4e8e"
     ],
     "border_color": [
-      "#4e4994",
-      "#13204f"
+      "#313B6E",
+      "#283564"
     ],
     "text_color": [
       "#e4ecf3",
@@ -67,8 +67,8 @@
       "#57639D"
     ],
     "border_color": [
-      "#4e4994",
-      "#1c3854"
+      "#374473",
+      "#283564"
     ],
     "text_color": [
       "#e4ecf3",
@@ -120,7 +120,7 @@
       "#8cff99"
     ],
     "button_color": [
-      "#3b4e8e",
+      "#1c2958",
       "#54609a"
     ],
     "button_hover_color": [
@@ -145,7 +145,7 @@
       "#fff18e"
     ],
     "border_color": [
-      "#313B6E",
+      "#d2c461",
       "#fff1c4"
     ],
     "hover_color": [
@@ -174,7 +174,7 @@
     ],
     "border_color": [
       "#1c3854",
-      "#000000"
+      "#283564"
     ]
   },
   "CTkSlider": {
@@ -191,7 +191,7 @@
       "#8cff99"
     ],
     "button_color": [
-      "#313B6E",
+      "#1c2958",
       "#57639D"
     ],
     "button_hover_color": [
@@ -226,15 +226,15 @@
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#313B6E",
+      "#7083b4",
       "#4b5791"
     ],
     "border_color": [
-      "#4e4994",
-      "#263063"
+      "#313B6E",
+      "#283564"
     ],
     "button_color": [
-      "#4e4994",
+      "#313B6E",
       "#57639D"
     ],
     "button_hover_color": [
@@ -299,12 +299,12 @@
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#4d5390",
-      "#363d6b"
+      "#7083b4",
+      "#57639D"
     ],
     "border_color": [
-      "#4e5894",
-      "#5660b3"
+      "#313B6E",
+      "#283564"
     ],
     "text_color": [
       "#e4ecf3",
@@ -359,12 +359,12 @@
   "provenance": {
     "theme author": "Clive Bostock",
     "date created": "Mar 27 2023 18:16:02",
-    "last modified by": "Clive  Bostock",
-    "last modified date": null,
+    "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "keystone method": null,
-    "keystone colour": "#ac0000",
-    "last modified": "Apr 26 2023 16:05:24",
-    "harmony method": "Split-complementary"
+    "last modified": "Jun 23 2023 19:30:39",
+    "keystone colour": "#57639D",
+    "harmony method": "Complementary",
+    "harmony differential": 5,
+    "theme name": "MoonlitSky"
   }
 }

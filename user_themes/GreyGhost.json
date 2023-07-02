@@ -31,11 +31,11 @@
     "corner_radius": 6,
     "border_width": 0,
     "fg_color": [
-      "#11202b",
+      "#697b88",
       "#11202b"
     ],
     "hover_color": [
-      "#000000",
+      "#788a97",
       "#000000"
     ],
     "border_color": [
@@ -79,7 +79,7 @@
       "#464e56"
     ]
   },
-  "CTkCheckbox": {
+  "CTkCheckBox": {
     "corner_radius": 6,
     "border_width": 3,
     "fg_color": [
@@ -136,7 +136,7 @@
       "#5e6b7c"
     ]
   },
-  "CTkRadiobutton": {
+  "CTkRadioButton": {
     "corner_radius": 1000,
     "border_width_checked": 6,
     "border_width_unchecked": 3,
@@ -361,7 +361,7 @@
     "date created": "Mar 27 2023 18:16:02",
     "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "Jun 09 2023 09:31:31",
+    "last modified": "Jun 23 2023 19:20:58",
     "keystone colour": "#3c5064",
     "harmony method": "Split-complementary",
     "harmony differential": null,

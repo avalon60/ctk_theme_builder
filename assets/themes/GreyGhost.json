@@ -31,11 +31,11 @@
     "corner_radius": 6,
     "border_width": 0,
     "fg_color": [
-      "#11202b",
+      "#697b88",
       "#11202b"
     ],
     "hover_color": [
-      "#000000",
+      "#788a97",
       "#000000"
     ],
     "border_color": [
@@ -67,8 +67,8 @@
       "#a9b8c4"
     ],
     "border_color": [
-      "#000000",
-      "#000000"
+      "#464f64",
+      "#464f64"
     ],
     "text_color": [
       "#2b3449",
@@ -226,12 +226,12 @@
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#748498",
-      "#748498"
+      "#9dacb8",
+      "#97a6b2"
     ],
     "border_color": [
-      "#000000",
-      "#000000"
+      "#464f64",
+      "#464f64"
     ],
     "button_color": [
       "#1e2e3c",
@@ -255,12 +255,12 @@
     "border_spacing": 4,
     "fg_color": "transparent",
     "button_color": [
-      "#4e5c6e",
-      "#4e5c6e"
+      "#081722",
+      "#081722"
     ],
     "button_hover_color": [
-      "#1c1e18",
-      "#1c1e18"
+      "#35444f",
+      "#374350"
     ]
   },
   "CTkSegmentedButton": {
@@ -315,7 +315,7 @@
       "#11202b"
     ],
     "scrollbar_button_hover_color": [
-      "#404c59",
+      "#2c3b46",
       "#404c59"
     ]
   },
@@ -359,9 +359,9 @@
   "provenance": {
     "theme author": "Clive Bostock",
     "date created": "Mar 27 2023 18:16:02",
-    "last modified by": "Clive Bostock",
+    "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "May 12 2023 18:37:37",
+    "last modified": "Jun 23 2023 19:20:58",
     "keystone colour": "#3c5064",
     "harmony method": "Split-complementary",
     "harmony differential": null,

@@ -61,7 +61,7 @@
  
    "016":{ "sql_apply_version":"2.0.0",
       "description": "Control panel geometry",
-      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('window_geometry', 'control_panel', 'str', '1050x905+10+30');" },
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('window_geometry', 'control_panel', 'str', '960x905+10+30');" },
 
    "017":{ "sql_apply_version":"2.0.0",
       "description": "Widget Geometry dialog geometry",
@@ -338,6 +338,21 @@
 
    "086":{ "sql_apply_version":"2.0.0",
       "description": "Colour cascade CTkScrollableFrame/text_color_disabled",
-      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (15, 'CTkScrollableFrame', 'text_color_disabled');"}
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (15, 'CTkScrollableFrame', 'text_color_disabled');"},
 
+   "088":{ "sql_apply_version":"2.3.0",
+      "description": "Scaling Clean-up",
+      "sql_statement": "delete from preferences where scope = 'scaling';"},
+
+   "089":{ "sql_apply_version":"2.3.0",
+      "description": "Control Panel scaling",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('scaling', 'control_panel', 'str', '100%');"},
+
+   "090":{ "sql_apply_version":"2.3.0",
+      "description": "Preview Panel scaling",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('scaling', 'preview_panel', 'str', '100%');" },
+
+   "091":{ "sql_apply_version":"2.3.0",
+      "description": "Preview Panel scaling",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('scaling', 'qa_application', 'str', '100%');" }
 }

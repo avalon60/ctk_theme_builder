@@ -79,7 +79,7 @@
       "#464e56"
     ]
   },
-  "CTkCheckbox": {
+  "CTkCheckBox": {
     "corner_radius": 6,
     "border_width": 3,
     "fg_color": [
@@ -136,7 +136,7 @@
       "#5e6b7c"
     ]
   },
-  "CTkRadiobutton": {
+  "CTkRadioButton": {
     "corner_radius": 1000,
     "border_width_checked": 6,
     "border_width_unchecked": 3,

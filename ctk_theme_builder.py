@@ -1,6 +1,6 @@
 __title__ = 'CTk Theme Builder'
 __author__ = 'Clive Bostock'
-__version__ = "2.2.0"
+__version__ = "2.3.0"
 __license__ = 'MIT - see LICENSE.md'
 
 import configparser
@@ -75,7 +75,6 @@ APP_THEMES_DIR = ASSETS_DIR / 'themes'
 APP_DATA_DIR = ASSETS_DIR / 'data'
 APP_IMAGES = ASSETS_DIR / 'images'
 DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
-
 
 CTK_SITE_PACKAGES = Path(ctk.__file__)
 CTK_SITE_PACKAGES = os.path.dirname(CTK_SITE_PACKAGES)
@@ -182,15 +181,14 @@ class About(ctk.CTkToplevel):
                                corner_radius=widget_corner_radius,
                                command=self.destroy)
         btn_ok.grid(row=0, column=0, padx=(5, 5), pady=10)
-        self.resizable(False, False)
+        # self.resizable(False, False)
 
         self.grab_set()
+        self.lift()
 
 
 class ControlPanel(ctk.CTk):
     _theme_json_dir: Path
-    PANEL_HEIGHT = 905
-    PANEL_WIDTH = 1020
     THEME_PALETTE_TILES = 16
     THEME_PALETTE_TILE_WIDTH = 8
     THEME_PALETTE_ROWS = 2
@@ -206,6 +204,7 @@ class ControlPanel(ctk.CTk):
     # update the widgets which utilise it. E.g. CTkComboBox, CTkOptionMenu.
     # In any case, any entries in the list, require a full preview panel refresh, to work around the respective
     # challenges.
+    # Here we key the properties requiring refresh, based on a CustomTkinter release range.
     FORCE_REFRESH_PROPERTIES = ["CheckBox: checkmark_color",
                                 "DropdownMenu: fg_color",
                                 "DropdownMenu: hover_color",
@@ -236,6 +235,8 @@ class ControlPanel(ctk.CTk):
         self.ETC_DIR = ASSETS_DIR / 'etc'
         self.VIEWS_DIR = ASSETS_DIR / 'views'
         self.palettes_dir = ASSETS_DIR / 'palettes'
+
+        self.qa_launched = False
         # ctk.set_widget_scaling(0.8)
         this_platform = platform.system()
         if this_platform == "Darwin":
@@ -292,6 +293,20 @@ class ControlPanel(ctk.CTk):
                                                                preference_name='last_theme_on_start',
                                                                data_type='int', preference_value=0)
             mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=self.last_theme_on_start)
+
+        control_panel_scale_pct = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                         scope='scaling',
+                                                         preference_name='control_panel')
+        scaling_float = mod.scaling_float(scale_pct=control_panel_scale_pct)
+        ctk.set_widget_scaling(scaling_float)
+
+        self.preview_panel_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                            scope='scaling',
+                                                            preference_name='preview_panel')
+
+        self.qa_application_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                             scope='scaling',
+                                                             preference_name='qa_application')
 
         if not self.theme_json_dir.exists():
             self.theme_json_dir = APP_HOME / 'user_themes'
@@ -605,7 +620,8 @@ class ControlPanel(ctk.CTk):
         # At this point widget_property is a concatenation of the widget type and widget property.
         # We need to split these out. The widget_property_split function, transforms these for us.
         widget_type, split_property = mod.widget_property_split(widget_property=widget_property)
-        json_widget_type = mod.json_widget_type(widget_type=widget_type)
+        # json_widget_type = mod.json_widget_type(widget_type=widget_type)
+        json_widget_type = widget_type
         self.theme_json_data[json_widget_type][split_property][appearance_mode_index] = new_colour
         parameters = []
 
@@ -738,6 +754,8 @@ class ControlPanel(ctk.CTk):
             program = [qa_app, '-a', self.appearance_mode, '-t', self.wip_json]
             print(f'Launching designer: {qa_app_launcher}')
             self.process = sp.Popen(program)
+        self.qa_launched = True
+
     def save_theme_palette(self, theme_name=None):
         """Save the colour palette colours back to disk."""
         if theme_name is None:
@@ -875,7 +893,7 @@ class ControlPanel(ctk.CTk):
         column += 1
 
         btn_geo_checkbox = ctk.CTkButton(master=self.frm_geometry,
-                                         text='Checkbox',
+                                         text='CheckBox',
                                          height=button_height,
                                          width=button_width,
                                          corner_radius=corner_radius,
@@ -1128,7 +1146,6 @@ class ControlPanel(ctk.CTk):
                                parameters=[self.appearance_mode])
         self.toggle_frame_mode()
 
-        # self.load_theme()
 
     def render_theme_palette(self):
         render_labels = self.enable_palette_labels
@@ -1275,7 +1292,6 @@ class ControlPanel(ctk.CTk):
         else:
             self.send_command_json(command_type='program', command='render_base_frame')
 
-
     def toggle_render_disabled(self):
         render_state = self.swt_render_disabled.get()
         if render_state:
@@ -1345,6 +1361,11 @@ class ControlPanel(ctk.CTk):
             self.preview_json = self.TEMP_DIR / self.theme_file
             shutil.copyfile(self.source_json_file, self.wip_json)
             self.theme_json_data = mod.json_dict(json_file_path=self.wip_json)
+            # The patch function checks to see if the theme, has wrong, pre CustomTkinter 5.2.0 property names.
+            # If so, it patches up the theme JSON. These should be CTkCheckBox and CTkRadioButton.
+            self.theme_json_data = mod.patch_theme(theme_json=self.theme_json_data)
+            with open(self.wip_json, "w") as f:
+                json.dump(self.theme_json_data, f, indent=2)
 
             # self.update_config(section='preferences', option='theme_json_dir', value=self.theme_json_dir)
             self.render_geometry_buttons()
@@ -1372,7 +1393,6 @@ class ControlPanel(ctk.CTk):
             self.file_menu.entryconfig('Flip Modes', state=tk.NORMAL)
 
             self.lbl_title.grid(row=0, column=0, columnspan=2, sticky='ew')
-            self.geometry(f'{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}')
             self.opm_theme.configure(values=self.json_files)
             palette_file = selected_theme + '.json'
             self.theme = selected_theme
@@ -1384,6 +1404,10 @@ class ControlPanel(ctk.CTk):
             if not palette_file.exists():
                 self.create_theme_palette(selected_theme)
 
+            # Force the Control Panel to complete rendering here,
+            # otherwise if we are auto-loading the last theme at app startup,
+            # the preview panel renders, before the Control Panel finishes - looks messy.
+            self.update()
             if reload_preview:
                 self.reload_preview()
 
@@ -1431,10 +1455,9 @@ class ControlPanel(ctk.CTk):
 
     def restore_harmony_geometry(self):
         """Restore window geometry from auto-saved preferences"""
-        default_geometry = f"{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}+347+93"
         saved_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH,
                                                 scope='window_geometry',
-                                                preference_name='harmonics_panel', default=default_geometry)
+                                                preference_name='harmonics_panel')
         self.top_harmony.geometry(saved_geometry)
         self.top_harmony.resizable(False, False)
 
@@ -1507,7 +1530,6 @@ class ControlPanel(ctk.CTk):
         widget_colour = property_widget.cget('fg_color')
 
         darker_shade = cbtk.shade_down(color=widget_colour, differential=shade_step, multiplier=multiplier)
-        print(f'Incoming shade: {widget_colour} / Darker shade: {darker_shade}')
         property_widget.configure(fg_color=darker_shade)
         if self.appearance_mode == 'Light':
             mode_idx = 0
@@ -1736,11 +1758,6 @@ class ControlPanel(ctk.CTk):
         self.set_option_states()
 
     def set_filtered_widget_display(self, dummy='dummy'):
-        properties_filter = self.opm_properties_filter.get()
-        if properties_filter == 'All':
-            self.geometry(f'{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}')
-        else:
-            self.geometry(f'{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}')
         self.render_widget_properties()
 
     def property_colour_picker(self, event, widget_property):
@@ -1843,7 +1860,8 @@ class ControlPanel(ctk.CTk):
                 try:
                     key = next(member_gen)
                     widget_type, widget_property = mod.widget_property_split(key)
-                    json_widget_type = mod.json_widget_type(widget_type=widget_type)
+                    # json_widget_type = mod.json_widget_type(widget_type=widget_type)
+                    json_widget_type = widget_type
                     colour_value = self.theme_json_data[json_widget_type][widget_property]
                 except StopIteration:
                     break
@@ -1985,7 +2003,8 @@ class ControlPanel(ctk.CTk):
         counter = 0
         for property_id in self.filter_list:
             widget_type, widget_property = mod.widget_property_split(property_id)
-            json_widget_type = mod.json_widget_type(widget_type=widget_type)
+            # json_widget_type = mod.json_widget_type(widget_type=widget_type)
+            json_widget_type = widget_type
             if str(self.theme_json_data[json_widget_type][widget_property]) == "transparent":
                 continue
             try:
@@ -2088,6 +2107,8 @@ class ControlPanel(ctk.CTk):
             elif response == 'Yes':
                 self.save_theme()
 
+        if self.qa_launched:
+            mod.request_close_qa_app()
         if self.process:
             self.send_command_json(command_type='program',
                                    command='quit',
@@ -2134,12 +2155,11 @@ class ControlPanel(ctk.CTk):
                 time.sleep(0.1)
 
     def restore_controller_geometry(self):
-        default_geometry = f"{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}+347+93"
         controller_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH,
                                                      scope='window_geometry',
-                                                     preference_name='control_panel', default=default_geometry)
+                                                     preference_name='control_panel')
         self.geometry(controller_geometry)
-        self.resizable(False, True)
+        # self.resizable(False, True)
 
     def save_controller_geometry(self):
         """Save the control panel geometry to the repo, for the next time the program is launched."""
@@ -2184,6 +2204,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
         self.HARMONICS_HEIGHT3 = 650
         self.theme_json_data = theme_json_data
         self.rendered_harmony_buttons = []
+        self.rendered_keystone_shades = []
         self.theme_name = theme_name
 
         self.harmony_contrast_differential = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
@@ -2374,6 +2395,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
         # self.master.set_option_states()
         self.protocol("WM_DELETE_WINDOW", self.on_harmonic_close)
         self.grab_set()
+        self.lift()
 
     @staticmethod
     def context_menu(event: tk.Event = None, menu: cbtk.CBtkMenu = None):
@@ -2381,10 +2403,9 @@ class HarmonicsDialog(ctk.CTkToplevel):
 
     def restore_harmony_geometry(self):
         """Restore window geometry from auto-saved preferences"""
-        default_geometry = f"{ControlPanel.PANEL_WIDTH}x{ControlPanel.PANEL_HEIGHT}+347+93"
         saved_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH,
                                                 scope='window_geometry',
-                                                preference_name='harmonics_panel', default=default_geometry)
+                                                preference_name='harmonics_panel')
         self.geometry(saved_geometry)
         self.resizable(False, False)
 
@@ -2525,7 +2546,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
 
         for button in self.rendered_harmony_buttons:
             button.destroy()
-            self.rendered_harmony_buttons = []
+        self.rendered_harmony_buttons = []
 
         harmony_entries = None
         if harmony_method == 'Analogous':
@@ -2542,11 +2563,11 @@ class HarmonicsDialog(ctk.CTkToplevel):
             print(f'ERROR: Unrecognised harmony colors method: {harmony_method}')
 
         if harmony_entries == 1:
-            self.geometry(f"510x{self.HARMONICS_HEIGHT1}")
+            self.geometry(f"600x{self.HARMONICS_HEIGHT1}")
         elif harmony_entries == 2:
             self.geometry(f"650x{self.HARMONICS_HEIGHT2}")
         elif harmony_entries == 3:
-            self.geometry(f"800x{self.HARMONICS_HEIGHT3}")
+            self.geometry(f"760x{self.HARMONICS_HEIGHT3}")
 
         menus = []
         pad_x = (5, 5)
@@ -2592,9 +2613,8 @@ class HarmonicsDialog(ctk.CTkToplevel):
                 harmony_method=harmony_method)
 
     def render_keystone_shades_palette(self, keystone_colour: str, harmony_method: str):
-        """Render the "shades palette" which displays the keystone colour, the complementary colours,
+        """Render the "shades palette" (right hand side), which displays the keystone colour, the complementary colours,
         and the contrast shades. """
-
         colour_object = ch.Color(mod.hex_to_rgb(keystone_colour), "", "")
 
         harmony_entries = 0
@@ -2651,7 +2671,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
         pad_y = 5
         menus = []
 
-        for button in self.master.rendered_keystone_shades:
+        for button in self.rendered_keystone_shades:
             button.destroy()
         self.rendered_keystone_shades = []
 
@@ -2755,7 +2775,6 @@ class HarmonicsDialog(ctk.CTkToplevel):
 class PreferencesDialog(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         control_panel_theme = mod.preference_setting(db_file_path=DB_FILE_PATH,
                                                      scope='user_preference', preference_name='control_panel_theme')
 
@@ -2790,6 +2809,18 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.theme_json_dir = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                      preference_name='theme_json_dir')
 
+        self.control_panel_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                            scope='scaling',
+                                                            preference_name='control_panel')
+
+        self.preview_panel_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                            scope='scaling',
+                                                            preference_name='preview_panel')
+
+        self.qa_application_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                             scope='scaling',
+                                                             preference_name='qa_application')
+
         self.action = 'cancelled'
 
         self.new_theme_json_dir = None
@@ -2803,7 +2834,7 @@ class PreferencesDialog(ctk.CTkToplevel):
             self.user_home_dir = os.getenv("HOME")
 
         self.title('CTk Theme Builder Preferences')
-        self.geometry('500x550')
+        # self.geometry('820x550')
         # Make sure the TopLevel doesn't disappear if we need to
 
         # Make preferences dialog modal
@@ -2947,30 +2978,55 @@ class PreferencesDialog(ctk.CTkToplevel):
         widget_start_row += 1
 
         lbl_shade_adjust_differential = ctk.CTkLabel(master=frm_widgets, text='Adjust Shade Step', justify="right")
-        lbl_shade_adjust_differential.grid(row=widget_start_row, column=0, padx=5, pady=(0, 0), sticky='e')
+        lbl_shade_adjust_differential.grid(row=widget_start_row, column=0, padx=5, pady=10, sticky='e')
 
         self.opm_shade_adjust_differential = ctk.CTkOptionMenu(master=frm_widgets,
                                                                width=12,
                                                                values=['1', '2', '3', '4', '5', '6', '7', '8', '9'])
-        self.opm_shade_adjust_differential.grid(row=widget_start_row, column=1, padx=0, pady=5, sticky='w')
+        self.opm_shade_adjust_differential.grid(row=widget_start_row, column=1, padx=0, pady=10, sticky='w')
         self.opm_shade_adjust_differential.set(str(self.shade_adjust_differential))
-        widget_start_row += 1
-
-        widget_start_row += 1
 
         lbl_harmony_contrast_differential = ctk.CTkLabel(master=frm_widgets, text='Harmony Shade Step', justify="right")
-        lbl_harmony_contrast_differential.grid(row=widget_start_row, column=0, padx=(30, 5), pady=(0, 0), sticky='e')
+        lbl_harmony_contrast_differential.grid(row=widget_start_row, column=2, padx=(10, 5), pady=(0, 0), sticky='e')
 
         self.opm_harmony_contrast_differential = ctk.CTkOptionMenu(master=frm_widgets,
                                                                    width=12,
                                                                    values=['1', '2', '3', '5', '6', '7', '8', '9'])
-        self.opm_harmony_contrast_differential.grid(row=widget_start_row, column=1, padx=0, pady=5, sticky='w')
+        self.opm_harmony_contrast_differential.grid(row=widget_start_row, column=3, padx=0, pady=5, sticky='w')
         self.opm_harmony_contrast_differential.set(str(self.harmony_contrast_differential))
-        widget_start_row += 1
 
+        widget_start_row += 1
+        lbl_control_panel_scaling = ctk.CTkLabel(master=frm_widgets, text='Control Panel Scaling', justify="left")
+        lbl_control_panel_scaling.grid(row=widget_start_row, column=0, padx=(10, 5), pady=10, sticky='e')
+
+        self.opm_control_panel_scaling = ctk.CTkOptionMenu(master=frm_widgets,
+                                                           width=12,
+                                                           values=mod.ui_scaling_list())
+        self.opm_control_panel_scaling.grid(row=widget_start_row, column=1, padx=0, pady=10, sticky='w')
+        self.opm_control_panel_scaling.set(self.control_panel_scaling)
+
+        lbl_preview_panel_scaling = ctk.CTkLabel(master=frm_widgets, text='Preview Panel Scaling', justify="left")
+        lbl_preview_panel_scaling.grid(row=widget_start_row, column=2, padx=(0, 5), pady=10, sticky='e')
+
+        self.opm_preview_panel_scaling = ctk.CTkOptionMenu(master=frm_widgets,
+                                                           width=12,
+                                                           values=mod.ui_scaling_list())
+        self.opm_preview_panel_scaling.grid(row=widget_start_row, column=3, padx=0, pady=10, sticky='w')
+        self.opm_preview_panel_scaling.set(self.preview_panel_scaling)
+
+        lbl_qa_application_scaling = ctk.CTkLabel(master=frm_widgets, text='QA App Scaling', justify="right")
+        lbl_qa_application_scaling.grid(row=widget_start_row, column=4, padx=(90, 5), pady=10, sticky='e')
+
+        self.opm_qa_application_scaling = ctk.CTkOptionMenu(master=frm_widgets,
+                                                            width=12,
+                                                            values=mod.ui_scaling_list())
+        self.opm_qa_application_scaling.grid(row=widget_start_row, column=5, padx=0, pady=10, sticky='w')
+        self.opm_qa_application_scaling.set(self.qa_application_scaling)
+
+        widget_start_row += 1
         self.folder_image = cbtk.load_image(light_image=APP_IMAGES / 'folder.png', image_size=(20, 20))
         lbl_theme_json_dir = ctk.CTkLabel(master=frm_widgets, text='Themes Location', justify="right")
-        lbl_theme_json_dir.grid(row=widget_start_row, column=0, padx=5, pady=5, sticky='e')
+        lbl_theme_json_dir.grid(row=widget_start_row, column=0, padx=5, pady=(15, 5), sticky='e')
 
         if self.enable_tooltips:
             lbl_theme_json_dir_tooltip = CTkToolTip(lbl_theme_json_dir,
@@ -2983,12 +3039,12 @@ class PreferencesDialog(ctk.CTkToplevel):
                                            fg_color='#748696',
                                            image=self.folder_image,
                                            command=self.preferred_json_location)
-        btn_theme_json_dir.grid(row=widget_start_row, column=1, pady=5, sticky='w')
+        btn_theme_json_dir.grid(row=widget_start_row, column=1, pady=(10, 0), sticky='w')
         widget_start_row += 1
 
-        self.lbl_pref_theme_dir_disp = ctk.CTkLabel(master=frm_widgets, text=self.theme_json_dir, justify="right",
+        self.lbl_pref_theme_dir_disp = ctk.CTkLabel(master=frm_widgets, text=self.theme_json_dir, justify="left",
                                                     font=mod.SMALL_TEXT)
-        self.lbl_pref_theme_dir_disp.grid(row=widget_start_row, column=1, padx=5, pady=5, sticky='e')
+        self.lbl_pref_theme_dir_disp.grid(row=widget_start_row, column=1, columnspan=5, padx=5, pady=5, sticky='w')
         widget_start_row += 1
 
         # Control buttons
@@ -2996,8 +3052,9 @@ class PreferencesDialog(ctk.CTkToplevel):
         btn_close.grid(row=0, column=0, padx=(15, 35), pady=5)
 
         btn_save = ctk.CTkButton(master=frm_buttons, text='Save', command=self.save_preferences)
-        btn_save.grid(row=0, column=1, padx=(150, 15), pady=5)
+        btn_save.grid(row=0, column=1, padx=(475, 15), pady=5)
         self.grab_set()
+        self.lift()
 
     def get_tooltips_setting(self):
         self.enable_tooltips = int(self.tk_enable_tooltips.get())
@@ -3075,6 +3132,26 @@ class PreferencesDialog(ctk.CTkToplevel):
                                            preference_value=self.harmony_contrast_differential):
             print(f'Row miss updating preferences: harmony contrast differential.')
 
+        control_panel_scale_pct = self.opm_control_panel_scaling.get()
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='scaling',
+                                           preference_name='control_panel',
+                                           preference_value=control_panel_scale_pct):
+            print(f'Row miss updating preferences: control panel scaling.')
+        scaling_float = mod.scaling_float(scale_pct=control_panel_scale_pct)
+        ctk.set_widget_scaling(scaling_float)
+
+        preview_panel_scale_pct = self.opm_preview_panel_scaling.get()
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='scaling',
+                                           preference_name='preview_panel',
+                                           preference_value=preview_panel_scale_pct):
+            print(f'Row miss updating preferences: preview panel scaling.')
+
+        qa_application_scale_pct = self.opm_preview_panel_scaling.get()
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='scaling',
+                                           preference_name='qa_application',
+                                           preference_value=qa_application_scale_pct):
+            print(f'Row miss updating preferences: QA application scaling.')
+
         ctk.set_appearance_mode(control_panel_mode)
         cbtk.CBtkMenu.update_widgets_mode()
         self.control_panel_mode = control_panel_mode
@@ -3144,8 +3221,8 @@ class GeometryDialog(ctk.CTkToplevel):
 
         frame_fg_color = self.theme_json_data['CTkFrame']['fg_color'][
             cbtk.str_mode_to_int(self.appearance_mode)]
-        json_widget_type = mod.json_widget_type(widget_type=widget_type)
-
+        # json_widget_type = mod.json_widget_type(widget_type=widget_type)
+        json_widget_type = widget_type
         mode = cbtk.str_mode_to_int(self.appearance_mode)
         if widget_type == 'CTkFrame':
             self.geometry('764x280')
@@ -3203,15 +3280,15 @@ class GeometryDialog(ctk.CTkToplevel):
                                             border_width=self.theme_json_data['CTkButton']['border_width'])
         elif widget_type == 'CTkCheckBox':
             self.geometry('786x232')
-            checkbox_fg_color = self.theme_json_data['CTkCheckbox']['fg_color'][mode]
+            checkbox_fg_color = self.theme_json_data['CTkCheckBox']['fg_color'][mode]
 
-            checkbox_border_color = self.theme_json_data['CTkCheckbox']['border_color'][mode]
+            checkbox_border_color = self.theme_json_data['CTkCheckBox']['border_color'][mode]
 
-            checkbox_hover_color = self.theme_json_data['CTkCheckbox']['hover_color'][mode]
+            checkbox_hover_color = self.theme_json_data['CTkCheckBox']['hover_color'][mode]
 
-            checkbox_checkmark_color = self.theme_json_data['CTkCheckbox']['checkmark_color'][mode]
+            checkbox_checkmark_color = self.theme_json_data['CTkCheckBox']['checkmark_color'][mode]
 
-            checkbox_text_color = self.theme_json_data['CTkCheckbox']['text_color'][mode]
+            checkbox_text_color = self.theme_json_data['CTkCheckBox']['text_color'][mode]
 
             geometry_widget = ctk.CTkCheckBox(master=frm_widget_preview_low,
                                               fg_color=checkbox_fg_color,
@@ -3219,8 +3296,8 @@ class GeometryDialog(ctk.CTkToplevel):
                                               hover_color=checkbox_hover_color,
                                               checkmark_color=checkbox_checkmark_color,
                                               text_color=checkbox_text_color,
-                                              corner_radius=self.theme_json_data['CTkCheckbox']['corner_radius'],
-                                              border_width=self.theme_json_data['CTkCheckbox']['border_width'])
+                                              corner_radius=self.theme_json_data['CTkCheckBox']['corner_radius'],
+                                              border_width=self.theme_json_data['CTkCheckBox']['border_width'])
         elif widget_type == 'CTkComboBox':
             self.geometry('795x234')
 
@@ -3249,8 +3326,8 @@ class GeometryDialog(ctk.CTkToplevel):
                                               dropdown_fg_color=dropdown_fg_colour,
                                               dropdown_text_color=dropdown_text_colour,
                                               dropdown_hover_color=dropdown_hover_colour,
-                                              corner_radius=self.theme_json_data['CTkCheckbox']['corner_radius'],
-                                              border_width=self.theme_json_data['CTkCheckbox']['border_width'],
+                                              corner_radius=self.theme_json_data['CTkCheckBox']['corner_radius'],
+                                              border_width=self.theme_json_data['CTkCheckBox']['border_width'],
                                               values=["Option 1", "Option 2", "Option 3", "Option 4..."])
         elif widget_type == 'CTkFrame':
             self.geometry('764x280')
@@ -3332,13 +3409,13 @@ class GeometryDialog(ctk.CTkToplevel):
 
         elif widget_type == 'CTkRadioButton':
             self.geometry('800x301')
-            radiobutton_fg_color = self.theme_json_data['CTkRadiobutton']['fg_color'][mode]
+            radiobutton_fg_color = self.theme_json_data['CTkRadioButton']['fg_color'][mode]
 
-            radiobutton_border_color = self.theme_json_data['CTkRadiobutton']['border_color'][mode]
+            radiobutton_border_color = self.theme_json_data['CTkRadioButton']['border_color'][mode]
 
-            radiobutton_hover_color = self.theme_json_data['CTkRadiobutton']['hover_color'][mode]
+            radiobutton_hover_color = self.theme_json_data['CTkRadioButton']['hover_color'][mode]
 
-            radiobutton_text_color = self.theme_json_data['CTkRadiobutton']['text_color'][mode]
+            radiobutton_text_color = self.theme_json_data['CTkRadioButton']['text_color'][mode]
 
             label_text_colour = self.theme_json_data['CTkLabel']['text_color'][mode]
 
@@ -3504,7 +3581,8 @@ class GeometryDialog(ctk.CTkToplevel):
             base_label_text = label_text.replace(widget_type.lower(), '') + ': '
             # This function call is necessary, because there are several naming
             # inconsistencies (at least in CTk 5.1.2), between widget names.
-            json_widget_type = mod.json_widget_type(widget_type=widget_type)
+            # json_widget_type = mod.json_widget_type(widget_type=widget_type)
+            json_widget_type = widget_type
 
             current_value = int(self.theme_json_data[json_widget_type][property])
             label_dict[property] = ctk.CTkLabel(master=frm_controls, text=base_label_text.title() + f'{current_value}')
@@ -3527,7 +3605,8 @@ class GeometryDialog(ctk.CTkToplevel):
             parameters = []
             # This function call is necessary, because there are several naming
             # inconsistencies (at least in CTk 5.1.2), between widget names.
-            json_widget_type = mod.json_widget_type(widget_type=widget_type)
+            # json_widget_type = mod.json_widget_type(widget_type=widget_type)
+            json_widget_type = widget_type
             if self.theme_json_data[json_widget_type][widget_property] != property_value:
                 self.theme_json_data[json_widget_type][widget_property] = property_value
                 self.master.json_state = 'dirty'
@@ -3765,6 +3844,7 @@ class ThemeMerger(ctk.CTkToplevel):
         self.bind("<Configure>", self.status_bar.auto_size_status_bar)
 
         self.grab_set()
+        self.lift()
 
     def validate_and_merge(self):
         """This method processes the "Merge Themes" dialog (launch_merge_dialog) submission, and is activated by the

@@ -34,7 +34,7 @@
     "text_color":[null, null],
     "placeholder_text_color": [null, null]
   },
-  "CTkCheckbox": {
+  "CTkCheckBox": {
     "corner_radius": 6,
     "border_width": 3,
     "fg_color": [null, null],
@@ -55,7 +55,7 @@
     "text_color": [null, null],
     "text_color_disabled": [null, null]
   },
-  "CTkRadiobutton": {
+  "CTkRadioButton": {
     "corner_radius": 1000,
     "border_width_checked": 6,
     "border_width_unchecked": 3,
