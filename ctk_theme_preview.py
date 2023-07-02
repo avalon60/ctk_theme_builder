@@ -321,7 +321,7 @@ class PreviewPanel:
         # CTkButton
         eye_con = ctk.CTkImage(light_image=Image.open(APP_IMAGES / 'eye_lm.png'),
                                dark_image=Image.open(APP_IMAGES / 'eye_dm.png'),
-                               size=(20, 20))
+                               size=(25, 18))
         # We contrive to always show a contrast of a button widget with and without a border.
         button_border_width = ThemeManager.theme['CTkButton']['border_width']
         self.button_1 = ctk.CTkButton(master=widget_frame, border_width=button_border_width)
@@ -625,7 +625,6 @@ class PreviewPanel:
         if command == 'set_widget_scaling':
             scaling_pct = parameters[0]
             scaling_float = mod.scaling_float(scaling_pct)
-            print(f'DEBUG: Widget Scaling Pct: {scaling_pct}')
             ctk.set_widget_scaling(scaling_float)
         elif command == 'render_preview_disabled':
             self._render_preview_disabled()
