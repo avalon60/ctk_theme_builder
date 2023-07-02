@@ -674,7 +674,7 @@ class PreviewPanel:
 
         else:
             for widget in self._rendered_widgets[widget_type]:
-                json_widget_type = mod.json_widget_type(widget_type=widget)
+                json_widget_type = widget
                 update_widget_geometry(widget, widget_property, int(property_value))
 
         # We contrive to always show a contrast of a button with and without a border.
@@ -899,6 +899,13 @@ class PreviewPanel:
         elif widget_type == 'CTkScrollbar' and widget_property_lower in ('fg_color', 'button_color',
                                                                          'button_hover_color'):
             for widget in self._rendered_widgets['CTkScrollableFrame']:
+                if widget_property_lower == 'fg_color':
+                    widget.configure(scrollbar_fg_color=widget_colour)
+                elif widget_property_lower == 'button_color':
+                    widget.configure(scrollbar_button_color=widget_colour)
+                elif widget_property_lower == 'button_hover_color':
+                    widget.configure(scrollbar_button_hover_color=widget_colour)
+            for widget in self._rendered_widgets['CTkTextbox']:
                 if widget_property_lower == 'fg_color':
                     widget.configure(scrollbar_fg_color=widget_colour)
                 elif widget_property_lower == 'button_color':
