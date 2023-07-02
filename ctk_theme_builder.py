@@ -205,17 +205,17 @@ class ControlPanel(ctk.CTk):
     # In any case, any entries in the list, require a full preview panel refresh, to work around the respective
     # challenges.
     # Here we key the properties requiring refresh, based on a CustomTkinter release range.
-    FORCE_REFRESH_PROPERTIES = [# "CheckBox: checkmark_color",
-                                "DropdownMenu: fg_color",
-                                "DropdownMenu: hover_color",
-                                "DropdownMenu: text_color"
-                                # "Frame: top_fg_color",
-                                # "CheckBox: text_color_disabled",
-                                # "Scrollbar: button_color",
-                                # "Scrollbar: button_hover_color",
-                                # "OptionMenu: text_color_disabled",
-                                # "Switch: text_color_disabled"
-                                ]
+    FORCE_REFRESH_PROPERTIES = [  # "CheckBox: checkmark_color",
+        "DropdownMenu: fg_color",
+        "DropdownMenu: hover_color",
+        "DropdownMenu: text_color"
+        # "Frame: top_fg_color",
+        # "CheckBox: text_color_disabled",
+        # "Scrollbar: button_color",
+        # "Scrollbar: button_hover_color",
+        # "OptionMenu: text_color_disabled",
+        # "Switch: text_color_disabled"
+    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -237,7 +237,6 @@ class ControlPanel(ctk.CTk):
         self.palettes_dir = ASSETS_DIR / 'palettes'
 
         self.qa_launched = False
-        # ctk.set_widget_scaling(0.8)
         this_platform = platform.system()
         if this_platform == "Darwin":
             self.platform = "MacOS"
@@ -294,19 +293,19 @@ class ControlPanel(ctk.CTk):
                                                                data_type='int', preference_value=0)
             mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=self.last_theme_on_start)
 
-        control_panel_scale_pct = mod.preference_setting(db_file_path=DB_FILE_PATH,
-                                                         scope='scaling',
-                                                         preference_name='control_panel')
-        scaling_float = mod.scaling_float(scale_pct=control_panel_scale_pct)
-        ctk.set_widget_scaling(scaling_float)
+        self.control_panel_scaling_pct = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                                scope='scaling',
+                                                                preference_name='control_panel')
+        control_panel_scale = mod.scaling_float(scale_pct=self.control_panel_scaling_pct)
+        ctk.set_widget_scaling(control_panel_scale)
 
-        self.preview_panel_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH,
-                                                            scope='scaling',
-                                                            preference_name='preview_panel')
+        self.preview_panel_scaling_pct = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                                scope='scaling',
+                                                                preference_name='preview_panel')
 
-        self.qa_application_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH,
-                                                             scope='scaling',
-                                                             preference_name='qa_application')
+        self.qa_application_scaling_pct = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                                 scope='scaling',
+                                                                 preference_name='qa_application')
 
         if not self.theme_json_dir.exists():
             self.theme_json_dir = APP_HOME / 'user_themes'
@@ -468,6 +467,13 @@ class ControlPanel(ctk.CTk):
                                                  state=tk.DISABLED,
                                                  command=self.toggle_render_disabled)
         self.swt_render_disabled.grid(row=8, column=0, padx=10, pady=(10, 0))
+
+        if self.enable_tooltips:
+            frame_mode_tooltip = CTkToolTip(self.swt_render_disabled,
+                                            wraplength=400,
+                                            justify="left",
+                                            message='Enable this switch, to preview widget appearances in disabled '
+                                                    'mode.')
 
         self.lbl_widget_view = ctk.CTkLabel(master=self.frm_button,
                                             text='Properties View:')
@@ -717,7 +723,7 @@ class ControlPanel(ctk.CTk):
         about_dialog = About()
 
     def launch_preferences_dialog(self):
-        preferences_dialog = PreferencesDialog()
+        preferences_dialog = PreferencesDialog(master=self)
         self.wait_window(preferences_dialog)
         action = preferences_dialog.action
         self.status_bar.set_status_text(status_text=f'Preferences {action}.')
@@ -752,7 +758,6 @@ class ControlPanel(ctk.CTk):
 
             qa_app = APP_HOME / qa_app_launcher
             program = [qa_app, '-a', self.appearance_mode, '-t', self.wip_json]
-            print(f'Launching designer: {qa_app_launcher}')
             self.process = sp.Popen(program)
         self.qa_launched = True
 
@@ -1145,7 +1150,6 @@ class ControlPanel(ctk.CTk):
                                command='set_appearance_mode',
                                parameters=[self.appearance_mode])
         self.toggle_frame_mode()
-
 
     def render_theme_palette(self):
         render_labels = self.enable_palette_labels
@@ -2070,6 +2074,9 @@ class ControlPanel(ctk.CTk):
         self.send_command_json(command_type='program',
                                command='refresh',
                                parameters=[self.appearance_mode])
+        self.send_command_json(command_type='program',
+                               command='set_widget_scaling',
+                               parameters=[self.preview_panel_scaling_pct])
 
     def reload_preview(self):
         """The reload_preview method causes a full reload of the preview panel."""
@@ -2153,6 +2160,10 @@ class ControlPanel(ctk.CTk):
                     if confirm.get() == 'OK':
                         exit(1)
                 time.sleep(0.1)
+
+            self.send_command_json(command_type='program',
+                                   command='set_widget_scaling',
+                                   parameters=[self.preview_panel_scaling_pct])
 
     def restore_controller_geometry(self):
         controller_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH,
@@ -2931,6 +2942,12 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.swt_enable_tooltips.grid(row=widget_start_row, column=1, padx=(0, 0), pady=10, sticky='w')
         widget_start_row += 1
 
+        btn_enable_palette_labels_tooltip = CTkToolTip(self.swt_enable_tooltips,
+                                                       wraplength=250,
+                                                       justify="left",
+                                                       message="When enabled, this causes tool-tips to be enabled "
+                                                               "throughout the theme builder application.")
+
         self.tk_enable_palette_labels = tk.IntVar(master=frm_widgets)
         self.tk_enable_palette_labels.set(self.enable_palette_labels)
         self.swt_enable_palette_labels = ctk.CTkSwitch(master=frm_widgets,
@@ -3132,13 +3149,16 @@ class PreferencesDialog(ctk.CTkToplevel):
                                            preference_value=self.harmony_contrast_differential):
             print(f'Row miss updating preferences: harmony contrast differential.')
 
-        control_panel_scale_pct = self.opm_control_panel_scaling.get()
+        control_panel_scaling_pct = self.opm_control_panel_scaling.get()
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='scaling',
                                            preference_name='control_panel',
-                                           preference_value=control_panel_scale_pct):
+                                           preference_value=control_panel_scaling_pct):
             print(f'Row miss updating preferences: control panel scaling.')
-        scaling_float = mod.scaling_float(scale_pct=control_panel_scale_pct)
-        ctk.set_widget_scaling(scaling_float)
+        if control_panel_scaling_pct != self.master.control_panel_scaling_pct:
+            scaling_float = mod.scaling_float(scale_pct=control_panel_scaling_pct)
+            ctk.set_widget_scaling(scaling_float)
+            self.master.control_panel_scaling_pct = control_panel_scaling_pct
+            self.master.geometry('960x870')
 
         preview_panel_scale_pct = self.opm_preview_panel_scaling.get()
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='scaling',
@@ -3146,7 +3166,13 @@ class PreferencesDialog(ctk.CTkToplevel):
                                            preference_value=preview_panel_scale_pct):
             print(f'Row miss updating preferences: preview panel scaling.')
 
-        qa_application_scale_pct = self.opm_preview_panel_scaling.get()
+        if preview_panel_scale_pct != self.master.preview_panel_scaling_pct:
+            self.master.preview_panel_scaling_pct = preview_panel_scale_pct
+            self.master.send_command_json(command_type='program',
+                                          command='set_widget_scaling',
+                                          parameters=[preview_panel_scale_pct])
+
+        qa_application_scale_pct = self.opm_qa_application_scaling.get()
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='scaling',
                                            preference_name='qa_application',
                                            preference_value=qa_application_scale_pct):
