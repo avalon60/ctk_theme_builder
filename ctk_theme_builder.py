@@ -195,26 +195,26 @@ class ControlPanel(ctk.CTk):
 
     # We normally list entries here, where the configure method has a bug or is subject to an omission.
     # Issue numbers and descriptions:
-    #   CTk 5.1.2 CTkCheckBox.configure(text_color_disabled=...) causes exception #1591
-    #   CTk 5.1.2: Omission: Theme JSON property checkmark_color of CTkCheckBox has no configure option #1586
-    #   CTk 5.1.2: CTkSegmentedButton property setting issues #1562
-    #   CTk 5.1.2: CTkOptionMenu.configure(text_color_disabled=...) raises exception #1559
-    #   CTk 5.1.3: CTkCheckBox has no supporting configure option for checkmark_color #1703
+    #   CTk 5.1.2 CTkCheckBox.configure(text_color_disabled=...) causes exception #1591 - Fixed in CTk 5.2.0
+    #   CTk 5.1.2: Omission: Theme JSON property checkmark_color of CTkCheckBox has no configure option #1586  - Fixed in CTk 5.2.0
+    #   CTk 5.1.2: CTkSegmentedButton property setting issues #1562 - Fixed in CTk 5.2.0
+    #   CTk 5.1.2: CTkOptionMenu.configure(text_color_disabled=...) raises exception #1559 - Fixed in CTk 5.2.0
+    #   CTk 5.1.3: CTkCheckBox has no supporting configure option for checkmark_color #1703 - Fixed in CTk 5.2.0
     # The DropdownMenu is a different case. This is not a widget in its own right and so has no methods to
     # update the widgets which utilise it. E.g. CTkComboBox, CTkOptionMenu.
     # In any case, any entries in the list, require a full preview panel refresh, to work around the respective
     # challenges.
     # Here we key the properties requiring refresh, based on a CustomTkinter release range.
-    FORCE_REFRESH_PROPERTIES = ["CheckBox: checkmark_color",
+    FORCE_REFRESH_PROPERTIES = [# "CheckBox: checkmark_color",
                                 "DropdownMenu: fg_color",
                                 "DropdownMenu: hover_color",
-                                "DropdownMenu: text_color",
-                                "Frame: top_fg_color",
-                                "CheckBox: text_color_disabled",
-                                "Scrollbar: button_color",
-                                "Scrollbar: button_hover_color",
-                                "OptionMenu: text_color_disabled",
-                                "Switch: text_color_disabled"
+                                "DropdownMenu: text_color"
+                                # "Frame: top_fg_color",
+                                # "CheckBox: text_color_disabled",
+                                # "Scrollbar: button_color",
+                                # "Scrollbar: button_hover_color",
+                                # "OptionMenu: text_color_disabled",
+                                # "Switch: text_color_disabled"
                                 ]
 
     def __init__(self, *args, **kwargs):
