@@ -53,6 +53,13 @@ listener_status = 0
 def update_widget_geometry(widget, widget_property, property_value):
     if widget_property == 'corner_radius':
         widget.configure(corner_radius=property_value)
+    elif widget_property == 'button_corner_radius':
+        # As of CTk 5.2.0 the configuring of button_corner_radius on CTkSlider causes an exception due to a bug.
+        # We trap this here, and hopefully this will be fixed soon.
+        try:
+            widget.configure(button_corner_radius=property_value)
+        except ValueError:
+            pass
     elif widget_property == 'border_width':
         widget.configure(border_width=property_value)
     elif widget_property == 'border_width_unchecked':
