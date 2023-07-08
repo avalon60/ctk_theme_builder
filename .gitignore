@@ -30,3 +30,5 @@ assets/data/ctk_theme_builder-2.2.0.db
 ctk_theme_builder
 
 assets/etc/qa_application.stop
+
+user_themes/Demo.json
