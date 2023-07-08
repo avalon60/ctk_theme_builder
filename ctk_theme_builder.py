@@ -275,8 +275,11 @@ class ControlPanel(ctk.CTk):
         self.enable_tooltips = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                       preference_name='enable_tooltips')
 
+        self.confirm_cascade = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                      preference_name='confirm_cascade')
+
         self.enable_palette_labels = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                            preference_name='enable_palette_labels')
+                                                            preference_name='confirm_cascade')
 
         self.enable_single_click_paste = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                                 preference_name='enable_single_click_paste')
@@ -620,8 +623,11 @@ class ControlPanel(ctk.CTk):
             self.status_bar.set_status_text(status_text=f'Paste action ignored - not a valid colour code.')
             return
         prev_colour = self.widgets[widget_property]["colour"]
-        self.widgets[widget_property]['button'].configure(fg_color=new_colour)
-        self.widgets[widget_property]['colour'] = new_colour
+        # We don't know whether the widget is displayed for sure, when we are using cascade from the colour palette
+        # region, so we need to check, the selected view, may not include the widget.
+        if self.widgets[widget_property]['button'].winfo_exists():
+            self.widgets[widget_property]['button'].configure(fg_color=new_colour)
+            self.widgets[widget_property]['colour'] = new_colour
         appearance_mode_index = cbtk.str_mode_to_int(self.appearance_mode)
         # At this point widget_property is a concatenation of the widget type and widget property.
         # We need to split these out. The widget_property_split function, transforms these for us.
@@ -726,6 +732,7 @@ class ControlPanel(ctk.CTk):
         preferences_dialog = PreferencesDialog(master=self)
         self.wait_window(preferences_dialog)
         action = preferences_dialog.action
+        self.load_preferences()
         self.status_bar.set_status_text(status_text=f'Preferences {action}.')
 
     def launch_provenance_dialog(self):
@@ -760,6 +767,61 @@ class ControlPanel(ctk.CTk):
             program = [qa_app, '-a', self.appearance_mode, '-t', self.wip_json]
             self.process = sp.Popen(program)
         self.qa_launched = True
+
+    def load_preferences(self):
+
+        control_panel_theme = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                     scope='user_preference', preference_name='control_panel_theme')
+
+        control_panel_theme = control_panel_theme + '.json'
+
+        self.control_panel_theme = str(APP_THEMES_DIR / control_panel_theme)
+
+        self.control_panel_mode = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                         scope='user_preference', preference_name='control_panel_mode')
+
+        self.last_theme_on_start = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                          preference_name='last_theme_on_start')
+
+        self.theme_author = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                   preference_name='theme_author')
+
+        self.enable_tooltips = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                      preference_name='enable_tooltips')
+
+        self.confirm_cascade = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                      preference_name='confirm_cascade')
+
+        self.enable_palette_labels = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                            preference_name='enable_palette_labels')
+
+        self.enable_single_click_paste = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                                preference_name='enable_single_click_paste')
+
+        self.shade_adjust_differential = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                                preference_name='shade_adjust_differential')
+
+        self.harmony_contrast_differential = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                                    preference_name='harmony_contrast_differential')
+
+        self.theme_json_dir = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                     preference_name='theme_json_dir')
+
+        self.control_panel_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                            scope='scaling',
+                                                            preference_name='control_panel')
+
+        self.preview_panel_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                            scope='scaling',
+                                                            preference_name='preview_panel')
+
+        self.qa_application_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH,
+                                                             scope='scaling',
+                                                             preference_name='qa_application')
+
+        self.min_ctk_version = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='system',
+                                                      preference_name='min_ctk_version')
+
 
     def save_theme_palette(self, theme_name=None):
         """Save the colour palette colours back to disk."""
@@ -1173,7 +1235,8 @@ class ControlPanel(ctk.CTk):
                                      pady=(5, 0),
                                      padx=10)
 
-        for tile_dict in palette_entries:
+        self.palette_button_list = []
+        for palette_id, tile_dict in enumerate(palette_entries):
             entry_id = tile_dict['entry_id']
             # Take account of the frame label
             row = int(tile_dict['row']) + 1
@@ -1206,7 +1269,7 @@ class ControlPanel(ctk.CTk):
                 padx = (10, 6)
             else:
                 padx = 6
-
+            self.palette_button_list.append(btn_colour_tile)
             btn_colour_tile.grid(row=row, column=col, padx=padx, pady=0)
             self.theme_palette_tiles.append(btn_colour_tile)
             # colour_tile = self.theme_palette_tiles[entry_id]
@@ -1273,6 +1336,11 @@ class ControlPanel(ctk.CTk):
             context_menu.add_separator()
             context_menu.add_command(label="Colour Picker",
                                      command=lambda button_id=entry_id: self.palette_colour_picker(button_id))
+
+            if self.cascade_enabled(palette_id=palette_id):
+                context_menu.add_separator()
+                context_menu.add_command(label="Cascade colour",
+                                         command=lambda button_id=entry_id: self.cascade_colour(button_id))
             menus.append(context_menu)
 
             if self.enable_single_click_paste:
@@ -1283,6 +1351,36 @@ class ControlPanel(ctk.CTk):
             btn_colour_tile.bind("<Button-3>",
                                  lambda event, menu=menus[entry_id], button_id=entry_id: self.context_menu(event,
                                                                                                            menu))
+
+    def cascade_colour(self, palette_id):
+        cascade_dict_list = mod.cascade_dict(palette_id=palette_id)
+        property_colour = self.palette_button_list[palette_id].cget("fg_color")
+        cascade_impact = mod.cascade_display_string(palette_id=palette_id)
+
+        if self.confirm_cascade:
+            confirm = CTkMessagebox(master=self,
+                                    title='Confirm Action',
+                                    message=f'The following properties will be updated to the selected colour:\n'
+                                            f'{cascade_impact}\n\n'
+                                            f'Do you wish to continue?',
+                                    options=["Yes", "No"])
+            response = confirm.get()
+            if response == 'No':
+                return
+
+        for _property in cascade_dict_list:
+            _widget_property = f'{_property["widget_type"]}: {_property["widget_property"]}'
+            if _property["widget_type"] != 'CTk':
+                # Except for the CTk() class, we strip out the CTk string,
+                # from the widget name, for display purposes.
+                _widget_property = _widget_property.replace('CTk', '')
+            pyperclip.copy(property_colour)
+            self.paste_colour(event=None, widget_property=_widget_property)
+            # Sleep here - avoidthreading issues with CustomTkinter
+            time.sleep(0.05)
+
+    def cascade_enabled(self, palette_id: int) -> bool:
+        return mod.cascade_enabled(palette_id=palette_id)
 
     def toggle_frame_mode(self):
         """We need the ability to render the frames in the preview panel as they would appear when we have a top frame
@@ -1484,7 +1582,7 @@ class ControlPanel(ctk.CTk):
             mode_idx = 1
         if darker_shade != widget_colour:
             pyperclip.copy(darker_shade)
-            # Leverage the _paste_palette_colour method to update the widget and the preview panel.
+            # Leverage the paste_palette_colour method to update the widget and the preview panel.
             self.paste_palette_colour(event=None, palette_button_id=palette_button_id)
 
     def lighten_palette_tile(self, palette_button: ctk.CTkButton,
@@ -1739,7 +1837,10 @@ class ControlPanel(ctk.CTk):
             return
         self.set_widget_colour(widget_property=widget_property, new_colour=new_colour)
         hover_colour = cbtk.contrast_colour(new_colour)
-        self.widgets[widget_property]['button'].configure(fg_color=new_colour, hover_color=hover_colour)
+        # We don't know whether the widget is displayed for sure, when we are using cascade from the colour palette
+        # region, so we need to check, the selected view, may not include the widget.
+        if self.widgets[widget_property]['button'].winfo_exists():
+            self.widgets[widget_property]['button'].configure(fg_color=new_colour, hover_color=hover_colour)
         self.status_bar.set_status_text(
             status_text=f'Colour {new_colour} assigned to widget property {widget_property}.')
         widget_type, base_property = mod.widget_property_split(widget_property=widget_property)
@@ -2805,6 +2906,9 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.enable_tooltips = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                       preference_name='enable_tooltips')
 
+        self.confirm_cascade = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                      preference_name='confirm_cascade')
+
         self.enable_palette_labels = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                             preference_name='enable_palette_labels')
 
@@ -2930,9 +3034,6 @@ class PreferencesDialog(ctk.CTkToplevel):
             rdo_dark.deselect()
             rdo_light.select()
 
-        # lbl_enable_tooltips = ctk.CTkLabel(master=frm_widgets, text='Enable tooltips', justify="right")
-        # lbl_enable_tooltips.grid(row=widget_start_row, column=0, padx=5, sticky='e')
-
         self.tk_enable_tooltips = tk.IntVar(master=frm_widgets)
         self.tk_enable_tooltips.set(self.enable_tooltips)
         self.swt_enable_tooltips = ctk.CTkSwitch(master=frm_widgets,
@@ -2947,6 +3048,22 @@ class PreferencesDialog(ctk.CTkToplevel):
                                                        justify="left",
                                                        message="When enabled, this causes tool-tips to be enabled "
                                                                "throughout the theme builder application.")
+
+        self.tk_confirm_cascade = tk.IntVar(master=frm_widgets)
+        self.tk_confirm_cascade.set(self.confirm_cascade)
+        self.swt_confirm_cascade = ctk.CTkSwitch(master=frm_widgets,
+                                                 text='Confirm cascade',
+                                                 variable=self.tk_confirm_cascade,
+                                                 command=self.get_cascade_setting)
+        self.swt_confirm_cascade.grid(row=widget_start_row, column=1, padx=(0, 0), pady=10, sticky='w')
+        widget_start_row += 1
+
+        btn_enable_cascade_tooltip = CTkToolTip(self.swt_confirm_cascade,
+                                                wraplength=250,
+                                                justify="left",
+                                                message="When enabled, causes causes a pop-up, confirmation dialog"
+                                                        " to appear, whenever a colour cascade is invoked from the "
+                                                        "floating menu, on the theme's colour palette.")
 
         self.tk_enable_palette_labels = tk.IntVar(master=frm_widgets)
         self.tk_enable_palette_labels.set(self.enable_palette_labels)
@@ -3073,6 +3190,9 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.grab_set()
         self.lift()
 
+    def get_cascade_setting(self):
+        self.confirm_cascade = int(self.tk_confirm_cascade.get())
+
     def get_tooltips_setting(self):
         self.enable_tooltips = int(self.tk_enable_tooltips.get())
 
@@ -3095,9 +3215,8 @@ class PreferencesDialog(ctk.CTkToplevel):
                                                preference_value=str(self.theme_json_dir)):
                 print(f'Row miss updating preferences theme author.')
             self.json_files = mod.user_themes_list()
-            self.opm_theme.configure(values=self.json_files)
+            self.master.opm_theme.configure(values=self.json_files)
 
-        preferences_dict = {}
         self.user_name = self.tk_author_name.get()
 
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
@@ -3118,7 +3237,12 @@ class PreferencesDialog(ctk.CTkToplevel):
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='enable_tooltips',
                                            preference_value=self.enable_tooltips):
-            print(f'Row miss updating preferences control panel appearance mode.')
+            print(f'Row miss updating preferences enable tooltips.')
+
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                           preference_name='confirm_cascade',
+                                           preference_value=self.confirm_cascade):
+            print(f'Row miss updating preferences for confirm cascade.')
 
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='last_theme_on_start',
@@ -3166,7 +3290,7 @@ class PreferencesDialog(ctk.CTkToplevel):
                                            preference_value=preview_panel_scale_pct):
             print(f'Row miss updating preferences: preview panel scaling.')
 
-        if preview_panel_scale_pct != self.master.preview_panel_scaling_pct:
+        if preview_panel_scale_pct != self.master.preview_panel_scaling_pct and self.master.theme:
             self.master.preview_panel_scaling_pct = preview_panel_scale_pct
             self.master.send_command_json(command_type='program',
                                           command='set_widget_scaling',
@@ -3617,7 +3741,7 @@ class GeometryDialog(ctk.CTkToplevel):
 
             slider_dict[property] = ctk.CTkSlider(master=frm_controls,
                                                   from_=lower_value, to=upper_value,
-                                                  width=450, number_of_steps=100,
+                                                  width=450, number_of_steps=(upper_value - lower_value),
                                                   command=lambda value, label_id=property: slider_callback(label_id,
                                                                                                            value))
             slider_dict[property].grid(row=row, column=0, padx=(25, 25), pady=(0, 15))
