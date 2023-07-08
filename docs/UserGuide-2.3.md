@@ -27,7 +27,8 @@ Key features include:
 * Easy colour shade adjustments, via a floating (right-click) menu, available via widget colour property tiles;
 * The ability to copy/paste colours between widget colour property tiles;
 * A preference option, allowing you to auto-load the last theme you worked on, when you open the Theme Builder application.
-* Lots of tooltips to help you on your theme building journey. These can be disabled via the Preferences.
+* Lots of tooltips to help you on your theme building journey. These can be disabled via the Preferences;
+* Widget scaling options, accessible via the Preferences.
 
 
 ### CustomTkinter Version
@@ -105,7 +106,7 @@ When you select this menu option, the QA app is launched, and renders based upon
 
 ![qa_application](https://github.com/avalon60/ctk_theme_builder/assets/89534395/2a713404-38f4-43c2-a474-12c18d0558ef)
 
-As you can see the UI Scaling has been set to 80%. The QA application has been enhanced to remember the last scaling selection as well as the placement of the window on your desktop.
+As you can see the UI Scaling has been set to 80%. You can adjust the scaling within the drop-down widget in the QA app, however, the default scale is defined within the Preferences dialog. This is accessible via the *Control Panel, Tools* menu.
 
 The QA application, once launched is semi-autonomous; You can close it via the _Close_ button on the bottom right of the QA application. You can also open more than one instance of the QA application, allowing you to compare interim changes to the theme. As of version 2.3 of the theme builder, all instances of the QA application are closed automatically, when you exit the theme builder via the Control Panel.
 
@@ -387,9 +388,33 @@ If you are more methodical, you can use it to plan your colours, in order to str
   
   Be aware that the *Colour Harmonics* dialogue has a *copy to Palette** button. When pressed, this will cause the keystone colour, and the generated base colours, to be copied to the first tiles in the Theme Palette (*Scratch1, Scratch2* etc. up to 4 colours in total, depending on the selected harmony method).
   
+  If you don't care for the labels which appear below the Theme Palette tiles, they can be switched off, via the Tools > Preferences menu selection.
+  
 If you right-click a tile in the *Theme Palette* region, you will be presented with a floating  menu. This will provide options for copying, pasting or various options for adjusting the colour of the selected tile. 
 
-If you don't care for the labels which appear below the Theme Palette tiles, they can be switched off, via the Tools > Preferences menu selection.
+
+An inclusion to the floating menu, is the *Cascade colours* option. Depending on which label you launch the menu from, this option allows you to update the colour to a whole bunch of related widget properties. When selected, the default behaviour is for a pop-up dialog to appear. This will inform you of the various widget properties, which will be subject to the colour assignment, and you will be asked to confirm the change. 
+
+*Cascade colours* does a lot of heavy lifting, especially in the early stages of theme development. 
+As an example, consider the current border settings here:
+
+![cascade1](https://github.com/avalon60/ctk_theme_builder/assets/89534395/00bf2392-2549-485a-ad6a-219f1fe6177d)
+
+Note that the border colour in the theme palette is a shade of grey. 
+
+By right clicking the grey tile we see the Cascade colour option:
+![cascade2](https://github.com/avalon60/ctk_theme_builder/assets/89534395/69f218b3-009f-4659-9ef8-2cabc0aa453d)
+When selected we are prompted to confirm the action (you can disable the confirmation in _Preferences_, if desired):
+
+![cascade3](https://github.com/avalon60/ctk_theme_builder/assets/89534395/174d9f36-62ab-410c-a208-c20352232292)
+
+Now with the one extra click, we get:
+
+![cascade4](https://github.com/avalon60/ctk_theme_builder/assets/89534395/e0b77031-12c2-45cd-8bdc-fd5adc889eda)
+There are cascade options available for all the palette tiles, excepting the Scratch tiles. So for example, the Button tile colour, can be applied to button color, of all widgets with a button.
+
+This last feature is arguably, one of the most powerful features of CTk Theme Builder.
+
   
 ## Colour Mappings Region
 Here is where you target and manage individual widget colour properties. This region reflects the colour properties of the widgets selected via the *Properties View / Filter View* widgets. Depending on your selection, you will see the widget colour properties, for one, several, or all widget types.
@@ -450,6 +475,7 @@ There are several new features in 2.3:
 * Fixed issues in CustomTkinter, now make for a better experience. CTk Theme builder, no longer has to do full preview panel refreshes to compensate for related property changes.
 * Improved rendering flow, when the application launches, where the Load Last Theme preference is enabled.
 * A new theme, NeonBanana has been added. (A hat tip to @rigvedmaanas, whose Flipper Zero theme inspired the Dark Mode)
+* Theme palette, *Colour cascade*. This allows you to cascade a colour from the colour palette, to associated widgets. E.g. for the tile labelled *Button*, the colour can be cascaded, to the button colour property of buttons in all widgets which include a button.
 
 # Known Issues and Behaviours
 
@@ -457,6 +483,14 @@ There are several new features in 2.3:
 
 #### CTkLabel Disabled Text
 There is currently no method or theme property, to set disabled text colour for CTkLabel. When disabled, it currently defaults to what is presumably the underlying Tkinter default.
+
+#### CTkSlider Configure button_corner_radius
+An issue has been raised on the CustomTkinter, GITHub repository where CTkSlider.configure(button_corner_radius=...) is called
+
+*CTk 5.2.0: Exception encountered when configuring CTkSlider, button_corner_radius* #1790
+
+For the time being, adjustments to the button corner radius of CTkSlider, have no visual effect inside the geometry pup up. You can however set a value, save it and hit the *Refresh* button, to preview the effect in the *Preview Panel*. 
+
  
 #### DropdownMenu
 
