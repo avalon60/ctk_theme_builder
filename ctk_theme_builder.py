@@ -1681,7 +1681,7 @@ class ControlPanel(ctk.CTk):
         self.load_theme()
 
     def create_theme(self):
-        """Create a new theme. This is based on the default.json file."""
+        """Create a new theme. This is based on the default_theme.json file."""
         if self.json_state == 'dirty':
             confirm = CTkMessagebox(master=self,
                                     title='Confirm Action',
@@ -1689,7 +1689,7 @@ class ControlPanel(ctk.CTk):
                                     options=["Yes", "No"])
             if confirm.get() == 'No':
                 return
-        source_file = ETC_DIR / 'default.json'
+        source_file = ETC_DIR / 'default_theme.json'
         dialog = ctk.CTkInputDialog(text="Enter new theme name:", title="Create New Theme")
         new_theme = dialog.get_input()
         if new_theme:
@@ -1843,7 +1843,7 @@ class ControlPanel(ctk.CTk):
             self.widgets[widget_property]['button'].configure(fg_color=new_colour, hover_color=hover_colour)
         self.status_bar.set_status_text(
             status_text=f'Colour {new_colour} assigned to widget property {widget_property}.')
-        widget_type, base_property = mod.widget_property_split(widget_property=widget_property)
+        # widget_type, base_property = mod.widget_property_split(widget_property=widget_property)
         self.json_state = 'dirty'
         self.set_option_states()
 
