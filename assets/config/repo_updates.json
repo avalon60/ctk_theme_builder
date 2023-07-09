@@ -61,7 +61,7 @@
  
    "016":{ "sql_apply_version":"2.0.0",
       "description": "Control panel geometry",
-      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('window_geometry', 'control_panel', 'str', '960x905+10+30');" },
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('window_geometry', 'control_panel', 'str', '960x870+10+30');" },
 
    "017":{ "sql_apply_version":"2.0.0",
       "description": "Widget Geometry dialog geometry",
@@ -77,7 +77,11 @@
 
    "020":{ "sql_apply_version":"2.0.0",
       "description": "Preview panel geometry",
-      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('window_geometry', 'preview_panel', 'str', '805x760+250+15');" },
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('window_geometry', 'preview_panel', 'str', '624x510+100+15');" },
+
+   "020a":{ "sql_apply_version":"2.0.0",
+      "description": "Preview panel geometry",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('window_geometry', 'qa_application', 'str', '810x420+150+15');" },
 
    "021":{ "sql_apply_version":"2.0.0",
       "description": "Colour palette Scratch 1",
@@ -375,15 +379,15 @@
 
    "110":{ "sql_apply_version":"2.3.0",
       "description": "Control Panel scaling",
-      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('scaling', 'control_panel', 'str', '100%');"},
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('scaling', 'control_panel', 'str', '90%');"},
 
    "111":{ "sql_apply_version":"2.3.0",
       "description": "Preview Panel scaling",
-      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('scaling', 'preview_panel', 'str', '100%');" },
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('scaling', 'preview_panel', 'str', '80%');" },
 
    "112":{ "sql_apply_version":"2.3.0",
       "description": "Preview Panel scaling",
-      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('scaling', 'qa_application', 'str', '100%');" },
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('scaling', 'qa_application', 'str', '80%');" },
 
 
    "120":{ "sql_apply_version":"2.3.0",
