@@ -13,7 +13,7 @@
    },
   "CTkEntry":{ 
       "corner_radius":[ 0, 12 ],
-      "border_width":[ 0, 20 ]
+      "border_width":[ 0, 10 ]
    },
    "CTkRadioButton":{
       "corner_radius":[ 0, 20 ],
