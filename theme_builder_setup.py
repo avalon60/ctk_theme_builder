@@ -411,7 +411,7 @@ if __name__ == "__main__":
 
     # Perform initial checks
     print('Checking Python interpreter version...')
-    if not (version_scalar('3.8.0') <= version_scalar(python_version) <= version_scalar('3.10.99')):
+    if not (version_scalar('3.8.0') <= version_scalar(python_version) <= version_scalar('3.11.99')):
         print(f'ERROR: Python interpreter version, {python_version}, is unsupported.\n'
               f'Only Python versions between 3.8 and 3.10 are supported')
         exit(1)
