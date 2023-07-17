@@ -27,10 +27,12 @@ TEMP_DIR = APP_HOME / 'tmp'
 VIEWS_DIR = ASSETS_DIR / 'views'
 APP_THEMES_DIR = ASSETS_DIR / 'themes'
 APP_DATA_DIR = ASSETS_DIR / 'data'
-APP_IMAGES = ASSETS_DIR / 'images'
 DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
+APP_IMAGES = ASSETS_DIR / 'images'
 QA_STOP_FILE = ETC_DIR / 'qa_application.stop'
 QA_STARTED_FILE = ETC_DIR / 'qa_application.started'
+
+SERVER = '127.0.0.1'
 
 # These aren't true sizes as per WEB design
 HEADING1 = ('Roboto', 26)
@@ -42,8 +44,8 @@ HEADING5 = ('Roboto', 16)
 CTK_VERSION = ctk.__version__
 
 # HEADING_UL = 'Roboto 11 underline'
-REGULAR_TEXT = ('Roboto', 10)
-SMALL_TEXT = ('Roboto', 9)
+REGULAR_TEXT = ('Roboto', 12)
+SMALL_TEXT = ('Roboto', 10)
 TOOLTIP_DELAY = 1
 
 DEFAULT_VIEW = 'Basic'
@@ -725,6 +727,19 @@ def colour_palette_entries(db_file_path: Path):
     db_conn.close()
     return colour_tiles
 
+
+def listener_port():
+    """The listener_port function obtains and returns the listener port, used for comms from the Control Panel to the
+    Preview Panel."""
+    _listener_port = preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                        preference_name='listener_port')
+    return _listener_port
+
+
+def method_listener_address():
+    _listener_port = listener_port()
+    _method_listener_address = (SERVER, _listener_port)
+    return _method_listener_address
 
 if __name__ == "__main__":
     colour_dict = colour_dictionary(Path('../assets/themes/GreyGhost.json'))
