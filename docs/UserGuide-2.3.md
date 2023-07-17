@@ -46,7 +46,7 @@ The job of the *Control Panel* is to present necessary interface controls, givin
 The *Preview Panel* appears when a theme has been opened and then remains for the duration of the session. Once opened the *Preview Panel* only closes, when you *Quit* via the *Control Panel*.
 
 ### Window Positions
-Whenever you drag and release a window into a new location of your display, CTk Theme Builder keeps track of where you place it. So for example, you may choose to have the *Preview Panel* on the left and the *Control Panel* to the right of it. When you quit the application, it saves the settings, and will subsequently restore the window positions when CTk Theme Builder is next started.
+Whenever you drag and release one of the main windows into a new location of your display, CTk Theme Builder keeps track of where you place it. So for example, you may choose to have the *Preview Panel* on the left and the *Control Panel* to the right of it. When you quit the application, it saves the settings, and will subsequently restore the window positions when CTk Theme Builder is next started.
 
 ### Copy / Paste Operations
 There are various sets of colour tiles, presented by the application. These appear in the control panel as well as the Colour Harmonics Panel (you will learn about this one later). In most cases, you can copy and paste hex colour codes (#rrggbb), between these. You can even copy hex colour codes based on searches on the Web, and / or by using colour samplers. As long as you have a valid hex colour code in your clipboard, you can paste it onto a colour tile.
@@ -59,9 +59,13 @@ If you are sufficiently acquainted with CustomTkinter, you will be aware that th
 When working your themes, you work / see, one appearance mode of a theme, at any given time, but can switch back and forth between the two whenever you wish.
 
 ### Concurrency
-You can only run once instance of CTk Theme Builder at a time. This is because the *Control Panel* communicates via a fixed socket address (port 5051). If you attempt to run two instances of CTk Theme Builder on the same computer, you will see a timeout message:
+CTk Theme Builder's control panel, communicates with the preview panel, via sockets. By default the listener port used by the preview panel, is 5051. You can only run one instance of CTk Theme Builder at a time using a given socket.  If you attempt to run two instances of CTk Theme Builder on the same computer, with the same socket, you will see a timeout message similar to the one seen here:
+
+TODO: Update image below
 
 ![timeout](https://github.com/avalon60/ctk_theme_builder/assets/89534395/9d12b650-8b17-4fe8-b9f0-97bd9d363e5f)
+
+You can however change the *Listener Port* in the *Preferences* dialogue. This will then allow you to run another instance of CTk Theme Builder, from a different install location, if required. It also offers you some latitude, in the event that the default port is in use, by another program.
 
 # Menus
 As you have possibly noticed, when you launch CTk Theme Builder, the control panel has a menu toolbar. This includes a *File* menu as well as a *Tools* menu, as we see here:
@@ -106,7 +110,7 @@ When you select this menu option, the QA app is launched, and renders based upon
 
 ![qa_application](https://github.com/avalon60/ctk_theme_builder/assets/89534395/2a713404-38f4-43c2-a474-12c18d0558ef)
 
-As you can see the UI Scaling has been set to 80%. You can adjust the scaling within the drop-down widget in the QA app, however, the default scale is defined within the Preferences dialog. This is accessible via the *Control Panel, Tools* menu.
+As you can see the UI Scaling has been set to 80%. You can adjust the scaling within the drop-down widget in the QA app, however, the default scale is defined within the Preferences dialoge. This is accessible via the *Control Panel, Tools* menu.
 
 The QA application, once launched is semi-autonomous; You can close it via the _Close_ button on the bottom right of the QA application. You can also open more than one instance of the QA application, allowing you to compare interim changes to the theme. As of version 2.3 of the theme builder, all instances of the QA application are closed automatically, when you exit the theme builder via the Control Panel.
 
@@ -131,14 +135,17 @@ Each of these options, are covered in their own dedicated section of the guide.
 The Preferences dialogue is accessed via the *Tools->Preferences* menu option.
 The preferences screen will appear something like this:
 
+TODO: Update preferences image
 ![image](https://github.com/avalon60/ctk_theme_builder/assets/89534395/a87cc60c-9b7e-4429-824d-f8eedefeb53e)
 
 When you start CTk Theme Builder for the very first time, the theme will be set to _GreyGhost_, as we see in the above image.
 
-For new installations, the Preferences dialogue should be the first Port of call.
+For new installations, the Preferences dialogue should be the first port of call, if only to ensure that you have updated the Author (see below), to ensure you are adequately credited for your good work.
 
 #### Author
-For a new installation the Author defaults to the user id that you are logged in as. You can simply over-type this, to whatever suits. The author is embedded into the JSON, of any theme files that you create.
+For a new installation the Author defaults to the user name that you are logged in as. You can simply over-type this, to whatever suits. 
+
+The author, along with some other theme specifics, is automatically embedded into the JSON, of any theme files that you create. When you open a theme created (or produced using *Save As*) by CTk Theme Builder, the Author's details can be viewed via the *Files > Provenance* menu option.
 
 
 #### Control Panel Theme
@@ -254,7 +261,7 @@ When pressed, the *Copy to Palette* button, causes the *Keystone Colour*, and th
 The *Tag Keystone* button, causes the Keystone colour and the chosen harmony method to be tagged to your theme. If you subsequently open the *Colour Harmonics* panel, for a given theme, the colours will be restored to the same state, as per when they were tagged.  
 
 ### Merge Themes
-The *Merge Themes* function allows you to create a new theme based upon two existing themes. It allows to to choose an appearance mode from each of the two selected themes, and combine them into a new theme. The dialog looks like this:  
+The *Merge Themes* function allows you to create a new theme based upon two existing themes. It allows to to choose an appearance mode from each of the two selected themes, and combine them into a new theme. The dialogue looks like this:  
 
 ![merge-themes](https://github.com/avalon60/ctk_theme_builder/assets/89534395/b83e52af-64fe-4376-957f-b13271e3b6f5)
 
@@ -264,9 +271,9 @@ As you can see, you can select the appearance mode required from each of your se
 
 The new theme adopts all non-color properties from the primary theme selection.
 
-### The About CTk Theme Builder Dialog
+### The About CTk Theme Builder Dialogue
 
-About the About dialog...
+About the About dialogue...
 
 ![about](https://github.com/avalon60/ctk_theme_builder/assets/89534395/e37d58b7-6e6b-4291-acb5-77d64f22c5d5)
 
@@ -344,7 +351,7 @@ This allows you to roll back any changes to your last *Save*. When this is done,
 We all make mistakes ;o)
 
 #### New Theme
-As this suggests, this allows you to create a brand new theme. When pressed a pop-up dialogue will be displayed, where you can enter the new theme name. When you click *OK* on the New Theme pop-up dialog, the theme is created and automatically saved. 
+As this suggests, this allows you to create a brand new theme. When pressed a pop-up dialogue will be displayed, where you can enter the new theme name. When you click *OK* on the New Theme pop-up dialogue, the theme is created and automatically saved. 
 
 If you have been working on another theme, and have unsaved changes, a pop-up dialogue will appear, asking you if you wish to discard your changes.
 
@@ -393,7 +400,7 @@ If you are more methodical, you can use it to plan your colours, in order to str
 If you right-click a tile in the *Theme Palette* region, you will be presented with a floating  menu. This will provide options for copying, pasting or various options for adjusting the colour of the selected tile. 
 
 
-An inclusion to the floating menu, is the *Cascade colours* option. Depending on which label you launch the menu from, this option allows you to update the colour to a whole bunch of related widget properties. When selected, the default behaviour is for a pop-up dialog to appear. This will inform you of the various widget properties, which will be subject to the colour assignment, and you will be asked to confirm the change. 
+An inclusion to the floating menu, is the *Cascade colours* option. Depending on which label you launch the menu from, this option allows you to update the colour to a whole bunch of related widget properties. When selected, the default behaviour is for a pop-up dialogue to appear. This will inform you of the various widget properties, which will be subject to the colour assignment, and you will be asked to confirm the change. 
 
 *Cascade colours* does a lot of heavy lifting, especially in the early stages of theme development. 
 As an example, consider the current border settings here:
@@ -476,6 +483,7 @@ There are several new features in 2.3:
 * Improved rendering flow, when the application launches, where the Load Last Theme preference is enabled.
 * A new theme, NeonBanana has been added. (A hat tip to @rigvedmaanas, whose Flipper Zero theme inspired the Dark Mode)
 * Theme palette, *Colour cascade*. This allows you to cascade a colour from the colour palette, to associated widgets. E.g. for the tile labelled *Button*, the colour can be cascaded, to the button colour property of buttons in all widgets which include a button.
+* All pop-up dialogues can now be closed with a press of the Escape button. This does not apply to the *Control Panel* or the *Preview Panel*.
 
 # Known Issues and Behaviours
 
@@ -491,6 +499,12 @@ An issue has been raised on the CustomTkinter, GITHub repository where CTkSlider
 
 For the time being, adjustments to the button corner radius of CTkSlider, have no visual effect inside the geometry pup up. You can however set a value, save it and hit the *Refresh* button, to preview the effect in the *Preview Panel*. 
 
+#### CTkTabview
+There is an issue with configuring the fg_color for CTkTabview. The configure option does not completely update the foreground area. See:  
+  
+   CTkTabview.confgure(fg_color=...) does not work correctly #1803 
+
+A workaround is to hit the *Refresh* button in the *Control Panel*.
  
 #### DropdownMenu
 
