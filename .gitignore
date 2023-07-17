@@ -32,3 +32,9 @@ ctk_theme_builder
 assets/etc/qa_application.stop
 
 user_themes/Demo.json
+
+user_themes/Demo3.json
+
+user_themes/Demo2.json
+
+gridedit.py
