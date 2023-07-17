@@ -269,6 +269,10 @@
       "description": "Colour cascade CTkFrame/top_fg color",
       "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (10, 'CTkFrame', 'top_fg_color');"}, 
 
+   "060a":{ "sql_apply_version":"2.3.0",
+      "description": "Colour cascade CTkScrollableFrame/label fg color ",
+      "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (10, 'CTkScrollableFrame', 'label_fg_color');"}, 
+
    "061":{ "sql_apply_version":"2.3.0",
       "description": "Colour cascade CTkFrame/fg color",
       "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (11, 'CTkFrame', 'fg_color');"}, 
@@ -395,10 +399,15 @@
       "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('user_preference', 'confirm_cascade', 'int', '1');" },
 
    "121":{ "sql_apply_version":"2.3.0",
-      "description": "Confirm cascade",
+      "description": "Reset last theme on start",
       "sql_statement": "delete from preferences where scope = 'user_preference' and preference_name = 'last_theme_on_start';"},
 
-   "121":{ "sql_apply_version":"2.3.0",
-      "description": "Confirm cascade",
-      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('user_preference', 'last_theme_on_start', 'int', '1');"}
+   "122":{ "sql_apply_version":"2.3.0",
+      "description": "Initialise last theme on start",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('user_preference', 'last_theme_on_start', 'int', '1');"},
+
+
+   "123":{ "sql_apply_version":"2.3.0",
+      "description": "Initialise listener port",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('user_preference', 'listener_port', 'int', '5051');"}
 }
