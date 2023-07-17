@@ -1,5 +1,4 @@
-import tkinter
-import tkinter.messagebox
+import tkinter as tk
 import customtkinter
 import argparse
 import os
@@ -28,7 +27,8 @@ DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
-
+        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
+        self.iconphoto(False, icon_photo)
         # Restore preferences
         self.qa_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='window_geometry',
                                                   preference_name='qa_application')
@@ -123,7 +123,7 @@ class App(customtkinter.CTk):
         # create radiobutton frame
         self.radiobutton_frame = customtkinter.CTkFrame(self)
         self.radiobutton_frame.grid(row=0, column=3, padx=(20, 20), pady=(20, 0), sticky="nsew")
-        self.radio_var = tkinter.IntVar(value=0)
+        self.radio_var =  tk.IntVar(value=0)
         self.label_radio_group = customtkinter.CTkLabel(master=self.radiobutton_frame, text="CTkRadioButton Group:")
         self.label_radio_group.grid(row=0, column=2, columnspan=1, padx=10, pady=10, sticky="")
         self.radio_button_1 = customtkinter.CTkRadioButton(master=self.radiobutton_frame, variable=self.radio_var,
@@ -204,6 +204,8 @@ class App(customtkinter.CTk):
         self.after(100, self.check_for_running)
         self.start_requested_close_listener()
 
+        self.bind('<Escape>', self.close_app)
+
     def check_for_running(self):
         if not self.keep_running:
             self.close_app()
@@ -227,7 +229,7 @@ class App(customtkinter.CTk):
         new_scaling_float = int(new_scaling.replace("%", "")) / 100
         customtkinter.set_widget_scaling(new_scaling_float)
 
-    def close_app(self):
+    def close_app(self, event=None):
         self.save_app_geometry()
         mod.complete_qa_stop()
         self.destroy()
