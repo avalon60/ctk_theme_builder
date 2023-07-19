@@ -27,10 +27,12 @@ TEMP_DIR = APP_HOME / 'tmp'
 VIEWS_DIR = ASSETS_DIR / 'views'
 APP_THEMES_DIR = ASSETS_DIR / 'themes'
 APP_DATA_DIR = ASSETS_DIR / 'data'
-APP_IMAGES = ASSETS_DIR / 'images'
 DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
+APP_IMAGES = ASSETS_DIR / 'images'
 QA_STOP_FILE = ETC_DIR / 'qa_application.stop'
 QA_STARTED_FILE = ETC_DIR / 'qa_application.started'
+
+SERVER = '127.0.0.1'
 
 # These aren't true sizes as per WEB design
 HEADING1 = ('Roboto', 26)
@@ -42,8 +44,8 @@ HEADING5 = ('Roboto', 16)
 CTK_VERSION = ctk.__version__
 
 # HEADING_UL = 'Roboto 11 underline'
-REGULAR_TEXT = ('Roboto', 10)
-SMALL_TEXT = ('Roboto', 9)
+REGULAR_TEXT = ('Roboto', 12)
+SMALL_TEXT = ('Roboto', 10)
 TOOLTIP_DELAY = 1
 
 DEFAULT_VIEW = 'Basic'
@@ -153,6 +155,7 @@ def remove_qa_status_files():
         except FileNotFoundError:
             pass
 
+
 def qa_app_started():
     # current dateTime
     now = datetime.now()
@@ -167,6 +170,7 @@ def qa_app_started():
     with open(QA_STARTED_FILE, 'w') as f:
         pid = os.getpid()
         f.write(f'[{pid}] CTk Theme Builder QA app started at: {date_started}')
+
 
 def request_close_qa_app():
     # current dateTime
@@ -239,6 +243,71 @@ def keys_exist(element, *keys):
         except KeyError:
             return False
     return True
+
+
+def cascade_dict(palette_id: int) -> dict:
+    """The cascade_dict function, extracts all the colour_cascade_properties entries, for a specified palette_id. Each
+    dictionary entry represents a row from the colour_cascade_properties table.
+
+    :param palette_id: Palette# of a displayed colour palette
+    :return list: List of cascade_dict dictionaries.
+    """
+    if not db_file_exists(db_file_path=DB_FILE_PATH):
+        print(f'Unable to locate database file located at {DB_FILE_PATH}')
+        raise FileNotFoundError
+
+    db_conn = sqlite3.connect(DB_FILE_PATH)
+    db_conn.row_factory = sqlite_dict_factory
+    cur = db_conn.cursor()
+    cur.execute("select widget_type, widget_property "
+                "from colour_cascade_properties "
+                "where entry_id = :entry_id", {"entry_id": palette_id})
+    _cascade_dict = cur.fetchall()
+    db_conn.close()
+    return _cascade_dict
+
+
+def cascade_display_string(palette_id: int) -> str:
+    """The cascade_list function, extracts all the colour_cascade_properties entries, for a specified palette_id. Each
+     entry represents a widget/property from the colour_cascade_properties table.
+
+    :param palette_id: Palette# of a displayed colour palette
+    :return list: List of cascade_dict dictionaries.
+    """
+
+    _cascade_dict = cascade_dict(palette_id=palette_id)
+    _properties_string = ''
+    for record in _cascade_dict:
+        _widget_type = record["widget_type"]
+        _widget_property = record["widget_property"]
+        _properties_string = _properties_string + f'\n{_widget_type}: {_widget_property}'
+
+    return _properties_string
+
+
+def cascade_enabled(palette_id: int) -> bool:
+    """The cascade_enabled function, checks for any entries in colour_cascade_properties for the specified palette slot.
+    If any exist, it returns True, otherwise it returns False.
+
+    :param palette_id: Palette# of a displayed colour palette
+    :return: Boolean.
+    """
+    if not db_file_exists(db_file_path=DB_FILE_PATH):
+        print(f'Unable to locate database file located at {DB_FILE_PATH}')
+        raise FileNotFoundError
+
+    db_conn = sqlite3.connect(DB_FILE_PATH)
+    cur = db_conn.cursor()
+    cur.execute("select count(*) "
+                "from colour_cascade_properties "
+                "where entry_id = :entry_id", {"entry_id": palette_id})
+    _cascade_count_list = cur.fetchall()
+    _cascade_count_list, = _cascade_count_list[0]
+    db_conn.close()
+    if _cascade_count_list:
+        return True
+    else:
+        return False
 
 
 def colour_dictionary(theme_file: Path) -> dict:
@@ -339,7 +408,7 @@ def flip_appearance_modes(theme_file_path: Path):
 
 
 def ui_scaling_list():
-    return ['80%', '90%', '100%', '110%', '120%']
+    return ['70%', '80%', '90%', '100%', '110%', '120%', '130%']
 
 
 def merge_themes(primary_theme_name: str, primary_mode: str, secondary_theme_name: str, secondary_mode: str,
@@ -354,7 +423,9 @@ def merge_themes(primary_theme_name: str, primary_mode: str, secondary_theme_nam
     primary_mode_idx = str_mode_to_int(primary_mode)
     secondary_mode_idx = str_mode_to_int(secondary_mode)
     primary_theme_dict = json_dict(primary_file)
+    primary_theme_dict = patch_theme(theme_json=primary_theme_dict)
     secondary_theme_dict = json_dict(secondary_file)
+    secondary_theme_dict = patch_theme(theme_json=secondary_theme_dict)
     mapped_primary_idx = str_mode_to_int(mapped_primary_mode)
     if mapped_primary_idx == 0:
         mapped_secondary_idx = 1
@@ -368,7 +439,6 @@ def merge_themes(primary_theme_name: str, primary_mode: str, secondary_theme_nam
                     primary_mode_idx]
                 new_theme_dict[widget_type][property_][mapped_secondary_idx] = \
                     secondary_theme_dict[widget_type][property_][secondary_mode_idx]
-    print(f'DEBUG: Writing to {new_theme_path}')
     with open(new_theme_path, "w") as f:
         json.dump(new_theme_dict, f, indent=2)
 
@@ -658,6 +728,19 @@ def colour_palette_entries(db_file_path: Path):
     return colour_tiles
 
 
+def listener_port():
+    """The listener_port function obtains and returns the listener port, used for comms from the Control Panel to the
+    Preview Panel."""
+    _listener_port = preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                        preference_name='listener_port')
+    return _listener_port
+
+
+def method_listener_address():
+    _listener_port = listener_port()
+    _method_listener_address = (SERVER, _listener_port)
+    return _method_listener_address
+
 if __name__ == "__main__":
     colour_dict = colour_dictionary(Path('../assets/themes/GreyGhost.json'))
     widget_prop = 'Button: text_color_disabled'
@@ -825,4 +908,7 @@ if __name__ == "__main__":
     print(f'Scope preferences records: {scope_prefs}')
     colour_palettess = colour_palette_entries(db_file_path=db_file)
     print(f'colour_palettess = {colour_palettess}')
-    pass
+    casc_dict = cascade_dict(palette_id=6)
+    cascade_count = cascade_enabled(6)
+    casc_list = cascade_display_string(palette_id=6)
+    print(casc_list)

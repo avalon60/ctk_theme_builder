@@ -8,4 +8,4 @@
 set PROG_PATH="%~dp0"
 set APP_ENV=%PROG_PATH%\venv
 call %APP_ENV%\Scripts\activate.bat
-%PROG_PATH%\ctk_theme_builder_test_app.py %1 %2 %3 %4 %5 %6
+%PROG_PATH%\ctk_theme_builder_qa_app.py %1 %2 %3 %4 %5 %6

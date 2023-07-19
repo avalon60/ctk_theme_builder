@@ -32,7 +32,7 @@
     "border_width": 2,
     "fg_color": [
       "#76f7f3",
-      "#76f7f3"
+      "#843453"
     ],
     "hover_color": [
       "#e1e661",
@@ -79,34 +79,6 @@
       "#23505c"
     ]
   },
-  "CTkCheckbox": {
-    "corner_radius": 6,
-    "border_width": 3,
-    "fg_color": [
-      "#6354ef",
-      "#6354ef"
-    ],
-    "border_color": [
-      "#f35926",
-      "#f35926"
-    ],
-    "hover_color": [
-      "#e1e661",
-      "#e1e661"
-    ],
-    "checkmark_color": [
-      "#ffffff",
-      "#ffffff"
-    ],
-    "text_color": [
-      "#000000",
-      "#000000"
-    ],
-    "text_color_disabled": [
-      "#d9e0e0",
-      "#d9e0e0"
-    ]
-  },
   "CTkSwitch": {
     "corner_radius": 1000,
     "border_width": 3,
@@ -126,31 +98,6 @@
     "button_hover_color": [
       "#50514e",
       "#50514e"
-    ],
-    "text_color": [
-      "#000000",
-      "#000000"
-    ],
-    "text_color_disabled": [
-      "#d9e0e0",
-      "#d9e0e0"
-    ]
-  },
-  "CTkRadiobutton": {
-    "corner_radius": 1000,
-    "border_width_checked": 6,
-    "border_width_unchecked": 3,
-    "fg_color": [
-      "#48bed4",
-      "#48bed4"
-    ],
-    "border_color": [
-      "#b66426",
-      "#b66426"
-    ],
-    "hover_color": [
-      "#000000",
-      "#000000"
     ],
     "text_color": [
       "#000000",
@@ -361,10 +308,63 @@
     "date created": "Mar 27 2023 18:16:02",
     "last modified by": "clive",
     "created with": "CTk Theme Builder",
-    "last modified": "May 29 2023 15:16:11",
+    "last modified": "Jul 02 2023 17:28:53",
     "keystone colour": "#263b2b",
     "harmony method": "Tetradic",
     "harmony differential": null,
     "theme name": "TestCard"
+  },
+  "CTkCheckBox": {
+    "corner_radius": 6,
+    "border_width": 3,
+    "fg_color": [
+      "#6354ef",
+      "#6354ef"
+    ],
+    "border_color": [
+      "#f35926",
+      "#f35926"
+    ],
+    "hover_color": [
+      "#e1e661",
+      "#e1e661"
+    ],
+    "checkmark_color": [
+      "#ffffff",
+      "#ffffff"
+    ],
+    "text_color": [
+      "#000000",
+      "#000000"
+    ],
+    "text_color_disabled": [
+      "#d9e0e0",
+      "#d9e0e0"
+    ]
+  },
+  "CTkRadioButton": {
+    "corner_radius": 1000,
+    "border_width_checked": 6,
+    "border_width_unchecked": 3,
+    "fg_color": [
+      "#48bed4",
+      "#48bed4"
+    ],
+    "border_color": [
+      "#b66426",
+      "#b66426"
+    ],
+    "hover_color": [
+      "#000000",
+      "#000000"
+    ],
+    "text_color": [
+      "#000000",
+      "#000000"
+    ],
+    "text_color_disabled": [
+      "#d9e0e0",
+      "#d9e0e0"
+    ]
   }
 }

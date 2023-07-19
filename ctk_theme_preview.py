@@ -37,10 +37,9 @@ DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
 
 DEBUG = 0
 HEADER_SIZE = 64
-METHOD_LISTENER_PORT = 5051
+METHOD_LISTENER_PORT = mod.listener_port()
 SERVER = '127.0.0.1'
-METHOD_LISTENER_ADDRESS = (SERVER, METHOD_LISTENER_PORT)
-
+METHOD_LISTENER_ADDRESS = mod.method_listener_address()
 ENCODING_FORMAT = 'utf-8'
 DISCONNECT_MESSAGE = "!DISCONNECT"
 DISCONNECT_JSON = '{"command_type": "program", "command": "' + DISCONNECT_MESSAGE + '", "parameters": [""]}'
@@ -53,6 +52,13 @@ listener_status = 0
 def update_widget_geometry(widget, widget_property, property_value):
     if widget_property == 'corner_radius':
         widget.configure(corner_radius=property_value)
+    elif widget_property == 'button_corner_radius':
+        # As of CTk 5.2.0 the configuring of button_corner_radius on CTkSlider causes an exception due to a bug.
+        # We trap this here, and hopefully this will be fixed soon.
+        try:
+            widget.configure(button_corner_radius=property_value)
+        except ValueError:
+            pass
     elif widget_property == 'border_width':
         widget.configure(border_width=property_value)
     elif widget_property == 'border_width_unchecked':
@@ -131,6 +137,8 @@ class PreviewPanel:
         self._theme_name = theme_name = os.path.splitext(theme_name)[0]
 
         self.preview = ctk.CTk()
+        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
+        self.preview.iconphoto(False, icon_photo)
         self.img_selected = cbtk.load_image(light_image=APP_IMAGES / 'colour_wheel.png', image_size=(10, 10))
         self.preview.protocol("WM_DELETE_WINDOW", self.block_closing)
         self._restore_preview_geometry()
@@ -321,7 +329,7 @@ class PreviewPanel:
         # CTkButton
         eye_con = ctk.CTkImage(light_image=Image.open(APP_IMAGES / 'eye_lm.png'),
                                dark_image=Image.open(APP_IMAGES / 'eye_dm.png'),
-                               size=(20, 20))
+                               size=(25, 18))
         # We contrive to always show a contrast of a button widget with and without a border.
         button_border_width = ThemeManager.theme['CTkButton']['border_width']
         self.button_1 = ctk.CTkButton(master=widget_frame, border_width=button_border_width)
@@ -625,7 +633,6 @@ class PreviewPanel:
         if command == 'set_widget_scaling':
             scaling_pct = parameters[0]
             scaling_float = mod.scaling_float(scaling_pct)
-            print(f'DEBUG: Widget Scaling Pct: {scaling_pct}')
             ctk.set_widget_scaling(scaling_float)
         elif command == 'render_preview_disabled':
             self._render_preview_disabled()
@@ -645,7 +652,7 @@ class PreviewPanel:
             widget_property = parameters[1]
             widget_colour = parameters[2]
             # print(f'Updating widget {widget_type} / {widget_property}')
-            self._update_widget_colour(widget_type, widget_property, widget_colour)
+            self.update_widget_colour(widget_type, widget_property, widget_colour)
         else:
             print(f'ERROR: Unrecognised method request: {command}')
 
@@ -674,7 +681,7 @@ class PreviewPanel:
 
         else:
             for widget in self._rendered_widgets[widget_type]:
-                json_widget_type = mod.json_widget_type(widget_type=widget)
+                json_widget_type = widget
                 update_widget_geometry(widget, widget_property, int(property_value))
 
         # We contrive to always show a contrast of a button with and without a border.
@@ -768,13 +775,13 @@ class PreviewPanel:
         """
         global listener_status
         self._client_handlers = {}
-        print("Method listener starting...")
+        print(f"Method listener starting on port {METHOD_LISTENER_PORT}...")
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             server.bind(METHOD_LISTENER_ADDRESS)
         except OSError:
             print(f'Preview Panel, socket bind error. ensure that no other instances of CTk Theme Builder are running '
-                  f'and that port 5051 is free.')
+                  f'and that port {METHOD_LISTENER_PORT} is free.')
             listener_status = -1
             raise
         server.listen()
@@ -826,111 +833,121 @@ class PreviewPanel:
             if confirm.get() == 'OK':
                 exit(1)
 
-    def _update_widget_colour(self, widget_type, widget_property, widget_colour):
+    def update_widget_colour(self, widget_type, widget_property, widget_colour):
         # print(f'_update_widget_colour: widget_type: {widget_type}; widget_property: {widget_property}')
         # We lowercase the widget property, due to an issue in CustomTkinter 5.1.2, where there was an fg_Color
         # property against CTkSwitch. This was fixed to fg_color in 5.1.3.
-        widget_property_lower = widget_property.lower()
 
-        if widget_type == 'CTkFrame' and widget_property_lower not in ['fg_color', 'top_fg_color']:
+        # print(f'Updating widget colour {widget_type} / {widget_property} / {widget_colour}')
+        if widget_type == 'CTkFrame' and widget_property not in ['fg_color', 'top_fg_color']:
             for widget in self._rendered_widgets['CTkScrollableFrame']:
                 widget.configure(border_color=widget_colour)
             for widget in self._rendered_widgets['CTkTabview']:
                 widget.configure(border_color=widget_colour)
 
-        if widget_type == 'CTkFrame' and widget_property_lower == 'top_fg_color':
+        if widget_type == 'CTkFrame' and widget_property == 'top_fg_color':
             widget_type = 'frame_top'
-            widget_property_lower = 'fg_color'
-        elif widget_type == 'CTkFrame' and widget_property_lower == 'fg_color':
+            widget_property = 'fg_color'
+        elif widget_type == 'CTkFrame' and widget_property == 'fg_color':
             widget_type = 'frame_base'
 
         for widget in self._rendered_widgets[widget_type]:
-            # print(f'Updating {widget_property_lower} for widget of type "{widget_type}"')
-            if widget_property_lower == 'border_color':
+            # print(f'Updating {widget_property} for widget of type "{widget_type}"')
+            if widget_property == 'border_color':
                 widget.configure(border_color=widget_colour)
-            elif widget_property_lower == 'button_color':
+            elif widget_property == 'button_color':
                 widget.configure(button_color=widget_colour)
-            elif widget_property_lower == 'button_hover_color':
+            elif widget_property == 'button_hover_color':
                 widget.configure(button_hover_color=widget_colour)
-            elif widget_property_lower == 'checkmark_color':
+            elif widget_property == 'checkmark_color':
                 widget.configure(checkmark_color=widget_colour)
-            elif widget_property_lower == 'fg_color':
+            elif widget_property == 'fg_color':
                 widget.configure(fg_color=widget_colour)
-            elif widget_property_lower == 'hover_color':
+            elif widget_property == 'hover_color':
                 widget.configure(hover_color=widget_colour)
-            elif widget_property_lower == 'label_fg_color':
+            elif widget_property == 'label_fg_color':
                 widget.configure(label_fg_color=widget_colour)
-            elif widget_property_lower == 'placeholder_text_color':
+            elif widget_property == 'placeholder_text_color':
                 widget.configure(placeholder_text_color=widget_colour)
-            elif widget_property_lower == 'progress_color':
+            elif widget_property == 'progress_color':
                 widget.configure(progress_color=widget_colour)
-            elif widget_property_lower == 'scrollbar_button_color':
+            elif widget_property == 'scrollbar_button_color':
                 widget.configure(scrollbar_button_color=widget_colour)
-            elif widget_property_lower == 'scrollbar_button_hover_color':
+            elif widget_property == 'scrollbar_button_hover_color':
                 widget.configure(scrollbar_button_hover_color=widget_colour)
-            elif widget_property_lower == 'selected_color':
+            elif widget_property == 'selected_color':
                 widget.configure(selected_color=widget_colour)
-            elif widget_property_lower == 'selected_hover_color':
+            elif widget_property == 'selected_hover_color':
                 widget.configure(selected_hover_color=widget_colour)
-            elif widget_property_lower == 'text_color':
+            elif widget_property == 'text_color':
                 widget.configure(text_color=widget_colour)
-            elif widget_property_lower == 'text_color_disabled':
+            elif widget_property == 'text_color_disabled':
                 widget.configure(text_color_disabled=widget_colour)
-            elif widget_property_lower == 'unselected_color':
+            elif widget_property == 'unselected_color':
                 widget.configure(unselected_color=widget_colour)
-            elif widget_property_lower == 'unselected_hover_color':
+            elif widget_property == 'unselected_hover_color':
                 widget.configure(unselected_hover_color=widget_colour)
             else:
-                print(f'WARNING: Unrecognised widget property: {widget_property_lower}')
+                print(f'WARNING: Unrecognised widget property: {widget_property}')
         # Now deal with composite widgets, which share properties with other widget types.
         # Scrollable Frames
         if widget_type == 'frame_base':
             for widget in self._rendered_widgets['CTkScrollableFrame']:
-                if widget_property_lower == 'fg_color':
+                if widget_property == 'fg_color':
                     widget.configure(fg_color=widget_colour)
-                elif widget_property_lower == 'border_color':
+                elif widget_property == 'border_color':
                     widget.configure(border_color=widget_colour)
             for widget in self._rendered_widgets['CTkTabview']:
-                if widget_property_lower == 'fg_color':
+                if widget_property == 'fg_color':
                     widget.configure(fg_color=widget_colour)
-                elif widget_property_lower == 'border_color':
+                    # Temporary work-around for issue #1803
+                    for tabs in widget._tab_dict.values():
+                        tabs.configure(fg_color=widget_colour, bg_color=widget_colour)
+                elif widget_property == 'border_color':
                     widget.configure(border_color=widget_colour)
 
-        elif widget_type == 'CTkScrollbar' and widget_property_lower in ('fg_color', 'button_color',
+        elif widget_type == 'CTkScrollbar' and widget_property in ('fg_color', 'button_color',
                                                                          'button_hover_color'):
             for widget in self._rendered_widgets['CTkScrollableFrame']:
-                if widget_property_lower == 'fg_color':
+                if widget_property == 'fg_color':
                     widget.configure(scrollbar_fg_color=widget_colour)
-                elif widget_property_lower == 'button_color':
+                elif widget_property == 'button_color':
                     widget.configure(scrollbar_button_color=widget_colour)
-                elif widget_property_lower == 'button_hover_color':
+                elif widget_property == 'button_hover_color':
                     widget.configure(scrollbar_button_hover_color=widget_colour)
-        elif widget_type == 'CTkLabel' and widget_property_lower in ('fg_color', 'text_color'):
+            for widget in self._rendered_widgets['CTkTextbox']:
+                if widget_property == 'fg_color':
+                    widget.configure(scrollbar_fg_color=widget_colour)
+                elif widget_property == 'button_color':
+                    widget.configure(scrollbar_button_color=widget_colour)
+                elif widget_property == 'button_hover_color':
+                    widget.configure(scrollbar_button_hover_color=widget_colour)
+        elif widget_type == 'CTkLabel' and widget_property in ('fg_color', 'text_color'):
             # TODO: print('Updating CTkScrollableFrame objects...')
             for widget in self._rendered_widgets['CTkScrollableFrame']:
-                if widget_property_lower == 'fg_color':
+                if widget_property == 'fg_color':
                     widget.configure(label_fg_color=widget_colour)
-                elif widget_property_lower == 'text_color':
+                elif widget_property == 'text_color':
                     widget.configure(label_text_color=widget_colour)
-        elif widget_type == 'CTkFrame' and widget_property_lower:
+        elif widget_type == 'CTkFrame':
             for widget in self._rendered_widgets['CTkTabview']:
-                if widget_property_lower == 'fg_color':
+                if widget_property == 'fg_color':
                     widget.configure(fg_color=widget_colour)
-        elif widget_type == 'CTkSegmentedButton' and widget_property_lower:
+        elif widget_type == 'CTkSegmentedButton':
             for widget in self._rendered_widgets['CTkTabview']:
-                if widget_property_lower == 'fg_color':
+                if widget_property == 'fg_color':
                     widget.configure(segmented_button_fg_color=widget_colour)
-                elif widget_property_lower == 'selected_color':
+                elif widget_property == 'selected_color':
                     widget.configure(segmented_button_selected_color=widget_colour)
-                elif widget_property_lower == 'selected_hover_color':
+                elif widget_property == 'selected_hover_color':
+                    widget.configure(segmented_button_selected_hover_color=widget_colour)
+                elif widget_property == 'unselected_hover_color':
                     widget.configure(segmented_button_unselected_hover_color=widget_colour)
-                elif widget_property_lower == 'unselected_hover_color':
-                    widget.configure(segmented_button_unselected_hover_color=widget_colour)
-                elif widget_property_lower == 'unselected_color':
+                elif widget_property == 'unselected_color':
                     widget.configure(segmented_button_unselected_color=widget_colour)
-                elif widget_property_lower == 'text_color':
+                elif widget_property == 'text_color':
                     widget.configure(text_color=widget_colour)
-                elif widget_property_lower == 'text_color_disabled':
+                elif widget_property == 'text_color_disabled':
                     widget.configure(text_color_disabled=widget_colour)
 
 

@@ -1,13 +1,14 @@
 """
 CTkToolTip Widget
-version: 0.2
+version: 0.4
 """
 
 import time
 import sys
 import customtkinter
+from tkinter import Toplevel, Frame
 
-class CTkToolTip(customtkinter.CTkToplevel):
+class CTkToolTip(Toplevel):
     """
     Creates a ToolTip (pop-up) widget for customtkinter.
     """
@@ -26,39 +27,40 @@ class CTkToolTip(customtkinter.CTkToplevel):
         border_color: str = None,
         alpha: float = 0.8,
         padding: tuple = (10,2),
-        resampling: bool = False,
         **message_kwargs):
         
         super().__init__()
-        
-        self.after(10)
+
         self.widget = widget
-        self.withdraw()  # Hide initially in case there is a delay
         
+        self.withdraw()
         # Disable ToolTip's title bar
         self.overrideredirect(True)
-        
+                
         if sys.platform.startswith("win"):
-            self.transparent_color = self._apply_appearance_mode(self._fg_color)
+            self.transparent_color = self.widget._apply_appearance_mode(customtkinter.ThemeManager.theme["CTkToplevel"]["fg_color"])
             self.attributes("-transparentcolor", self.transparent_color)
+            self.transient()
         elif sys.platform.startswith("darwin"):
             self.transparent_color = 'systemTransparent'
             self.attributes("-transparent", True)
+            self.transient(self.master)
         else:
             self.transparent_color = '#000001'
             corner_radius = 0
+            self.transient()
             
-        if not resampling: self.resizable(width=True, height=True)
-        # self.transient(self.master)
+        self.resizable(width=True, height=True)
+        self.transient()
         
         # Make the background transparent
         self.config(background=self.transparent_color)
-
+        
         # StringVar instance for msg string
         self.messageVar = customtkinter.StringVar()
         self.message = message
         self.messageVar.set(self.message)
-        
+      
         self.delay = delay
         self.follow = follow
         self.x_offset = x_offset
@@ -77,24 +79,30 @@ class CTkToolTip(customtkinter.CTkToplevel):
         self.attributes('-alpha', self.alpha)
         
         # Add the message widget inside the tooltip
-        self.frame = customtkinter.CTkFrame(self, bg_color=self.transparent_color, corner_radius=self.corner_radius,
+        self.transparent_frame = Frame(self, bg=self.transparent_color)
+        self.transparent_frame.pack(padx=0, pady=0, fill="both", expand=True)
+        
+        self.frame = customtkinter.CTkFrame(self.transparent_frame, bg_color=self.transparent_color, corner_radius=self.corner_radius,
                                             border_width=self.border_width, fg_color=self.bg_color, border_color=self.border_color)
-        self.frame.pack(padx=0, pady=0)
+        self.frame.pack(padx=0, pady=0, fill="both", expand=True)
+        
         self.message_label = customtkinter.CTkLabel(self.frame, textvariable=self.messageVar, **message_kwargs)
-        self.message_label.pack(fill="both", padx=self.padding[0]+self.border_width, pady=self.padding[1]+self.border_width)
+        self.message_label.pack(fill="both", padx=self.padding[0]+self.border_width,
+                                pady=self.padding[1]+self.border_width, expand=True)
 
-        if self.frame.cget("fg_color")==self.widget.cget("bg_color"):
-            if not bg_color:             
-                self._top_fg_color = self._apply_appearance_mode(customtkinter.ThemeManager.theme["CTkFrame"]["top_fg_color"])
-                self.frame.configure(fg_color=self._top_fg_color)
-            
+        if self.widget.winfo_name()!="tk":
+            if self.frame.cget("fg_color")==self.widget.cget("bg_color"):
+                if not bg_color:             
+                    self._top_fg_color = self.frame._apply_appearance_mode(customtkinter.ThemeManager.theme["CTkFrame"]["top_fg_color"])
+                    self.frame.configure(fg_color=self._top_fg_color)
+  
         # Add bindings to the widget without overriding the existing ones
         self.widget.bind("<Enter>", self.on_enter, add="+")
         self.widget.bind("<Leave>", self.on_leave, add="+")
         self.widget.bind("<Motion>", self.on_enter, add="+")
         self.widget.bind("<B1-Motion>", self.on_enter, add="+")
         self.widget.bind("<Destroy>", lambda _: self.hide(), add="+")
-        
+ 
     def show(self) -> None:
         """
         Enable the widget.
@@ -105,7 +113,7 @@ class CTkToolTip(customtkinter.CTkToplevel):
         """
         Processes motion within the widget including entering and moving.
         """
-        
+
         if self.disable: return
         self.last_moved = time.time()
 
@@ -128,7 +136,7 @@ class CTkToolTip(customtkinter.CTkToplevel):
         """
         Hides the ToolTip temporarily.
         """
-        
+
         if self.disable: return
         self.status = "outside"
         self.withdraw()
@@ -137,7 +145,7 @@ class CTkToolTip(customtkinter.CTkToplevel):
         """
         Displays the ToolTip.
         """
-        
+
         if not self.widget.winfo_exists():
             self.hide()
             self.destroy()
@@ -145,11 +153,13 @@ class CTkToolTip(customtkinter.CTkToplevel):
         if self.status == "inside" and time.time() - self.last_moved >= self.delay:
             self.status = "visible"
             self.deiconify()
-
+        
     def hide(self) -> None:
         """
         Disable the widget from appearing.
         """
+        if not self.winfo_exists():
+            return
         self.withdraw()
         self.disable = True
 
@@ -169,7 +179,6 @@ class CTkToolTip(customtkinter.CTkToplevel):
         """
         Set new message or configure the label parameters.
         """
-        
         if delay: self.delay = delay
         if bg_color: self.frame.configure(fg_color=bg_color)
         
