@@ -779,9 +779,9 @@ class ControlPanel(ctk.CTk):
         else:
             qa_app_launcher = 'ctk_theme_builder_qa_app.sh'
 
-            qa_app = APP_HOME / qa_app_launcher
-            program = [qa_app, '-a', self.appearance_mode, '-t', self.wip_json]
-            self.process = sp.Popen(program)
+        qa_app = APP_HOME / qa_app_launcher
+        program = [qa_app, '-a', self.appearance_mode, '-t', self.wip_json]
+        self.process = sp.Popen(program)
         self.qa_launched = True
 
     def load_preferences(self):
