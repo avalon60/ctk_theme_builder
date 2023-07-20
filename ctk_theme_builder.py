@@ -2195,8 +2195,6 @@ class ControlPanel(ctk.CTk):
                 self.theme_palette[str(entry_id)][0] = fg_colour
 
         self.save_theme_palette()
-        self.json_state = 'dirty'
-        self.set_option_states()
 
     def refresh_preview(self):
         """The _refresh_preview method, instructs the Preview Panel to perform a re-rendering of all widgets."""
