@@ -49,6 +49,7 @@ class App(customtkinter.CTk):
                                                                data_type='str', preference_value=self.qa_app_scaling)
             mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=self.qa_app_scaling_dict)
 
+        self.change_scaling_event(self.qa_app_scaling)
         # configure window
         self.title("CTk Theme Builder Quality Assurance")
         theme_dict = mod.json_dict(theme_json_file)
@@ -187,7 +188,6 @@ class App(customtkinter.CTk):
                             "CTkTextbox\n\n" + "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\n\n" * 20)
         self.seg_button_1.configure(values=["CTkSegmentedButton", "Value 2", "Value 3"])
         self.seg_button_1.set("Value 2")
-        self.change_scaling_event(self.qa_app_scaling)
         self.protocol("WM_DELETE_WINDOW", self.close_app)
 
         self.keep_running = True
