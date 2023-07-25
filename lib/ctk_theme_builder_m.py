@@ -11,6 +11,10 @@ import customtkinter as ctk
 import sqlite3
 import os
 from datetime import datetime
+from dataclasses import dataclass
+import lib.ctk_theme_builder_m as mod
+from typing import Union
+import socket
 
 # Constants
 APP_HOME = os.path.dirname(os.path.realpath(__file__))
@@ -31,8 +35,13 @@ DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
 APP_IMAGES = ASSETS_DIR / 'images'
 QA_STOP_FILE = ETC_DIR / 'qa_application.stop'
 QA_STARTED_FILE = ETC_DIR / 'qa_application.started'
+LISTENER_FILE = ETC_DIR / 'listener.started'
 
 SERVER = '127.0.0.1'
+HEADER_SIZE = 64
+ENCODING_FORMAT = 'utf-8'
+DISCONNECT_MESSAGE = "!DISCONNECT"
+DISCONNECT_JSON = '{"command_type": "program", "command": "' + DISCONNECT_MESSAGE + '", "parameters": [""]}'
 
 # These aren't true sizes as per WEB design
 HEADING1 = ('Roboto', 26)
@@ -75,7 +84,6 @@ COLOUR_PROPERTIES = ["border_color",
                      "button_hover_color",
                      "checkmark_color",
                      "fg_color",
-                     "fg_color",
                      "hover_color",
                      "label_fg_color",
                      "placeholder_text_color",
@@ -89,6 +97,15 @@ COLOUR_PROPERTIES = ["border_color",
                      "top_fg_color",
                      "unselected_color",
                      "unselected_hover_color"]
+
+GEOMETRY_PROPERTIES = ["border_spacing",
+                       "border_width",
+                       "border_width_checked",
+                       "border_width_unchecked",
+                       "button_corner_radius",
+                       "button_length",
+                       "corner_radius"
+                       ]
 
 RENDERED_PREVIEW_WIDGETS = {"CTk": [],
                             "CTkButton": [],
@@ -115,6 +132,11 @@ RENDERED_PREVIEW_WIDGETS = {"CTk": [],
 
 db_file_found = None
 
+
+class EmptyStack(Exception):
+    def __init__(self, stack_name: str, print_message: bool = True):
+        self.message = f"Attempted pop on empty {stack_name}!"
+        print(self.message)
 
 def app_themes_list():
     """This method generates a list of theme names, based on the json files found in the application themes folder.
@@ -182,21 +204,6 @@ def request_close_qa_app():
         f.write(f'[{pid}] CTk Theme Builder QA app close requested at: {date_started}')
 
 
-def user_themes_list():
-    """This method generates a list of theme names, based on the json files found in the user's themes folder
-    (i.e. self.theme_json_dir). These are basically the theme file names, with the .json extension stripped out."""
-    user_themes_dir = preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                         preference_name='theme_json_dir')
-    json_files = list(user_themes_dir.glob('*.json'))
-    theme_names = []
-    for file in json_files:
-        file = os.path.basename(file)
-        theme_name = os.path.splitext(file)[0]
-        theme_names.append(theme_name)
-    theme_names.sort()
-    return theme_names
-
-
 def db_file_exists(db_file_path: Path):
     global db_file_found
     if db_file_found is None:
@@ -211,7 +218,8 @@ def patch_theme(theme_json: dict):
     """The patch_theme function, checks for incorrect theme properties. These were fixed in CustomTkinter 5.2.0.
     However, the fix in CustomTkinter included an allowance for the older, wrong names. We correct the older property
     names here."""
-    if 'CTkCheckbox' in theme_json or 'CTkRadiobutton' in theme_json:
+    if 'CTkCheckbox' in theme_json or 'CTkRadiobutton' in theme_json \
+            or "text_color_disabled" not in theme_json['CTkLabel']:
         _theme_json = copy.deepcopy(theme_json)
     else:
         return theme_json
@@ -220,6 +228,9 @@ def patch_theme(theme_json: dict):
 
     if 'CTkRadiobutton' in _theme_json:
         _theme_json['CTkRadioButton'] = _theme_json.pop('CTkRadiobutton')
+
+    if "text_color_disabled" not in _theme_json['CTkLabel']:
+        _theme_json['CTkLabel']['text_color_disabled'] = _theme_json['CTkLabel']['text_color']
 
     return _theme_json
 
@@ -623,6 +634,73 @@ def preference_row(db_file_path: Path, scope: str, preference_name) -> dict:
     return preference_row
 
 
+def user_themes_list():
+    """This method generates a list of theme names, based on the json files found in the user's themes folder
+    (i.e. self.theme_json_dir). These are basically the theme file names, with the .json extension stripped out."""
+    user_themes_dir = preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                         preference_name='theme_json_dir')
+    json_files = list(user_themes_dir.glob('*.json'))
+    theme_names = []
+    for file in json_files:
+        file = os.path.basename(file)
+        theme_name = os.path.splitext(file)[0]
+        theme_names.append(theme_name)
+    theme_names.sort()
+    return theme_names
+
+
+def listener_port():
+    """The listener_port function obtains and returns the listener port, used for comms from the Control Panel to the
+    Preview Panel."""
+    _listener_port = preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                        preference_name='listener_port')
+    return _listener_port
+
+
+def method_listener_address():
+    _listener_port = listener_port()
+    _method_listener_address = (SERVER, _listener_port)
+    return _method_listener_address
+
+
+METHOD_LISTENER_ADDRESS = method_listener_address()
+
+
+def send_command_json(command_type: str, command: str, parameters: list = None):
+    """Format our command into a JSON payload in string format. We have two command type. These are 'control' and
+    'filter'. The parameters' parameter, can be used to accept a list to filter against, of a list to be used to pass
+    parameters to a target function/method, in the Preview Panel."""
+    if parameters is None:
+        parameters = []
+
+    parameters_str = ''
+    for parameter in parameters:
+        parameters_str = parameters_str + '"' + str(parameter) + '", '
+    parameters_str = parameters_str.rstrip(", ")
+
+    if command == 'update_widget_colour':
+        # We need to keep track of dirtied entries
+        # so that we can re-render if we toggle
+        # Light and Dark mode.
+        widget_property = f'{parameters[0]}: {parameters[1]}'
+        if parameters[0] != 'CTk':
+            # Except for CTk(), we strip out the CTk string,
+            # from the widget name, for display purposes.
+            widget_property = widget_property.replace('CTk', '')
+
+        # So we update either light_status or
+        # dark_status entry in our widgets dict.
+
+    message_json_str = '{ "command_type": "%command_type%",' \
+                       ' "command": "%command%",' \
+                       ' "parameters": [%parameters%] }'
+    message_json_str = message_json_str.replace('%parameters%', parameters_str)
+
+    message_json_str = message_json_str.replace('%command_type%', command_type)
+    message_json_str = message_json_str.replace('%command%', command)
+    mod.send_message(message=message_json_str)
+
+
 def sqlite_dict_factory(cursor, row):
     """The sqlite_dict_factory (SQL dictionary factory) method converts a row from a returned sqlite3  dataset
     into a dictionary, keyed on column names.
@@ -728,18 +806,237 @@ def colour_palette_entries(db_file_path: Path):
     return colour_tiles
 
 
-def listener_port():
-    """The listener_port function obtains and returns the listener port, used for comms from the Control Panel to the
-    Preview Panel."""
-    _listener_port = preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                        preference_name='listener_port')
-    return _listener_port
+def prepare_message(message):
+    message = message.encode(ENCODING_FORMAT)
+    msg_length = len(message)
+    send_length = str(msg_length).encode(ENCODING_FORMAT)
+    send_length += b' ' * (HEADER_SIZE - len(send_length))
+    return send_length, message
 
 
-def method_listener_address():
-    _listener_port = listener_port()
-    _method_listener_address = (SERVER, _listener_port)
-    return _method_listener_address
+def send_message(message):
+    listener_checks = 0
+    listener_started = False
+    while not listener_started:
+        if LISTENER_FILE.exists():
+            listener_started = True
+        else:
+            listener_checks += 1
+        if listener_checks > 50:
+            print('Timeout waiting for preview panel listener!')
+            exit(1)
+        time.sleep(0.1)
+
+    client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    connected = False
+    connect_tries = 0
+    while not connected:
+        try:
+            if connect_tries > 10:
+                print(f'Communication error sending message to preview panel, via {METHOD_LISTENER_ADDRESS}!')
+                exit(1)
+            connect_tries += 1
+            client.connect(METHOD_LISTENER_ADDRESS)
+            connected = True
+        except ConnectionRefusedError:
+            time.sleep(0.1)
+
+    send_length, message = mod.prepare_message(message)
+    client.send(send_length)
+    client.send(message)
+    # print(f'Message sent: {message.decode(ENCODING_FORMAT)}')
+    # The disconnect command has to follow the required JSON command format...
+    send_length, message = mod.prepare_message(DISCONNECT_JSON)
+    client.send(send_length)
+    client.send(message)
+    client.close()
+
+
+@dataclass
+class PropertyVector:
+    command_type: str
+    command: str
+    old_value: str
+    new_value: str
+    component_type: str = ''
+    component_property: str = ''
+
+    @classmethod
+    def internal_from_display(cls, display_property: str) -> tuple:
+        """Utility method, which accepts a string in the form "<widget_type>: <widget_property>" and decomposes this
+        into widget_type, widget property, returning as a tuple."""
+        widget_split = display_property.split(': ')
+        widget_type = widget_split[0]
+        if widget_type != 'CTk' and 'CTk' in widget_type:
+            ValueError()
+        if widget_type != 'CTk' and widget_type != 'DropdownMenu':
+            widget_type = 'CTk' + widget_type
+        _property = widget_split[1]
+        return widget_type, _property
+
+    @classmethod
+    def display_property(cls, widget_type: str, widget_property: str):
+
+        if widget_type != 'CTk':
+            widget_type = widget_type.replace('CTk', '')
+        return f'"{widget_type}: {widget_property}"'
+
+    def __post_init__(self):
+
+        if self.command not in (
+                'render_top_frame',
+                'render_base_frame',
+                'render_preview_disabled',
+                'render_preview_enabled',
+                'set_appearance_mode',
+                'refresh',
+                'set_widget_scaling',
+                'quit',
+                'update_widget_colour',
+                'update_widget_geometry'):
+            raise ValueError(f'The widget command, {self.command}, is not a known command. '
+                             f'widget type.')
+
+        if self.command_type not in ('colour', 'geometry', 'program'):
+            raise ValueError('The command_type property must be "colour", "geometry" or "program"')
+
+        if self.component_property and self.component_property not in mod.GEOMETRY_PROPERTIES \
+                and self.component_property not in mod.COLOUR_PROPERTIES:
+            raise ValueError(
+                f'The widget_property, {self.component_property}, is not a module registered CustomTkinter '
+                f'property.')
+
+    def __repr__(self):
+        return f'{self.__class__.__name__} of {self._display_property()} (old_value = {self.old_value}, ' \
+               f'new_value = {self.new_value}, command_type = {self.command_type})'
+
+    def this_display_property(self):
+        if self.command not in ('colour', 'geometry'):
+            ValueError(f'{__class__}: vector with command defined as, {self.command}, '
+                       f'not supported by method, display_property.')
+        _widget_type = self.component_type
+        _widget_property = self.component_property
+
+        return PropertyVector.display_property(widget_type=_widget_type, widget_property=_widget_property)
+
+    def _display_property(self):
+        return f'{self.component_type}["{self.component_property}"]'
+
+
+class CommandStack:
+    """The CommandStack class actually provides two stacks, in the form of Python lists. These are used respectively,
+    for maintaining undo and redo. This build on the PropertyVector class, instances of which are maintained within
+    the two stacks."""
+
+    def __init__(self):
+        self.undo_stack = []
+        self.redo_stack = []
+
+    def add_vector(self, new_vector: PropertyVector):
+        """The add_vector method, accepts a property vector and adds it to the undo stack. It also ensures that
+        the redo stack is wiped, since this method is called for non undo/redo operations."""
+        self.undo_stack.append(new_vector)
+        self.redo_stack = []
+
+    def undo_command(self) -> tuple:
+        """Execute the command from the top vector entry of the undo stack. The undone command is placed on the redo
+        stack. A tuple is returned and for widget related vectors includes, an action description string, describing
+        the undo effect, followed by the command type, widget type, the widget property and the assumed property value.
+        For non widget operations, the first tuple member (action description) is an empty string. Note that the
+        returned tuple, is slightly different for program command types."""
+        if len(self.undo_stack) == 0:
+            # Belt n' braces this should never hold true, assuming states are implemented correctly!
+            raise EmptyStack('undo')
+
+        _vector = self.undo_stack.pop()
+        _command_type = _vector.command_type
+        _command = _vector.command
+        _component_type = _vector.component_type
+        _component_property = _vector.component_property
+        _old_property_value = _vector.old_value
+        _new_property_value = _vector.new_value
+        self.do_command(command_type=_command_type, command=_command, component_type=_component_type,
+                        component_property=_component_property, property_value=_old_property_value)
+        self.redo_stack.append(_vector)
+        cap_command_type = _command_type.capitalize()
+        if _command_type in ('colour', 'geometry'):
+            return f'{cap_command_type} change to {_component_type} / {_component_property}, reverted from ' \
+                   f'{_new_property_value} to {_old_property_value}.', \
+                   _command_type, _component_type, _component_property, _old_property_value
+        else:
+            return '', _command_type, _command, _component_property, _old_property_value
+
+    def redo_command(self) -> tuple:
+        """Execute the command from the top vector entry of the redo stack. The redone command is placed on the undo
+        stack. A tuple is returned and for widget related vectors includes, an action description string, describing
+        the undo effect, followed by the command type, widget type, the widget property and the assumed property value.
+        For non widget operations, the first tuple member (action description) is an empty string. Note that the
+        returned tuple, is slightly different for program command types.."""
+        if len(self.redo_stack) == 0:
+            # Belt n' braces this should never hold true, assuming states are implemented correctly!
+            raise EmptyStack('redo')
+        _vector = self.redo_stack.pop()
+        _command_type = _vector.command_type
+        _command = _vector.command
+        _component_type = _vector.component_type
+        _component_property = _vector.component_property
+        _new_property_value = _vector.new_value
+        _old_property_value = _vector.old_value
+        self.do_command(command_type=_command_type, command=_command, component_type=_component_type,
+                        component_property=_component_property, property_value=_new_property_value)
+        self.undo_stack.append(_vector)
+        cap_command_type = _command_type.capitalize()
+
+        if _command_type in ('colour', 'geometry'):
+            return f'{cap_command_type} change to {_component_type} / {_component_property}, rolled forward from ' \
+                   f'{_old_property_value} to {_new_property_value}.', \
+                _command_type, _component_type, _component_property, _new_property_value
+        else:
+            return '', _command_type, _command, _component_property, _new_property_value
+
+    def exec_command(self, property_vector: PropertyVector):
+        """The exec_command is responsible for actioning non undo/redo changes to the preview panel. Also ensures that
+        the redo stack is left empty, since we can't execute redo, when we branch commands after an undo."""
+
+        _command_type = property_vector.command_type
+        _command = property_vector.command
+        _component_type = property_vector.component_type
+        _component_property = property_vector.component_property
+        _property_value = property_vector.new_value
+        self.do_command(command_type=_command_type, command=_command, component_type=_component_type,
+                        component_property=_component_property, property_value=_property_value)
+        self.undo_stack.append(property_vector)
+        self.redo_stack = []
+
+    @staticmethod
+    def do_command(command_type: str, command: str, component_type: str = '',
+                   component_property: str = '', property_value: Union[int, str] = ''):
+        """This method is the common method called by exec_command, undo_command and redo_command. It is responsible
+        for marshalling the required data in the appropriate format for the send_command_json function. Any changes
+        instigated here result in update requests to the Preview Panel."""
+        parameters = []
+        if command != 'set_appearance_mode':
+            parameters.append(component_type)
+            parameters.append(component_property)
+        parameters.append(property_value)
+
+        mod.send_command_json(command_type=command_type,
+                              command=command,
+                              parameters=parameters)
+
+    def undo_length(self):
+        """Method to return the length of the undo stack."""
+        return len(self.undo_stack)
+
+    def redo_length(self):
+        """Method to return the length of the redo stack."""
+        return len(self.redo_stack)
+
+    def reset_stacks(self):
+        """Method to empty the command stacks."""
+        self.undo_stack = []
+        self.redo_stack = []
+
 
 if __name__ == "__main__":
     colour_dict = colour_dictionary(Path('../assets/themes/GreyGhost.json'))
@@ -891,8 +1188,8 @@ if __name__ == "__main__":
 
     counter = 0
     member_gen = widget_member(widget_entries=sorted_widget_properties_x, filter_list=properties_filter_list_x)
-    for widget_property in member_gen:
-        print(f'widget_property = {widget_property}')
+    for this_widget_property in member_gen:
+        print(f'widget_property = {this_widget_property}')
         counter += 1
         if counter == 5:
             break
