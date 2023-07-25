@@ -18,31 +18,32 @@ from pathlib import Path
 from datetime import datetime
 import lib.cbtk_kit as cbtk
 import lib.ctk_theme_builder_m as mod
-from lib.ctk_tooltip.ctk_tooltip import CTkToolTip
+from CTkToolTip import *
 from CTkMessagebox import CTkMessagebox
 from PIL import Image
 
 PROG = os.path.basename(__file__)
 APP_HOME = Path(os.path.dirname(os.path.realpath(__file__)))
-ASSETS_DIR = APP_HOME / 'assets'
-CONFIG_DIR = ASSETS_DIR / 'config'
-ETC_DIR = ASSETS_DIR / 'etc'
-TEMP_DIR = APP_HOME / 'tmp'
-VIEWS_DIR = ASSETS_DIR / 'views'
-APP_THEMES_DIR = ASSETS_DIR / 'themes'
-APP_IMAGES = ASSETS_DIR / 'images'
-LISTENER_FILE = ETC_DIR / 'listener.started'
-APP_DATA_DIR = ASSETS_DIR / 'data'
-DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
+ASSETS_DIR = mod.ASSETS_DIR
+CONFIG_DIR = mod.CONFIG_DIR
+ETC_DIR = mod.ETC_DIR
+TEMP_DIR = mod.TEMP_DIR
+VIEWS_DIR = mod.VIEWS_DIR
+APP_THEMES_DIR = mod.APP_THEMES_DIR
+APP_IMAGES = mod.APP_IMAGES
+LISTENER_FILE = mod.LISTENER_FILE
+APP_DATA_DIR = mod.APP_DATA_DIR
+DB_FILE_PATH = mod.DB_FILE_PATH
 
 DEBUG = 0
-HEADER_SIZE = 64
 METHOD_LISTENER_PORT = mod.listener_port()
 SERVER = '127.0.0.1'
+HEADER_SIZE = mod.HEADER_SIZE
+
 METHOD_LISTENER_ADDRESS = mod.method_listener_address()
-ENCODING_FORMAT = 'utf-8'
-DISCONNECT_MESSAGE = "!DISCONNECT"
-DISCONNECT_JSON = '{"command_type": "program", "command": "' + DISCONNECT_MESSAGE + '", "parameters": [""]}'
+ENCODING_FORMAT = mod.ENCODING_FORMAT
+DISCONNECT_MESSAGE = mod.DISCONNECT_MESSAGE
+DISCONNECT_JSON = mod.DISCONNECT_JSON
 
 DEFAULT_VIEW = mod.DEFAULT_VIEW
 
