@@ -488,7 +488,7 @@ class PreviewPanel:
                                              wraplength=250,
                                              x_offset=-120,
                                              padding=(5, 5),
-                                             message='The CTkTabview is a composite widget. As of CustomTkinter 5.1.2, '
+                                             message='The CTkTabview is a composite widget. As of CustomTkinter v5, '
                                                      'it has no direct default properties. instead it borrows from '
                                                      'CTkFrame and CTkSegmentedButton.\n\n'
                                                      'The text in the main body of the CTkTabview preview, '
@@ -498,7 +498,7 @@ class PreviewPanel:
                                              wraplength=250,
                                              x_offset=-120,
                                              padding=(5, 5),
-                                             message='The CTkTabview is a composite widget. As of CustomTkinter 5.1.2, '
+                                             message='The CTkTabview is a composite widget. As of CustomTkinter v5, '
                                                      'it has no direct default properties. instead it borrows from '
                                                      'CTkFrame and CTkSegmentedButton.\n\n'
                                                      'The text in the main body of the preview is produced '
@@ -508,7 +508,7 @@ class PreviewPanel:
                                              wraplength=250,
                                              x_offset=-120,
                                              padding=(5, 5),
-                                             message='The CTkTabview is a composite widget. As of CustomTkinter 5.1.2, '
+                                             message='The CTkTabview is a composite widget. As of CustomTkinter v5, '
                                                      'it has no direct default properties. instead it borrows from '
                                                      'CTkFrame and CTkSegmentedButton.\n\n'
                                                      'The text in the main body of the preview is produced '
@@ -835,10 +835,6 @@ class PreviewPanel:
                 exit(1)
 
     def update_widget_colour(self, widget_type, widget_property, widget_colour):
-        # print(f'_update_widget_colour: widget_type: {widget_type}; widget_property: {widget_property}')
-        # We lowercase the widget property, due to an issue in CustomTkinter 5.1.2, where there was an fg_Color
-        # property against CTkSwitch. This was fixed to fg_color in 5.1.3.
-
         # print(f'Updating widget colour {widget_type} / {widget_property} / {widget_colour}')
         if widget_type == 'CTkFrame' and widget_property not in ['fg_color', 'top_fg_color']:
             for widget in self._rendered_widgets['CTkScrollableFrame']:
