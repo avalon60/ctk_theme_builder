@@ -695,7 +695,10 @@ class ControlPanel(ctk.CTk):
         self.des_menu.add_cascade(label='File', menu=self.file_menu)
         self.file_menu.add_command(label='Refresh Preview', command=self.reload_preview)
         self.file_menu.add_separator()
+        self.file_menu.add_command(label='Undo', command=self.undo_change)
+        self.file_menu.add_command(label='Redo', command=self.redo_change)
         self.file_menu.add_command(label='Reset', command=self.reset_theme)
+        self.file_menu.add_separator()
         self.file_menu.add_command(label='New Theme', command=self.create_theme)
         self.file_menu.add_command(label='Sync Modes', command=self.sync_appearance_mode)
         self.file_menu.add_command(label='Flip Modes', command=self.flip_appearance_modes)
@@ -856,15 +859,40 @@ class ControlPanel(ctk.CTk):
         self.min_ctk_version = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='system',
                                                       preference_name='min_ctk_version')
 
-    def save_theme_palette(self, theme_name=None):
+    def stash_theme_palette(self, mode):
+        """Stash the theme colour palette colours to disk. We do this when switching appearance mode."""
+        for entry_id, button in enumerate(self.theme_palette_tiles):
+            fg_colour = self.theme_palette_tiles[entry_id].cget('fg_color')
+            self.theme_palette[str(entry_id)][mode] = fg_colour
+
+        with open(self.wip_palette_file, "w") as f:
+            json.dump(self.theme_palette, f, indent=2)
+
+    def load_stashed_theme_palette(self, mode):
+        self.theme_palette = mod.json_dict(json_file_path=self.wip_palette_file)
+        # Marry the palette buttons to their palette colours
+        try:
+            for entry_id, button in enumerate(self.theme_palette_tiles):
+                colour = self.theme_palette[str(entry_id)][mode]
+                hover_colour = cbtk.contrast_colour(colour)
+                button.configure(fg_color=colour, hover_color=hover_colour)
+        except IndexError:
+            pass
+
+
+    def save_theme_palette(self, theme_name: str = None):
         """Save the colour palette colours back to disk."""
         if theme_name is None:
-            palette_json = self.palette_file
+            palette_json_file = self.source_palette_file
         else:
-            palette_json = theme_name.replace('.json', '') + '.json'
+            palette_json_file = theme_name.replace('.json', '') + '.json'
+
+        self.source_palette_file = self.palettes_dir / palette_json_file
+
+        self.theme_palette = mod.json_dict(json_file_path=self.wip_palette_file)
 
         # Update the button colour settings to the self.theme_palette dictionary
-        self.palette_file = self.palettes_dir / palette_json
+        self.palette_file = self.palettes_dir / palette_json_file
         if self.appearance_mode.lower() == 'light':
             mode = 0
         else:
@@ -873,8 +901,10 @@ class ControlPanel(ctk.CTk):
             fg_colour = self.theme_palette_tiles[entry_id].cget('fg_color')
             self.theme_palette[str(entry_id)][mode] = fg_colour
 
-        with open(self.palette_file, "w") as f:
+        with open(self.wip_palette_file, "w") as f:
             json.dump(self.theme_palette, f, indent=2)
+
+        shutil.copyfile(self.wip_palette_file, self.source_palette_file)
 
     def render_geometry_buttons(self):
         """Set up the geometry buttons near the top of the Control Panel"""
@@ -1094,10 +1124,9 @@ class ControlPanel(ctk.CTk):
     def set_option_states(self):
         """This function sets the button and menu option states. The states are set based upon a combination of,
         whether a theme is currently selected, and the state of the theme ('dirty'/'clean')"""
-        if self.command_stack.undo_length() == 0:
-            self.json_state = 'clean'
-        else:
+        if self.command_stack.undo_length() > 0:
             self.json_state = 'dirty'
+
         if self.theme:
             tk_state = tk.NORMAL
         else:
@@ -1143,13 +1172,17 @@ class ControlPanel(ctk.CTk):
 
         if self.command_stack.undo_length() > 0:
             self.btn_undo.configure(state=ctk.NORMAL)
+            self.file_menu.entryconfig('Undo', state=ctk.NORMAL)
         else:
             self.btn_undo.configure(state=ctk.DISABLED)
+            self.file_menu.entryconfig('Undo', state=ctk.DISABLED)
 
         if self.command_stack.redo_length() > 0:
             self.btn_redo.configure(state=ctk.NORMAL)
+            self.file_menu.entryconfig('Redo', state=ctk.NORMAL)
         else:
             self.btn_redo.configure(state=ctk.DISABLED)
+            self.file_menu.entryconfig('Redo', state=ctk.DISABLED)
 
         if self.harmony_palette_running:
             self.tools_menu.entryconfig('Colour Harmonics', state=tk.DISABLED)
@@ -1162,9 +1195,13 @@ class ControlPanel(ctk.CTk):
         if preview_appearance_mode == 'Light Mode':
             self.appearance_mode = 'Light'
             old_value = 'Dark'
+            old_mode_index = 1
+            new_mode_index = 0
         else:
             self.appearance_mode = 'Dark'
             old_value = 'Light'
+            old_mode_index = 0
+            new_mode_index = 1
 
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='auto_save',
                                            preference_name='appearance_mode',
@@ -1173,9 +1210,9 @@ class ControlPanel(ctk.CTk):
 
         self.lbl_palette_header.configure(text=f'Theme Palette ({preview_appearance_mode})')
         self.update_wip_file()
-        self.load_theme_palette()
+        self.stash_theme_palette(mode=old_mode_index)
         self.render_widget_properties()
-
+        self.load_stashed_theme_palette(mode=new_mode_index)
         # We only log change vectors for appearance mode, where there might be colour changes involved.
         if self.command_stack.undo_length() > 0 or self.command_stack.redo_length() > 0:
             change_vector = mod.PropertyVector(command_type='program',
@@ -1416,12 +1453,12 @@ class ControlPanel(ctk.CTk):
 
     def undo_change(self):
         undo_text, _command_type, _widget_type, _widget_property, _property_value = self.command_stack.undo_command()
+        _command = _widget_type
         if _command_type == 'colour':
             self.update_rendered_widget(widget_type=_widget_type,
                                         widget_property=_widget_property, property_value=_property_value)
-        self.set_option_states()
-        _command = _widget_type
-        if _command == 'set_appearance_mode':
+
+        elif _command == 'set_appearance_mode':
             # _property_value is 'Light' or 'Dark'
             self.tk_seg_mode.set(_property_value + ' Mode')
 
@@ -1440,17 +1477,23 @@ class ControlPanel(ctk.CTk):
             self.update_wip_file()
             self.load_theme_palette()
             self.render_widget_properties()
+
+        elif _command_type == 'palette_colour':
+            palette_button_id = _widget_property
+            self.set_palette_colour(palette_button_id=palette_button_id, colour=_property_value)
+
+        self.set_option_states()
         self.status_bar.set_status_text(
             status_text=undo_text)
 
     def redo_change(self):
         redo_text, _command_type, _widget_type, _widget_property, _property_value = self.command_stack.redo_command()
+        _command = _widget_type
         if _command_type == 'colour':
             self.update_rendered_widget(widget_type=_widget_type,
                                         widget_property=_widget_property, property_value=_property_value)
-        self.set_option_states()
-        _command = _widget_type
-        if _command == 'set_appearance_mode':
+
+        elif _command == 'set_appearance_mode':
             # _property_value is 'Light' or 'Dark'
             self.tk_seg_mode.set(_property_value + ' Mode')
 
@@ -1469,6 +1512,12 @@ class ControlPanel(ctk.CTk):
             self.update_wip_file()
             self.load_theme_palette()
             self.render_widget_properties()
+
+        elif _command_type == 'palette_colour':
+            palette_button_id = _widget_property
+            self.set_palette_colour(palette_button_id=palette_button_id, colour=_property_value)
+
+        self.set_option_states()
         self.status_bar.set_status_text(
             status_text=redo_text)
 
@@ -1502,78 +1551,81 @@ class ControlPanel(ctk.CTk):
             self.opm_theme.set('-- Select Theme --')
             return
 
-        if self.source_json_file:
-            self.wip_json = self.TEMP_DIR / self.theme_file
-            self.preview_json = self.TEMP_DIR / self.theme_file
-            shutil.copyfile(self.source_json_file, self.wip_json)
-            self.theme_json_data = mod.json_dict(json_file_path=self.wip_json)
-            # The patch function checks to see if the theme, has wrong, pre CustomTkinter 5.2.0 property names.
-            # If so, it patches up the theme JSON. These should be CTkCheckBox and CTkRadioButton.
-            self.theme_json_data = mod.patch_theme(theme_json=self.theme_json_data)
-            with open(self.wip_json, "w") as f:
-                json.dump(self.theme_json_data, f, indent=2)
+        if not self.source_json_file:
+            return
 
-            # self.update_config(section='preferences', option='theme_json_dir', value=self.theme_json_dir)
-            self.render_geometry_buttons()
-            self.render_theme_palette()
-            self.load_theme_palette()
-            self.set_filtered_widget_display()
+        self.wip_json = self.TEMP_DIR / self.theme_file
+        self.preview_json = self.TEMP_DIR / self.theme_file
+        shutil.copyfile(self.source_json_file, self.wip_json)
+        self.theme_json_data = mod.json_dict(json_file_path=self.wip_json)
+        # The patch function checks to see if the theme, has wrong, pre CustomTkinter 5.2.0 property names.
+        # If so, it patches up the theme JSON. These should be CTkCheckBox and CTkRadioButton.
+        self.theme_json_data = mod.patch_theme(theme_json=self.theme_json_data)
+        with open(self.wip_json, "w") as f:
+            json.dump(self.theme_json_data, f, indent=2)
 
-            try:
-                self.btn_refresh.configure(state=tk.NORMAL)
-            except tk.TclError:
-                pass
+        # self.update_config(section='preferences', option='theme_json_dir', value=self.theme_json_dir)
+        self.render_geometry_buttons()
+        self.render_theme_palette()
+        self.load_theme_palette()
+        self.set_filtered_widget_display()
+
+        try:
             self.btn_refresh.configure(state=tk.NORMAL)
-            # Enable buttons
-            self.seg_mode.configure(state=tk.NORMAL)
-            self.opm_properties_filter.configure(state=tk.NORMAL)
-            self.btn_save_as.configure(state=tk.NORMAL)
-            self.btn_delete.configure(state=tk.NORMAL)
-            self.btn_sync_modes.configure(state=tk.NORMAL)
-            self.opm_properties_view.configure(state=tk.NORMAL)
-            self.swt_render_disabled.configure(state=tk.NORMAL)
-            self.file_menu.entryconfig('Save', state=tk.NORMAL)
-            self.file_menu.entryconfig('Save As', state=tk.NORMAL)
-            self.file_menu.entryconfig('Delete', state=tk.NORMAL)
-            self.file_menu.entryconfig('Sync Modes', state=tk.NORMAL)
-            self.file_menu.entryconfig('Flip Modes', state=tk.NORMAL)
+        except tk.TclError:
+            pass
+        self.btn_refresh.configure(state=tk.NORMAL)
+        # Enable buttons
+        self.seg_mode.configure(state=tk.NORMAL)
+        self.opm_properties_filter.configure(state=tk.NORMAL)
+        self.btn_save_as.configure(state=tk.NORMAL)
+        self.btn_delete.configure(state=tk.NORMAL)
+        self.btn_sync_modes.configure(state=tk.NORMAL)
+        self.opm_properties_view.configure(state=tk.NORMAL)
+        self.swt_render_disabled.configure(state=tk.NORMAL)
+        self.file_menu.entryconfig('Save', state=tk.NORMAL)
+        self.file_menu.entryconfig('Save As', state=tk.NORMAL)
+        self.file_menu.entryconfig('Delete', state=tk.NORMAL)
+        self.file_menu.entryconfig('Sync Modes', state=tk.NORMAL)
+        self.file_menu.entryconfig('Flip Modes', state=tk.NORMAL)
 
-            self.lbl_title.grid(row=0, column=0, columnspan=2, sticky='ew')
-            self.opm_theme.configure(values=self.json_files)
-            palette_file = selected_theme + '.json'
-            self.theme = selected_theme
+        self.lbl_title.grid(row=0, column=0, columnspan=2, sticky='ew')
+        self.opm_theme.configure(values=self.json_files)
 
-            self.json_state = 'clean'
-            self.set_option_states()
 
-            palette_file = self.palettes_dir / palette_file
-            if not palette_file.exists():
-                self.create_theme_palette(selected_theme)
+        self.wip_palette_file = self.TEMP_DIR / self.theme_file.replace('json', 'tmpl')
+        palette_file = selected_theme + '.json'
+        self.theme = selected_theme
+        self.source_palette_file = self.palettes_dir / palette_file
+        if not self.source_palette_file.exists():
+            self.create_theme_palette(selected_theme)
+        shutil.copyfile(self.source_palette_file, self.wip_palette_file)
+        # Force the Control Panel to complete rendering here,
+        # otherwise if we are auto-loading the last theme at app startup,
+        # the preview panel renders, before the Control Panel finishes - looks messy.
+        self.update()
+        if reload_preview:
+            self.reload_preview()
 
-            # Force the Control Panel to complete rendering here,
-            # otherwise if we are auto-loading the last theme at app startup,
-            # the preview panel renders, before the Control Panel finishes - looks messy.
-            self.update()
-            if reload_preview:
-                self.reload_preview()
+        # Here we load in the standard CustomTkinter green.json theme. We use this as a reference theme
+        # file. This is a belt n' braces approach to ensuring that we aren't missing any widget properties,
+        # which may have been introduced, in the event that someone has upgraded to a later version of
+        # CustomTkinter to a version that the app has not been updated to deal with. We can't maintain
+        # the properties but at least we can update the opened theme, to make the JSON is complete.
+        for widget, widget_property in self.reference_theme_json.items():
+            if widget not in self.theme_json_data:
+                self.theme_json_data[widget] = widget_property
 
-            # Here we load in the standard CustomTkinter green.json theme. We use this as a reference theme
-            # file. This is a belt n' braces approach to ensuring that we aren't missing any widget properties,
-            # which may have been introduced, in the event that someone has upgraded to a later version of
-            # CustomTkinter to a version that the app has not been updated to deal with. We can't maintain
-            # the properties but at least we can update the opened theme, to make the JSON is complete.
-            for widget, widget_property in self.reference_theme_json.items():
-                if widget not in self.theme_json_data:
-                    self.theme_json_data[widget] = widget_property
-
-            # Update the auto-save section of the preferences, to record the last theme we opened.
-            # This may be required on the next app startup, if the last_theme_on_start preference is enabled.
-            if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='auto_save',
-                                               preference_name='selected_theme',
-                                               preference_value=selected_theme):
-                print(f'Row miss: on update of auto save of selected theme.')
-            self.status_bar.set_status_text(status_text_life=30,
-                                            status_text=f'Theme file, {self.theme_file}, loaded. ')
+        # Update the auto-save section of the preferences, to record the last theme we opened.
+        # This may be required on the next app startup, if the last_theme_on_start preference is enabled.
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='auto_save',
+                                           preference_name='selected_theme',
+                                           preference_value=selected_theme):
+            print(f'Row miss: on update of auto save of selected theme.')
+        self.status_bar.set_status_text(status_text_life=30,
+                                        status_text=f'Theme file, {self.theme_file}, loaded. ')
+        self.json_state = 'clean'
+        self.set_option_states()
 
     def save_harmonics_geometry(self):
         """Save the harmonics panel geometry to the repo, for the next time the dialog is launched."""
@@ -1684,11 +1736,18 @@ class ControlPanel(ctk.CTk):
         if theme_name is None:
             theme_name = self.theme_file
         palette_json = theme_name
-        self.palette_file = self.palettes_dir / palette_json
-        if not self.palette_file.exists():
+
+        self.source_palette_file = self.palettes_dir / palette_json
+        if not self.source_palette_file.exists():
             self.create_theme_palette(theme_name)
 
-        self.theme_palette = mod.json_dict(json_file_path=self.palette_file)
+        self.wip_palette_file = self.TEMP_DIR / theme_name.replace('json', 'tmpl')
+
+        if not self.source_palette_file.exists():
+            self.create_theme_palette(theme_name)
+        shutil.copyfile(self.source_palette_file, self.wip_palette_file)
+
+        self.theme_palette = mod.json_dict(json_file_path=self.wip_palette_file)
 
         mode = cbtk.str_mode_to_int(self.appearance_mode)
 
@@ -1868,6 +1927,9 @@ class ControlPanel(ctk.CTk):
             self.json_files = mod.user_themes_list()
             self.opm_theme.configure(values=self.json_files)
             self.theme = new_theme
+            self.json_state = 'clean'
+            self.command_stack.reset_stacks()
+            self.set_option_states()
 
     def paste_colour(self, event, widget_property, property_colour: str = None):
         """Paste the colour currently stored in the paste buffer, to the selected button, where the paste operation
@@ -1900,11 +1962,24 @@ class ControlPanel(ctk.CTk):
             self.set_option_states()
 
     def paste_palette_colour(self, event, palette_button_id):
+
         new_colour = pyperclip.paste()
         if not cbtk.valid_colour(new_colour):
             self.status_bar.set_status_text(status_text='Attempted paste of non colour code - pasted text ignored.')
             return
+        old_colour = self.theme_palette_tiles[palette_button_id].cget("fg_color")
+        change_vector = mod.PropertyVector(command_type='palette_colour',
+                                           command='null',
+                                           component_type='palette_tile',
+                                           component_property=palette_button_id,
+                                           new_value=new_colour,
+                                           old_value=old_colour)
+        self.command_stack.exec_command(property_vector=change_vector)
+
         self.set_palette_colour(palette_button_id=palette_button_id, colour=new_colour)
+
+        self.json_state = 'dirty'
+        self.set_option_states()
         self.status_bar.set_status_text(
             status_text=f'Colour {new_colour} assigned to palette entry {palette_button_id + 1}.')
 
@@ -1933,6 +2008,18 @@ class ControlPanel(ctk.CTk):
 
         if new_colour[1] is not None:
             new_colour = new_colour[1]
+            old_colour = self.theme_palette_tiles[palette_button_id].cget("fg_color")
+            change_vector = mod.PropertyVector(command_type='palette_colour',
+                                               command='null',
+                                               component_type='palette_tile',
+                                               component_property=palette_button_id,
+                                               new_value=new_colour,
+                                               old_value=old_colour)
+            self.command_stack.exec_command(property_vector=change_vector)
+
+            self.set_palette_colour(palette_button_id=palette_button_id, colour=new_colour)
+
+
             self.theme_palette_tiles[palette_button_id].configure(fg_color=new_colour, hover_color=new_colour)
             self.status_bar.set_status_text(
                 status_text=f'Colour {new_colour} assigned to palette entry {palette_button_id + 1}.')
@@ -2210,23 +2297,17 @@ class ControlPanel(ctk.CTk):
 
         confirm = CTkMessagebox(master=self,
                                 title='Confirm Action',
-                                message=f'This will replace and save the Theme Palette colours for the theme\'s '
+                                message=f'This will replace the Theme Palette colours for the theme\'s '
                                         f'"{to_mode_description}" mode settings with '
                                         f'those from the "{current_mode}" mode.',
                                 options=["Yes", "No"])
         if confirm.get() == 'Cancel':
             return
 
-        if self.appearance_mode == 'Light':
-            for entry_id, button in enumerate(self.theme_palette_tiles):
-                fg_colour = self.theme_palette_tiles[entry_id].cget('fg_color')
-                self.theme_palette[str(entry_id)][1] = fg_colour
-        else:
-            for entry_id, button in enumerate(self.theme_palette_tiles):
-                fg_colour = self.theme_palette_tiles[entry_id].cget('fg_color')
-                self.theme_palette[str(entry_id)][0] = fg_colour
-
-        self.save_theme_palette()
+        self.stash_theme_palette(mode=from_mode)
+        self.load_stashed_theme_palette(to_mode)
+        self.json_state = 'dirty'
+        self.set_option_states()
 
     def refresh_preview(self):
         """The _refresh_preview method, instructs the Preview Panel to perform a re-rendering of all widgets."""
@@ -2371,9 +2452,10 @@ class ControlPanel(ctk.CTk):
         shutil.copyfile(self.wip_json, self.source_json_file)
         theme_file_name = os.path.basename(self.source_json_file)
         self.json_state = 'clean'
-        self.btn_reset.configure(state=tk.DISABLED)
-        self.btn_save.configure(state=tk.DISABLED)
+
         self.status_bar.set_status_text(status_text=f'Theme file, {theme_file_name}, saved successfully!')
+        self.command_stack.reset_stacks()
+        self.set_option_states()
         self.save_theme_palette()
 
 
@@ -2930,9 +3012,6 @@ class HarmonicsDialog(ctk.CTkToplevel):
             else:
                 contrast_step += 1
                 harmony_idx = 0
-
-        self.master.json_state = 'dirty'
-
         self.harmony_status_bar.set_status_text(
             status_text=f'Keystone and generated colours copied to palette.')
 
