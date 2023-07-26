@@ -892,15 +892,17 @@ class PropertyVector:
                 'refresh',
                 'set_widget_scaling',
                 'quit',
+                'null',
                 'update_widget_colour',
                 'update_widget_geometry'):
-            raise ValueError(f'The widget command, {self.command}, is not a known command. '
-                             f'widget type.')
+            error_text = f'The widget command, {self.command}, is not a known command type.'
+            raise ValueError('The received command, is not a known command.')
 
-        if self.command_type not in ('colour', 'geometry', 'program'):
+        if self.command_type not in ('colour', 'geometry', 'palette_colour', 'program'):
             raise ValueError('The command_type property must be "colour", "geometry" or "program"')
 
-        if self.component_property and self.component_property not in mod.GEOMETRY_PROPERTIES \
+        if self.command != 'null' and self.component_property \
+                and self.component_property not in mod.GEOMETRY_PROPERTIES \
                 and self.component_property not in mod.COLOUR_PROPERTIES:
             raise ValueError(
                 f'The widget_property, {self.component_property}, is not a module registered CustomTkinter '
@@ -955,10 +957,20 @@ class CommandStack:
         _component_property = _vector.component_property
         _old_property_value = _vector.old_value
         _new_property_value = _vector.new_value
+        cap_command_type = _command_type.capitalize()
+
+        if _command_type == 'palette_colour':
+            # This is a theme colour palette change, so we don't execute a preview panel command.
+            # Instead, just return the required reversal properties.
+            self.redo_stack.append(_vector)
+            return f'{cap_command_type} change to {_component_type} / {_component_property}, reverted from ' \
+                   f'{_new_property_value} to {_old_property_value}.', \
+                   _command_type, _component_type, _component_property, _old_property_value
+
         self.do_command(command_type=_command_type, command=_command, component_type=_component_type,
                         component_property=_component_property, property_value=_old_property_value)
         self.redo_stack.append(_vector)
-        cap_command_type = _command_type.capitalize()
+
         if _command_type in ('colour', 'geometry'):
             return f'{cap_command_type} change to {_component_type} / {_component_property}, reverted from ' \
                    f'{_new_property_value} to {_old_property_value}.', \
@@ -982,10 +994,20 @@ class CommandStack:
         _component_property = _vector.component_property
         _new_property_value = _vector.new_value
         _old_property_value = _vector.old_value
+        cap_command_type = _command_type.capitalize()
+
+        if _command_type == 'palette_colour':
+            # This is a theme colour palette change, so we don't execute a preview panel command.
+            # Instead, just return the required reversal properties.
+            self.undo_stack.append(_vector)
+            return f'{cap_command_type} change to {_component_type} / {_component_property}, reverted from ' \
+                   f'{_new_property_value} to {_old_property_value}.', \
+                   _command_type, _component_type, _component_property, _new_property_value
+
+
         self.do_command(command_type=_command_type, command=_command, component_type=_component_type,
                         component_property=_component_property, property_value=_new_property_value)
         self.undo_stack.append(_vector)
-        cap_command_type = _command_type.capitalize()
 
         if _command_type in ('colour', 'geometry'):
             return f'{cap_command_type} change to {_component_type} / {_component_property}, rolled forward from ' \
