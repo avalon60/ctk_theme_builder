@@ -1,6 +1,6 @@
 """
 CTkToolTip Widget
-version: 0.4
+version: 0.7
 """
 
 import time
@@ -25,15 +25,16 @@ class CTkToolTip(Toplevel):
         corner_radius: int = 10,
         border_width: int = 0,
         border_color: str = None,
-        alpha: float = 0.8,
+        alpha: float = 1,
         padding: tuple = (10,2),
         **message_kwargs):
         
         super().__init__()
 
         self.widget = widget
-        
+
         self.withdraw()
+        
         # Disable ToolTip's title bar
         self.overrideredirect(True)
                 
@@ -51,7 +52,6 @@ class CTkToolTip(Toplevel):
             self.transient()
             
         self.resizable(width=True, height=True)
-        self.transient()
         
         # Make the background transparent
         self.config(background=self.transparent_color)
@@ -69,7 +69,7 @@ class CTkToolTip(Toplevel):
         self.alpha = alpha
         self.border_width = border_width
         self.padding = padding
-        self.bg_color = bg_color
+        self.bg_color = customtkinter.ThemeManager.theme["CTkFrame"]["fg_color"] if bg_color is None else bg_color
         self.border_color = border_color
         self.disable = False
         
@@ -77,7 +77,13 @@ class CTkToolTip(Toplevel):
         self.status = "outside"
         self.last_moved = 0
         self.attributes('-alpha', self.alpha)
-        
+
+        if sys.platform.startswith("win"):
+            if self.widget._apply_appearance_mode(self.bg_color)==self.transparent_color:
+                self.transparent_color = "#000001"
+                self.config(background=self.transparent_color)
+                self.attributes("-transparentcolor", self.transparent_color)
+            
         # Add the message widget inside the tooltip
         self.transparent_frame = Frame(self, bg=self.transparent_color)
         self.transparent_frame.pack(padx=0, pady=0, fill="both", expand=True)
@@ -94,15 +100,16 @@ class CTkToolTip(Toplevel):
             if self.frame.cget("fg_color")==self.widget.cget("bg_color"):
                 if not bg_color:             
                     self._top_fg_color = self.frame._apply_appearance_mode(customtkinter.ThemeManager.theme["CTkFrame"]["top_fg_color"])
-                    self.frame.configure(fg_color=self._top_fg_color)
-  
+                    if self._top_fg_color!=self.transparent_color:
+                        self.frame.configure(fg_color=self._top_fg_color)
+        
         # Add bindings to the widget without overriding the existing ones
         self.widget.bind("<Enter>", self.on_enter, add="+")
         self.widget.bind("<Leave>", self.on_leave, add="+")
         self.widget.bind("<Motion>", self.on_enter, add="+")
         self.widget.bind("<B1-Motion>", self.on_enter, add="+")
         self.widget.bind("<Destroy>", lambda _: self.hide(), add="+")
- 
+        
     def show(self) -> None:
         """
         Enable the widget.
