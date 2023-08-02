@@ -1,6 +1,6 @@
 __title__ = 'CTk Theme Builder'
 __author__ = 'Clive Bostock'
-__version__ = "2.2.0"
+__version__ = "2.4.0"
 __license__ = 'MIT - see LICENSE.md'
 
 import copy
@@ -18,7 +18,7 @@ from pathlib import Path
 from datetime import datetime
 import lib.cbtk_kit as cbtk
 import lib.ctk_theme_builder_m as mod
-from CTkToolTip import *
+from lib.CTkToolTip import *
 from CTkMessagebox import CTkMessagebox
 from PIL import Image
 
@@ -295,6 +295,7 @@ class PreviewPanel:
         if self._enable_tooltips:
             progressbar_1tooltip = CTkToolTip(self.progressbar_1,
                                               justify="left",
+                                              padding=(10, 10),
                                               message='CTkProgressBar widget')
 
         self.slider_1 = ctk.CTkSlider(master=widget_frame, command=slider_callback, from_=0, to=1)
@@ -303,6 +304,8 @@ class PreviewPanel:
         if self._enable_tooltips:
             slider_1_tooltip = CTkToolTip(self.slider_1,
                                           justify="left",
+                                          padding=(10, 10),
+                                          border_width=1,
                                           message='CTkSlider widget')
         self._rendered_widgets['CTkSlider'].append(self.slider_1)
 
@@ -341,6 +344,8 @@ class PreviewPanel:
         if self._enable_tooltips:
             self.button_1_tooltip = CTkToolTip(self.button_1,
                                                justify="left",
+                                               padding=(10, 10),
+                                               border_width=1,
                                                x_offset=-70,
                                                message=f'CTkButton - with default border setting of {button_border_width}')
 
@@ -355,6 +360,7 @@ class PreviewPanel:
             self.button_2_tooltip = CTkToolTip(self.button_2,
                                                border_width=second_border_width,
                                                justify="left",
+                                               padding=(10, 10),
                                                x_offset=-70,
                                                message=f'TkButton - with border setting of {second_border_width}')
 
@@ -399,8 +405,10 @@ class PreviewPanel:
         if self._enable_tooltips:
             self.entry_1_tooltip = CTkToolTip(self.entry_1,
                                               justify="left",
+                                              border_width=1,
+                                              padding=(10, 10),
                                               wraplength=250,
-                                              padding=(5, 5),
+                                              corner_radius=6,
                                               message=f'CTkEntry - with default border setting of {entry_border_width}')
 
         self._rendered_widgets['CTkEntry'].append(self.entry_1)
@@ -410,7 +418,10 @@ class PreviewPanel:
         if self._enable_tooltips:
             self.entry_2_tooltip = CTkToolTip(self.entry_2,
                                               justify="left",
+                                              padding=(10, 10),
+                                              border_width=1,
                                               wraplength=250,
+                                              corner_radius=6,
                                               message=f'CTkEntry - with border setting of {second_border_width}')
         self._rendered_widgets['CTkEntry'].append(self.entry_2)
 
@@ -420,9 +431,11 @@ class PreviewPanel:
         if self._enable_tooltips:
             textbox_tooltip = CTkToolTip(self.textbox,
                                          wraplength=300,
-                                         padding=(5, 5),
+                                         padding=(10, 10),
                                          x_offset=-100,
                                          justify="left",
+                                         border_width=1,
+                                         corner_radius=6,
                                          message='CTkTextbox')
 
         self.textbox.insert("0.0", "CTkTextbox\n\n" + "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, "
@@ -440,9 +453,10 @@ class PreviewPanel:
         if self._enable_tooltips:
             scrollable_frame_tooltip = CTkToolTip(self.scrollable_frame,
                                                   wraplength=300,
-                                                  padding=(5, 5),
+                                                  padding=(10, 10),
                                                   x_offset=-100,
                                                   justify="left",
+                                                  border_width=1,
                                                   message='NOTE: CTkScrollableFrame, is a composite widget. '
                                                           'With the exception of the label_fg_color, '
                                                           'theme file property, its other colour '
@@ -485,9 +499,10 @@ class PreviewPanel:
         if self._enable_tooltips:
             label_tab_1_tooltip = CTkToolTip(self.label_tab_1,
                                              justify="left",
+                                             border_width=1,
                                              wraplength=250,
                                              x_offset=-120,
-                                             padding=(5, 5),
+                                             padding=(10, 10),
                                              message='The CTkTabview is a composite widget. As of CustomTkinter v5, '
                                                      'it has no direct default properties. instead it borrows from '
                                                      'CTkFrame and CTkSegmentedButton.\n\n'
@@ -495,9 +510,10 @@ class PreviewPanel:
                                                      'is produced via an embedded CTkLabel.')
             label_tab_2_tooltip = CTkToolTip(self.label_tab_2,
                                              justify="left",
+                                             border_width=1,
                                              wraplength=250,
                                              x_offset=-120,
-                                             padding=(5, 5),
+                                             padding=(10, 10),
                                              message='The CTkTabview is a composite widget. As of CustomTkinter v5, '
                                                      'it has no direct default properties. instead it borrows from '
                                                      'CTkFrame and CTkSegmentedButton.\n\n'
@@ -505,9 +521,10 @@ class PreviewPanel:
                                                      'via an embedded CTkLabel.')
             label_tab_3_tooltip = CTkToolTip(self.label_tab_3,
                                              justify="left",
+                                             border_width=1,
                                              wraplength=250,
                                              x_offset=-120,
-                                             padding=(5, 5),
+                                             padding=(10, 10),
                                              message='The CTkTabview is a composite widget. As of CustomTkinter v5, '
                                                      'it has no direct default properties. instead it borrows from '
                                                      'CTkFrame and CTkSegmentedButton.\n\n'
