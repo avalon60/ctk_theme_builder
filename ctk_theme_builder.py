@@ -1,6 +1,6 @@
 __title__ = 'CTk Theme Builder'
 __author__ = 'Clive Bostock'
-__version__ = "2.3.0"
+__version__ = "2.4.0"
 __license__ = 'MIT - see LICENSE.md'
 
 import configparser
@@ -8,7 +8,7 @@ import copy
 
 # A hat tip and thankyou, to Tom Schimansky for is excellent work with CustomTkinter.
 # Credit to my friend and colleague Jan Bejec, as well as my wife for their contributions to my logo.
-# Also a thankyou to Akash Bora for producing the excellent CTkToolTip and CTkMessagebox widgets.
+# Also, a thankyou to Akash Bora for producing the excellent CTkToolTip and CTkMessagebox widgets.
 
 import argparse
 import tkinter as tk
@@ -38,7 +38,7 @@ from ctk_theme_preview import update_widget_geometry
 import ctk_theme_preview
 import lib.ctk_theme_builder_m as mod
 from CTkMessagebox import CTkMessagebox
-from CTkToolTip import *
+from lib.CTkToolTip import *
 
 # import lib.CTkMessagebox.ctkmessagebox
 
@@ -203,7 +203,8 @@ class ControlPanel(ctk.CTk):
     # We normally list entries here, where the configure method has a bug or is subject to an omission.
     # Issue numbers and descriptions:
     #   CTk 5.1.2 CTkCheckBox.configure(text_color_disabled=...) causes exception #1591 - Fixed in CTk 5.2.0
-    #   CTk 5.1.2: Omission: Theme JSON property checkmark_color of CTkCheckBox has no configure option #1586  - Fixed in CTk 5.2.0
+    #   CTk 5.1.2: Omission: Theme JSON property checkmark_color of CTkCheckBox has no configure option #1586
+    #                        - Fixed in CTk 5.2.0
     #   CTk 5.1.2: CTkSegmentedButton property setting issues #1562 - Fixed in CTk 5.2.0
     #   CTk 5.1.2: CTkOptionMenu.configure(text_color_disabled=...) raises exception #1559 - Fixed in CTk 5.2.0
     #   CTk 5.1.3: CTkCheckBox has no supporting configure option for checkmark_color #1703 - Fixed in CTk 5.2.0
@@ -226,6 +227,8 @@ class ControlPanel(ctk.CTk):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.theme_palette_tiles = []
+        self.palette_button_list = []
         self.protocol("WM_DELETE_WINDOW", self.block_window_close)
         self.control_panel_scaling = None
         self.preview_panel_scaling = None
@@ -298,9 +301,6 @@ class ControlPanel(ctk.CTk):
         self.enable_single_click_paste = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                                 preference_name='enable_single_click_paste')
 
-        self.theme_json_dir = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                     preference_name='theme_json_dir')
-
         self.last_theme_on_start = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                           preference_name='last_theme_on_start')
 
@@ -324,8 +324,26 @@ class ControlPanel(ctk.CTk):
                                                                  scope='scaling',
                                                                  preference_name='qa_application')
 
-        if not self.theme_json_dir.exists():
+        self.theme_json_dir = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                     preference_name='theme_json_dir')
+
+        # If no row found for the user theme directory, fall back to the
+        # default location.
+        if self.theme_json_dir == 'NO_DATA_FOUND':
             self.theme_json_dir = APP_HOME / 'user_themes'
+            theme_dir_row = mod.new_preference_dict(scope='user_preference',
+                                                    preference_name='theme_json_dir',
+                                                    preference_value=str(self.theme_json_dir),
+                                                    data_type='Path')
+            mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=theme_dir_row)
+
+        elif not self.theme_json_dir.exists():
+            self.theme_json_dir = APP_HOME / 'user_themes'
+            theme_dir_row = mod.new_preference_dict(db_file_path=DB_FILE_PATH,
+                                                    scope='user_preference',
+                                                    preference_name='theme_json_dir',
+                                                    preference_value=self.theme_json_dir)
+            mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=theme_dir_row)
 
         self.shade_adjust_differential = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                                 preference_name='shade_adjust_differential')
@@ -470,6 +488,9 @@ class ControlPanel(ctk.CTk):
             frame_mode_tooltip = CTkToolTip(self.swt_frame_mode,
                                             wraplength=400,
                                             justify="left",
+                                            border_width=1,
+                                            padding=(10, 10),
+                                            corner_radius=6,
                                             message='When enabled, the Preview Panel appears as a Top Frame render. '
                                                     '\n\n'
                                                     'When configuring a frame, stacked on top of another frame, the '
@@ -489,6 +510,9 @@ class ControlPanel(ctk.CTk):
             frame_mode_tooltip = CTkToolTip(self.swt_render_disabled,
                                             wraplength=400,
                                             justify="left",
+                                            border_width=1,
+                                            padding=(10, 10),
+                                            corner_radius=6,
                                             message='Enable this switch, to preview widget appearances in disabled '
                                                     'mode.')
 
@@ -509,6 +533,9 @@ class ControlPanel(ctk.CTk):
             filter_view_tooltip = CTkToolTip(self.opm_properties_view,
                                              wraplength=400,
                                              justify="left",
+                                             border_width=1,
+                                             padding=(10, 10),
+                                             corner_radius=6,
                                              message='Views help you to target specific widgets, or groups of  '
                                                      'related widgets, and their associated properties. ')
 
@@ -525,6 +552,9 @@ class ControlPanel(ctk.CTk):
             filter_view_tooltip = CTkToolTip(self.opm_properties_filter,
                                              wraplength=400,
                                              justify="left",
+                                             border_width=1,
+                                             padding=(10, 10),
+                                             corner_radius=6,
                                              message='Within the properties available for the selected view, you can '
                                                      'elect to filter the display further.')
 
@@ -536,6 +566,9 @@ class ControlPanel(ctk.CTk):
             sync_tooltip = CTkToolTip(self.btn_refresh,
                                       wraplength=250,
                                       justify="left",
+                                      border_width=1,
+                                      padding=(10, 10),
+                                      corner_radius=6,
                                       message='The "Refresh Preview" button causes a reload of the preview panel, and '
                                               're-paints the preview, with the currently selected theme / appearance '
                                               'mode.')
@@ -572,6 +605,9 @@ class ControlPanel(ctk.CTk):
             sync_tooltip = CTkToolTip(self.btn_sync_modes,
                                       wraplength=250,
                                       justify="left",
+                                      border_width=1,
+                                      padding=(10, 10),
+                                      corner_radius=6,
                                       message='Copies the color settings of the selected widget properties, for the '
                                               'currently selected Appearance Mode ("Dark"/"Light"), to its counterpart '
                                               'mode.')
@@ -585,6 +621,9 @@ class ControlPanel(ctk.CTk):
             sync_tooltip = CTkToolTip(self.btn_sync_modes,
                                       wraplength=250,
                                       justify="left",
+                                      border_width=1,
+                                      padding=(10, 10),
+                                      corner_radius=6,
                                       message='Copies the Theme Palette color settings of the selected appearance '
                                               'mode ("Light"/"Dark") to its counterpart mode')
 
@@ -630,6 +669,16 @@ class ControlPanel(ctk.CTk):
         pass
 
     def flip_appearance_modes(self):
+        if self.json_state == 'dirty':
+            confirm = CTkMessagebox(master=self,
+                                    title='Acknowledge',
+                                    message=f'You have unsaved changes. You must Save or Reset any changes, '
+                                            f'before using the Flip Modes option.',
+                                    options=["OK"])
+            response = confirm.get()
+            if response == 'OK':
+                return
+        selected_theme = self.opm_theme.get()
         confirm = CTkMessagebox(master=self,
                                 title='Confirm Action',
                                 message=f'This will swap around, all of the theme appearance mode colours, between '
@@ -878,7 +927,6 @@ class ControlPanel(ctk.CTk):
                 button.configure(fg_color=colour, hover_color=hover_colour)
         except IndexError:
             pass
-
 
     def save_theme_palette(self, theme_name: str = None):
         """Save the colour palette colours back to disk."""
@@ -1540,6 +1588,7 @@ class ControlPanel(ctk.CTk):
         if selected_theme == '-- Select Theme --':
             return
 
+        self.status_bar.set_status_text(status_text=f'Opening theme, {selected_theme} ...')
         self.theme_file = selected_theme + '.json'
         self.source_json_file = self.theme_json_dir / self.theme_file
         if not self.source_json_file.exists():
@@ -1591,7 +1640,6 @@ class ControlPanel(ctk.CTk):
 
         self.lbl_title.grid(row=0, column=0, columnspan=2, sticky='ew')
         self.opm_theme.configure(values=self.json_files)
-
 
         self.wip_palette_file = self.TEMP_DIR / self.theme_file.replace('json', 'tmpl')
         palette_file = selected_theme + '.json'
@@ -1730,11 +1778,11 @@ class ControlPanel(ctk.CTk):
             # Leverage the _paste_color method to update the widget and the preview panel.
             self.paste_colour(event=None, widget_property=widget_property)
 
-    def load_theme_palette(self, theme_name=None):
+    def load_theme_palette(self):
         """Determine and open the JSON theme palette file, for the selected theme, and marry the colours mapped in
         the file, to the palette widgets. """
-        if theme_name is None:
-            theme_name = self.theme_file
+
+        theme_name = self.theme_file
         palette_json = theme_name
 
         self.source_palette_file = self.palettes_dir / palette_json
@@ -1746,7 +1794,6 @@ class ControlPanel(ctk.CTk):
         if not self.source_palette_file.exists():
             self.create_theme_palette(theme_name)
         shutil.copyfile(self.source_palette_file, self.wip_palette_file)
-
         self.theme_palette = mod.json_dict(json_file_path=self.wip_palette_file)
 
         mode = cbtk.str_mode_to_int(self.appearance_mode)
@@ -1760,6 +1807,7 @@ class ControlPanel(ctk.CTk):
                 button.configure(fg_color=colour, hover_color=hover_colour)
         except IndexError:
             pass
+        pass
 
     def reset_theme(self):
         """Reset the theme file, to the state of the last save operation, or the state when it was opened,
@@ -2019,7 +2067,6 @@ class ControlPanel(ctk.CTk):
 
             self.set_palette_colour(palette_button_id=palette_button_id, colour=new_colour)
 
-
             self.theme_palette_tiles[palette_button_id].configure(fg_color=new_colour, hover_color=new_colour)
             self.status_bar.set_status_text(
                 status_text=f'Colour {new_colour} assigned to palette entry {palette_button_id + 1}.')
@@ -2040,7 +2087,15 @@ class ControlPanel(ctk.CTk):
 
     def render_widget_properties(self, dummy=None):
         """Here we render the widget properties, within the control panel, along with their colour settings."""
+        # TODO: Performance investigation here
+
+        # start_time = time.time()
+
         filter_key = self.opm_properties_filter.get()
+
+        # end_time = time.time()
+        # elapsed_time = end_time - start_time
+        # print("Elapsed time 1: ", elapsed_time)
         self.filter_list = self.widget_attributes[filter_key]
         # self.appearance_mode = self.seg_mode.get()
 
@@ -2631,6 +2686,9 @@ class HarmonicsDialog(ctk.CTkToplevel):
             btn_tooltip = CTkToolTip(btn_copy_to_palette,
                                      wraplength=250,
                                      justify="left",
+                                     border_width=1,
+                                     padding=(10, 10),
+                                     corner_radius=6,
                                      message='Copy the keystone and harmony colours (not including harmony shades),'
                                              ' to the theme palette scratch slots.')
 
@@ -2649,6 +2707,9 @@ class HarmonicsDialog(ctk.CTkToplevel):
                                          wraplength=250,
                                          justify="left",
                                          x_offset=-50,
+                                         border_width=1,
+                                         padding=(10, 10),
+                                         corner_radius=6,
                                          message='Tag this keystone colour to the theme.\n\nThis will cause the '
                                                  'keystone colour to be restored when the theme is opened and the '
                                                  'Colour Harmonics dialog opened.')
@@ -3146,6 +3207,9 @@ class PreferencesDialog(ctk.CTkToplevel):
             btn_author_tooltip = CTkToolTip(lbl_author_name,
                                             wraplength=250,
                                             justify="left",
+                                            border_width=1,
+                                            padding=(10, 10),
+                                            corner_radius=6,
                                             message="The author's name is included to the theme JSON, in the "
                                                     "provenance section.")
 
@@ -3157,6 +3221,9 @@ class PreferencesDialog(ctk.CTkToplevel):
             btn_author_tooltip = CTkToolTip(lbl_theme,
                                             wraplength=250,
                                             justify="left",
+                                            border_width=1,
+                                            padding=(10, 10),
+                                            corner_radius=6,
                                             message="The default theme for the CTk Theme Builder control panel, "
                                                     "is GreyGhost, however you can override this here.")
 
@@ -3203,6 +3270,9 @@ class PreferencesDialog(ctk.CTkToplevel):
         btn_enable_palette_labels_tooltip = CTkToolTip(self.swt_enable_tooltips,
                                                        wraplength=250,
                                                        justify="left",
+                                                       border_width=1,
+                                                       padding=(10, 10),
+                                                       corner_radius=6,
                                                        message="When enabled, this causes tool-tips to be enabled "
                                                                "throughout the theme builder application.")
 
@@ -3218,6 +3288,9 @@ class PreferencesDialog(ctk.CTkToplevel):
         btn_enable_cascade_tooltip = CTkToolTip(self.swt_confirm_cascade,
                                                 wraplength=250,
                                                 justify="left",
+                                                border_width=1,
+                                                padding=(10, 10),
+                                                corner_radius=6,
                                                 message="When enabled, causes causes a pop-up, confirmation dialog"
                                                         " to appear, whenever a colour cascade is invoked from the "
                                                         "floating menu, on the theme's colour palette.")
@@ -3232,7 +3305,11 @@ class PreferencesDialog(ctk.CTkToplevel):
 
         if self.enable_tooltips:
             btn_enable_palette_labels_tooltip = CTkToolTip(self.swt_enable_palette_labels,
-                                                           "Enable/disable the rendering of the colour palette "
+                                                           border_width=1,
+                                                           justify="left",
+                                                           padding=(10, 10),
+                                                           corner_radius=6,
+                                                           message="Enable/disable the rendering of the colour palette "
                                                            "labels.")
 
         widget_start_row += 1
@@ -3247,6 +3324,9 @@ class PreferencesDialog(ctk.CTkToplevel):
             last_theme_on_start_tooltip = CTkToolTip(self.swt_last_theme_on_start,
                                                      wraplength=250,
                                                      justify="left",
+                                                     border_width=1,
+                                                     padding=(10, 10),
+                                                     corner_radius=6,
                                                      message="Enable this switch, to auto-select the last theme "
                                                              "you worked on, at application startup.")
 
@@ -3263,6 +3343,10 @@ class PreferencesDialog(ctk.CTkToplevel):
         if self.enable_tooltips:
             btn_enable_tooltips_tooltip = CTkToolTip(self.swt_enable_single_click_paste,
                                                      wraplength=400,
+                                                     border_width=1,
+                                                     justify="left",
+                                                     padding=(10, 10),
+                                                     corner_radius=6,
                                                      message="Enable/disable colour pasting, via a single click. "
                                                              "Colours can be pasted to the colour palette or the array "
                                                              "of widget colour properties.")
@@ -3328,6 +3412,9 @@ class PreferencesDialog(ctk.CTkToplevel):
             lbl_listener_port_tooltip = CTkToolTip(lbl_listener_port,
                                                    wraplength=400,
                                                    justify='left',
+                                                   border_width=1,
+                                                   padding=(10, 10),
+                                                   corner_radius=6,
                                                    message="Here you can change the listener port for the Preview "
                                                            "Panel.\n\nYou can modify this, if for example, you want to "
                                                            "run multiple instances of the application. Each instance "
@@ -3340,7 +3427,11 @@ class PreferencesDialog(ctk.CTkToplevel):
 
         if self.enable_tooltips:
             lbl_theme_json_dir_tooltip = CTkToolTip(lbl_theme_json_dir,
-                                                    "Select a location to store your themes.")
+                                                    border_width=1,
+                                                    justify="left",
+                                                    padding=(10, 10),
+                                                    corner_radius=6,
+                                                    message="Select a location to store your themes.")
 
         btn_theme_json_dir = ctk.CTkButton(master=frm_widgets,
                                            text='',
@@ -3388,7 +3479,9 @@ class PreferencesDialog(ctk.CTkToplevel):
     def save_preferences(self):
         """Save the selected preferences."""
         # Save JSON Directory:
-        if self.new_theme_json_dir is not None:
+        # If the directory selection was cancelled, we end up with
+        # the string representation of the path, returning as a dot.
+        if str(self.new_theme_json_dir) != '.':
             self.theme_json_dir = self.new_theme_json_dir
             if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                preference_name='theme_json_dir',
@@ -3472,9 +3565,9 @@ class PreferencesDialog(ctk.CTkToplevel):
 
         if preview_panel_scale_pct != self.master.preview_panel_scaling_pct and self.master.theme:
             self.master.preview_panel_scaling_pct = preview_panel_scale_pct
-            self.master.send_command_json(command_type='program',
-                                          command='set_widget_scaling',
-                                          parameters=[preview_panel_scale_pct])
+            mod.send_command_json(command_type='program',
+                                  command='set_widget_scaling',
+                                  parameters=[preview_panel_scale_pct])
 
         qa_application_scale_pct = self.opm_qa_application_scaling.get()
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='scaling',
@@ -3500,7 +3593,8 @@ class PreferencesDialog(ctk.CTkToplevel):
         """A simple method which asks the themes author to navigate to where
          the themes JSON are to be stored/maintained."""
         self.new_theme_json_dir = Path(tk.filedialog.askdirectory(initialdir=self.theme_json_dir))
-        self.lbl_pref_theme_dir_disp.configure(text=self.new_theme_json_dir)
+        if str(self.new_theme_json_dir) != '.':
+            self.lbl_pref_theme_dir_disp.configure(text=self.new_theme_json_dir)
 
 
 class GeometryDialog(ctk.CTkToplevel):
@@ -3685,7 +3779,11 @@ class GeometryDialog(ctk.CTkToplevel):
                                            text_color=preview_text_colour,
                                            fg_color=cbtk.contrast_colour(preview_frame_top, 15),
                                            corner_radius=self.theme_json_data[widget_type]['corner_radius'])
-            widget_tooltip = CTkToolTip(geometry_widget, wraplength=200, justify='left',
+            widget_tooltip = CTkToolTip(geometry_widget, wraplength=200,
+                                        border_width=1,
+                                        justify="left",
+                                        padding=(10, 10),
+                                        corner_radius=6,
                                         message='The CTkLabel widget has been intentionally '
                                                 'rendered with a contrasting fg_color, so that '
                                                 'the corner radius effect may be seen.')
@@ -3892,9 +3990,11 @@ class GeometryDialog(ctk.CTkToplevel):
             if self.master.enable_tooltips:
                 textbox_tooltip = CTkToolTip(geometry_widget,
                                              wraplength=300,
-                                             padding=(5, 5),
+                                             padding=(10, 10),
+                                             corner_radius=6,
                                              x_offset=-100,
                                              justify="left",
+                                             border_width=1,
                                              message='CTkTextbox')
 
             geometry_widget.insert("0.0", "CTkTextbox\n\n" + "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, "
@@ -4043,6 +4143,9 @@ class ThemeMerger(ctk.CTkToplevel):
             btn_author_tooltip = CTkToolTip(lbl_primary_theme,
                                             wraplength=250,
                                             justify="left",
+                                            border_width=1,
+                                            padding=(10, 10),
+                                            corner_radius=6,
                                             message="The primary theme to merge. The non-colour properties are, "
                                                     "adopted from the primary theme.")
 
@@ -4058,6 +4161,9 @@ class ThemeMerger(ctk.CTkToplevel):
             btn_author_tooltip = CTkToolTip(lbl_primary_mode,
                                             wraplength=250,
                                             justify="left",
+                                            border_width=1,
+                                            padding=(10, 10),
+                                            corner_radius=6,
                                             message="Select the appearance mode to be merged from the primary theme.")
         # The primary_theme_mode holds the CustomTkinter appearance mode (Dark / Light)
         self.tk_primary_mode = tk.StringVar()
@@ -4082,6 +4188,9 @@ class ThemeMerger(ctk.CTkToplevel):
             btn_author_tooltip = CTkToolTip(lbl_primary_mapped_mode,
                                             wraplength=250,
                                             justify="left",
+                                            border_width=1,
+                                            padding=(10, 10),
+                                            corner_radius=6,
                                             message="Select which appearance mode, the selected primary mode will be"
                                                     " mapped to. \n\nThe secondary theme's selected appearance mode, "
                                                     "will be mapped to the unselected mode.")
@@ -4109,6 +4218,9 @@ class ThemeMerger(ctk.CTkToplevel):
             btn_author_tooltip = CTkToolTip(lbl_secondary_theme,
                                             wraplength=250,
                                             justify="left",
+                                            border_width=1,
+                                            padding=(10, 10),
+                                            corner_radius=6,
                                             message="The secondary theme to merge. The non-colour properties are, "
                                                     "adopted from the secondary theme.")
 
@@ -4124,6 +4236,9 @@ class ThemeMerger(ctk.CTkToplevel):
             btn_author_tooltip = CTkToolTip(lbl_secondary_mode,
                                             wraplength=250,
                                             justify="left",
+                                            border_width=1,
+                                            padding=(10, 10),
+                                            corner_radius=6,
                                             message="Select the appearance mode to be merged from the secondary theme.")
         # The secondary_theme_mode holds the CustomTkinter appearance mode (Dark / Light)
         self.tk_secondary_mode = tk.StringVar()
@@ -4155,6 +4270,9 @@ class ThemeMerger(ctk.CTkToplevel):
             btn_author_tooltip = CTkToolTip(lbl_new_theme_name,
                                             wraplength=250,
                                             justify="left",
+                                            border_width=1,
+                                            padding=(10, 10),
+                                            corner_radius=6,
                                             message="Provide a new target theme file name.")
 
         self.tk_new_theme_file = tk.StringVar()
@@ -4174,6 +4292,10 @@ class ThemeMerger(ctk.CTkToplevel):
         if self.enable_tooltips:
             btn_enable_tooltips_tooltip = CTkToolTip(self.swt_open_on_merge,
                                                      wraplength=400,
+                                                     justify="left",
+                                                     border_width=1,
+                                                     padding=(10, 10),
+                                                     corner_radius=6,
                                                      message="Enable this switch, if you wish to open the merged theme.")
 
         widget_start_row += 1
