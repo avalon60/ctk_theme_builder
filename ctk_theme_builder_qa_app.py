@@ -11,17 +11,17 @@ prog_path = os.path.realpath(__file__)
 app_home = Path(os.path.dirname(os.path.realpath(__file__)))
 
 PROG = os.path.basename(__file__)
-APP_HOME = Path(os.path.dirname(os.path.realpath(__file__)))
 
-ASSETS_DIR = APP_HOME / 'assets'
-CONFIG_DIR = ASSETS_DIR / 'config'
-ETC_DIR = ASSETS_DIR / 'etc'
-TEMP_DIR = APP_HOME / 'tmp'
-VIEWS_DIR = ASSETS_DIR / 'views'
-APP_THEMES_DIR = ASSETS_DIR / 'themes'
-APP_DATA_DIR = ASSETS_DIR / 'data'
-APP_IMAGES = ASSETS_DIR / 'images'
-DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
+APP_HOME = mod.APP_HOME
+ASSETS_DIR = mod.ASSETS_DIR
+CONFIG_DIR = mod.CONFIG_DIR
+ETC_DIR = mod.ETC_DIR
+TEMP_DIR = mod.TEMP_DIR
+VIEWS_DIR = mod.VIEWS_DIR
+APP_THEMES_DIR = mod.APP_THEMES_DIR
+APP_DATA_DIR = mod.APP_DATA_DIR
+APP_IMAGES = mod.APP_IMAGES
+DB_FILE_PATH = mod.DB_FILE_PATH
 
 
 class App(customtkinter.CTk):
@@ -243,7 +243,8 @@ class App(customtkinter.CTk):
         geometry_row["preference_value"] = qa_geometry
         mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
 
-    def sidebar_button_event(self):
+    @staticmethod
+    def sidebar_button_event():
         print("sidebar_button click")
 
 
