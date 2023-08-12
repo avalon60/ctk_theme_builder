@@ -75,7 +75,7 @@ class PreferencesDialog(ctk.CTkToplevel):
 
         self.action = 'cancelled'
 
-        self.new_theme_json_dir = None
+        self.new_theme_json_dir = self.theme_json_dir
         # Establish the user login name and home directory.
         this_platform = platform.system()
         if this_platform == "Windows":
