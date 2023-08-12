@@ -12,10 +12,12 @@ import sqlite3
 import os
 from datetime import datetime
 from dataclasses import dataclass
-import lib.ctk_theme_builder_m as mod
 from typing import Union
 import socket
+import sys
+import re
 
+application_title = 'CTk Theme Builder'
 # Constants
 APP_HOME = os.path.dirname(os.path.realpath(__file__))
 APP_HOME = Path(os.path.dirname(APP_HOME))
@@ -25,6 +27,7 @@ CTK_ASSETS = CTK_SITE_PACKAGES / Path('assets')
 CTK_THEMES = CTK_ASSETS / 'themes'
 
 ASSETS_DIR = APP_HOME / 'assets'
+LIB_DIR = APP_HOME / 'lib'
 CONFIG_DIR = ASSETS_DIR / 'config'
 ETC_DIR = ASSETS_DIR / 'etc'
 TEMP_DIR = APP_HOME / 'tmp'
@@ -36,6 +39,9 @@ APP_IMAGES = ASSETS_DIR / 'images'
 QA_STOP_FILE = ETC_DIR / 'qa_application.stop'
 QA_STARTED_FILE = ETC_DIR / 'qa_application.started'
 LISTENER_FILE = ETC_DIR / 'listener.started'
+LOG_DIR = APP_HOME / 'logs'
+PALETTES_DIR = ASSETS_DIR / 'palettes'
+PROG_NAME = 'CTk Theme Builder'
 
 SERVER = '127.0.0.1'
 HEADER_SIZE = 64
@@ -133,10 +139,38 @@ RENDERED_PREVIEW_WIDGETS = {"CTk": [],
 db_file_found = None
 
 
+def app_title():
+    return application_title
+
+
+def app_author():
+    return __author__
+
+
+def app_version():
+    return __version__
+
+
+def app_license():
+    return __license__
+
+
+def all_widget_categories(widget_attributes):
+    """This function receives a dictionary, based on JSON theme builder view file content,
+    and scans it, to build a list of all the widget categories included in the view. The categories
+    are the select options we see, in the Filter View drop-down list, once we have selected a Properties View."""
+    categories = []
+    for category in widget_attributes:
+        categories.append(category)
+    categories.sort()
+    return categories
+
+
 class EmptyStack(Exception):
     def __init__(self, stack_name: str, print_message: bool = True):
         self.message = f"Attempted pop on empty {stack_name}!"
         print(self.message)
+
 
 def app_themes_list():
     """This method generates a list of theme names, based on the json files found in the application themes folder.
@@ -402,6 +436,14 @@ def scaling_float(scale_pct: str) -> float:
     """Expects a scaling percentage, including the % symbol and converts to a fractional decimal."""
     scaling_float = int(scale_pct.replace("%", "")) / 100
     return scaling_float
+
+
+def valid_theme_file_name(theme_name):
+    pattern = re.compile("[A-Za-z0-9_()]+")
+    if pattern.fullmatch(theme_name):
+        return True
+    else:
+        return False
 
 
 def flip_appearance_modes(theme_file_path: Path):
@@ -698,7 +740,7 @@ def send_command_json(command_type: str, command: str, parameters: list = None):
 
     message_json_str = message_json_str.replace('%command_type%', command_type)
     message_json_str = message_json_str.replace('%command%', command)
-    mod.send_message(message=message_json_str)
+    send_message(message=message_json_str)
 
 
 def sqlite_dict_factory(cursor, row):
@@ -841,12 +883,12 @@ def send_message(message):
         except ConnectionRefusedError:
             time.sleep(0.1)
 
-    send_length, message = mod.prepare_message(message)
+    send_length, message = prepare_message(message)
     client.send(send_length)
     client.send(message)
     # print(f'Message sent: {message.decode(ENCODING_FORMAT)}')
     # The disconnect command has to follow the required JSON command format...
-    send_length, message = mod.prepare_message(DISCONNECT_JSON)
+    send_length, message = prepare_message(DISCONNECT_JSON)
     client.send(send_length)
     client.send(message)
     client.close()
@@ -902,8 +944,8 @@ class PropertyVector:
             raise ValueError('The command_type property must be "colour", "geometry" or "program"')
 
         if self.command != 'null' and self.component_property \
-                and self.component_property not in mod.GEOMETRY_PROPERTIES \
-                and self.component_property not in mod.COLOUR_PROPERTIES:
+                and self.component_property not in GEOMETRY_PROPERTIES \
+                and self.component_property not in COLOUR_PROPERTIES:
             raise ValueError(
                 f'The widget_property, {self.component_property}, is not a module registered CustomTkinter '
                 f'property.')
@@ -938,7 +980,7 @@ class CommandStack:
         """The add_vector method, accepts a property vector and adds it to the undo stack. It also ensures that
         the redo stack is wiped, since this method is called for non undo/redo operations."""
         self.undo_stack.append(new_vector)
-        self.redo_stack = []
+        self.redo_stack.clear()
 
     def undo_command(self) -> tuple:
         """Execute the command from the top vector entry of the undo stack. The undone command is placed on the redo
@@ -965,7 +1007,7 @@ class CommandStack:
             self.redo_stack.append(_vector)
             return f'{cap_command_type} change to {_component_type} / {_component_property}, reverted from ' \
                    f'{_new_property_value} to {_old_property_value}.', \
-                   _command_type, _component_type, _component_property, _old_property_value
+                _command_type, _component_type, _component_property, _old_property_value
 
         self.do_command(command_type=_command_type, command=_command, component_type=_component_type,
                         component_property=_component_property, property_value=_old_property_value)
@@ -974,7 +1016,7 @@ class CommandStack:
         if _command_type in ('colour', 'geometry'):
             return f'{cap_command_type} change to {_component_type} / {_component_property}, reverted from ' \
                    f'{_new_property_value} to {_old_property_value}.', \
-                   _command_type, _component_type, _component_property, _old_property_value
+                _command_type, _component_type, _component_property, _old_property_value
         else:
             return '', _command_type, _command, _component_property, _old_property_value
 
@@ -1002,8 +1044,7 @@ class CommandStack:
             self.undo_stack.append(_vector)
             return f'{cap_command_type} change to {_component_type} / {_component_property}, reverted from ' \
                    f'{_new_property_value} to {_old_property_value}.', \
-                   _command_type, _component_type, _component_property, _new_property_value
-
+                _command_type, _component_type, _component_property, _new_property_value
 
         self.do_command(command_type=_command_type, command=_command, component_type=_component_type,
                         component_property=_component_property, property_value=_new_property_value)
@@ -1028,7 +1069,7 @@ class CommandStack:
         self.do_command(command_type=_command_type, command=_command, component_type=_component_type,
                         component_property=_component_property, property_value=_property_value)
         self.undo_stack.append(property_vector)
-        self.redo_stack = []
+        self.redo_stack.clear()
 
     @staticmethod
     def do_command(command_type: str, command: str, component_type: str = '',
@@ -1042,7 +1083,7 @@ class CommandStack:
             parameters.append(component_property)
         parameters.append(property_value)
 
-        mod.send_command_json(command_type=command_type,
+        send_command_json(command_type=command_type,
                               command=command,
                               parameters=parameters)
 
@@ -1056,8 +1097,8 @@ class CommandStack:
 
     def reset_stacks(self):
         """Method to empty the command stacks."""
-        self.undo_stack = []
-        self.redo_stack = []
+        self.undo_stack.clear()
+        self.redo_stack.clear()
 
 
 if __name__ == "__main__":
