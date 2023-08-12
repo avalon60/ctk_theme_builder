@@ -60,30 +60,6 @@ class ControlPanel(ctk.CTk):
     THEME_PALETTE_ROWS = 2
 
     command_stack = mod.CommandStack()
-    # We normally list entries here, where the configure method has a bug or is subject to an omission.
-    # Issue numbers and descriptions:
-    #   CTk 5.1.2 CTkCheckBox.configure(text_color_disabled=...) causes exception #1591 - Fixed in CTk 5.2.0
-    #   CTk 5.1.2: Omission: Theme JSON property checkmark_color of CTkCheckBox has no configure option #1586
-    #                        - Fixed in CTk 5.2.0
-    #   CTk 5.1.2: CTkSegmentedButton property setting issues #1562 - Fixed in CTk 5.2.0
-    #   CTk 5.1.2: CTkOptionMenu.configure(text_color_disabled=...) raises exception #1559 - Fixed in CTk 5.2.0
-    #   CTk 5.1.3: CTkCheckBox has no supporting configure option for checkmark_color #1703 - Fixed in CTk 5.2.0
-    # The DropdownMenu is a different case. This is not a widget in its own right and so has no methods to
-    # update the widgets which utilise it. E.g. CTkComboBox, CTkOptionMenu.
-    # In any case, any entries in the list, require a full preview panel refresh, to work around the respective
-    # challenges.
-    # Here we key the properties requiring refresh, based on a CustomTkinter release range.
-    FORCE_REFRESH_PROPERTIES = [  # "CheckBox: checkmark_color",
-        "DropdownMenu: fg_color",
-        "DropdownMenu: hover_color",
-        "DropdownMenu: text_color",
-        # "Frame: top_fg_color",
-        # "CheckBox: text_color_disabled",
-        # "Scrollbar: button_color",
-        # "Scrollbar: button_hover_color",
-        # "OptionMenu: text_color_disabled",
-        # "Switch: text_color_disabled"
-    ]
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -569,7 +545,7 @@ class ControlPanel(ctk.CTk):
         widget_type, split_property = mod.widget_property_split(widget_property=widget_property)
         self.theme_json_data[widget_type][split_property][appearance_mode_index] = new_colour
 
-        if prev_colour != new_colour and widget_property in ControlPanel.FORCE_REFRESH_PROPERTIES:
+        if prev_colour != new_colour and widget_property in mod.FORCE_COLOR_REFRESH_PROPERTIES:
             # Then either this isn't a real widget, or is a property which cannot be updated
             # dynamically, and so we force a refresh to update the widgets dependent upon its properties.
             self.refresh_preview()
@@ -1037,11 +1013,19 @@ class ControlPanel(ctk.CTk):
                                          command_stack=self.command_stack,
                                          theme_json_data=self.theme_json_data,
                                          appearance_mode=self.appearance_mode)
+        if geometry_dialog.force_refresh:
+            # This is a property which cannot be updated
+            # dynamically, and so we force a refresh to update
+            # the widget.
+            self.refresh_preview(set_scaling=False)
 
     def set_option_states(self):
         """This function sets the button and menu option states. The states are set based upon a combination of,
         whether a theme is currently selected, and the state of the theme ('dirty'/'clean')"""
         if self.command_stack.undo_length() > 0:
+            # Reminder: do not be tempted to set the state to 'clean' where undo_length == 0
+            # We have operations other than undo/redo which dirty the JSON. Setting to 'clean'
+            # will break the Reset option for such operations.
             self.json_state = 'dirty'
 
         if self.theme:
@@ -2236,16 +2220,18 @@ class ControlPanel(ctk.CTk):
         self.json_state = 'dirty'
         self.set_option_states()
 
-    def refresh_preview(self):
+    def refresh_preview(self, set_scaling: bool=True):
         """The _refresh_preview method, instructs the Preview Panel to perform a re-rendering of all widgets."""
 
         self.update_wip_file()
         mod.send_command_json(command_type='program',
                               command='refresh',
                               parameters=[self.appearance_mode])
-        mod.send_command_json(command_type='program',
-                              command='set_widget_scaling',
-                              parameters=[self.preview_panel_scaling_pct])
+
+        if set_scaling:
+            mod.send_command_json(command_type='program',
+                                  command='set_widget_scaling',
+                                  parameters=[self.preview_panel_scaling_pct])
 
     def reload_preview(self):
         """The reload_preview method causes a full reload of the preview panel."""
