@@ -63,10 +63,8 @@ def update_widget_geometry(widget, widget_property, property_value):
     elif widget_property == 'border_width':
         widget.configure(border_width=property_value)
     elif widget_property == 'border_width_unchecked':
-        widget.deselect()
         widget.configure(border_width_unchecked=property_value)
     elif widget_property == 'border_width_checked':
-        widget.select()
         widget.configure(border_width_checked=property_value)
 
 
