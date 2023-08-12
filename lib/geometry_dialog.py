@@ -5,12 +5,14 @@ import tkinter as tk
 import lib.cbtk_kit as cbtk
 import lib.ctk_theme_builder_m as mod
 from ctk_theme_preview import update_widget_geometry
+import json
 
 from pathlib import Path
 from lib.CTkToolTip import *
 
 ETC_DIR = mod.ETC_DIR
 DB_FILE_PATH = mod.DB_FILE_PATH
+
 class GeometryDialog(ctk.CTkToplevel):
     def __init__(self, widget_type: str, theme_json_data: dict, appearance_mode: str,
                  command_stack: mod.CommandStack, *args, **kwargs):
@@ -455,6 +457,7 @@ class GeometryDialog(ctk.CTkToplevel):
         self.wait_window()
 
     def save_geometry_edits(self, widget_type):
+        self.force_refresh = False
         for widget_property, property_value in self.geometry_edit_values.items():
             parameters = []
             # This function call is necessary, because there are several naming
@@ -473,13 +476,18 @@ class GeometryDialog(ctk.CTkToplevel):
                                                    old_value=self.theme_json_data[json_widget_type][widget_property])
 
                 self.command_stack.exec_command(property_vector=change_vector)
+                display_property = mod.PropertyVector.display_property(widget_type=widget_type,
+                                                                       widget_property=widget_property)
+                if display_property in mod.FORCE_GEOM_REFRESH_PROPERTIES:
+                    self.force_refresh = True
                 self.theme_json_data[json_widget_type][widget_property] = property_value
 
         if self.master.json_state == 'dirty':
             with open(self.master.wip_json, "w") as f:
                 json.dump(self.theme_json_data, f, indent=2)
-
             self.master.set_option_states()
+
+
         self.close_geometry_dialog()
 
     def close_geometry_dialog(self, event=None):
@@ -501,4 +509,3 @@ class GeometryDialog(ctk.CTkToplevel):
         panel_geometry = self.geometry()
         geometry_row["preference_value"] = panel_geometry
         mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
-
