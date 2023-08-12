@@ -136,6 +136,37 @@ RENDERED_PREVIEW_WIDGETS = {"CTk": [],
                             "CTkTextbox": [],
                             "CTkToplevel": []}
 
+# We normally list entries here, where there is no direct configure option.
+FORCE_GEOM_REFRESH_PROPERTIES = [
+    "Scrollbar: border_spacing",
+    "Scrollbar: corner_radius"
+]
+
+# We normally list entries here, where the configure method has a bug or is subject to an omission.
+# Issue numbers and descriptions:
+#   CTk 5.1.2 CTkCheckBox.configure(text_color_disabled=...) causes exception #1591 - Fixed in CTk 5.2.0
+#   CTk 5.1.2: Omission: Theme JSON property checkmark_color of CTkCheckBox has no configure option #1586
+#                        - Fixed in CTk 5.2.0
+#   CTk 5.1.2: CTkSegmentedButton property setting issues #1562 - Fixed in CTk 5.2.0
+#   CTk 5.1.2: CTkOptionMenu.configure(text_color_disabled=...) raises exception #1559 - Fixed in CTk 5.2.0
+#   CTk 5.1.3: CTkCheckBox has no supporting configure option for checkmark_color #1703 - Fixed in CTk 5.2.0
+# The DropdownMenu is a different case. This is not a widget in its own right and so has no methods to
+# update the widgets which utilise it. E.g. CTkComboBox, CTkOptionMenu.
+# In any case, any entries in the list, require a full preview panel refresh, to work around the respective
+# challenges.
+# Here we key the properties requiring refresh, based on a CustomTkinter release range.
+FORCE_COLOR_REFRESH_PROPERTIES = [  # "CheckBox: checkmark_color",
+    "DropdownMenu: fg_color",
+    "DropdownMenu: hover_color",
+    "DropdownMenu: text_color",
+    "ScrollableFrame: corner_radius"
+    # "Frame: top_fg_color",
+    # "CheckBox: text_color_disabled",
+    # "Scrollbar: button_color",
+    # "Scrollbar: button_hover_color",
+    # "OptionMenu: text_color_disabled",
+    # "Switch: text_color_disabled"
+]
 db_file_found = None
 
 
@@ -904,24 +935,11 @@ class PropertyVector:
     component_property: str = ''
 
     @classmethod
-    def internal_from_display(cls, display_property: str) -> tuple:
-        """Utility method, which accepts a string in the form "<widget_type>: <widget_property>" and decomposes this
-        into widget_type, widget property, returning as a tuple."""
-        widget_split = display_property.split(': ')
-        widget_type = widget_split[0]
-        if widget_type != 'CTk' and 'CTk' in widget_type:
-            ValueError()
-        if widget_type != 'CTk' and widget_type != 'DropdownMenu':
-            widget_type = 'CTk' + widget_type
-        _property = widget_split[1]
-        return widget_type, _property
-
-    @classmethod
     def display_property(cls, widget_type: str, widget_property: str):
 
         if widget_type != 'CTk':
             widget_type = widget_type.replace('CTk', '')
-        return f'"{widget_type}: {widget_property}"'
+        return f'{widget_type}: {widget_property}'
 
     def __post_init__(self):
 
@@ -1019,6 +1037,7 @@ class CommandStack:
                 _command_type, _component_type, _component_property, _old_property_value
         else:
             return '', _command_type, _command, _component_property, _old_property_value
+
 
     def redo_command(self) -> tuple:
         """Execute the command from the top vector entry of the redo stack. The redone command is placed on the undo
