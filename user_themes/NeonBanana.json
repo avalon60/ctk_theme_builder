@@ -57,6 +57,10 @@
     "text_color": [
       "#00bee3",
       "#f4cb29"
+    ],
+    "text_color_disabled": [
+      "#00bee3",
+      "#f4cb29"
     ]
   },
   "CTkEntry": {
@@ -193,7 +197,7 @@
       "#f4cb29"
     ],
     "text_color_disabled": [
-      "#1496bb",
+      "#586176",
       "#cb7629"
     ]
   },
@@ -307,9 +311,9 @@
     "theme name": "NeonBanana",
     "theme author": "clive",
     "date created": "Jun 14 2023 20:24:54",
-    "last modified by": "clive",
+    "last modified by": "Clive Bostock",
     "created with": "CTk Theme Builder v2.3.0",
-    "last modified": "Jul 06 2023 20:24:43",
+    "last modified": "Aug 13 2023 13:53:38",
     "keystone colour": "#3c5064",
     "harmony method": "Split-complementary",
     "harmony differential": null

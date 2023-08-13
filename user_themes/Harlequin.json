@@ -57,6 +57,10 @@
     "text_color": [
       "#ffffff",
       "#ffffff"
+    ],
+    "text_color_disabled": [
+      "#ffffff",
+      "#ffffff"
     ]
   },
   "CTkEntry": {
@@ -161,12 +165,12 @@
       "#63003d"
     ],
     "text_color": [
-      "#212a3f",
-      "#212a3f"
+      "#172035",
+      "#172035"
     ],
     "text_color_disabled": [
-      "#a9b8c4",
-      "#a9b8c4"
+      "#353e53",
+      "#353e53"
     ]
   },
   "CTkComboBox": {
@@ -189,12 +193,12 @@
       "#63003d"
     ],
     "text_color": [
-      "#2b3449",
-      "#2b3449"
+      "#172035",
+      "#172035"
     ],
     "text_color_disabled": [
-      "#a9b8c4",
-      "#a9b8c4"
+      "#4e576c",
+      "#4e576c"
     ]
   },
   "CTkScrollbar": {
@@ -309,7 +313,7 @@
     "date created": "Jun 02 2023 17:01:42",
     "last modified by": "Clive Bostock",
     "created with": "CTk Theme Builder v2.1.0",
-    "last modified": "Jul 20 2023 18:56:55",
+    "last modified": "Aug 13 2023 13:50:25",
     "keystone colour": "#0C6300",
     "harmony method": "Split-complementary",
     "harmony differential": 8
