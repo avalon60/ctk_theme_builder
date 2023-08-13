@@ -3,11 +3,10 @@
 import lib.ctk_theme_builder_m as mod
 import customtkinter as ctk
 import tkinter as tk
-import platform
-import os
+import pyperclip
 from lib.CTkToolTip import *
 import lib.cbtk_kit as cbtk
-from pathlib import Path
+
 import colorharmonies as ch
 from tkinter.colorchooser import askcolor
 
