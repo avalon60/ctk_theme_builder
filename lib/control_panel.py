@@ -1698,7 +1698,6 @@ class ControlPanel(ctk.CTk):
             # If user has included a ".json" extension, remove it, because we add one below.
             new_theme_basename = os.path.splitext(new_theme)[0]
             new_theme = new_theme_basename + '.json'
-            creanew_theme = new_theme_basename + '.json'
             new_theme_path = self.theme_json_dir / new_theme
             if new_theme_path.exists():
                 self.status_bar.set_status_text(status_text=f'Theme {new_theme} already exists - '
@@ -1734,6 +1733,11 @@ class ControlPanel(ctk.CTk):
         if confirm.get() == 'No':
             self.seg_mode.set(self.appearance_mode)
             return
+
+        # Force the preview panel to look like the default (grey) theme.
+        default_file = ETC_DIR / 'default_theme.json'
+        self.theme_json_data = mod.json_dict(json_file_path=default_file)
+        self.reload_preview()
 
         os.remove(self.source_json_file)
         source_palette_file = self.theme + '.json'
@@ -1830,6 +1834,10 @@ class ControlPanel(ctk.CTk):
             self.theme = new_theme
             self.json_state = 'clean'
             self.command_stack.reset_stacks()
+            if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='auto_save',
+                                               preference_name='selected_theme',
+                                               preference_value=new_theme):
+                print(f'Row miss: on update of auto save of selected theme.')
             self.set_option_states()
 
     def paste_colour(self, event, widget_property, property_colour: str = None):
