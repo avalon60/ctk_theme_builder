@@ -96,8 +96,8 @@ class HarmonicsDialog(ctk.CTkToplevel):
         self.frm_shades_palette = ctk.CTkFrame(master=frm_main)
         self.frm_shades_palette.grid(column=2, row=0, padx=(0, 10), pady=10, sticky='nsew', rowspan=2)
 
-        frm_buttons = ctk.CTkFrame(master=frm_main)
-        frm_buttons.grid(column=0, row=2, padx=10, pady=(5, 0), sticky='ew', columnspan=3)
+        frm_buttons = ctk.CTkFrame(master=frm_main, border_width=0)
+        frm_buttons.grid(column=0, row=2, padx=10, pady=(0, 5), sticky='ew', columnspan=3)
 
         self.harmony_status_bar = cbtk.CBtkStatusBar(master=self,
                                                      status_text_life=30,
