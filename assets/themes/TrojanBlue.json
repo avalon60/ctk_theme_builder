@@ -13,17 +13,17 @@
   },
   "CTkFrame": {
     "corner_radius": 6,
-    "border_width": 0,
+    "border_width": 3,
     "fg_color": [
       "#3c528f",
-      "#2a447e"
-    ],
-    "top_fg_color": [
-      "#2d4380",
       "#233976"
     ],
+    "top_fg_color": [
+      "#324885",
+      "#192f6c"
+    ],
     "border_color": [
-      "#283e7b",
+      "#192d69",
       "#3F5EA8"
     ]
   },
@@ -39,7 +39,7 @@
       "#8c6b3f"
     ],
     "border_color": [
-      "#3F5EA8",
+      "#192d69",
       "#3F5EA8"
     ],
     "text_color": [
@@ -57,6 +57,10 @@
     "text_color": [
       "#ffffff",
       "#ffffff"
+    ],
+    "text_color_disabled": [
+      "#ffffff",
+      "#ffffff"
     ]
   },
   "CTkEntry": {
@@ -67,7 +71,7 @@
       "#1e326e"
     ],
     "border_color": [
-      "#3F5EA8",
+      "#192d69",
       "#3F5EA8"
     ],
     "text_color": [
@@ -77,34 +81,6 @@
     "placeholder_text_color": [
       "#a3c8ff",
       "#a3c8ff"
-    ]
-  },
-  "CTkCheckbox": {
-    "corner_radius": 6,
-    "border_width": 3,
-    "fg_color": [
-      "#283e7b",
-      "#142864"
-    ],
-    "border_color": [
-      "#3FA854",
-      "#3FA854"
-    ],
-    "hover_color": [
-      "#112c7c",
-      "#112c7c"
-    ],
-    "checkmark_color": [
-      "#ffffff",
-      "#ffffff"
-    ],
-    "text_color": [
-      "#ffffff",
-      "#ffffff"
-    ],
-    "text_color_disabled": [
-      "#b1d9ff",
-      "#b1d9ff"
     ]
   },
   "CTkSwitch": {
@@ -136,31 +112,6 @@
       "#b1d9ff"
     ]
   },
-  "CTkRadiobutton": {
-    "corner_radius": 1000,
-    "border_width_checked": 6,
-    "border_width_unchecked": 3,
-    "fg_color": [
-      "#3FA854",
-      "#3FA854"
-    ],
-    "border_color": [
-      "#218a36",
-      "#218a36"
-    ],
-    "hover_color": [
-      "#8c6b3f",
-      "#8c6b3f"
-    ],
-    "text_color": [
-      "#ffffff",
-      "#d9d9d9"
-    ],
-    "text_color_disabled": [
-      "#b1d9ff",
-      "#b1d9ff"
-    ]
-  },
   "CTkProgressBar": {
     "corner_radius": 1000,
     "border_width": 0,
@@ -173,8 +124,8 @@
       "#3FA854"
     ],
     "border_color": [
-      "#000000",
-      "#000000"
+      "#192d69",
+      "#3F5EA8"
     ]
   },
   "CTkSlider": {
@@ -230,7 +181,7 @@
       "#233773"
     ],
     "border_color": [
-      "#5170ba",
+      "#192d69",
       "#3F5EA8"
     ],
     "button_color": [
@@ -297,13 +248,13 @@
   },
   "CTkTextbox": {
     "corner_radius": 6,
-    "border_width": 0,
+    "border_width": 2,
     "fg_color": [
       "#283e7b",
       "#1e326e"
     ],
     "border_color": [
-      "#3F5EA8",
+      "#192d69",
       "#3F5EA8"
     ],
     "text_color": [
@@ -321,8 +272,8 @@
   },
   "CTkScrollableFrame": {
     "label_fg_color": [
-      "#43639b",
-      "#344e88"
+      "#324885",
+      "#192f6c"
     ]
   },
   "DropdownMenu": {
@@ -359,12 +310,65 @@
   "provenance": {
     "theme author": "Clive Bostock",
     "date created": "Mar 27 2023 18:16:02",
-    "last modified by": "clive",
+    "last modified by": "Clive Bostock",
     "created with": "CTk Theme Builder",
-    "last modified": "Jun 23 2023 19:37:27",
+    "last modified": "Aug 13 2023 14:03:54",
     "keystone colour": "#1f3572",
     "harmony method": "Complementary",
     "harmony differential": 5,
     "theme name": "TrojanBlue"
+  },
+  "CTkCheckBox": {
+    "corner_radius": 6,
+    "border_width": 3,
+    "fg_color": [
+      "#283e7b",
+      "#142864"
+    ],
+    "border_color": [
+      "#192d69",
+      "#3F5EA8"
+    ],
+    "hover_color": [
+      "#112c7c",
+      "#112c7c"
+    ],
+    "checkmark_color": [
+      "#ffffff",
+      "#ffffff"
+    ],
+    "text_color": [
+      "#ffffff",
+      "#ffffff"
+    ],
+    "text_color_disabled": [
+      "#b1d9ff",
+      "#b1d9ff"
+    ]
+  },
+  "CTkRadioButton": {
+    "corner_radius": 1000,
+    "border_width_checked": 6,
+    "border_width_unchecked": 3,
+    "fg_color": [
+      "#3FA854",
+      "#3FA854"
+    ],
+    "border_color": [
+      "#192d69",
+      "#3F5EA8"
+    ],
+    "hover_color": [
+      "#8c6b3f",
+      "#8c6b3f"
+    ],
+    "text_color": [
+      "#ffffff",
+      "#d9d9d9"
+    ],
+    "text_color_disabled": [
+      "#b1d9ff",
+      "#b1d9ff"
+    ]
   }
 }

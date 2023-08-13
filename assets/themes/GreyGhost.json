@@ -47,14 +47,18 @@
       "#ffffff"
     ],
     "text_color_disabled": [
-      "#8899a6",
-      "#8899a6"
+      "#c9dae7",
+      "#97a8b5"
     ]
   },
   "CTkLabel": {
     "corner_radius": 0,
     "fg_color": "transparent",
     "text_color": [
+      "#2b3449",
+      "#2b3449"
+    ],
+    "text_color_disabled": [
       "#2b3449",
       "#2b3449"
     ]
@@ -79,7 +83,7 @@
       "#464e56"
     ]
   },
-  "CTkCheckbox": {
+  "CTkCheckBox": {
     "corner_radius": 6,
     "border_width": 3,
     "fg_color": [
@@ -136,7 +140,7 @@
       "#5e6b7c"
     ]
   },
-  "CTkRadiobutton": {
+  "CTkRadioButton": {
     "corner_radius": 1000,
     "border_width_checked": 6,
     "border_width_unchecked": 3,
@@ -218,8 +222,8 @@
       "#ffffff"
     ],
     "text_color_disabled": [
-      "#b6b8ba",
-      "#b6b8ba"
+      "#c0c2c4",
+      "#cfd1d3"
     ]
   },
   "CTkComboBox": {
@@ -246,8 +250,8 @@
       "#ffffff"
     ],
     "text_color_disabled": [
-      "#b9bbbd",
-      "#b9bbbd"
+      "#dcdee0",
+      "#d7d9db"
     ]
   },
   "CTkScrollbar": {
@@ -287,11 +291,11 @@
       "#586b78"
     ],
     "text_color": [
-      "#2b3449",
+      "#1c253a",
       "#2b3449"
     ],
     "text_color_disabled": [
-      "#495363",
+      "#3a4454",
       "#495363"
     ]
   },
@@ -359,9 +363,9 @@
   "provenance": {
     "theme author": "Clive Bostock",
     "date created": "Mar 27 2023 18:16:02",
-    "last modified by": "clive",
+    "last modified by": "Clive Bostock",
     "created with": "CTk Theme Builder",
-    "last modified": "Jun 23 2023 19:20:58",
+    "last modified": "Aug 13 2023 13:42:44",
     "keystone colour": "#3c5064",
     "harmony method": "Split-complementary",
     "harmony differential": null,
