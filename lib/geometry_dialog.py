@@ -18,13 +18,14 @@ class GeometryDialog(ctk.CTkToplevel):
                  command_stack: mod.CommandStack, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.command_stack = command_stack
-
+        self.force_refresh = False
         # The interactions between this dialog and the Control Panel are strongly linked, making it less
         # straight forward to define as a class.
         def slider_callback(property_name, value):
             label_text = property_name.replace('_', ' ')
             base_label_text = label_text.replace(widget_type.lower(), '') + ': '
             property_value = int(value)
+            print(f'DEBUG: slider_callback({property_name}, {property_value} / {label_dict[property_name]})')
             label_dict[property_name].configure(text=base_label_text + str(property_value))
             config_param = property_name.replace(f'{widget_type.lower()}_', '')
             self.geometry_edit_values[property_name] = property_value
