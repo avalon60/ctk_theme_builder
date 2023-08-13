@@ -48,7 +48,7 @@
     ],
     "text_color_disabled": [
       "#5e6b7c",
-      "#5e6b7c"
+      "#b4bcc6"
     ]
   },
   "CTkLabel": {
@@ -109,7 +109,7 @@
     ],
     "text_color_disabled": [
       "#5e6b7c",
-      "#5e6b7c"
+      "#b4bcc6"
     ]
   },
   "CTkProgressBar": {
@@ -170,7 +170,7 @@
     ],
     "text_color_disabled": [
       "#5e6b7c",
-      "#5e6b7c"
+      "#b4bcc6"
     ]
   },
   "CTkComboBox": {
@@ -198,7 +198,7 @@
     ],
     "text_color_disabled": [
       "#5e6b7c",
-      "#5e6b7c"
+      "#b4bcc6"
     ]
   },
   "CTkScrollbar": {
@@ -242,8 +242,8 @@
       "#2b3449"
     ],
     "text_color_disabled": [
-      "#5e6b7c",
-      "#5e6b7c"
+      "#464e58",
+      "#3c444e"
     ]
   },
   "CTkTextbox": {
@@ -311,9 +311,9 @@
     "theme name": "Anthracite",
     "theme author": "clive",
     "date created": "Jun 10 2023 12:22:59",
-    "last modified by": "Clive Bostock",
+    "last modified by": "clive",
     "created with": "CTk Theme Builder v2.2.0",
-    "last modified": "Aug 01 2023 18:21:25",
+    "last modified": "Aug 13 2023 12:50:49",
     "keystone colour": "#3c5064",
     "harmony method": "Split-complementary",
     "harmony differential": null
@@ -343,7 +343,7 @@
     ],
     "text_color_disabled": [
       "#5e6b7c",
-      "#5e6b7c"
+      "#b4bcc6"
     ]
   },
   "CTkRadioButton": {
@@ -368,7 +368,7 @@
     ],
     "text_color_disabled": [
       "#c8d0de",
-      "#c8d0de"
+      "#b4bcc6"
     ]
   }
 }
