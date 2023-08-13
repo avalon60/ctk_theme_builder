@@ -66,6 +66,8 @@ def update_widget_geometry(widget, widget_property, property_value):
         widget.configure(border_width_unchecked=property_value)
     elif widget_property == 'border_width_checked':
         widget.configure(border_width_checked=property_value)
+    elif widget_property == 'button_length':
+        widget.configure(button_length=property_value)
 
 
 class PreviewPanel:
@@ -805,9 +807,9 @@ class PreviewPanel:
         now = datetime.now()
         # convert to string
         date_started = now.strftime("%b %d %Y %H:%M:%S")
-        print('PREVIEW: Checking for listener file...')
+        print('Preview Panel: Checking for listener file...')
         if not LISTENER_FILE.exists():
-            print('PREVIEW: Listener file missing, creating...')
+            print('Preview Panel: Listener file missing, creating...')
             with open(LISTENER_FILE, 'w') as f:
                 pid = os.getpid()
                 f.write(f'[{pid}] CTk Theme Builder listener started at: {date_started}')
