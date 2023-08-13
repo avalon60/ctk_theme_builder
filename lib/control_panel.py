@@ -21,7 +21,6 @@ from datetime import datetime
 import shutil
 import os
 import subprocess as sp
-from tkinter import filedialog
 from tkinter.colorchooser import askcolor
 import json
 from lib.CTkToolTip import *
@@ -1554,8 +1553,7 @@ class ControlPanel(ctk.CTk):
 
     def launch_harmony_dialog(self):
         harmonics_dialog = HarmonicsDialog(theme_name=self.theme,
-                                           theme_json_data=self.theme_json_data,
-                                           enable_tooltips=self.enable_tooltips)
+                                           theme_json_data=self.theme_json_data)
 
     def darken_palette_tile(self, palette_button: ctk.CTkButton,
                             palette_button_id: int,
@@ -2311,7 +2309,7 @@ class ControlPanel(ctk.CTk):
                     confirm = CTkMessagebox(master=self,
                                             title='Please Upgrade CustomTkinter',
                                             message=f'TIMEOUT: Waited too long for preview listener!\n\n'
-                                                    f'Ensure that only one instance of {__title__} is running is '
+                                                    f'Ensure that only one instance of {mod.app_title()} is running is '
                                                     f'running on port {self.listener_port}, and that no other process '
                                                     f'is using the port.',
                                             option_1='OK')

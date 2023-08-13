@@ -24,7 +24,7 @@ HEADING4 = mod.HEADING4
 REGULAR_TEXT = cbtk.REGULAR_TEXT
 SMALL_TEXT = mod.SMALL_TEXT
 class HarmonicsDialog(ctk.CTkToplevel):
-    def __init__(self, theme_name, theme_json_data: dict, enable_tooltips: bool, *args, **kwargs):
+    def __init__(self, theme_name, theme_json_data: dict, *args, **kwargs):
         super().__init__(*args, **kwargs)
         icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
         self.iconphoto(False, icon_photo)
@@ -38,6 +38,9 @@ class HarmonicsDialog(ctk.CTkToplevel):
 
         self.harmony_contrast_differential = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                                     preference_name='harmony_contrast_differential')
+
+        self.enable_tooltips = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                      preference_name='enable_tooltips')
 
         control_panel_theme = mod.preference_setting(db_file_path=DB_FILE_PATH,
                                                      scope='user_preference', preference_name='control_panel_theme')
@@ -191,7 +194,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
                                             state=button_state,
                                             command=self.copy_harmonics_to_palette)
 
-        if enable_tooltips:
+        if self.enable_tooltips:
             btn_tooltip = CTkToolTip(btn_copy_to_palette,
                                      wraplength=250,
                                      justify="left",
@@ -211,7 +214,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
                                               )
             btn_save_keystone.grid(row=0, column=2, padx=15, pady=5)
 
-            if enable_tooltips:
+            if self.enable_tooltips:
                 btn_tooltip = CTkToolTip(btn_save_keystone,
                                          wraplength=250,
                                          justify="left",

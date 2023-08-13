@@ -6,8 +6,6 @@ import customtkinter as ctk
 import tkinter as tk
 import lib.cbtk_kit as cbtk
 
-
-
 APP_IMAGES = mod.APP_IMAGES
 
 
@@ -73,4 +71,3 @@ class About(ctk.CTkToplevel):
 
     def close_dialog(self, event=None):
         self.destroy()
-

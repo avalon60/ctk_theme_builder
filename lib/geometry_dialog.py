@@ -19,6 +19,9 @@ class GeometryDialog(ctk.CTkToplevel):
         super().__init__(*args, **kwargs)
         self.command_stack = command_stack
         self.force_refresh = False
+
+        self.enable_tooltips = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                      preference_name='enable_tooltips')
         # The interactions between this dialog and the Control Panel are strongly linked, making it less
         # straight forward to define as a class.
         def slider_callback(property_name, value):
@@ -404,7 +407,7 @@ class GeometryDialog(ctk.CTkToplevel):
                                              width=190,
                                              height=180)
             geometry_widget.grid(row=10, column=0, padx=(15, 0), pady=(30, 0), sticky="nsew", rowspan=1)
-            if self.master.enable_tooltips:
+            if self.enable_tooltips:
                 textbox_tooltip = CTkToolTip(geometry_widget,
                                              wraplength=300,
                                              padding=(10, 10),

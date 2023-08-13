@@ -14,7 +14,6 @@ from datetime import datetime
 from dataclasses import dataclass
 from typing import Union
 import socket
-import sys
 import re
 
 application_title = 'CTk Theme Builder'
@@ -117,7 +116,6 @@ RENDERED_PREVIEW_WIDGETS = {"CTk": [],
                             "CTkButton": [],
                             "CTkCheckBox": [],
                             "CTkComboBox": [],
-                            "CTk": [],
                             "CTkDropdownMenu": [],
                             "CTkEntry": [],
                             "CTkFrame": [],

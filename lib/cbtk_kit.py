@@ -6,13 +6,11 @@ __license__ = 'MIT - see LICENSE.md'
 import tkinter as tk
 import customtkinter as ctk
 from customtkinter import ThemeManager
-from PIL import Image, ImageTk
+from PIL import Image
 import textwrap
 import json
 from matplotlib.colors import is_color_like
 import lib.color_constants as color_constants
-from customtkinter.windows.widgets.appearance_mode.appearance_mode_base_class import CTkAppearanceModeBaseClass
-import platform
 
 # Constants
 # These aren't true sizes as per WEB design
@@ -47,14 +45,8 @@ def contrast_colour(color: str, differential: int = 20):
     if not str(color).startswith("#"):
         convert_hex = color_constants.colors[color].hex_format()
         color_rgb = hex2rgb(convert_hex)
-        rgb_0 = color_rgb[0]
-        rgb_1 = color_rgb[1]
-        rgb_2 = color_rgb[2]
     else:
         color_rgb = hex2rgb(color)
-        rgb_0 = color_rgb[0]
-        rgb_1 = color_rgb[1]
-        rgb_2 = color_rgb[2]
 
     if color_rgb[0] > differential:
         rgb_0 = color_rgb[0] - differential
@@ -86,16 +78,11 @@ def shade_up(color: str, differential: int = 20, multiplier: int = 1):
     if not str(color).startswith("#"):
         convert_hex = color_constants.colors[color].hex_format()
         color_rgb = hex2rgb(convert_hex)
-        rgb_0 = color_rgb[0]
-        rgb_1 = color_rgb[1]
-        rgb_2 = color_rgb[2]
     else:
         color_rgb = hex2rgb(color)
-        rgb_0 = color_rgb[0]
-        rgb_1 = color_rgb[1]
-        rgb_2 = color_rgb[2]
 
-    if color_rgb[0] + compound_differential > 255 or color_rgb[1] + compound_differential > 255 or color_rgb[2] + compound_differential > 255:
+    if color_rgb[0] + compound_differential > 255 or color_rgb[1] + compound_differential > 255 \
+            or color_rgb[2] + compound_differential > 255:
         # Don't perturb the colour balance
         return color
 
@@ -118,16 +105,11 @@ def shade_down(color: str, differential: int = 20, multiplier: int = 1):
     if not str(color).startswith("#"):
         convert_hex = color_constants.colors[color].hex_format()
         color_rgb = hex2rgb(convert_hex)
-        rgb_0 = color_rgb[0]
-        rgb_1 = color_rgb[1]
-        rgb_2 = color_rgb[2]
     else:
         color_rgb = hex2rgb(color)
-        rgb_0 = color_rgb[0]
-        rgb_1 = color_rgb[1]
-        rgb_2 = color_rgb[2]
 
-    if color_rgb[0] - compound_differential < 0 or color_rgb[1] - compound_differential < 0 or color_rgb[2] - compound_differential < 0:
+    if color_rgb[0] - compound_differential < 0 or color_rgb[1] - compound_differential < 0 \
+            or color_rgb[2] - compound_differential < 0:
         # Don't perturb the colour balance
         return color
 
@@ -210,6 +192,7 @@ def theme_property_color(theme_file_path, widget_type: str, widget_property: str
     property_colour = theme_dict[widget_type][widget_property][mode_idx]
     return property_colour
 
+
 def theme_property(theme_file_path, widget_type: str, widget_property: str):
     """Based on the pathname to the CustomTkinter theme's JSON file, we return the property value, for the specified
     CustomTkinter widget property. """
@@ -219,7 +202,8 @@ def theme_property(theme_file_path, widget_type: str, widget_property: str):
     property_colour = theme_dict[widget_type][widget_property]
     return property_colour
 
-def theme_provenence_attribute(theme_file_path, attribute: str, value_on_missing:str = 'Unknown'):
+
+def theme_provenence_attribute(theme_file_path, attribute: str, value_on_missing: str = 'Unknown'):
     """Based on the pathname to the CustomTkinter theme's JSON file, we return the requested provenance value
     associated with the supplied attribute."""
     with open(theme_file_path) as json_file:
@@ -243,6 +227,7 @@ def wrap_string(text_string: str, wrap_width=80):
     for element in word_list:
         string = string + element + '\n'
     return string
+
 
 class CBtkMenu(tk.Menu):
     widget_registry = []
@@ -286,52 +271,6 @@ class CBtkMenu(tk.Menu):
 
     def update_appearance_mode(self):
         """Method called to scan through rendered widgets and update to a new appearance mode setting."""
-        mode = ctk.get_appearance_mode()
-        if mode == 'Light':
-            mode = 0
-        else:
-            mode = 1
-
-        fg_color = ThemeManager.theme["DropdownMenu"]["fg_color"][mode]
-        hover_color = ThemeManager.theme["DropdownMenu"]["hover_color"][mode]
-        text_color = ThemeManager.theme["DropdownMenu"]["text_color"][mode]
-
-        self.configure(bg=fg_color,
-                       fg=text_color,
-                       activebackground=hover_color,
-                       activeforeground=text_color)
-
-
-class CBtkMenu2(tk.Menu, CTkAppearanceModeBaseClass):
-    def __init__(self):
-        CTkAppearanceModeBaseClass.__init__(self)
-
-    def __init__(self,
-                 *args,
-                 **kwargs):
-        super().__init__(*args, **kwargs)
-
-        mode = ctk.get_appearance_mode()
-        if mode == 'Light':
-            mode = 0
-        else:
-            mode = 1
-        fg_color = ThemeManager.theme["DropdownMenu"]["fg_color"][mode]
-        hover_color = ThemeManager.theme["DropdownMenu"]["hover_color"][mode]
-        text_color = ThemeManager.theme["DropdownMenu"]["text_color"][mode]
-
-        platform_font = ThemeManager.theme["CTkFont"]
-        self._font_family = platform_font["family"]
-        self._font_size = 11
-        self._font_weight = platform_font["weight"]
-
-        self.configure(bg=fg_color,
-                       fg=text_color,
-                       activebackground=hover_color,
-                       activeforeground=text_color,
-                       font=(self._font_family, self._font_size, self._font_weight))
-
-    def update_appearance_mode(self):
         mode = ctk.get_appearance_mode()
         if mode == 'Light':
             mode = 0
@@ -417,10 +356,6 @@ class CBtkMessageBox(object):
         self.lbl_message = ctk.CTkLabel(self.frm_message, text=self.message)
         self.lbl_message.pack(fill=tk.BOTH, padx=10, pady=(20, 10))
 
-        button_count = 2
-        buttons_width = button_count * button_width
-        # self.root.update_idletasks()
-        # width = self.frm_buttons.winfo_width()
         button_count = 1
         if button2_text:
             button_count += 1
@@ -506,9 +441,6 @@ class CBtkMessageBox(object):
 
         # Make the message box visible
         self.frm_main.update_idletasks()
-        width = self.frm_main.winfo_width()
-        height = self.frm_main.winfo_height()
-
         self.root.grab_set()
 
         try:
@@ -684,7 +616,7 @@ class CBtkStatusBar(tk.Entry):
         super().__init__()
 
         if fg_color is None:
-            fg_color = bg_color = self.get_color_from_name(widget_type='CTkFrame', widget_property='fg_color')
+            fg_color = self.get_color_from_name(widget_type='CTkFrame', widget_property='fg_color')
         if text_color is None:
             text_color = self.get_color_from_name(widget_type='CTkLabel', widget_property='text_color')
 
@@ -745,7 +677,6 @@ class CBtkStatusBar(tk.Entry):
 
     def set_status_text(self, status_text: str,
                         status_text_life=None):
-        message_life = 0
         try:
             self.widget.configure(text='  ' + status_text)
         except tk.TclError:
@@ -848,13 +779,12 @@ class CBtkToolTip(object):
         self._id = self._widget.after(self._wait_time, self.show_tooltip)
 
     def _unschedule(self):
-        id = self._id
+        _id = self._id
         self._id = None
-        if id:
-            self._widget.after_cancel(id)
+        if _id:
+            self._widget.after_cancel(_id)
 
     def show_tooltip(self, event=None):
-        x = y = 0
         x, y, cx, cy = self._widget.bbox("insert")
         x += self._widget.winfo_rootx() + 40
         y += self._widget.winfo_rooty() + 20
