@@ -127,7 +127,7 @@ class ThemeMerger(ctk.CTkToplevel):
         widget_start_row += 1
 
         lbl_secondary_theme = ctk.CTkLabel(master=frm_widgets, text='Secondary theme', justify="right")
-        lbl_secondary_theme.grid(row=widget_start_row, column=0, padx=15, pady=(20, 5), sticky='e')
+        lbl_secondary_theme.grid(row=widget_start_row, column=0, padx=5, pady=(20, 5), sticky='e')
 
         if self.enable_tooltips:
             btn_author_tooltip = CTkToolTip(lbl_secondary_theme,
@@ -238,6 +238,7 @@ class ThemeMerger(ctk.CTkToplevel):
         """This method processes the "Merge Themes" dialog (launch_merge_dialog) submission, and is activated by the
         Merge button."""
         primary_theme_name = self.tk_primary_theme.get()
+
         primary_appearance_mode = self.tk_primary_mode.get()
         secondary_theme_name = self.tk_secondary_theme.get()
         secondary_appearance_mode = self.tk_secondary_mode.get()
@@ -247,10 +248,21 @@ class ThemeMerger(ctk.CTkToplevel):
         self.open_when_merged = None
         self.new_theme = None
 
+        if not primary_theme_name:
+            self.status_bar.set_status_text('You must select a Primary theme name.')
+            return
+
+        if not secondary_theme_name:
+            self.status_bar.set_status_text('You must select a Secondary theme name.')
+            return
+
         if primary_theme_name == secondary_theme_name and primary_appearance_mode == secondary_appearance_mode:
             self.status_bar.set_status_text('You cannot merge the same theme / appearance mode to itself.')
+            return
+
         if not mod.valid_theme_file_name(new_theme_file):
             self.status_bar.set_status_text('Invalid characters in new theme file name!')
+            return
 
         if len(new_theme_file) == 0:
             self.status_bar.set_status_text(status_text=f'You must enter a theme name for the new theme.')
