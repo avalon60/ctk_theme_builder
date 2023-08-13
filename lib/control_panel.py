@@ -88,9 +88,6 @@ class ControlPanel(ctk.CTk):
         self.palettes_dir = mod.PALETTES_DIR
         self.listener_port = mod.listener_port()
         self.qa_launched = False
-        this_platform = platform.system()
-        if this_platform == "Darwin":
-            self.platform = "MacOS"
 
         icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
         self.iconphoto(False, icon_photo)
@@ -652,7 +649,7 @@ class ControlPanel(ctk.CTk):
         if listener_port != self.listener_port:
             self.reload_preview()
         self.load_preferences()
-        self.status_bar.set_status_text(status_text=f'Preferences {action}.')
+        self.status_bar.set_status_text(status_text=f'Preference updates {action}.')
 
     def launch_provenance_dialog(self):
         provenance_dialog = ProvenanceDialog()
@@ -1256,14 +1253,17 @@ class ControlPanel(ctk.CTk):
 
             context_menu.add_cascade(label='Lighten shade', menu=shade_up_menu)
             context_menu.add_cascade(label='Darken shade', menu=shade_down_menu)
-            context_menu.add_separator()
-            context_menu.add_command(label="Colour Picker",
-                                     command=lambda button_id=entry_id: self.palette_colour_picker(button_id))
 
             if self.cascade_enabled(palette_id=palette_id):
                 context_menu.add_separator()
                 context_menu.add_command(label="Cascade colour",
                                          command=lambda button_id=entry_id: self.cascade_colour(button_id))
+
+            context_menu.add_separator()
+            context_menu.add_command(label="Colour Picker",
+                                     command=lambda button_id=entry_id: self.palette_colour_picker(button_id))
+
+
             menus.append(context_menu)
 
             if self.enable_single_click_paste:
