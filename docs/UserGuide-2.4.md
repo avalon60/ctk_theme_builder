@@ -498,11 +498,18 @@ As you can guess by the name, this is an extension of the CTkFrame widget. With 
 The CTkTabview widget is a composite of CTkFrame and CTkSegmentedButton. It has no properties of its own in a theme file and so inherits its defaults from these two widget types.
 
 # What's New in CTk Theme Builder 2.4
+
 There are several new features in 2.4:
 
 * Improved Theme Palette management - we now transparently allow switching appearance modes, without losing palette changes. These previously had to be saved so as not to lose changes.
 * New Undo / Redo buttons, allowing individual changes to be undone or re-done.
 * The ability to adjust the network port, on which CTk Theme builder, controls the Preview Panel.
+
+### Fixes
+* Windows users may have noticed an issue with the tool-tips, causing the background text and tool-tip text to be muddled together. This is now fixed.
+* An issue with the button_length adjustment for CTkSwitch has been fixed. This was causing any changes to not be visualised.
+* Preferences fix - the Themes Location was being set to None, when a Save was performed without changing the location.
+* Fixed a scaling bug in QA app, which caused geometry to get messed up.
 
 # Known Issues and Behaviours
 
@@ -517,6 +524,16 @@ An issue has been raised on the CustomTkinter, GITHub repository where CTkSlider
 *CTk 5.2.0: Exception encountered when configuring CTkSlider, button_corner_radius* #1790. A fix is pending.
 
 For the time being, adjustments to the button corner radius of CTkSlider, have no visual effect inside the geometry pup up. You can however set a value, save it and hit the *Refresh* button, to preview the effect in the *Preview Panel*. 
+
+#### CTkSlider Configure button_length
+Adjusting the button length causes:
+
+`raise ValueError(f"{list(kwargs_dict.keys())} are not supported arguments. Look at the documentation for supported arguments.")`
+`ValueError: ['button_length'] are not supported arguments. Look at the documentation for supported arguments.`
+
+This has been raised as Issue #1905, [https://github.com/TomSchimansky/CustomTkinter/issues/1905](https://github.com/TomSchimansky/CustomTkinter/issues/1905)
+As a partial workaround, CTk Theme Builder, forces a refresh of the Preview Panel, so that the effect of the adjustment can be seen. 
+However, you will not see the changes in rel time, within the CTkSlider geometry dialogue.
 
 #### DropdownMenu
 
