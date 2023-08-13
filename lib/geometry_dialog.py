@@ -28,7 +28,6 @@ class GeometryDialog(ctk.CTkToplevel):
             label_text = property_name.replace('_', ' ')
             base_label_text = label_text.replace(widget_type.lower(), '') + ': '
             property_value = int(value)
-            print(f'DEBUG: slider_callback({property_name}, {property_value} / {label_dict[property_name]})')
             label_dict[property_name].configure(text=base_label_text + str(property_value))
             config_param = property_name.replace(f'{widget_type.lower()}_', '')
             self.geometry_edit_values[property_name] = property_value
@@ -103,7 +102,7 @@ class GeometryDialog(ctk.CTkToplevel):
         widget_label = ctk.CTkLabel(master=frm_label, text=f'{widget_type} Geometry',
                                     font=mod.HEADING5,
                                     justify=ctk.CENTER)
-        widget_label.grid(row=0, column=0, padx=(30, 30), sticky='ew')
+        widget_label.grid(row=0, column=0, padx=(30, 30), pady=(5, 5), sticky='ew')
 
         # Control buttons
         btn_close = ctk.CTkButton(master=frm_buttons, text='Cancel', command=self.close_geometry_dialog)
@@ -466,9 +465,7 @@ class GeometryDialog(ctk.CTkToplevel):
             parameters = []
             # This function call is necessary, because there are several naming
             # inconsistencies (at least in CTk 5.1.2), between widget names.
-            # json_widget_type = mod.json_widget_type(widget_type=widget_type)
-            json_widget_type = widget_type
-            if self.theme_json_data[json_widget_type][widget_property] != property_value:
+            if self.theme_json_data[widget_type][widget_property] != property_value:
                 self.master.json_state = 'dirty'
 
                 # Create ourselves a change vector - needed for undo / redo
@@ -477,14 +474,14 @@ class GeometryDialog(ctk.CTkToplevel):
                                                    component_type=widget_type,
                                                    component_property=widget_property,
                                                    new_value=property_value,
-                                                   old_value=self.theme_json_data[json_widget_type][widget_property])
+                                                   old_value=self.theme_json_data[widget_type][widget_property])
 
                 self.command_stack.exec_command(property_vector=change_vector)
                 display_property = mod.PropertyVector.display_property(widget_type=widget_type,
                                                                        widget_property=widget_property)
                 if display_property in mod.FORCE_GEOM_REFRESH_PROPERTIES:
                     self.force_refresh = True
-                self.theme_json_data[json_widget_type][widget_property] = property_value
+                self.theme_json_data[widget_type][widget_property] = property_value
 
         if self.master.json_state == 'dirty':
             with open(self.master.wip_json, "w") as f:
