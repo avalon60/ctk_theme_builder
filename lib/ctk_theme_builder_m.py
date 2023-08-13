@@ -137,9 +137,11 @@ RENDERED_PREVIEW_WIDGETS = {"CTk": [],
                             "CTkToplevel": []}
 
 # We normally list entries here, where there is no direct configure option.
+#  CTk 5.2.0: CTkSlider.button_length has no supporting configure option. #1905
 FORCE_GEOM_REFRESH_PROPERTIES = [
     "Scrollbar: border_spacing",
-    "Scrollbar: corner_radius"
+    "Scrollbar: corner_radius",
+    "Slider: button_length"
 ]
 
 # We normally list entries here, where the configure method has a bug or is subject to an omission.
