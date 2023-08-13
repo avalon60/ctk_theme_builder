@@ -18,6 +18,11 @@ DB_FILE_PATH = mod.DB_FILE_PATH
 class PreferencesDialog(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+
+        this_platform = platform.system()
+        if this_platform == "Darwin":
+            self.platform = "MacOS"
+
         icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
         self.iconphoto(False, icon_photo)
         control_panel_theme = mod.preference_setting(db_file_path=DB_FILE_PATH,
@@ -76,8 +81,7 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.action = 'cancelled'
 
         self.new_theme_json_dir = self.theme_json_dir
-        # Establish the user login name and home directory.
-        this_platform = platform.system()
+        # Establish the user login name and home directory        this_platform = platform.system()
         if this_platform == "Windows":
             self.user_home_dir = os.getenv("UserProfile")
             self.user_name = os.getenv("LOGNAME")
