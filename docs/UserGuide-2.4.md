@@ -4,7 +4,7 @@
 ### Acknowledegments
 *A thank-you to my ever patient, ever loving, beautiful wife, who has let me hide in my office and beaver away at this project, for many an hour.* 
    
-*I would also like to thank my friend and colleague, Jan Bejec, for his graphics contributions.*
+*I would also like to thank my friend and colleague, Jan Bajec, for his graphics contributions.*
 
 ### A Bit of History
 In case you are wondering, "so where is CTk Theme Builder version 1.0?", well it was never made public. CTk Theme Builder, started with very humble beginnings. In fact it started with a crude CustomTkinter program which was used to display the results of theme file modifications, performed using a Vim editor (yes I also use Vim - sue me ;o). Features were added and added, and well, the project grew legs and became a bit of an obsession. Version 1.0 was based on CustomTkinter 4, which had a radically different JSON format for the theme files. So when Tom decided to release v5 with a drastically different format, I decided to take a break and let things with the new version, bed in. Anyway, although the initial CTk Theme Builder was functional, it was never as polished as I would have liked.  The CustomTkinter v5 JSON format was actually a game changer - much improved and more object oriented, although it did present some non-trivial re-engineering challenges, but finally, here we are.
@@ -124,6 +124,8 @@ As you can see the UI Scaling has been set to 80%. You can adjust the scaling wi
 
 The QA application, once launched is semi-autonomous; You can close it via the _Close_ button on the bottom right of the QA application. You can also open more than one instance of the QA application, allowing you to compare interim changes to the theme. From version 2.3 of the theme builder onward, all instances of the QA application are closed automatically, when you exit the theme builder via the _Quit_ button on the Control Panel.
 
+**The _Provenance_ option is only available for themes created using CTk Theme Builder. If you need to access it for a file of different origin, you need to do a _Save As_, and edit the theme as per the new theme name.**
+
 
 ## Tools Menu
 
@@ -238,7 +240,7 @@ NOTE: If you change the theme location at any time, you will need to manually co
 
 ### Colour Harmonics
 
-The *Colour Harmonics* panel, is accessed via the *Tools* menu, and only becomes available when you open a theme.
+The *Colour Harmonics* panel, is accessed via the *Tools* menu, and only becomes available when you open a theme. 
 
 The idea behind it, is that you can generate colours, around which you can base a new theme.
 
@@ -251,6 +253,8 @@ Amongst other functions, right clicking the *Keystone Colour* tile, presents a *
 The tiles to the right are produced by taking the core colours, and copying them to the first row. Theses are then used to produce shade variants, with each successive row being darkened slightly, as you scan down from the top row of colours, to the bottom. 
 
 You can of course, copy one of the generated darker shades and paste it to the *Keystone Colour*, causing it to generate another set of shade variants. 
+
+**The _Colour Harmonics_ option is only available for themes created using CTk Theme Builder. If you need to access it for a file of different origin, you need to do a _Save As_, and edit the theme as per the new theme name.**
 
 #### Method Options
 
@@ -501,15 +505,18 @@ The CTkTabview widget is a composite of CTkFrame and CTkSegmentedButton. It has 
 
 There are several new features in 2.4:
 
-* Improved Theme Palette management - we now transparently allow switching appearance modes, without losing palette changes. These previously had to be saved so as not to lose changes.
 * New Undo / Redo buttons, allowing individual changes to be undone or re-done.
+* Improved Theme Palette management - we now transparently allow switching appearance modes, without losing palette changes. These previously had to be saved so as not to lose changes.
 * The ability to adjust the network port, on which CTk Theme builder, controls the Preview Panel.
+* When deleting a theme, CTk Theme Builder, now greys out colours in the Preview Panel.
 
 ### Fixes
 * Windows users may have noticed an issue with the tool-tips, causing the background text and tool-tip text to be muddled together. This is now fixed.
 * An issue with the button_length adjustment for CTkSwitch has been fixed. This was causing any changes to not be visualised.
-* Preferences fix - the Themes Location was being set to None, when a Save was performed without changing the location.
 * Fixed a scaling bug in QA app, which caused geometry to get messed up.
+* When doing a *Save As*, the theme was not "remembered" and auto opened upon application launch, When *Load Last Theme* was enabled in preferences - this is now fixed.
+* Supplied themes have been improved - mainly around disabled text colouration.
+* Fix widget type display, in geometry dialogue (bottom right), for control panel themes which include a frame border. Text was blotting out part of border.
 
 # Known Issues and Behaviours
 
