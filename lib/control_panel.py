@@ -1083,7 +1083,7 @@ class ControlPanel(ctk.CTk):
 
         if self.harmony_palette_running:
             self.tools_menu.entryconfig('Colour Harmonics', state=tk.DISABLED)
-        elif not self.harmony_palette_running and self.theme:
+        elif not self.harmony_palette_running and self.theme and 'provenance' in self.theme_json_data:
             self.tools_menu.entryconfig('Colour Harmonics', state=tk.NORMAL)
 
     def switch_preview_appearance_mode(self, event='event'):
