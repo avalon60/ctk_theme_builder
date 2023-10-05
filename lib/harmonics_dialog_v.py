@@ -6,6 +6,8 @@ import tkinter as tk
 import pyperclip
 from lib.CTkToolTip import *
 import lib.cbtk_kit as cbtk
+import lib.preferences_m as pref
+import lib.loggerutl as log
 
 import colorharmonies as ch
 from tkinter.colorchooser import askcolor
@@ -22,6 +24,8 @@ HEADING4 = mod.HEADING4
 
 REGULAR_TEXT = cbtk.REGULAR_TEXT
 SMALL_TEXT = mod.SMALL_TEXT
+
+
 class HarmonicsDialog(ctk.CTkToplevel):
     def __init__(self, theme_name, theme_json_data: dict, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -35,22 +39,22 @@ class HarmonicsDialog(ctk.CTkToplevel):
         self.rendered_keystone_shades = []
         self.theme_name = theme_name
 
-        self.harmony_contrast_differential = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                                    preference_name='harmony_contrast_differential')
+        self.harmony_contrast_differential = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                                     preference_name='harmony_contrast_differential')
 
-        self.enable_tooltips = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                      preference_name='enable_tooltips')
+        self.enable_tooltips = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                       preference_name='enable_tooltips')
 
-        control_panel_theme = mod.preference_setting(db_file_path=DB_FILE_PATH,
-                                                     scope='user_preference', preference_name='control_panel_theme')
+        control_panel_theme = pref.preference_setting(db_file_path=DB_FILE_PATH,
+                                                      scope='user_preference', preference_name='control_panel_theme')
 
         control_panel_theme = control_panel_theme + '.json'
 
         self.control_panel_theme = str(APP_THEMES_DIR / control_panel_theme)
         # The control_panel_mode holds the  CustomTkinter appearance mode (Dark / Light)
 
-        self.control_panel_mode = mod.preference_setting(db_file_path=DB_FILE_PATH,
-                                                         scope='user_preference', preference_name='control_panel_mode')
+        self.control_panel_mode = pref.preference_setting(db_file_path=DB_FILE_PATH,
+                                                          scope='user_preference', preference_name='control_panel_mode')
         self.TEMP_DIR = TEMP_DIR
 
         ctl_mode_idx = cbtk.str_mode_to_int(self.control_panel_mode)
@@ -241,14 +245,16 @@ class HarmonicsDialog(ctk.CTkToplevel):
 
     def restore_harmony_geometry(self):
         """Restore window geometry from auto-saved preferences"""
-        saved_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH,
-                                                scope='window_geometry',
-                                                preference_name='harmonics_panel')
+        saved_geometry = pref.preference_setting(db_file_path=DB_FILE_PATH,
+                                                 scope='window_geometry',
+                                                 preference_name='harmonics_panel')
         self.geometry(saved_geometry)
         self.resizable(False, False)
 
     def copy_harmony_input_colour(self, event=None):
         colour = self.btn_keystone_colour.cget('fg_color')
+        log.log_debug(log_text=f'Copy harmony input colour, {colour} to clipboard', class_name='HarmonicsDialog',
+                      method_name='copy_harmony_input_colour')
         pyperclip.copy(colour)
         self.harmony_status_bar.set_status_text(
             status_text=f'Colour {colour} copied to clipboard.')
@@ -256,6 +262,9 @@ class HarmonicsDialog(ctk.CTkToplevel):
     def paste_harmony_keystone_colour(self):
         """Paste the colour currently stored in the paste buffer, to the harmony input button."""
         new_colour = pyperclip.paste()
+        log.log_debug(log_text=f'Paste harmony input colour, {new_colour} from clipboard',
+                      class_name='HarmonicsDialog',
+                      method_name='paste_harmony_keystone_colour')
         if not cbtk.valid_colour(new_colour):
             self.harmony_status_bar.set_status_text(status_text='Attempted paste of non colour code text - ignored.')
             return
@@ -275,23 +284,37 @@ class HarmonicsDialog(ctk.CTkToplevel):
             # set the harmony method, as tagged in the theme file.
             self.opm_harmony_method.set(method)
             self.keystone_colour = colour_code
+            log.log_debug(log_text=f'Set harmony keystone colour: {colour_code}',
+                          class_name='HarmonicsDialog',
+                          method_name='set_harmony_keystone')
 
     def copy_keystone_colour(self, event=None, harmony_button_id=None, shade_copy=False):
         colour = self.rendered_keystone_shades[harmony_button_id].cget('fg_color')
         if shade_copy:
             colour = cbtk.contrast_colour(colour, self.shade_adjust_differential)
+        log.log_debug(log_text=f'Copy keystone colour: {colour}',
+                      class_name='HarmonicsDialog',
+                      method_name='copy_keystone_colour')
         pyperclip.copy(colour)
         self.harmony_status_bar.set_status_text(
             status_text=f'Colour {colour} copied from palette entry {harmony_button_id + 1} to clipboard.')
 
     def copy_harmony_colour(self, event=None, harmony_button_id=None, shade_copy=False):
         colour = self.rendered_harmony_buttons[harmony_button_id].cget('fg_color')
+        log.log_debug(log_text=f'Copy harmony colour: {colour}',
+                      class_name='HarmonicsDialog',
+                      method_name='copy_harmony_colour')
         pyperclip.copy(colour)
 
         self.harmony_status_bar.set_status_text(
             status_text=f'Colour {colour} copied from palette entry {harmony_button_id + 1} to clipboard.')
 
     def harmony_input_colour_picker(self):
+
+        log.log_debug(log_text='Launch harmony colour picker',
+                      class_name='HarmonicsDialog',
+                      method_name='harmony_input_colour_picker')
+
         # self.harmonics_label_count
         self.lift()
         self.transient()
@@ -323,6 +346,9 @@ class HarmonicsDialog(ctk.CTkToplevel):
         self.populate_harmony_colours()
 
     def populate_harmony_colours(self):
+        log.log_debug(log_text='Populate harmony colours',
+                      class_name='HarmonicsDialog',
+                      method_name='populate_harmony_colours')
         primary_colour = self.keystone_colour
         harmony_method = self.opm_harmony_method.get()
         colour_object = ch.Color(mod.hex_to_rgb(self.keystone_colour), "", "")
@@ -360,14 +386,20 @@ class HarmonicsDialog(ctk.CTkToplevel):
 
     def save_harmonics_geometry(self):
         """Save the harmonics panel geometry to the repo, for the next time the dialog is launched."""
-        geometry_row = mod.preference_row(db_file_path=DB_FILE_PATH,
-                                          scope='window_geometry',
-                                          preference_name='harmonics_panel')
+        log.log_debug(log_text='Save harmonics display geometry',
+                      class_name='HarmonicsDialog',
+                      method_name='save_harmonics_geometry')
+        geometry_row = pref.preference_row(db_file_path=DB_FILE_PATH,
+                                           scope='window_geometry',
+                                           preference_name='harmonics_panel')
         panel_geometry = self.geometry()
         geometry_row["preference_value"] = panel_geometry
-        mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
+        pref.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
 
     def close_harmonics(self, event=None):
+        log.log_debug(log_text=f'Closing colour harmonics dialogue',
+                      class_name='HarmonicsDialog', method_name='close_harmonics')
+
         self.rendered_keystone_shades = []
         self.save_harmonics_geometry()
         self.destroy()
@@ -378,7 +410,9 @@ class HarmonicsDialog(ctk.CTkToplevel):
         """This method updates the rendered buttons, below the keystone colour button, when we change the harmony
         method (complimentary, triadic etc)."""
         harmony_method = self.opm_harmony_method.get()
-
+        log.log_debug(log_text='Update the newly generated colours to buttons, below the keystone colour button',
+                      class_name='HarmonicsDialog',
+                      method_name='switch_harmony_method')
         row = 1
         column = 0
 
@@ -554,6 +588,10 @@ class HarmonicsDialog(ctk.CTkToplevel):
                     break
 
     def copy_harmonics_to_palette(self):
+        """This method copies the primary, and generated base colours to the first few tiles of the theme palette."""
+        log.log_debug(log_text='Copy harmonics to theme colour palette',
+                      class_name='HarmonicsDialog',
+                      method_name='copy_harmonics_to_palette')
         harmonic_differential = self.harmony_contrast_differential
         colour_range = [self.btn_keystone_colour.cget('fg_color')]
 
@@ -591,8 +629,12 @@ class HarmonicsDialog(ctk.CTkToplevel):
         self.master.set_option_states()
 
     def tag_keystone_colour_to_theme(self):
+        """Tag the keystone colour, and harmony method, to the theme."""
         keystone_colour = self.btn_keystone_colour.cget('fg_color')
         harmony_method = self.opm_harmony_method.get()
+        log.log_debug(log_text='Tag the keystone colour, and harmony method, to the theme',
+                      class_name='HarmonicsDialog',
+                      method_name='copy_harmonics_to_palette')
         self.theme_json_data['provenance']['keystone colour'] = keystone_colour
         self.theme_json_data['provenance']['harmony method'] = harmony_method
         self.theme_json_data['provenance']['harmony differential'] = self.harmony_contrast_differential
@@ -600,4 +642,3 @@ class HarmonicsDialog(ctk.CTkToplevel):
         self.master.set_option_states()
         self.harmony_status_bar.set_status_text(
             status_text=f'Keystone colour tagged to theme {self.theme_name}.')
-

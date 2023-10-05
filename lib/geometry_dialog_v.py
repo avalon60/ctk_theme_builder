@@ -6,9 +6,10 @@ import lib.cbtk_kit as cbtk
 import lib.ctk_theme_builder_m as mod
 from ctk_theme_preview import update_widget_geometry
 import json
-
+import lib.loggerutl as log
 from pathlib import Path
 from lib.CTkToolTip import *
+import lib.preferences_m as pref
 
 ETC_DIR = mod.ETC_DIR
 DB_FILE_PATH = mod.DB_FILE_PATH
@@ -19,6 +20,7 @@ class GeometryDialog(ctk.CTkToplevel):
         super().__init__(*args, **kwargs)
         self.command_stack = command_stack
         self.force_refresh = False
+        log.log_debug(log_text='Geometry dialog launched.')
 
         self.enable_tooltips = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                       preference_name='enable_tooltips')
@@ -493,20 +495,21 @@ class GeometryDialog(ctk.CTkToplevel):
 
     def close_geometry_dialog(self, event=None):
         self.save_widget_geom_geometry()
+        log.log_debug(log_text='Geometry dialog closing.')
         self.destroy()
 
     def restore_geom_geometry(self):
         """Restore window geometry of the Widget Geometry dialog from auto-saved preferences"""
-        saved_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH,
+        saved_geometry = pref.preference_setting(db_file_path=DB_FILE_PATH,
                                                 scope='window_geometry',
                                                 preference_name='widget_geometry')
         # self.geometry(saved_geometry)
 
     def save_widget_geom_geometry(self):
         """Save the widget geometry dialog's geometry to the repo, for the next time the dialog is launched."""
-        geometry_row = mod.preference_row(db_file_path=DB_FILE_PATH,
+        geometry_row = pref.preference_row(db_file_path=DB_FILE_PATH,
                                           scope='window_geometry',
                                           preference_name='widget_geometry')
         panel_geometry = self.geometry()
         geometry_row["preference_value"] = panel_geometry
-        mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
+        pref.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)

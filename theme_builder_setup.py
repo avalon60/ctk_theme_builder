@@ -431,6 +431,7 @@ if __name__ == "__main__":
     images_location = assets_location / 'images'
     themes_location = assets_location / 'themes'
     etc_location = assets_location / 'etc'
+    log_location = assets_location / 'log'
     palettes_location = assets_location / 'palettes_location'
     views_location = assets_location / 'views'
     db_file = data_location / f'{PRODUCT.lower()}.db'
@@ -461,6 +462,10 @@ if __name__ == "__main__":
         print(f'Creating application assets location: {assets_location}')
         os.mkdir(assets_location)
 
+    if not exists(log_location):
+        print(f'Creating application assets location: {log_location}')
+        os.mkdir(log_location)
+
     if not exists(temp_location):
         print(f'Creating application temp location: {temp_location}')
         os.mkdir(temp_location)
@@ -484,7 +489,7 @@ if __name__ == "__main__":
         print(f'Unpacking package: {package} to: {install_location}')
         unpack_package(zip_pathname=package, install_location=install_location)
 
-    entry_point_script = PRODUCT.lower() + '.py'
+    version_script = PRODUCT.lower() + '_m.py'
 
     print(f'Inspecting {PRODUCT} application home directory...')
     if app_home_contents_ok():
@@ -501,7 +506,7 @@ if __name__ == "__main__":
         os.system('./build_app.sh')
         os.system('chmod 750 ctk_theme_builder')
 
-    app_version = app_file_version(app_home / f'{entry_point_script}')
+    app_version = app_file_version(app_home / 'lib' / f'{version_script}')
 
     apply_repo_updates(data_directory=data_location, app_file_version=app_version, db_file_path=db_file)
     print(f'App Home for {PRODUCT}: ' + str(os.path.abspath(app_home)))

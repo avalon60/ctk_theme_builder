@@ -4,6 +4,7 @@ import customtkinter as ctk
 import tkinter as tk
 import lib.ctk_theme_builder_m as mod
 import lib.cbtk_kit as cbtk
+import lib.loggerutl as log
 
 APP_IMAGES = mod.APP_IMAGES
 
@@ -109,6 +110,8 @@ class ProvenanceDialog(ctk.CTkToplevel):
         self.bind('<Escape>', self.close_dialog)
 
     def close_dialog(self, event=None):
+        log.log_debug(log_text='Close provenance dialogue', class_name='ProvenanceDialog',
+                      method_name='close_dialog')
         self.destroy()
 
     def modify_property(self, property_name, value):

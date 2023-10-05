@@ -8,7 +8,9 @@ import platform
 import os
 from lib.CTkToolTip import *
 import lib.cbtk_kit as cbtk
+import lib.loggerutl as log
 from pathlib import Path
+import lib.preferences_m as pref
 
 APP_THEMES_DIR = mod.APP_THEMES_DIR
 APP_IMAGES = mod.APP_IMAGES
@@ -25,58 +27,63 @@ class PreferencesDialog(ctk.CTkToplevel):
 
         icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
         self.iconphoto(False, icon_photo)
-        control_panel_theme = mod.preference_setting(db_file_path=DB_FILE_PATH,
+        control_panel_theme = pref.preference_setting(db_file_path=DB_FILE_PATH,
                                                      scope='user_preference', preference_name='control_panel_theme')
 
         control_panel_theme = control_panel_theme + '.json'
 
         self.control_panel_theme = str(APP_THEMES_DIR / control_panel_theme)
 
-        self.control_panel_mode = mod.preference_setting(db_file_path=DB_FILE_PATH,
+        self.control_panel_mode = pref.preference_setting(db_file_path=DB_FILE_PATH,
                                                          scope='user_preference', preference_name='control_panel_mode')
 
-        self.last_theme_on_start = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+        self.last_theme_on_start = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                           preference_name='last_theme_on_start')
 
-        self.theme_author = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+        self.theme_author = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                    preference_name='theme_author')
 
-        self.enable_tooltips = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+        self.enable_tooltips = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                       preference_name='enable_tooltips')
 
-        self.confirm_cascade = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+        self.confirm_cascade = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                       preference_name='confirm_cascade')
 
-        self.enable_palette_labels = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+        self.enable_palette_labels = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                             preference_name='enable_palette_labels')
 
-        self.enable_single_click_paste = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+        self.enable_single_click_paste = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                                 preference_name='enable_single_click_paste')
 
-        self.shade_adjust_differential = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+        self.shade_adjust_differential = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                                 preference_name='shade_adjust_differential')
 
-        self.harmony_contrast_differential = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+        self.harmony_contrast_differential = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                                     preference_name='harmony_contrast_differential')
 
-        self.theme_json_dir = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+        self.theme_json_dir = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                      preference_name='theme_json_dir')
 
-        self.control_panel_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH,
+        self.control_panel_scaling = pref.preference_setting(db_file_path=DB_FILE_PATH,
                                                             scope='scaling',
                                                             preference_name='control_panel')
 
-        self.preview_panel_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH,
+        self.preview_panel_scaling = pref.preference_setting(db_file_path=DB_FILE_PATH,
                                                             scope='scaling',
                                                             preference_name='preview_panel')
 
-        self.listener_port = mod.preference_setting(db_file_path=DB_FILE_PATH,
+        self.listener_port = pref.preference_setting(db_file_path=DB_FILE_PATH,
                                                     scope='user_preference',
                                                     preference_name='listener_port')
 
-        self.qa_application_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH,
+        self.qa_application_scaling = pref.preference_setting(db_file_path=DB_FILE_PATH,
                                                              scope='scaling',
                                                              preference_name='qa_application')
+
+        log_level = pref.preference_setting(scope='logger', preference_name='log_level', default="Info")
+
+        self.log_level = log_level.upper()
+        self.log_stderr = pref.preference_setting(scope='logger', preference_name='log_stderr', default="Yes")
 
         self.action = 'cancelled'
 
@@ -371,6 +378,33 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.lbl_pref_theme_dir_disp.grid(row=widget_start_row, column=1, columnspan=5, padx=5, pady=5, sticky='w')
         widget_start_row += 1
 
+        lbl_log_level = ctk.CTkLabel(master=frm_widgets, text='Logging Level', justify="right")
+        lbl_log_level.grid(row=widget_start_row, column=0, padx=5, pady=10, sticky='e')
+
+        self.opm_log_level = ctk.CTkOptionMenu(master=frm_widgets,
+                                               width=12,
+                                               values=log.LOG_LEVEL_DISP)
+
+        self.opm_log_level.grid(row=widget_start_row, column=1, padx=0, pady=10, sticky='w')
+        self.opm_log_level.set(str(self.log_level.title()))
+
+        lbl_log_stderr = ctk.CTkLabel(master=frm_widgets, text='Log to stderr', justify="right")
+        lbl_log_stderr.grid(row=widget_start_row, column=2, padx=5, pady=10, sticky='e')
+
+        lbl_log_stderr_tooltip = CTkToolTip(lbl_log_stderr,
+                                            border_width=1,
+                                            justify="left",
+                                            padding=(10, 10),
+                                            corner_radius=6,
+                                            message='Typically, we only log to the ctk_tb.log file, in the log '
+                                                    'folder.\n\nSelect "Yes", to duplex logging to the terminal.')
+
+        self.opm_log_stderr = ctk.CTkOptionMenu(master=frm_widgets,
+                                                width=12,
+                                                values=['Yes', 'No'])
+        self.opm_log_stderr.grid(row=widget_start_row, column=3, padx=0, pady=10, sticky='w')
+        self.opm_log_stderr.set(str(self.log_stderr))
+
         # Control buttons
         btn_close = ctk.CTkButton(master=frm_buttons, text='Cancel', command=self.close_preferences)
         btn_close.grid(row=0, column=0, padx=(15, 35), pady=5)
@@ -382,6 +416,9 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.bind('<Escape>', self.close_preferences)
 
     def close_preferences(self, event=None):
+        log.log_debug(log_text='Closing preferences dialogue',
+                      class_name='PreferencesDialog',
+                      method_name='close_preferences')
         self.destroy()
 
     def get_cascade_setting(self):
@@ -404,12 +441,15 @@ class PreferencesDialog(ctk.CTkToplevel):
         # Save JSON Directory:
         # If the directory selection was cancelled, we end up with
         # the string representation of the path, returning as a dot.
+        log.log_debug(log_text='Save preferences and close dialogue',
+                      class_name='PreferencesDialog',
+                      method_name='save_preferences')
         if str(self.new_theme_json_dir) != '.':
             self.theme_json_dir = self.new_theme_json_dir
             if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                preference_name='theme_json_dir',
                                                preference_value=str(self.theme_json_dir)):
-                print(f'Row miss updating preferences theme author.')
+                print(f'Row miss updating preferences: user_preference > theme_json_dir')
             self.json_files = mod.user_themes_list()
             self.master.opm_theme.configure(values=self.json_files)
 
@@ -417,63 +457,63 @@ class PreferencesDialog(ctk.CTkToplevel):
 
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='theme_author', preference_value=self.user_name):
-            print(f'Row miss updating preferences theme author.')
+            log.log_error(log_text=f'Row miss updating preferences: user_preference > theme_author')
 
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='control_panel_theme',
                                            preference_value=self.opm_control_panel_theme.get()):
-            print(f'Row miss updating preferences control panel theme.')
+            log.log_error(log_text=f'Row miss updating preferences: user_preference > control_panel_theme')
 
         control_panel_mode = self.tk_appearance_mode_var.get()
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='control_panel_mode',
                                            preference_value=control_panel_mode):
-            print(f'Row miss updating preferences control panel appearance mode.')
+            log.log_error(log_text=f'Row miss updating preferences: user_preference > control_panel_mode')
 
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='enable_tooltips',
                                            preference_value=self.enable_tooltips):
-            print(f'Row miss updating preferences enable tooltips.')
+            log.log_error(log_text=f'Row miss updating preferences: user_preference > enable_tooltips')
 
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='confirm_cascade',
                                            preference_value=self.confirm_cascade):
-            print(f'Row miss updating preferences for confirm cascade.')
+            log.log_error(log_text=f'Row miss updating preferences: user_preference > confirm_cascade')
 
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='last_theme_on_start',
                                            preference_value=self.last_theme_on_start):
-            print(f'Row miss updating preferences control panel last theme on start.')
+            log.log_error(log_text=f'Row miss updating preferences: user_preference > last_theme_on_start')
 
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='enable_palette_labels',
                                            preference_value=self.enable_palette_labels):
-            print(f'Row miss updating preferences: enable palette labels.')
+            log.log_error(log_text=f'Row miss updating preferences: user_preference > enable_palette_labels')
 
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='enable_single_click_paste',
                                            preference_value=self.enable_single_click_paste):
-            print(f'Row miss updating preferences: enable single click paste.')
+            log.log_error(log_text=f'Row miss updating preferences: user_preference > enable_single_click_paste')
 
         self.shade_adjust_differential = self.opm_shade_adjust_differential.get()
         self.shade_adjust_differential = int(self.shade_adjust_differential)
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='shade_adjust_differential',
                                            preference_value=self.shade_adjust_differential):
-            print(f'Row miss updating preferences: shade adjust differential.')
+            log.log_error(log_text=f'Row miss updating preferences: user_preference > shade_adjust_differential')
 
         self.harmony_contrast_differential = self.opm_harmony_contrast_differential.get()
         self.harmony_contrast_differential = int(self.harmony_contrast_differential)
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='harmony_contrast_differential',
                                            preference_value=self.harmony_contrast_differential):
-            print(f'Row miss updating preferences: harmony contrast differential.')
+            log.log_error(log_text=f'Row miss updating preferences: user_preference > harmony_contrast_differential')
 
         control_panel_scaling_pct = self.opm_control_panel_scaling.get()
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='scaling',
                                            preference_name='control_panel',
                                            preference_value=control_panel_scaling_pct):
-            print(f'Row miss updating preferences: control panel scaling.')
+            log.log_error(log_text=f'Row miss updating preferences: scaling > control_panel')
         if control_panel_scaling_pct != self.master.control_panel_scaling_pct:
             scaling_float = mod.scaling_float(scale_pct=control_panel_scaling_pct)
             ctk.set_widget_scaling(scaling_float)
@@ -484,7 +524,7 @@ class PreferencesDialog(ctk.CTkToplevel):
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='scaling',
                                            preference_name='preview_panel',
                                            preference_value=preview_panel_scale_pct):
-            print(f'Row miss updating preferences: preview panel scaling.')
+            log.log_error(log_text=f'Row miss updating preferences: scaling > preview_panel')
 
         if preview_panel_scale_pct != self.master.preview_panel_scaling_pct and self.master.theme:
             self.master.preview_panel_scaling_pct = preview_panel_scale_pct
@@ -496,13 +536,26 @@ class PreferencesDialog(ctk.CTkToplevel):
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='scaling',
                                            preference_name='qa_application',
                                            preference_value=qa_application_scale_pct):
-            print(f'Row miss updating preferences: QA application scaling.')
+            log.log_error(log_text=f'Row miss updating preferences: scaling > qa_application')
 
         listener_port = self.opm_listener_port.get()
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='listener_port',
                                            preference_value=listener_port):
-            print(f'Row miss updating preferences: listener port.')
+            log.log_error(log_text=f'Row miss updating preferences: user_preference > listener port')
+
+        log_level = self.opm_log_level.get()
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='logger',
+                                           preference_name='log_level',
+                                           preference_value=log_level.upper()):
+
+            log.log_error(log_text=f'Row miss updating logger > log_level')
+
+        log_stderr = self.opm_log_stderr.get()
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='logger',
+                                           preference_name='log_stderr',
+                                           preference_value=log_stderr):
+            log.log_error(log_text=f'Row miss updating logger > log_stderr')
 
         ctk.set_appearance_mode(control_panel_mode)
         cbtk.CBtkMenu.update_widgets_mode()
