@@ -409,5 +409,17 @@
 
    "123":{ "sql_apply_version":"2.3.0",
       "description": "Initialise listener port",
-      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('user_preference', 'listener_port', 'int', '5051');"}
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('user_preference', 'listener_port', 'int', '5051');"},
+
+   "130":{ "sql_apply_version":"2.5.0",
+      "description": "Logger level",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('logger', 'log_level', 'str', 'Info');"},
+
+   "131":{ "sql_apply_version":"2.5.0",
+      "description": "Logger level",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('logger', 'log_stamping', 'str', 'Yes');"},
+
+   "132":{ "sql_apply_version":"2.5.0",
+      "description": "Logger level",
+      "sql_statement": "insert into preferences (scope, preference_name, data_type, preference_value) values ('logger', 'log_stderr', 'str', 'No');"}
 }
