@@ -1,6 +1,5 @@
 __title__ = 'CTk Theme Builder'
 __author__ = 'Clive Bostock'
-__version__ = "2.4.0"
 __license__ = 'MIT - see LICENSE.md'
 
 import configparser
@@ -11,18 +10,13 @@ import copy
 # Also, a thankyou to Akash Bora for producing the excellent CTkToolTip and CTkMessagebox widgets.
 
 import argparse
-from lib.control_panel import ControlPanel
+from lib.control_panel_v import ControlPanel
 from argparse import HelpFormatter
 from operator import attrgetter
 import os
 import re
-
-from enum import Enum
-import lib.cbtk_kit as cbtk
 from ctk_theme_preview import PreviewPanel
 
-import ctk_theme_preview
-import lib.ctk_theme_builder_m as mod
 
 # import lib.CTkMessagebox.ctkmessagebox
 
