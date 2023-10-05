@@ -17,9 +17,11 @@ from pathlib import Path
 from datetime import datetime
 import lib.cbtk_kit as cbtk
 import lib.ctk_theme_builder_m as mod
+import lib.loggerutl as log
 from lib.CTkToolTip import *
 from CTkMessagebox import CTkMessagebox
 from PIL import Image
+import lib.preferences_m as pref
 
 PROG = os.path.basename(__file__)
 APP_HOME = Path(os.path.dirname(os.path.realpath(__file__)))
@@ -74,7 +76,7 @@ class PreviewPanel:
     PANEL_HEIGHT = 740
 
     def __init__(self, theme_file: str, appearance_mode: str = 'Dark'):
-
+        log.log_started(class_name='PreviewPanel', supplementary_text='Theme Builder Preview Panel launched')
         self._appearance_mode = appearance_mode
         self._theme_file = theme_file
         ctk.set_default_color_theme(self._theme_file)
@@ -124,17 +126,17 @@ class PreviewPanel:
         self._config_file = self._CONFIG_DIR / 'ctk_theme_maker.ini'
 
         self._render_state = tk.NORMAL
-        self._enable_tooltips = mod.preference_setting(db_file_path=DB_FILE_PATH,
-                                                       scope='user_preference', preference_name='enable_tooltips')
+        self._enable_tooltips = pref.preference_setting(db_file_path=DB_FILE_PATH,
+                                                        scope='user_preference', preference_name='enable_tooltips')
 
-        self._render_disabled = mod.preference_setting(db_file_path=DB_FILE_PATH,
-                                                       scope='auto_save', preference_name='render_disabled')
+        self._render_disabled = pref.preference_setting(db_file_path=DB_FILE_PATH,
+                                                        scope='auto_save', preference_name='render_disabled')
 
         # self._shade_adjust_differential = int(self._config_property_val('preferences',
         #                                                                 'shade_adjust_differential', '3'))
 
         theme_name = os.path.basename(self._theme_file)
-        self._theme_name = theme_name = os.path.splitext(theme_name)[0]
+        self._theme_name = os.path.splitext(theme_name)[0]
 
         self.preview = ctk.CTk()
         icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
@@ -167,10 +169,10 @@ class PreviewPanel:
 
         # Get the theme being used by the control panel. We can use this to style some
         #  non-preview components in the Preview panel.
-        control_panel_theme = mod.preference_setting(db_file_path=DB_FILE_PATH,
-                                                     scope='user_preference', preference_name='control_panel_theme')
-        control_panel_mode = mod.preference_setting(db_file_path=DB_FILE_PATH,
-                                                    scope='user_preference', preference_name='control_panel_mode')
+        control_panel_theme = pref.preference_setting(db_file_path=DB_FILE_PATH,
+                                                      scope='user_preference', preference_name='control_panel_theme')
+        control_panel_mode = pref.preference_setting(db_file_path=DB_FILE_PATH,
+                                                     scope='user_preference', preference_name='control_panel_mode')
         self._theme_palette_buttons = {}
 
         control_panel_theme = control_panel_theme + '.json'
@@ -252,8 +254,8 @@ class PreviewPanel:
         self.render_preview_frames()
 
     def _render_frame_top_preview(self):
-        def slider_callback(value):
-            self.progressbar_1.set(value)
+        def slider_callback(slider_value):
+            self.progressbar_1.set(slider_value)
 
         js = open(self._theme_file)
         json_text = json.load(js)
@@ -605,20 +607,20 @@ class PreviewPanel:
         pass
 
     def _restore_preview_geometry(self):
-        panel_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH,
-                                                scope='window_geometry',
-                                                preference_name='preview_panel')
+        panel_geometry = pref.preference_setting(db_file_path=DB_FILE_PATH,
+                                                 scope='window_geometry',
+                                                 preference_name='preview_panel')
         self.preview.geometry(panel_geometry)
         # self.preview.resizable(True, True)
 
     def _save_preview_geometry(self):
         # save current geometry to the preferences
-        geometry_row = mod.preference_row(db_file_path=DB_FILE_PATH,
-                                          scope='window_geometry',
-                                          preference_name='preview_panel')
+        geometry_row = pref.preference_row(db_file_path=DB_FILE_PATH,
+                                           scope='window_geometry',
+                                           preference_name='preview_panel')
         panel_geometry = self.preview.geometry()
         geometry_row["preference_value"] = panel_geometry
-        mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
+        pref.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
 
     def exec_program_command(self):
 
@@ -626,11 +628,16 @@ class PreviewPanel:
         command = command_json['command']
         if command == 'quit':
             self._save_preview_geometry()
-            print('Preview panel quitting...')
+            log.log_debug(log_text='Preview panel received quit command', class_name='PreviewPanel',
+                          method_name='exec_program_command')
             if LISTENER_FILE.exists():
                 os.remove(LISTENER_FILE)
+                log.log_debug('Listener file removed.')
+            log.log_complete(class_name='PreviewPanel', supplementary_text='Theme Builder Preview Panel closed')
             exit(0)
         if command == 'refresh':
+            log.log_debug(log_text='Preview panel received refresh command', class_name='PreviewPanel',
+                          method_name='exec_program_command')
             ctk.set_default_color_theme(self._theme_file)
             ctk.set_appearance_mode(self._appearance_mode)
             # So we need to call the render preview frames method. This
@@ -641,20 +648,32 @@ class PreviewPanel:
         parameters = command_json['parameters']
         # print(f'Command: {command} / Parameters: {parameters}')
         if command == 'set_appearance_mode':
+            log.log_debug(log_text='Preview panel received set_appearance_mode command', class_name='PreviewPanel',
+                          method_name='exec_program_command')
             mode = parameters[0]
             self._appearance_mode = mode
             self._switch_appearance_mode(appearance_mode=mode)
         if command == 'set_widget_scaling':
+            log.log_debug(log_text='Preview panel received set_widget_scaling command', class_name='PreviewPanel',
+                          method_name='exec_program_command')
             scaling_pct = parameters[0]
             scaling_float = mod.scaling_float(scaling_pct)
             ctk.set_widget_scaling(scaling_float)
         elif command == 'render_preview_disabled':
+            log.log_debug(log_text='Preview panel received render_preview_disabled command', class_name='PreviewPanel',
+                          method_name='exec_program_command')
             self._render_preview_disabled()
         elif command == 'render_preview_enabled':
+            log.log_debug(log_text='Preview panel received render_preview_enabled command', class_name='PreviewPanel',
+                          method_name='exec_program_command')
             self._render_preview_enabled()
         elif command == 'render_top_frame':
+            log.log_debug(log_text='Preview panel received render_top_frame command', class_name='PreviewPanel',
+                          method_name='exec_program_command')
             self.render_top_frame()
         elif command == 'render_base_frame':
+            log.log_debug(log_text='Preview panel received render_base_frame command', class_name='PreviewPanel',
+                          method_name='exec_program_command')
             self.render_base_frame()
 
     def _exec_colour_command(self):
@@ -668,7 +687,8 @@ class PreviewPanel:
             # print(f'Updating widget {widget_type} / {widget_property}')
             self.update_widget_colour(widget_type, widget_property, widget_colour)
         else:
-            print(f'ERROR: Unrecognised method request: {command}')
+            log.log_error(log_text=f'Unrecognised method request: {command}', class_name='PreviewPanel',
+                          method_name='exec_program_command')
 
     def _exec_geometry_command(self):
         """This method is responsible for updating widget geometry, based on commands JSON received from the
@@ -676,7 +696,8 @@ class PreviewPanel:
         command_json = self._command_json
         command = command_json['command']
         if command != 'update_widget_geometry':
-            print(f'ERROR: Unrecognised method request: {command}')
+            log.log_error(log_text=f'ERROR: Unrecognised method request: {command}', class_name='PreviewPanel',
+                          method_name='_exec_geometry_command')
             return
 
         parameters = command_json['parameters']
@@ -770,7 +791,7 @@ class PreviewPanel:
 
                 if command == DISCONNECT_MESSAGE and command_type == 'program':
                     if DEBUG:
-                        print(f'[{address}] Session disconnected')
+                        log.log_debug(f'[{address}] Session disconnected')
                     if conn in self._client_handlers:
                         del self._client_handlers[conn]
                     connected = False
@@ -788,13 +809,19 @@ class PreviewPanel:
         """
         global listener_status
         self._client_handlers = {}
-        print(f"Method listener starting on port {METHOD_LISTENER_PORT}...")
+        log.log_info(log_text=f"Starting method listener on port {METHOD_LISTENER_PORT}...",
+                     class_name='PreviewPanel', method_name='_method_listener')
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         try:
             server.bind(METHOD_LISTENER_ADDRESS)
         except OSError:
-            print(f'Preview Panel, socket bind error. ensure that no other instances of CTk Theme Builder are running '
-                  f'and that port {METHOD_LISTENER_PORT} is free.')
+            log.log_critical(f'Preview Panel, socket bind error.',
+                             class_name='PreviewPanel', method_name='_method_listener')
+
+            log.log_supplementary('Ensure that no other instances of CTk Theme Builder '
+                                  f'are running and that port {METHOD_LISTENER_PORT} is free.')
+
+            log.log_exception(OSError)
             listener_status = -1
             raise
         server.listen()
@@ -802,15 +829,19 @@ class PreviewPanel:
         now = datetime.now()
         # convert to string
         date_started = now.strftime("%b %d %Y %H:%M:%S")
-        print('Preview Panel: Checking for listener file...')
+        log.log_debug(log_text='Preview Panel: Checking for listener file...',
+                      class_name='PreviewPanel', method_name='_method_listener')
         if not LISTENER_FILE.exists():
-            print('Preview Panel: Listener file missing, creating...')
+            log.log_debug('Preview Panel: Listener file missing, creating...',
+                          class_name='PreviewPanel', method_name='_method_listener')
             with open(LISTENER_FILE, 'w') as f:
                 pid = os.getpid()
                 f.write(f'[{pid}] CTk Theme Builder listener started at: {date_started}')
-        print(f'Method listener started on port: {METHOD_LISTENER_PORT}')
+            log.log_info(f'Method listener successfully started',
+                         class_name='PreviewPanel', method_name='_method_listener')
         while True:
-            # print('Waiting for a client request...')
+            log.log_debug(log_text='Waiting for a client request...', class_name='PreviewPanel',
+                          method_name='_method_listener')
             conn, address = server.accept()
             client_thread = threading.Thread(target=self._handle_client,
                                              args=(conn, address),
@@ -843,6 +874,10 @@ class PreviewPanel:
                         f'Ensure that only one instance of {__title__} is running and that no '
                         f'other process is using the port.',
                 option_1='OK')
+            log.log_critical(log_text=f'The listener failed to bind to port {METHOD_LISTENER_PORT}\n\n',
+                             class_name='PreviewPanel', method_name='start_method_listener')
+            log.log_supplementary(f'Ensure that only one instance of {__title__} is running and that no '
+                                  f'other process is using the port.')
             if confirm.get() == 'OK':
                 exit(1)
 
@@ -897,7 +932,7 @@ class PreviewPanel:
             elif widget_property == 'unselected_hover_color':
                 widget.configure(unselected_hover_color=widget_colour)
             else:
-                print(f'WARNING: Unrecognised widget property: {widget_property}')
+                log.log_warning(f'Unrecognised widget property: {widget_property}')
         # Now deal with composite widgets, which share properties with other widget types.
         # Scrollable Frames
         if widget_type == 'frame_base':
