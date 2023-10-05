@@ -50,3 +50,7 @@ assets/etc/qa_application.started
 user_themes/Test.json
 
 lib/CTkToolTip-main.zip
+
+log/ctk_tb.log
+
+*.db
