@@ -4,6 +4,7 @@ import argparse
 import os
 from pathlib import Path
 import lib.ctk_theme_builder_m as mod
+import lib.preferences_m as pref
 import threading
 import time
 
@@ -30,24 +31,24 @@ class App(customtkinter.CTk):
         icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
         self.iconphoto(False, icon_photo)
         # Restore preferences
-        self.qa_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='window_geometry',
-                                                  preference_name='qa_application')
+        self.qa_geometry = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='window_geometry',
+                                                   preference_name='qa_application')
         if self.qa_geometry == 'NO_DATA_FOUND':
             self.qa_geometry = '1100x580+0+0'
-            self.qa_geometry_dict = mod.new_preference_dict(scope='window_geometry',
-                                                            preference_name='qa_application',
-                                                            data_type='str', preference_value=self.qa_geometry)
-            mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=self.qa_geometry_dict)
+            self.qa_geometry_dict = pref.new_preference_dict(scope='window_geometry',
+                                                             preference_name='qa_application',
+                                                             data_type='str', preference_value=self.qa_geometry)
+            pref.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=self.qa_geometry_dict)
         self.geometry(self.qa_geometry)
 
-        self.qa_app_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='scaling',
-                                                     preference_name='qa_application')
+        self.qa_app_scaling = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='scaling',
+                                                      preference_name='qa_application')
         if self.qa_app_scaling == 'NO_DATA_FOUND':
             self.qa_app_scaling = '100%'
-            self.qa_app_scaling_dict = mod.new_preference_dict(scope='scaling',
-                                                               preference_name='qa_application',
-                                                               data_type='str', preference_value=self.qa_app_scaling)
-            mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=self.qa_app_scaling_dict)
+            self.qa_app_scaling_dict = pref.new_preference_dict(scope='scaling',
+                                                                preference_name='qa_application',
+                                                                data_type='str', preference_value=self.qa_app_scaling)
+            pref.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=self.qa_app_scaling_dict)
 
         self.change_scaling_event(self.qa_app_scaling)
         # configure window
@@ -118,7 +119,7 @@ class App(customtkinter.CTk):
         # create radiobutton frame
         self.radiobutton_frame = customtkinter.CTkFrame(self)
         self.radiobutton_frame.grid(row=0, column=3, padx=(20, 20), pady=(20, 0), sticky="nsew")
-        self.radio_var =  tk.IntVar(value=0)
+        self.radio_var = tk.IntVar(value=0)
         self.label_radio_group = customtkinter.CTkLabel(master=self.radiobutton_frame, text="CTkRadioButton Group:")
         self.label_radio_group.grid(row=0, column=2, columnspan=1, padx=10, pady=10, sticky="")
         self.radio_button_1 = customtkinter.CTkRadioButton(master=self.radiobutton_frame, variable=self.radio_var,
@@ -236,12 +237,12 @@ class App(customtkinter.CTk):
 
     def save_app_geometry(self):
         """Save the control panel geometry to the repo, for the next time the program is launched."""
-        geometry_row = mod.preference_row(db_file_path=DB_FILE_PATH,
-                                          scope='window_geometry',
-                                          preference_name='qa_application')
+        geometry_row = pref.preference_row(db_file_path=DB_FILE_PATH,
+                                           scope='window_geometry',
+                                           preference_name='qa_application')
         qa_geometry = self.geometry()
         geometry_row["preference_value"] = qa_geometry
-        mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
+        pref.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
 
     @staticmethod
     def sidebar_button_event():
