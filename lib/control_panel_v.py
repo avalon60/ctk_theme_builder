@@ -2467,7 +2467,7 @@ class ControlPanel(ctk.CTk):
                                      method_name='launch_preview')
                     if confirm.get() == 'OK':
                         exit(1)
-                time.sleep(0.1)
+                time.sleep(0.5)
 
             log.log_info(log_text='Listener established', class_name='ControlPanel',
                          method_name='launch_preview')
