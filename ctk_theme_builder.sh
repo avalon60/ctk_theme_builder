@@ -14,6 +14,7 @@ then
 else
   DCCM_PY="${FULL_PATH}.py"
 fi
+
 APP_HOME=`echo ${FULL_PATH} | sed "s/${PROG}//; s/\/$//"`
 APP_ENV=${PROG_PATH}/venv
 if [ -f ${APP_ENV}/bin/activate ]
@@ -22,13 +23,14 @@ then
 elif [ -f ${APP_ENV}/Scripts/activate ]
 then
   source ${APP_ENV}/Scripts/activate
-fi 
-type python 2> /dev/null
+fi
+
+type python > /dev/null
 if [ $? -eq 0 ]
 then
   PYTHON="python"
 else
-  type python3 2> /dev/null
+  type python3 > /dev/null
   if [ $? -eq 0 ]
   then
     PYTHON="python3"

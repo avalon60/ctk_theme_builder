@@ -1,127 +1,135 @@
 {
   "CTk": {
     "fg_color": [
-      "#1c253a",
-      "#0d162b"
+      "#181b28",
+      "#181b28"
     ]
   },
   "CTkToplevel": {
     "fg_color": [
-      "#1c253a",
-      "#0d162b"
+      "#181b28",
+      "#181b28"
     ]
   },
   "CTkFrame": {
     "corner_radius": 6,
-    "border_width": 1,
+    "border_width": 0,
     "fg_color": [
-      "#1c253a",
-      "#1c253a"
+      "#181b28",
+      "#181b28"
     ],
     "top_fg_color": [
-      "#0d162b",
-      "#0d162b"
+      "#181b28",
+      "#181b28"
     ],
     "border_color": [
-      "#586b78",
-      "#586b78"
+      "#10121f",
+      "#10121f"
     ]
   },
   "CTkButton": {
     "corner_radius": 6,
-    "border_width": 2,
+    "border_width": 0,
     "fg_color": [
-      "#6c46a9",
-      "#4e288b"
+      "#212435",
+      "#212435"
     ],
     "hover_color": [
-      "#63003d",
-      "#63003d"
+      "#171926",
+      "#171926"
     ],
     "border_color": [
-      "#586b78",
-      "#405366"
+      "#080b12",
+      "#080b12"
     ],
     "text_color": [
-      "#ffffff",
-      "#ffffff"
+      "#cdc8ce",
+      "#cdc8ce"
     ],
     "text_color_disabled": [
-      "#a9b8c4",
-      "#a9b8c4"
+      "#7a8894",
+      "#7a8894"
     ]
   },
   "CTkLabel": {
     "corner_radius": 0,
     "fg_color": "transparent",
     "text_color": [
-      "#ffffff",
-      "#ffffff"
+      "#cdc8ce",
+      "#cdc8ce"
+    ],
+    "text_color_disabled": [
+      "#cdc8ce",
+      "#cdc8ce"
     ]
   },
   "CTkEntry": {
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#a9b8c4",
-      "#a9b8c4"
+      "#212435",
+      "#212435"
     ],
     "border_color": [
-      "#586b78",
-      "#405366"
+      "#080b12",
+      "#080b12"
     ],
     "text_color": [
-      "#ffffff",
-      "#2b3449"
+      "#cdc8ce",
+      "#cdc8ce"
     ],
     "placeholder_text_color": [
-      "#464e56",
-      "#464e56"
+      "#cdc8ce",
+      "#cdc8ce"
     ]
   },
   "CTkSwitch": {
     "corner_radius": 1000,
     "border_width": 3,
     "button_length": 0,
+    "fg_Color": [
+      null,
+      null
+    ],
     "progress_color": [
-      "#748498",
-      "#1b720f"
+      "#00e6c3",
+      "#00e6c3"
     ],
     "button_color": [
-      "#6c46a9",
-      "#4e288b"
-    ],
-    "fg_color": [
-      "#383e3e",
-      "#623c9f"
+      "#2e324a",
+      "#2e324a"
     ],
     "button_hover_color": [
-      "#63003d",
-      "#63003d"
+      "#2e324a",
+      "#2e324a"
     ],
     "text_color": [
-      "#ffffff",
-      "#ffffff"
+      "#cdc8ce",
+      "#cdc8ce"
     ],
     "text_color_disabled": [
-      "#a9b8c4",
-      "#a9b8c4"
+      "#7a8894",
+      "#7a8894"
+    ],
+    "fg_color": [
+      "#1f2233",
+      "#1f2233"
     ]
   },
   "CTkProgressBar": {
     "corner_radius": 1000,
     "border_width": 0,
     "fg_color": [
-      "#383e3e",
-      "#623c9f"
+      "#c452f8",
+      "#c452f8"
     ],
     "progress_color": [
-      "#748498",
-      "#1b720f"
+      "#363844",
+      "#363844"
     ],
     "border_color": [
-      "#000000",
-      "#000000"
+      "#0d101f",
+      "#0d101f"
     ]
   },
   "CTkSlider": {
@@ -130,71 +138,71 @@
     "border_width": 6,
     "button_length": 0,
     "fg_color": [
-      "#383e3e",
-      "#623c9f"
+      "#c452f8",
+      "#c452f8"
     ],
     "progress_color": [
-      "#ffffff",
-      "#1b720f"
+      "#363844",
+      "#363844"
     ],
     "button_color": [
-      "#6c46a9",
-      "#4e288b"
+      "#303344",
+      "#303344"
     ],
     "button_hover_color": [
-      "#63003d",
-      "#680542"
+      "#10121f",
+      "#10121f"
     ]
   },
   "CTkOptionMenu": {
     "corner_radius": 6,
     "fg_color": [
-      "#748498",
-      "#748498"
+      "gray20",
+      "gray20"
     ],
     "button_color": [
-      "#6c46a9",
-      "#116805"
+      "#144870",
+      "#144870"
     ],
     "button_hover_color": [
-      "#63003d",
-      "#63003d"
+      "#203A4F",
+      "#203A4F"
     ],
     "text_color": [
-      "#ffffff",
-      "#212a3f"
+      "#cdc8ce",
+      "#cdc8ce"
     ],
     "text_color_disabled": [
-      "#a9b8c4",
-      "#a9b8c4"
+      "#7a8894",
+      "#7a8894"
     ]
   },
   "CTkComboBox": {
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#a9b8c4",
-      "#a9b8c4"
+      "gray20",
+      "gray20"
     ],
     "border_color": [
-      "#586b78",
-      "#405366"
+      "#565B5E",
+      "#565B5E"
     ],
     "button_color": [
-      "#6c46a9",
-      "#4e288b"
+      "#212435",
+      "#212435"
     ],
     "button_hover_color": [
-      "#63003d",
-      "#63003d"
+      "#7A848D",
+      "#7A848D"
     ],
     "text_color": [
-      "#ffffff",
-      "#2b3449"
+      "#cdc8ce",
+      "#cdc8ce"
     ],
     "text_color_disabled": [
-      "#a9b8c4",
-      "#a9b8c4"
+      "#7a8894",
+      "#7a8894"
     ]
   },
   "CTkScrollbar": {
@@ -202,88 +210,88 @@
     "border_spacing": 4,
     "fg_color": "transparent",
     "button_color": [
-      "#6c46a9",
-      "#4e288b"
+      "gray41",
+      "gray41"
     ],
     "button_hover_color": [
-      "#63003d",
-      "#63003d"
+      "gray53",
+      "gray53"
     ]
   },
   "CTkSegmentedButton": {
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#748498",
-      "#405366"
+      "#212435",
+      "#212435"
     ],
     "selected_color": [
-      "#6c46a9",
-      "#4e288b"
+      "#262835",
+      "#262835"
     ],
     "selected_hover_color": [
-      "#63003d",
-      "#63003d"
+      "#313449",
+      "#313449"
     ],
     "unselected_color": [
-      "#667885",
-      "#260063"
+      "#181b28",
+      "#181b28"
     ],
     "unselected_hover_color": [
-      "#63003d",
-      "#63003d"
+      "#313449",
+      "#313449"
     ],
     "text_color": [
-      "#ffffff",
-      "#ffffff"
+      "#cdc8ce",
+      "#cdc8ce"
     ],
     "text_color_disabled": [
-      "#a9b8c4",
-      "#a9b8c4"
+      "#7a8894",
+      "#7a8894"
     ]
   },
   "CTkTextbox": {
     "corner_radius": 6,
-    "border_width": 2,
+    "border_width": 0,
     "fg_color": [
-      "#a9b8c4",
-      "#a9b8c4"
+      "#212435",
+      "#212435"
     ],
     "border_color": [
-      "#586b78",
-      "#586b78"
+      "#080b12",
+      "#080b12"
     ],
     "text_color": [
-      "#ffffff",
-      "#2b3449"
+      "#cdc8ce",
+      "#cdc8ce"
     ],
     "scrollbar_button_color": [
-      "#11202b",
-      "#4e288b"
+      "#696969",
+      "#696969"
     ],
     "scrollbar_button_hover_color": [
-      "#2c3b46",
-      "#63003d"
+      "#878787",
+      "#878787"
     ]
   },
   "CTkScrollableFrame": {
     "label_fg_color": [
-      "#d3dbe1",
-      "#283146"
+      "#181b28",
+      "#181b28"
     ]
   },
   "DropdownMenu": {
     "fg_color": [
-      "#748498",
-      "#748498"
+      "gray20",
+      "gray20"
     ],
     "hover_color": [
-      "#d3dbe1",
-      "#623c9f"
+      "gray28",
+      "gray28"
     ],
     "text_color": [
-      "#000000",
-      "#260063"
+      "#DCE4EE",
+      "#DCE4EE"
     ]
   },
   "CTkFont": {
@@ -303,43 +311,32 @@
       "weight": "normal"
     }
   },
-  "provenance": {
-    "theme name": "HarleyQuinn",
-    "theme author": "clive",
-    "date created": "Jun 02 2023 17:01:42",
-    "last modified by": "clive",
-    "created with": "CTk Theme Builder v2.1.0",
-    "last modified": "Jul 05 2023 21:46:14",
-    "keystone colour": "#4e288b",
-    "harmony method": "Tetradic",
-    "harmony differential": 5
-  },
   "CTkCheckBox": {
     "corner_radius": 6,
     "border_width": 3,
     "fg_color": [
-      "#748498",
-      "#0c6300"
+      "#212435",
+      "#212435"
     ],
     "border_color": [
-      "#586b78",
-      "#0c6300"
+      "#01e9c4",
+      "#01e9c4"
     ],
     "hover_color": [
-      "#697b88",
-      "#63003d"
+      "#171926",
+      "#171926"
     ],
     "checkmark_color": [
-      "#ffffff",
-      "#ffffff"
+      "#01e9c4",
+      "#01e9c4"
     ],
     "text_color": [
-      "#ffffff",
-      "#ffffff"
+      "#cdc8ce",
+      "#cdc8ce"
     ],
     "text_color_disabled": [
-      "#a9b8c4",
-      "#a9b8c4"
+      "#7a8894",
+      "#7a8894"
     ]
   },
   "CTkRadioButton": {
@@ -347,24 +344,35 @@
     "border_width_checked": 6,
     "border_width_unchecked": 3,
     "fg_color": [
-      "#6c46a9",
-      "#1b720f"
+      "#01e9c4",
+      "#01e9c4"
     ],
     "border_color": [
-      "#586b78",
-      "#116805"
+      "#2b2e3f",
+      "#2b2e3f"
     ],
     "hover_color": [
-      "#63003d",
-      "#63003d"
+      "#10121f",
+      "#10121f"
     ],
     "text_color": [
-      "#ffffff",
-      "#ffffff"
+      "#cdc8ce",
+      "#cdc8ce"
     ],
     "text_color_disabled": [
-      "#a9b8c4",
-      "#a9b8c4"
+      "#7a8894",
+      "#7a8894"
     ]
+  },
+  "provenance": {
+    "theme name": "Sweetkind",
+    "theme author": "@Akascape",
+    "date created": "Aug 16 2023 11:56:06",
+    "last modified by": "Clive Bostock",
+    "last modified": "Aug 16 2023 12:01:00",
+    "created with": "CTk Theme Builder v2.4.0",
+    "keystone colour": "#181b28",
+    "harmony method": "Triadic",
+    "harmony differential": 5
   }
 }

@@ -30,6 +30,7 @@
     "Frame: top_fg_color",
     "Label: fg_color",
     "Label: text_color",
+    "Label: text_color_disabled",
     "OptionMenu: button_color",
     "OptionMenu: button_hover_color",
     "OptionMenu: fg_color",
@@ -116,7 +117,8 @@
   ],
   "Label": [
     "Label: fg_color",
-    "Label: text_color"
+    "Label: text_color",
+    "Label: text_color_disabled"
   ],
   "OptionMenu": [
     "OptionMenu: button_color",

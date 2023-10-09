@@ -9,10 +9,15 @@ import shutil
 import platform
 import sqlite3
 import os
+import glob
 from os.path import exists
 from os.path import expanduser
 from zipfile import ZipFile
 import zipfile
+from datetime import datetime
+
+now = datetime.now()  # current date and time
+DATE_STAMP = now.strftime("%Y-%m-%d_%H-%M-%S")
 
 PRODUCT = 'CTk_Theme_Builder'
 PRODUCT_NAME = PRODUCT.replace('_', ' ')
@@ -38,6 +43,15 @@ else:
 
 # Get the data location, required for the config file etc
 
+def lprint(output_text: str, inc_newline: bool = True):
+    """Function to duplex output across stdout and the logfile."""
+    print(output_text)
+    if inc_newline:
+        LOG_FILE.write(f'{output_text}\n')
+    else:
+        LOG_FILE.write(f'{output_text}')
+
+
 class SortingHelpFormatter(HelpFormatter):
     def add_arguments(self, actions):
         actions = sorted(actions, key=attrgetter('option_strings'))
@@ -48,18 +62,16 @@ ap = argparse.ArgumentParser(formatter_class=SortingHelpFormatter
                              , description=f"""{prog}: The {prog} tool is used to assist in the installation and with 
                              upgrades of {PRODUCT}.""")
 
-ap.add_argument("-i", "--install-locations", required=False, action="store",
-                help=f"""Used to point to the install/upgrade location for {PRODUCT}. {PRODUCT} will be installed 
-                in a {PRODUCT.lower()}, subdirectory below the location provided. If not supplied, a default
-                location will be used. The default install location is assumed to be the user's home directory. 
-                For example on MacOS or Linux, this will equate to  $HOME, and on Windows it would be 
+ap.add_argument("-i", "--install-location", required=False, action="store",
+                help=f"""Used to point to the base install/upgrade location for {PRODUCT_NAME}. {PRODUCT_NAME} will 
+                be installed in a {PRODUCT.lower()}, subdirectory below the location provided. If not supplied, 
+                a default location will be used. The default install location is assumed to be the user's home 
+                directory. For example on MacOS or Linux, this will equate to  $HOME, and on Windows it would be 
                 <system_drive>:\\Users\\<username>.""", dest='install_location', default=None)
 
-
 ap.add_argument("-p", "--package", required=False, action="store",
-                help=f"""Used for {PRODUCT} deployments & upgrades. Use -a along with the pathname to the {PRODUCT} 
-                      package ZIP file.""", dest='package', default=None)
-
+                help=f"""Used for {PRODUCT_NAME} deployments & upgrades. Use -a along with the pathname to the 
+                      {PRODUCT_NAME}  package ZIP file.""", dest='package', default=None)
 
 operating_system = platform.system()
 home_directory = expanduser("~")
@@ -67,10 +79,7 @@ home_directory = expanduser("~")
 args_list = vars(ap.parse_args())
 
 package = args_list["package"]
-
-if package is not None and not exists(package):
-    print(f'ERROR: Cannot locate the specified package ZIP file: {package}')
-    exit(1)
+package_path = Path(package)
 
 b_prog = prog.replace(".py", "")
 
@@ -99,10 +108,10 @@ def apply_repo_updates(data_directory: Path, app_file_version: str, db_file_path
 
     registered_app_version, _ = app_versions()
     if registered_app_version is None:
-        print('No record of current repo version, assuming 2.0.0')
+        lprint('No record of current repo version, assuming 2.0.0')
         registered_app_version = '2.0.0'
-    print(f'Updating the {PRODUCT} repository:-')
-    print(f'Existing repository appears to be version {registered_app_version}...')
+    lprint(f'Updating the {PRODUCT_NAME} repository:-')
+    lprint(f'Existing repository appears to be version {registered_app_version}...')
 
     db_conn = sqlite3.connect(db_file_path)
     cur = db_conn.cursor()
@@ -114,8 +123,8 @@ def apply_repo_updates(data_directory: Path, app_file_version: str, db_file_path
         try:
             updates_dict_list = json.load(json_file)
         except ValueError:
-            print(f'ERROR: The file, "{updates_json_file}", does not appear to be a valid JSON file.')
-            print('Bailing out!')
+            lprint(f'ERROR: The file, "{updates_json_file}", does not appear to be a valid JSON file.')
+            lprint('Bailing out!')
             raise
         except IOError:
             feedback = f'Failed to read file {updates_json_file} - possible permissions issue.'
@@ -131,11 +140,11 @@ def apply_repo_updates(data_directory: Path, app_file_version: str, db_file_path
     # If changes are to be made to the repo, and this is not a greenfield
     # deployment, then take a backup of the repo, as a safety measure.
     if sql_to_apply > 0 and registered_app_version != '1.9.9':
-        print(f'There are {sql_to_apply} potential upgrade actions pending...')
-        print(f'Backing up ${PRODUCT} repo to: {data_directory}/{backup_repo}')
+        lprint(f'There are {sql_to_apply} potential upgrade actions pending...')
+        lprint(f'Backing up ${PRODUCT} repo to: {data_directory}/{backup_repo}')
         shutil.copy(db_file_path, Path(f'{data_directory}/{backup_repo}'))
     else:
-        print(f'No upgrade actions pending.')
+        lprint(f'No upgrade actions pending.')
 
     sql_count = 0
     for sql_id in updates_dict_list:
@@ -148,15 +157,15 @@ def apply_repo_updates(data_directory: Path, app_file_version: str, db_file_path
                 app_file_version):
             try:
                 cur.execute(sql_statement)
-                print(f'Applying SQL Id: {sql_id}  :- {description} (Succeeded)')
+                lprint(f'Applying SQL Id: {sql_id}  :- {description} (Succeeded)')
             except sqlite3.OperationalError:
                 if version_scalar(sql_apply_version) == version_scalar(app_file_version):
                     # If it fails and the versions are the same, we assume that it's because a DDL
                     # script has been previously run.
-                    print(f'Apply SQL Id: {sql_id}  :- {description} (FAILED - OperationalError)')
+                    lprint(f'Apply SQL Id: {sql_id}  :- {description} (FAILED - OperationalError)')
                     raise
             except sqlite3.IntegrityError:
-                print(f'Error processing SQL (Id = {sql_id}): {sql_statement}')
+                lprint(f'Error processing SQL (Id = {sql_id}): {sql_statement}')
                 raise
             sql_count += 1
     print(f'Repo updates applied: {sql_count}')
@@ -172,8 +181,8 @@ def version_scalar(version: str):
     be augmented to 3 components (3.1.0), before converting and returning the scalar value."""
     dot_count = version.count('.')
     if dot_count > 2:
-        print(f'Invalid number of dots in version string, {version}, a maximum of 2 is expected.')
-        print('Bailing out!')
+        lprint(f'Invalid number of dots in version string, {version}, a maximum of 2 is expected.')
+        lprint('Bailing out!')
         exit(1)
 
     version_padded = version
@@ -185,13 +194,13 @@ def version_scalar(version: str):
         try:
             comp = int(component)
         except ValueError:
-            print(f'Invalid non-integer character, "{component}", found in version string, "{version}" ')
-            print('Bailing out!')
+            lprint(f'Invalid non-integer character, "{component}", found in version string, "{version}" ')
+            lprint('Bailing out!')
             exit(1)
         if len(component) > 2:
-            print(f'Invalid version component, "{component}", found in version string, "{version}"')
-            print('Maximum version component length expected is 2 characters.')
-            print('Bailing out!')
+            lprint(f'Invalid version component, "{component}", found in version string, "{version}"')
+            lprint('Maximum version component length expected is 2 characters.')
+            lprint('Bailing out!')
             exit(1)
 
     scalar_version = ''
@@ -206,7 +215,7 @@ def initialise_database():
     when the program is first run.
 
     :param db_file_path: Pathname of the sqllite3 database, to be created."""
-    print(f'DEBUG: DB File: {db_file}')
+    # print(f'DEBUG: DB File: {db_file}')
     db_conn = sqlite3.connect(db_file)
     cur = db_conn.cursor()
 
@@ -251,6 +260,7 @@ def initialise_database():
 
     db_conn.commit()
 
+
 def preference(db_file_path: Path, scope: str, preference_name):
     """The preference function accepts a preference scope and preference name, and returns the associated preference
     value.
@@ -289,7 +299,6 @@ def app_versions():
         application_version, previous_app_version = record
     else:
         previous_app_version, application_version = '0.0.0', '2.0.0'
-
 
     db_conn.close()
     return application_version, previous_app_version
@@ -331,7 +340,6 @@ def upsert_preference(db_file_path: Path,
     # Check to see if the preference exists.
     pref_exists = preference(db_file_path=db_file_path, scope=scope, preference_name=preference_name)
 
-
     if pref_exists is None:
         # The preference does not exist
         cur.execute("insert  "
@@ -368,15 +376,42 @@ def app_home_contents_ok():
         if not full_path.exists():
             missing_files.append(full_path)
     if len(missing_files) > 0 or len(missing_dirs) > 0:
-        print(f'The specified application home directory, {app_home}, appears invalid.\nThe following components '
-              f'are missing:')
+        lprint(f'The specified application home directory, {app_home}, appears invalid.\nThe following components '
+               f'are missing:')
         for directory in missing_dirs:
-            print(f'{directory} (directory)')
+            lprint(f'{directory} (directory)')
         for file in missing_files:
-            print(f'{file} (file)')
+            lprint(f'{file} (file)')
         return False
     else:
         return True
+
+
+def dir_access(directory_path: Path):
+
+    if platform.system() == 'Windows':
+        return ''
+
+    if not os.access(install_location, os.R_OK):
+        return f'No READ permissions for directory, {install_location}'
+    elif not os.access(install_location, os.W_OK):
+        return f'No WRITE permissions for directory, {install_location}'
+    elif not os.access(install_location, os.X_OK):
+        return f'No EXECUTE permissions for directory, {install_location}'
+
+    return ''
+
+
+def purge_files(directory, file_match):
+    """Pattern match and delete files in specified directory."""
+    file_list = glob.glob(pathname=f'{directory}/{file_match}')
+
+    for file_path in file_list:
+        try:
+            lprint(f'Removing previous: {file_path}')
+            os.remove(file_path)
+        except OSError:
+            lprint(f'Failed to delete file: {file_path} (OSError)')
 
 
 def unpack_package(zip_pathname: Path, install_location: Path):
@@ -387,7 +422,7 @@ def unpack_package(zip_pathname: Path, install_location: Path):
     :param install_location:
     """
     if not zipfile.is_zipfile(zip_pathname):
-        print(f'unpack_package: Artefact file, {zip_pathname}, appears to be an invalid ZIP file. Unable to proceed!')
+        lprint(f'unpack_package: Artefact file, {zip_pathname}, appears to be an invalid ZIP file. Unable to proceed!')
         exit(1)
 
     with ZipFile(zip_pathname, 'r') as archive:
@@ -397,17 +432,17 @@ def unpack_package(zip_pathname: Path, install_location: Path):
 
 if __name__ == "__main__":
     if args_list["install_location"] is None:
-        install_location = Path(home_directory) / 'ctk_theme_builder'
+        install_location = Path(home_directory)
+
     else:
         install_location = args_list["install_location"]
         install_location = str(os.path.abspath(install_location))
         install_location = Path(install_location)
-    
-    if package:
-        package = os.path.abspath(package)
 
-    print(f'Starting {PRODUCT} deployment.')
-    print(f'Application home: {str(install_location)}')
+    app_home = Path(install_location) / 'ctk_theme_builder'
+
+    if package:
+        package = os.path.abspath(package_path)
 
     # Perform initial checks
     print('Checking Python interpreter version...')
@@ -418,11 +453,6 @@ if __name__ == "__main__":
     else:
         print(f'Python version, {python_version}, is a supported version.')
 
-    app_home = Path(os.path.abspath(install_location))
-    # Switch working directory to the application home
-    os.chdir(app_home)
-
-    app_home = install_location / 'ctk_theme_builder'
     assets_location = app_home / 'assets'
     data_location = assets_location / 'data'
     temp_location = app_home / 'tmp'
@@ -431,82 +461,151 @@ if __name__ == "__main__":
     images_location = assets_location / 'images'
     themes_location = assets_location / 'themes'
     etc_location = assets_location / 'etc'
+    log_location = app_home / 'log'
     palettes_location = assets_location / 'palettes_location'
     views_location = assets_location / 'views'
     db_file = data_location / f'{PRODUCT.lower()}.db'
 
-    if not exists(install_location) and package is not None:
-        if exists(install_location):
-            print(f'Creating application home: {app_home}')
-            os.mkdir(app_home)
-        else:
-            print(f'ERROR: The parent directory, {install_location}, for the specified {PRODUCT} application home, '
-                  f'does not exist.\nPlease correct the supplied pathname and retry.')
-            exit(1)
-    elif not exists(install_location) and package is None:
+    # Check requisite directory permissions
+    directory_check = dir_access(directory_path=install_location)
+    if directory_check:
+        print('ERROR: Cannot install to the specified directory, the directory permissions are insufficient:')
+        print(directory_check)
+        print(f'The directory must have read, write and execute permissions.')
+        exit(1)
+
+    if not install_location.exists() and package is not None:
+        print(f'ERROR: The parent directory, {install_location}, for the specified {PRODUCT_NAME} application home, '
+              f'does not exist.\nPlease correct the supplied pathname and retry.')
+        exit(1)
+    elif install_location.exists() and package is None:
         print(
-            f'ERROR: For the new application home, {install_location}, you must provide a deployment package via the '
+            f'ERROR: For the new application home, you must provide a deployment package via the '
             f'"-a/--package" command modifier.')
         print(f'Please correct and retry.')
         exit(1)
 
+    if package is not None and not package_path.exists():
+        lprint(f'ERROR: Cannot locate the specified package ZIP file: {package_path}')
+        exit(1)
+
+    greenfield = False
     if app_home.exists():
-        print(f'Updating existing application at: {app_home}')
+        action = f'Updating existing application at: {app_home}'
     else:
         # belt n' braces
-        print(f'Creating application home: {app_home}')
+        action = f'Creating application home: {app_home}'
+        greenfield = True
         os.mkdir(app_home)
+    # Switch working directory to the application home
+    os.chdir(app_home)
 
+    LOGFILE_NAME = f'theme_builder_setup_{DATE_STAMP}.log'
+    LOG_FILE = open(LOGFILE_NAME, "a")
+
+    lprint(f'Starting {PRODUCT_NAME} deployment.')
+    lprint(f'Installation base location: {str(install_location)}')
+    lprint(action)
+
+    lprint(f'\n======================== KEY LOCATION MAPPINGS ==========================')
+    lprint(f'Package Location: {package}')
+    lprint(f'App Home = {app_home}')
+    lprint(f'Assets Location = {assets_location}')
+    lprint(f'User Theme Location = {user_themes_location}')
+    lprint(f'Log Location = {log_location}')
+    lprint(f'=========================================================================\n')
+
+    if str(install_location).endswith('ctk_theme_builder') and greenfield:
+        lprint(f'\nWARNING: Over-cooked base install location. Install base path includes "ctk_theme_builder".')
+        lprint(f'This will cause an application home folder to be {app_home}')
+        lprint(f"To rectify, delete the upper ctk_theme_builder folder, once the install has finished, and re-run with a simpler install path.\n")
     if not exists(assets_location):
-        print(f'Creating application assets location: {assets_location}')
+        lprint(f'Creating application assets location: {assets_location}')
         os.mkdir(assets_location)
 
+    if not exists(log_location):
+        lprint(f'Creating application assets location: {log_location}')
+        os.mkdir(log_location)
+
     if not exists(temp_location):
-        print(f'Creating application temp location: {temp_location}')
+        lprint(f'Creating application temp location: {temp_location}')
         os.mkdir(temp_location)
 
     if not exists(data_location):
-        print(f'Creating application data location: {data_location}')
+        lprint(f'Creating application data location: {data_location}')
         os.mkdir(data_location)
 
+    if not exists(log_location):
+        lprint(f'Creating log location: {log_location}')
+        os.mkdir(log_location)
+
     if not exists(user_themes_location):
-        print(f'Creating user themes location: {user_themes_location}')
+        lprint(f'Creating user themes location: {user_themes_location}')
         os.mkdir(user_themes_location)
 
-
-    print(f'Checking for repository: {db_file}')
+    lprint(f'Checking for repository: {db_file}')
     if not exists(db_file):
         new_database = True
-        print("Greenfield installation - creating a new repository.")
+        lprint("Greenfield installation - creating a new repository.")
         initialise_database()
+    else:
+        lprint("Repository located - pre-existing installation.")
 
     if package:
-        print(f'Unpacking package: {package} to: {install_location}')
-        unpack_package(zip_pathname=package, install_location=install_location)
+        lprint(f'Unpacking package: {package} to: {install_location}')
+        # If we are updating from a ZIP file, then first remove old executables
+        purge_files(directory=app_home, file_match='*.py')
+        purge_files(directory=app_home, file_match='*.sh')
+        purge_files(directory=app_home, file_match='*.bat')
+        purge_files(directory=app_home / 'lib', file_match='*.py')
+        purge_files(directory=app_home / 'lib', file_match='*.sh')
+        purge_files(directory=app_home / 'lib', file_match='*.bat')
+        unpack_package(zip_pathname=package_path, install_location=install_location)
 
-    entry_point_script = PRODUCT.lower() + '.py'
+    version_script = PRODUCT.lower() + '_m.py'
 
-    print(f'Inspecting {PRODUCT} application home directory...')
+    lprint(f'Inspecting {PRODUCT_NAME} application home directory...')
     if app_home_contents_ok():
-        print(f'Install base, {str(os.path.abspath(install_location))}, looks fine.')
+        lprint(f'Install base, {str(os.path.abspath(install_location))}, looks fine.')
     else:
-        print(f'Install base, {install_location}, does not appear to be correct.')
+        lprint(f'Install base, {install_location}, does not appear to be correct.')
         exit(1)
 
-    os.chdir(app_home)
     if operating_system == 'Windows':
-        os.system('.\\build_app.bat')
+        lprint('')
+        lprint('Launching build_app.bat')
+        os.system('.\\build_app.bat > build_app.log 2>&1')
+        # Include the build_app.log to the main logfile.
+        with open('build_app.log') as f:
+            lines = [line for line in f]
+            for line in lines:
+                lprint(line, inc_newline=False)
+        lprint('')
     else:
+        lprint('Set execute permissions for build_app.sh')
         os.system('chmod 750 *.sh')
-        os.system('./build_app.sh')
+        lprint('')
+        lprint('Launching build_app.sh')
+        os.system('./build_app.sh > build_app.log 2>&1')
+        # Include the build_app.log to the main logfile.
+        with open('build_app.log') as f:
+            lines = [line for line in f]
+            for line in lines:
+                lprint(line, inc_newline=False)
+        lprint('')
+        lprint('Set execute permissions for ctk_theme_builder')
         os.system('chmod 750 ctk_theme_builder')
 
-    app_version = app_file_version(app_home / f'{entry_point_script}')
+    app_version = app_file_version(app_home / 'lib' / f'{version_script}')
 
     apply_repo_updates(data_directory=data_location, app_file_version=app_version, db_file_path=db_file)
-    print(f'App Home for {PRODUCT}: ' + str(os.path.abspath(app_home)))
+    lprint(f'App Home for {PRODUCT_NAME}: ' + str(os.path.abspath(app_home)))
 
-    print(f'\nTo launch the application run the ctk_theme_builder command script, located at:\n{app_home}/ctk_theme_builder')
+    lprint(f'\nTo launch the application run the ctk_theme_builder command script, located at:')
+    lprint(f'{app_home}/ctk_theme_builder')
 
-    print("\nDone.")
-
+    print(f'Installation log can be found at: {log_location / LOGFILE_NAME}')
+    lprint("\nDone.")
+    LOG_FILE.close()
+    os.rename(LOGFILE_NAME, log_location / LOGFILE_NAME)
+    os.remove('build_app.log')

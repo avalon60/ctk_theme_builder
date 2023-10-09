@@ -57,6 +57,10 @@
     "text_color": [
       "#0e1d28",
       "#0e1d28"
+    ],
+    "text_color_disabled": [
+      "#515e6f",
+      "#515e6f"
     ]
   },
   "CTkEntry": {
@@ -357,7 +361,7 @@
     }
   },
   "provenance": {
-    "theme name": "default_theme",
+    "theme name": "Defaulted Theme",
     "theme author": "clive",
     "date created": "Jul 08 2023 17:29:15",
     "last modified by": "clive",

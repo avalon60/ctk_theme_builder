@@ -4,6 +4,7 @@ import argparse
 import os
 from pathlib import Path
 import lib.ctk_theme_builder_m as mod
+import lib.preferences_m as pref
 import threading
 import time
 
@@ -11,17 +12,17 @@ prog_path = os.path.realpath(__file__)
 app_home = Path(os.path.dirname(os.path.realpath(__file__)))
 
 PROG = os.path.basename(__file__)
-APP_HOME = Path(os.path.dirname(os.path.realpath(__file__)))
 
-ASSETS_DIR = APP_HOME / 'assets'
-CONFIG_DIR = ASSETS_DIR / 'config'
-ETC_DIR = ASSETS_DIR / 'etc'
-TEMP_DIR = APP_HOME / 'tmp'
-VIEWS_DIR = ASSETS_DIR / 'views'
-APP_THEMES_DIR = ASSETS_DIR / 'themes'
-APP_DATA_DIR = ASSETS_DIR / 'data'
-APP_IMAGES = ASSETS_DIR / 'images'
-DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
+APP_HOME = mod.APP_HOME
+ASSETS_DIR = mod.ASSETS_DIR
+CONFIG_DIR = mod.CONFIG_DIR
+ETC_DIR = mod.ETC_DIR
+TEMP_DIR = mod.TEMP_DIR
+VIEWS_DIR = mod.VIEWS_DIR
+APP_THEMES_DIR = mod.APP_THEMES_DIR
+APP_DATA_DIR = mod.APP_DATA_DIR
+APP_IMAGES = mod.APP_IMAGES
+DB_FILE_PATH = mod.DB_FILE_PATH
 
 
 class App(customtkinter.CTk):
@@ -30,25 +31,26 @@ class App(customtkinter.CTk):
         icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
         self.iconphoto(False, icon_photo)
         # Restore preferences
-        self.qa_geometry = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='window_geometry',
-                                                  preference_name='qa_application')
+        self.qa_geometry = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='window_geometry',
+                                                   preference_name='qa_application')
         if self.qa_geometry == 'NO_DATA_FOUND':
             self.qa_geometry = '1100x580+0+0'
-            self.qa_geometry_dict = mod.new_preference_dict(scope='window_geometry',
-                                                            preference_name='qa_application',
-                                                            data_type='str', preference_value=self.qa_geometry)
-            mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=self.qa_geometry_dict)
+            self.qa_geometry_dict = pref.new_preference_dict(scope='window_geometry',
+                                                             preference_name='qa_application',
+                                                             data_type='str', preference_value=self.qa_geometry)
+            pref.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=self.qa_geometry_dict)
         self.geometry(self.qa_geometry)
 
-        self.qa_app_scaling = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='scaling',
-                                                     preference_name='qa_application')
+        self.qa_app_scaling = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='scaling',
+                                                      preference_name='qa_application')
         if self.qa_app_scaling == 'NO_DATA_FOUND':
             self.qa_app_scaling = '100%'
-            self.qa_app_scaling_dict = mod.new_preference_dict(scope='scaling',
-                                                               preference_name='qa_application',
-                                                               data_type='str', preference_value=self.qa_app_scaling)
-            mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=self.qa_app_scaling_dict)
+            self.qa_app_scaling_dict = pref.new_preference_dict(scope='scaling',
+                                                                preference_name='qa_application',
+                                                                data_type='str', preference_value=self.qa_app_scaling)
+            pref.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=self.qa_app_scaling_dict)
 
+        self.change_scaling_event(self.qa_app_scaling)
         # configure window
         self.title("CTk Theme Builder Quality Assurance")
         theme_dict = mod.json_dict(theme_json_file)
@@ -81,12 +83,6 @@ class App(customtkinter.CTk):
                                                                        values=["Light", "Dark", "System"],
                                                                        command=self.change_appearance_mode_event)
         self.appearance_mode_optionemenu.grid(row=6, column=0, padx=20, pady=(10, 10))
-        self.scaling_label = customtkinter.CTkLabel(self.sidebar_frame, text="UI Scaling:", anchor="w")
-        self.scaling_label.grid(row=7, column=0, padx=20, pady=(10, 0))
-        self.scaling_optionemenu = customtkinter.CTkOptionMenu(self.sidebar_frame,
-                                                               values=["80%", "90%", "100%", "110%", "120%"],
-                                                               command=self.change_scaling_event)
-        self.scaling_optionemenu.grid(row=8, column=0, padx=20, pady=(10, 20))
 
         # create main entry and button
         self.entry = customtkinter.CTkEntry(self, placeholder_text="CTkEntry")
@@ -123,7 +119,7 @@ class App(customtkinter.CTk):
         # create radiobutton frame
         self.radiobutton_frame = customtkinter.CTkFrame(self)
         self.radiobutton_frame.grid(row=0, column=3, padx=(20, 20), pady=(20, 0), sticky="nsew")
-        self.radio_var =  tk.IntVar(value=0)
+        self.radio_var = tk.IntVar(value=0)
         self.label_radio_group = customtkinter.CTkLabel(master=self.radiobutton_frame, text="CTkRadioButton Group:")
         self.label_radio_group.grid(row=0, column=2, columnspan=1, padx=10, pady=10, sticky="")
         self.radio_button_1 = customtkinter.CTkRadioButton(master=self.radiobutton_frame, variable=self.radio_var,
@@ -193,8 +189,6 @@ class App(customtkinter.CTk):
                             "CTkTextbox\n\n" + "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.\n\n" * 20)
         self.seg_button_1.configure(values=["CTkSegmentedButton", "Value 2", "Value 3"])
         self.seg_button_1.set("Value 2")
-        self.scaling_optionemenu.set(self.qa_app_scaling)
-        self.change_scaling_event(self.qa_app_scaling)
         self.protocol("WM_DELETE_WINDOW", self.close_app)
 
         self.keep_running = True
@@ -243,14 +237,15 @@ class App(customtkinter.CTk):
 
     def save_app_geometry(self):
         """Save the control panel geometry to the repo, for the next time the program is launched."""
-        geometry_row = mod.preference_row(db_file_path=DB_FILE_PATH,
-                                          scope='window_geometry',
-                                          preference_name='qa_application')
+        geometry_row = pref.preference_row(db_file_path=DB_FILE_PATH,
+                                           scope='window_geometry',
+                                           preference_name='qa_application')
         qa_geometry = self.geometry()
         geometry_row["preference_value"] = qa_geometry
-        mod.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
+        pref.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
 
-    def sidebar_button_event(self):
+    @staticmethod
+    def sidebar_button_event():
         print("sidebar_button click")
 
 

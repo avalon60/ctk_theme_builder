@@ -38,7 +38,7 @@
       "border_width":[ 0, 20 ],
       "button_corner_radius": [0, 1000],
       "border_width": [0, 12],
-      "button_length": [0, 6]
+      "button_length": [0, 15]
    },
    "CTkScrollbar":{
       "corner_radius":[ 0, 40 ],
@@ -51,7 +51,7 @@
    "CTkSwitch":{
       "border_width":[ 0, 10 ],
       "corner_radius":[ 4, 10 ],
-      "button_length": [0, 50]
+      "button_length": [0, 15]
    },
    "CTkTextbox":{
       "corner_radius":[ 0, 50 ],

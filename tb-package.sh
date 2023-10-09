@@ -4,6 +4,7 @@
 #
 PROG=`basename $0`
 ART_CODE="ctk_theme_builder"
+VERSION_FILE="lib/ctk_theme_builder_m.py"
 E="-e"
 
 APP_HOME=`dirname $0` 
@@ -18,7 +19,7 @@ date_time()
 
 app_version()
 {
-  version=`head -30 ${ART_CODE}.py | grep "__version__" | cut -f3 -d " " |  sed 's/"//g'`
+  version=`head -30 ${VERSION_FILE} | grep "__version__" | cut -f3 -d " " |  sed 's/"//g'`
   echo "$version"
 }   
 display_usage()
@@ -48,7 +49,7 @@ done
 app_vers=`app_version`
 if [ "${VERSION_TAG}" != "${app_vers}" ]
 then
-   echo "ERROR: A version tag of \"${VERSION_TAG}\", when ${ART_CODE}.py, thinks that it is version \"${app_vers}\""
+   echo "ERROR: A version tag of \"${VERSION_TAG}\", when ${VERSION_FILE}, thinks that it is version \"${app_vers}\""
    exit 1
 fi
 
