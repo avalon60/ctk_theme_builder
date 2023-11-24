@@ -447,11 +447,11 @@ if __name__ == "__main__":
     print('Checking Python interpreter version...')
     lower_supported = '3.8.0'
     upper_supported = '3.11.99'
-    if not (version_scalar(lower_supported) <= version_scalar(python_version) <= version_scalar(upper_supported)):
+    if version_scalar(lower_supported) > version_scalar(python_version):
         print(f'WARNING: Python interpreter version, {python_version}, is unsupported.\n'
               f'Only Python versions before {lower_supported} are not supported')
         exit(1)
-    elif version_scalar(python_version) <= version_scalar(upper_supported):
+    elif version_scalar(python_version) > version_scalar(upper_supported):
         print(f'WARNING: Python interpreter version, {python_version}, is unsupported.\n'
               f'         Only Python versions between {lower_supported} and {upper_supported} are fully supported')
     else:
