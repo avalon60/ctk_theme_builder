@@ -422,8 +422,7 @@ def unpack_package(zip_pathname: Path, install_location: Path):
     :param install_location:
     """
     if not zipfile.is_zipfile(zip_pathname):
-        lprint(f'unpack_package: Artefact file, {zip_pathname}, appears to be an invalid ZIP file. Unable to proceed!')
-        exit(1)
+        lprint(f'[unpack_package] WARNING: Artefact file, {zip_pathname}, appears to be an invalid ZIP file.')
 
     with ZipFile(zip_pathname, 'r') as archive:
         extract_location = Path(install_location)
@@ -446,10 +445,15 @@ if __name__ == "__main__":
 
     # Perform initial checks
     print('Checking Python interpreter version...')
-    if not (version_scalar('3.8.0') <= version_scalar(python_version) <= version_scalar('3.11.99')):
-        print(f'ERROR: Python interpreter version, {python_version}, is unsupported.\n'
-              f'Only Python versions between 3.8 and 3.10 are supported')
+    lower_supported = '3.8.0'
+    upper_supported = '3.11.99'
+    if not (version_scalar(lower_supported) <= version_scalar(python_version) <= version_scalar(upper_supported)):
+        print(f'WARNING: Python interpreter version, {python_version}, is unsupported.\n'
+              f'Only Python versions before {lower_supported} are not supported')
         exit(1)
+    elif version_scalar(python_version) <= version_scalar(upper_supported):
+        print(f'WARNING: Python interpreter version, {python_version}, is unsupported.\n'
+              f'         Only Python versions between {lower_supported} and {upper_supported} are fully supported')
     else:
         print(f'Python version, {python_version}, is a supported version.')
 
