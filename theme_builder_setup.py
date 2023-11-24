@@ -69,7 +69,7 @@ ap.add_argument("-i", "--install-location", required=False, action="store",
                 directory. For example on MacOS or Linux, this will equate to  $HOME, and on Windows it would be 
                 <system_drive>:\\Users\\<username>.""", dest='install_location', default=None)
 
-ap.add_argument("-p", "--package", required=False, action="store",
+ap.add_argument("-p", "--package", required=True, action="store",
                 help=f"""Used for {PRODUCT_NAME} deployments & upgrades. Use -a along with the pathname to the 
                       {PRODUCT_NAME}  package ZIP file.""", dest='package', default=None)
 
