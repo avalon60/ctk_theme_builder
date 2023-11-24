@@ -55,6 +55,7 @@ fi
 
 echo -e "Application home: ${APP_HOME}\n"
 cd ${APP_HOME}
+rm ${APP_HOME}/log/*.log 2> /dev/null
 ${APP_HOME}/freeze.sh
 if [ -d ../stage/ctk_theme_builder ]
 then 
