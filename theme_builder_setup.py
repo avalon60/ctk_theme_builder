@@ -69,7 +69,7 @@ ap.add_argument("-i", "--install-location", required=False, action="store",
                 directory. For example on MacOS or Linux, this will equate to  $HOME, and on Windows it would be 
                 <system_drive>:\\Users\\<username>.""", dest='install_location', default=None)
 
-ap.add_argument("-p", "--package", required=False, action="store",
+ap.add_argument("-p", "--package", required=True, action="store",
                 help=f"""Used for {PRODUCT_NAME} deployments & upgrades. Use -a along with the pathname to the 
                       {PRODUCT_NAME}  package ZIP file.""", dest='package', default=None)
 
@@ -447,11 +447,11 @@ if __name__ == "__main__":
     print('Checking Python interpreter version...')
     lower_supported = '3.8.0'
     upper_supported = '3.11.99'
-    if not (version_scalar(lower_supported) <= version_scalar(python_version) <= version_scalar(upper_supported)):
+    if version_scalar(lower_supported) > version_scalar(python_version):
         print(f'WARNING: Python interpreter version, {python_version}, is unsupported.\n'
               f'Only Python versions before {lower_supported} are not supported')
         exit(1)
-    elif version_scalar(python_version) <= version_scalar(upper_supported):
+    elif version_scalar(python_version) > version_scalar(upper_supported):
         print(f'WARNING: Python interpreter version, {python_version}, is unsupported.\n'
               f'         Only Python versions between {lower_supported} and {upper_supported} are fully supported')
     else:
