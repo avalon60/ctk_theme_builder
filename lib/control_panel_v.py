@@ -2457,7 +2457,7 @@ class ControlPanel(ctk.CTk):
                     confirm = CTkMessagebox(master=self,
                                             title='Listener Timeout',
                                             message=f'TIMEOUT: Waited too long for preview listener!\n\n'
-                                                    f'Ensure that only one instance of {mod.app_title()} is running is '
+                                                    f'Ensure that only one instance of {mod.app_title()} is '
                                                     f'running on port {self.listener_port}, and that no other process '
                                                     f'is using the port.',
                                             option_1='OK')
