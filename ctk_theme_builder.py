@@ -17,17 +17,16 @@ import os
 import re
 from ctk_theme_preview import PreviewPanel
 
-
 # import lib.CTkMessagebox.ctkmessagebox
 
 DEBUG = 0
 
 preview_panel = None
-
 PROG = os.path.basename(__file__)
 
+
 def valid_theme_name(theme_name):
-    pattern = re.compile("[A-Za-z0-9_()\s]+")
+    pattern = re.compile(r"[A-Za-z0-9_()\s]+")
     if pattern.fullmatch(theme_name):
         return True
     else:
