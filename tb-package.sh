@@ -102,4 +102,5 @@ then
    exit 1
 fi
 rm -fr ../stage/ctk_theme_builder
+echo -e "\nArtefact written to: ${STAGE_LOC}/${arch_file}\n"
 echo "Done."
