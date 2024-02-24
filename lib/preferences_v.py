@@ -28,57 +28,57 @@ class PreferencesDialog(ctk.CTkToplevel):
         icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
         self.iconphoto(False, icon_photo)
         control_panel_theme = pref.preference_setting(db_file_path=DB_FILE_PATH,
-                                                     scope='user_preference', preference_name='control_panel_theme')
+                                                      scope='user_preference', preference_name='control_panel_theme')
 
         control_panel_theme = control_panel_theme + '.json'
 
         self.control_panel_theme = str(APP_THEMES_DIR / control_panel_theme)
 
         self.control_panel_mode = pref.preference_setting(db_file_path=DB_FILE_PATH,
-                                                         scope='user_preference', preference_name='control_panel_mode')
+                                                          scope='user_preference', preference_name='control_panel_mode')
 
         self.last_theme_on_start = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                          preference_name='last_theme_on_start')
+                                                           preference_name='last_theme_on_start')
 
         self.theme_author = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                   preference_name='theme_author')
+                                                    preference_name='theme_author')
 
         self.enable_tooltips = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                      preference_name='enable_tooltips')
+                                                       preference_name='enable_tooltips')
 
         self.confirm_cascade = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                      preference_name='confirm_cascade')
+                                                       preference_name='confirm_cascade')
 
         self.enable_palette_labels = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                            preference_name='enable_palette_labels')
+                                                             preference_name='enable_palette_labels')
 
         self.enable_single_click_paste = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                                preference_name='enable_single_click_paste')
+                                                                 preference_name='enable_single_click_paste')
 
         self.shade_adjust_differential = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                                preference_name='shade_adjust_differential')
+                                                                 preference_name='shade_adjust_differential')
 
         self.harmony_contrast_differential = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                                    preference_name='harmony_contrast_differential')
+                                                                     preference_name='harmony_contrast_differential')
 
         self.theme_json_dir = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                     preference_name='theme_json_dir')
+                                                      preference_name='theme_json_dir')
 
         self.control_panel_scaling = pref.preference_setting(db_file_path=DB_FILE_PATH,
-                                                            scope='scaling',
-                                                            preference_name='control_panel')
+                                                             scope='scaling',
+                                                             preference_name='control_panel')
 
         self.preview_panel_scaling = pref.preference_setting(db_file_path=DB_FILE_PATH,
-                                                            scope='scaling',
-                                                            preference_name='preview_panel')
+                                                             scope='scaling',
+                                                             preference_name='preview_panel')
 
         self.listener_port = pref.preference_setting(db_file_path=DB_FILE_PATH,
-                                                    scope='user_preference',
-                                                    preference_name='listener_port')
+                                                     scope='user_preference',
+                                                     preference_name='listener_port')
 
         self.qa_application_scaling = pref.preference_setting(db_file_path=DB_FILE_PATH,
-                                                             scope='scaling',
-                                                             preference_name='qa_application')
+                                                              scope='scaling',
+                                                              preference_name='qa_application')
 
         log_level = pref.preference_setting(scope='logger', preference_name='log_level', default="Info")
 
@@ -548,7 +548,6 @@ class PreferencesDialog(ctk.CTkToplevel):
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='logger',
                                            preference_name='log_level',
                                            preference_value=log_level.upper()):
-
             log.log_error(log_text=f'Row miss updating logger > log_level')
 
         log_stderr = self.opm_log_stderr.get()
