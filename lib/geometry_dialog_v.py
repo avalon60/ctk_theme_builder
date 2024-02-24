@@ -22,7 +22,7 @@ class GeometryDialog(ctk.CTkToplevel):
         self.force_refresh = False
         log.log_debug(log_text='Geometry dialog launched.')
 
-        self.enable_tooltips = mod.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+        self.enable_tooltips = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                       preference_name='enable_tooltips')
         # The interactions between this dialog and the Control Panel are strongly linked, making it less
         # straight forward to define as a class.
