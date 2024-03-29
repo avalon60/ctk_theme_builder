@@ -4,7 +4,7 @@ import customtkinter as ctk
 import tkinter as tk
 import utils.cbtk_kit as cbtk
 import model.ctk_theme_builder as mod
-from ctk_theme_preview import update_widget_geometry
+from view.ctk_theme_preview import update_widget_geometry
 import json
 import utils.loggerutl as log
 from pathlib import Path
