@@ -12,7 +12,7 @@ from argparse import HelpFormatter
 from operator import attrgetter
 import os
 import re
-from ctk_theme_preview import PreviewPanel
+from view.ctk_theme_preview import PreviewPanel
 
 # import lib.CTkMessagebox.ctkmessagebox
 
