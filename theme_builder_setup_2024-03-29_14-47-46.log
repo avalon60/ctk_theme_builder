@@ -1,0 +1,158 @@
+Checking Python interpreter version...
+Starting CTk Theme Builder deployment.
+
+Operating System: Linux version #21~22.04.1-Ubuntu SMP PREEMPT_DYNAMIC Fri Feb  9 13:32:52 UTC 2
+Installation base location: /home/clive
+Updating existing application at: /home/clive/ctk_theme_builder
+
+======================== KEY LOCATION MAPPINGS ==========================
+Package Location: /home/clive/PycharmProjects/stage/ctk_theme_builder-3.0.2.zip
+App Home = /home/clive/ctk_theme_builder
+Assets Location = /home/clive/ctk_theme_builder/assets
+User Theme Location = /home/clive/ctk_theme_builder/user_themes
+Log Location = /home/clive/ctk_theme_builder/log
+=========================================================================
+
+Checking for repository: /home/clive/ctk_theme_builder/assets/data/ctk_theme_builder.db
+Repository located - pre-existing installation.
+Unpacking package: /home/clive/PycharmProjects/stage/ctk_theme_builder-3.0.2.zip to: /home/clive
+Removing previous: /home/clive/ctk_theme_builder/ctk_theme_builder.py
+Removing previous: /home/clive/ctk_theme_builder/ctk_theme_builder_qa_app.py
+Removing previous: /home/clive/ctk_theme_builder/ctk_theme_migrate.py
+Removing previous: /home/clive/ctk_theme_builder/ctk_theme_preview.py
+Removing previous: /home/clive/ctk_theme_builder/get-pip.py
+Removing previous: /home/clive/ctk_theme_builder/theme_builder_setup.py
+Removing previous: /home/clive/ctk_theme_builder/build_app.sh
+Removing previous: /home/clive/ctk_theme_builder/ctk_theme_builder_qa_app.sh
+Removing previous: /home/clive/ctk_theme_builder/ctk_theme_builder.sh
+Removing previous: /home/clive/ctk_theme_builder/build_app.bat
+Removing previous: /home/clive/ctk_theme_builder/ctk_theme_builder.bat
+Removing previous: /home/clive/ctk_theme_builder/ctk_theme_migrate.bat
+Removing previous: /home/clive/ctk_theme_builder/ctk_theme_builder_qa_app.bat
+Removing previous: /home/clive/ctk_theme_builder/lib/__init__.py
+Removing previous: /home/clive/ctk_theme_builder/view/preferences.py
+Removing previous: /home/clive/ctk_theme_builder/view/about.py
+Removing previous: /home/clive/ctk_theme_builder/view/theme_merger.py
+Removing previous: /home/clive/ctk_theme_builder/view/harmonics_dialog.py
+Removing previous: /home/clive/ctk_theme_builder/view/provenance_dialog.py
+Removing previous: /home/clive/ctk_theme_builder/view/geometry_dialog.py
+Removing previous: /home/clive/ctk_theme_builder/view/control_panel.py
+Removing previous: /home/clive/ctk_theme_builder/view/__init__.py
+Removing previous: /home/clive/ctk_theme_builder/controller/__init__.py
+Removing previous: /home/clive/ctk_theme_builder/utils/ctk_theme_builder_qa_app.sh
+Removing previous: /home/clive/ctk_theme_builder/utils/cbtk_kit.py
+Removing previous: /home/clive/ctk_theme_builder/utils/color_constants.py
+Removing previous: /home/clive/ctk_theme_builder/utils/loggerutl.py
+Removing previous: /home/clive/ctk_theme_builder/utils/ctk_theme_builder_qa_app.py
+Inspecting CTk Theme Builder application home directory...
+Install base, /home/clive, looks fine.
+Set execute permissions for build_app.sh
+
+Launching build_app.sh
+CTK Theme Builder build started...
+Ensuring Linux style line terminators.
+Converting EOL for file build_app.sh
+Converting EOL for file ctk_theme_builder.py
+Converting EOL for file ctk_theme_builder_qa_app.py
+Converting EOL for file ctk_theme_builder_qa_app.sh
+Converting EOL for file ctk_theme_builder.sh
+Converting EOL for file ctk_theme_migrate.py
+Converting EOL for file ctk_theme_preview.py
+Converting EOL for file get-pip.py
+Converting EOL for file theme_builder_setup.py
+Processing assets/...
+Converting EOL for file repo_updates.json
+Processing assets/...
+Converting EOL for file default_palette.json
+Converting EOL for file default_theme.json
+Converting EOL for file geometry_parameters.json
+Converting EOL for file harmony_palette.json
+Converting EOL for file palette_labels.json
+Converting EOL for file theme_skeleton.json
+Processing assets/...
+Converting EOL for file Anthracite.json
+Converting EOL for file blue.json
+Converting EOL for file Blue.json
+Converting EOL for file Dark-Blue.json
+Converting EOL for file DaynNight.json
+Converting EOL for file default.json
+Converting EOL for file GhostTrain.json
+Converting EOL for file Greengage.json
+Converting EOL for file Green.json
+Converting EOL for file GreyGhost.json
+Converting EOL for file Hades.json
+Converting EOL for file Harlequin.json
+Converting EOL for file MoonlitSky.json
+Converting EOL for file NeonBanana.json
+Converting EOL for file NeonMagic.json
+Converting EOL for file NightTrain.json
+Converting EOL for file Oceanix.json
+Converting EOL for file sweetkind.json
+Converting EOL for file Sweetkind.json
+Converting EOL for file TestCard.json
+Converting EOL for file TrojanBlue.json
+Processing assets/...
+Converting EOL for file Anthracite.json
+Converting EOL for file Blue.json
+Converting EOL for file DaynNight.json
+Converting EOL for file GhostTrain.json
+Converting EOL for file Greengage.json
+Converting EOL for file Green.json
+Converting EOL for file GreyGhost.json
+Converting EOL for file Hades.json
+Converting EOL for file Harlequin.json
+Converting EOL for file MoonlitSky.json
+Converting EOL for file NightTrain.json
+Converting EOL for file Oceanix.json
+Converting EOL for file TrojanBlue.json
+Processing assets/...
+Converting EOL for file Basic.json
+Converting EOL for file Categorised.json
+Line terminators converted.
+python is /usr/bin/python
+Collecting pip
+  Using cached pip-24.0-py3-none-any.whl (2.1 MB)
+Installing collected packages: pip
+  Attempting uninstall: pip
+    Found existing installation: pip 24.0
+    Uninstalling pip-24.0:
+      Successfully uninstalled pip-24.0
+Successfully installed pip-24.0
+Requirement already satisfied: colorharmonies==1.0.5 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 1)) (1.0.5)
+Requirement already satisfied: colour==0.1.5 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 2)) (0.1.5)
+Requirement already satisfied: contourpy==1.2.0 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 3)) (1.2.0)
+Requirement already satisfied: CTkMessagebox==2.5 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 4)) (2.5)
+Requirement already satisfied: customtkinter==5.2.2 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 5)) (5.2.2)
+Requirement already satisfied: cycler==0.12.1 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 6)) (0.12.1)
+Requirement already satisfied: darkdetect==0.8.0 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 7)) (0.8.0)
+Requirement already satisfied: distro==1.9.0 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 8)) (1.9.0)
+Requirement already satisfied: fonttools==4.49.0 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 9)) (4.49.0)
+Requirement already satisfied: importlib-resources==6.1.1 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 10)) (6.1.1)
+Requirement already satisfied: kiwisolver==1.4.5 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 11)) (1.4.5)
+Requirement already satisfied: loguru==0.7.2 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 12)) (0.7.2)
+Requirement already satisfied: matplotlib==3.8.3 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 13)) (3.8.3)
+Requirement already satisfied: numpy==1.26.4 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 14)) (1.26.4)
+Requirement already satisfied: packaging==23.2 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 15)) (23.2)
+Requirement already satisfied: pathvalidate==3.2.0 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 16)) (3.2.0)
+Requirement already satisfied: pillow==10.2.0 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 17)) (10.2.0)
+Requirement already satisfied: pyparsing==3.1.1 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 18)) (3.1.1)
+Requirement already satisfied: pyperclip==1.8.2 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 19)) (1.8.2)
+Requirement already satisfied: python-dateutil==2.8.2 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 20)) (2.8.2)
+Requirement already satisfied: scikit-build==0.17.6 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 21)) (0.17.6)
+Requirement already satisfied: six==1.16.0 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 22)) (1.16.0)
+Requirement already satisfied: tomli==2.0.1 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 23)) (2.0.1)
+Requirement already satisfied: zipp==3.15.0 in ./venv/lib/python3.10/site-packages (from -r requirements.txt (line 24)) (3.15.0)
+Requirement already satisfied: setuptools>=42.0.0 in ./venv/lib/python3.10/site-packages (from scikit-build==0.17.6->-r requirements.txt (line 21)) (59.6.0)
+Requirement already satisfied: wheel>=0.32.0 in ./venv/lib/python3.10/site-packages (from scikit-build==0.17.6->-r requirements.txt (line 21)) (0.43.0)
+App build done.
+
+Set execute permissions for ctk_theme_builder
+Updating the CTk Theme Builder repository:-
+Existing repository appears to be version 3.0.2...
+No upgrade actions pending.
+App Home for CTk Theme Builder: /home/clive/ctk_theme_builder
+
+To launch the application run the ctk_theme_builder command script, located at:
+/home/clive/ctk_theme_builder/ctk_theme_builder
+
+Done.

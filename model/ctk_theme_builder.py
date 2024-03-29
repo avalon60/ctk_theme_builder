@@ -1,6 +1,6 @@
 __title__ = 'CB CustomTkinter Theme Builder Module'
 __author__ = 'Clive Bostock'
-__version__ = "3.0.1"
+__version__ = "3.0.2"
 __license__ = 'MIT - see LICENSE.md'
 
 import copy
@@ -15,8 +15,9 @@ from dataclasses import dataclass
 from typing import Union
 import socket
 import re
-import lib.preferences_m as pref
-import lib.loggerutl as log
+import model.preferences as pref
+import utils.loggerutl as log
+
 
 application_title = 'CTk Theme Builder'
 # Constants
@@ -45,7 +46,7 @@ PALETTES_DIR = ASSETS_DIR / 'palettes'
 PROG_NAME = 'CTk Theme Builder'
 
 log.log_debug(log_text=f'APP_HOME={APP_HOME}',
-              class_name='ctk_theme_builder_m.py')
+              class_name='ctk_theme_builder.py')
 
 SERVER = '127.0.0.1'
 HEADER_SIZE = 64
@@ -226,7 +227,7 @@ def close_qa_app_requested():
     """Used to determine whether the QA application has been requested to close."""
 
     if QA_STOP_FILE.exists():
-        log.log_debug(log_text=f'Found a stop file', class_name='ctk_theme_builder_m.py',
+        log.log_debug(log_text=f'Found a stop file', class_name='ctk_theme_builder.py',
                       method_name='close_qa_app_requested')
         return True
     else:
@@ -235,24 +236,24 @@ def close_qa_app_requested():
 
 def complete_qa_stop():
     time.sleep(0.5)
-    log.log_debug(log_text=f'Slept, now calling remove_qa_status_files() and closing QA app', class_name='ctk_theme_builder_m.py',
+    log.log_debug(log_text=f'Slept, now calling remove_qa_status_files() and closing QA app', class_name='ctk_theme_builder.py',
                   method_name='complete_qa_stop')
     remove_qa_status_files()
 
 
 def remove_qa_status_files():
-    log.log_debug(log_text=f'Cleaning up...', class_name='ctk_theme_builder_m.py',
+    log.log_debug(log_text=f'Cleaning up...', class_name='ctk_theme_builder.py',
                   method_name='remove_qa_status_files')
     if QA_STOP_FILE.exists():
         try:
-            log.log_debug(log_text=f'Removing QA_STOP_FILE', class_name='ctk_theme_builder_m.py',
+            log.log_debug(log_text=f'Removing QA_STOP_FILE', class_name='ctk_theme_builder.py',
                           method_name='remove_qa_status_files')
             os.remove(QA_STOP_FILE)
         except FileNotFoundError:
             pass
     if QA_STARTED_FILE.exists():
         try:
-            log.log_debug(log_text=f'Removing QA_STARTED_FILE', class_name='ctk_theme_builder_m.py',
+            log.log_debug(log_text=f'Removing QA_STARTED_FILE', class_name='ctk_theme_builder.py',
                           method_name='remove_qa_status_files')
             os.remove(QA_STARTED_FILE)
         except FileNotFoundError:
@@ -260,7 +261,7 @@ def remove_qa_status_files():
 
 
 def qa_app_started():
-    log.log_debug(log_text=f'QA app launched', class_name='ctk_theme_builder_m.py',
+    log.log_debug(log_text=f'QA app launched', class_name='ctk_theme_builder.py',
                   method_name='qa_app_started')
     # current dateTime
     now = datetime.now()
@@ -278,7 +279,7 @@ def qa_app_started():
 
 
 def request_close_qa_app():
-    log.log_debug(log_text=f'Request QA app closure', class_name='ctk_theme_builder_m.py',
+    log.log_debug(log_text=f'Request QA app closure', class_name='ctk_theme_builder.py',
                   method_name='request_close_qa_app')
     # current dateTime
     now = datetime.now()
@@ -582,7 +583,7 @@ def listener_port():
     Preview Panel."""
     _listener_port = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                              preference_name='listener_port')
-    log.log_debug(log_text=f'Listener port returned as {_listener_port}', class_name='ctk_theme_builder_m.py',
+    log.log_debug(log_text=f'Listener port returned as {_listener_port}', class_name='ctk_theme_builder.py',
                   method_name='listener_port')
     return _listener_port
 
@@ -591,7 +592,7 @@ def method_listener_address():
     _listener_port = listener_port()
     _method_listener_address = (SERVER, _listener_port)
     log.log_debug(log_text=f'Listener address returned as {_method_listener_address}',
-                  class_name='ctk_theme_builder_m.py',
+                  class_name='ctk_theme_builder.py',
                   method_name='listener_port')
     return _method_listener_address
 
@@ -607,7 +608,7 @@ def send_command_json(command_type: str, command: str, parameters: list = None):
         parameters = []
 
     log.log_debug(log_text=f'Parameters: command_type={command_type}, command={command}, parameters={parameters}',
-                  class_name='ctk_theme_builder_m.py',
+                  class_name='ctk_theme_builder.py',
                   method_name='send_command_json')
     parameters_str = ''
     for parameter in parameters:
@@ -635,7 +636,7 @@ def send_command_json(command_type: str, command: str, parameters: list = None):
     message_json_str = message_json_str.replace('%command_type%', command_type)
     message_json_str = message_json_str.replace('%command%', command)
     log.log_debug(log_text=f'Sending message; message={message_json_str}',
-                  class_name='ctk_theme_builder_m.py',
+                  class_name='ctk_theme_builder.py',
                   method_name='send_command_json')
     send_message(message=message_json_str)
 

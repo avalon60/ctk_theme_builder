@@ -1,13 +1,13 @@
 """Class container for the colour Harmonics Dialog class."""
 
-import lib.ctk_theme_builder_m as mod
+import model.ctk_theme_builder as mod
 import customtkinter as ctk
 import tkinter as tk
 import pyperclip
 from lib.CTkToolTip import *
-import lib.cbtk_kit as cbtk
-import lib.preferences_m as pref
-import lib.loggerutl as log
+import utils.cbtk_kit as cbtk
+import model.preferences as pref
+import utils.loggerutl as log
 
 import colorharmonies as ch
 from tkinter.colorchooser import askcolor

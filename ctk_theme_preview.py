@@ -15,13 +15,13 @@ import platform
 import threading
 from pathlib import Path
 from datetime import datetime
-import lib.cbtk_kit as cbtk
-import lib.ctk_theme_builder_m as mod
-import lib.loggerutl as log
+import utils.cbtk_kit as cbtk
+import model.ctk_theme_builder as mod
+import utils.loggerutl as log
 from lib.CTkToolTip import *
 from CTkMessagebox import CTkMessagebox
 from PIL import Image
-import lib.preferences_m as pref
+import model.preferences as pref
 
 PROG = os.path.basename(__file__)
 APP_HOME = Path(os.path.dirname(os.path.realpath(__file__)))

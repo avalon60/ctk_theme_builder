@@ -2,14 +2,14 @@
 
 import customtkinter as ctk
 import tkinter as tk
-import lib.cbtk_kit as cbtk
-import lib.ctk_theme_builder_m as mod
+import utils.cbtk_kit as cbtk
+import model.ctk_theme_builder as mod
 from ctk_theme_preview import update_widget_geometry
 import json
-import lib.loggerutl as log
+import utils.loggerutl as log
 from pathlib import Path
 from lib.CTkToolTip import *
-import lib.preferences_m as pref
+import model.preferences as pref
 
 ETC_DIR = mod.ETC_DIR
 DB_FILE_PATH = mod.DB_FILE_PATH

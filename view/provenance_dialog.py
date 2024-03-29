@@ -2,9 +2,9 @@
 
 import customtkinter as ctk
 import tkinter as tk
-import lib.ctk_theme_builder_m as mod
-import lib.cbtk_kit as cbtk
-import lib.loggerutl as log
+import model.ctk_theme_builder as mod
+import utils.cbtk_kit as cbtk
+import utils.loggerutl as log
 
 APP_IMAGES = mod.APP_IMAGES
 

@@ -2,17 +2,17 @@
 
 import customtkinter as ctk
 import tkinter as tk
-import lib.cbtk_kit as cbtk
-import lib.ctk_theme_builder_m as mod
-import lib.loggerutl as log
-from lib.harmonics_dialog_v import HarmonicsDialog
-from lib.preferences_v import PreferencesDialog
-from lib.theme_merger_v import ThemeMerger
-from lib.about_v import About
-from lib.provenance_dialog_v import ProvenanceDialog
-from lib.geometry_dialog_v import GeometryDialog
+import utils.cbtk_kit as cbtk
+import model.ctk_theme_builder as mod
+import utils.loggerutl as log
+from view.harmonics_dialog import HarmonicsDialog
+from view.preferences import PreferencesDialog
+from view.theme_merger import ThemeMerger
+from view.about import About
+from view.provenance_dialog import ProvenanceDialog
+from view.geometry_dialog import GeometryDialog
 from lib.CTkToolTip import *
-import lib.preferences_m as pref
+import model.preferences as pref
 import operator
 import platform
 import pyperclip
@@ -43,6 +43,7 @@ LISTENER_FILE = mod.LISTENER_FILE
 PROG_NAME = mod.PROG_NAME
 
 APP_HOME = mod.APP_HOME
+APP_UTILS = APP_HOME / 'utils'
 APP_THEMES_DIR = mod.APP_THEMES_DIR
 DB_FILE_PATH = mod.DB_FILE_PATH
 ETC_DIR = mod.ETC_DIR
@@ -78,7 +79,7 @@ class ControlPanel(ctk.CTk):
         if sys.prefix == sys.base_prefix:
             log.log_warning(class_name='ControlPanel',
                             log_text='This instance of CTk Theme Builder, does not appear to be running in a'
-                                     'virtual environment!',
+                                     ' virtual environment!',
                             supplementary_text='CTk Theme Builder should normally run via ctk_theme_builder.bat ('
                                                'Windows) or ctk_theme_builder.sh (Linux/MacOS)')
         # Grab the JSON for one of the JSON files released with the

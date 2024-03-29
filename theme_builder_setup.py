@@ -40,8 +40,16 @@ if platform.system() == 'Windows':
 else:
     os_user_name = os.getenv("LOGNAME")
 
+def log_os_details():
+    # Get the operating system name
+    os_name = platform.system()
 
-# Get the data location, required for the config file etc
+    # Get the operating system version
+    os_version = platform.version()
+    if os_name == 'Darwin':
+        os_name = 'MacOS'
+    lprint(f'\nOperating System: {os_name} version {os_version}')
+
 
 def lprint(output_text: str, inc_newline: bool = True):
     """Function to duplex output across stdout and the logfile."""
@@ -430,6 +438,7 @@ def unpack_package(zip_pathname: Path, install_location: Path):
 
 
 if __name__ == "__main__":
+    stage_dir = os.getcwd()
     if args_list["install_location"] is None:
         install_location = Path(home_directory)
 
@@ -443,8 +452,11 @@ if __name__ == "__main__":
     if package:
         package = os.path.abspath(package_path)
 
+    LOGFILE_NAME = f'theme_builder_setup_{DATE_STAMP}.log'
+    LOG_FILE = open(LOGFILE_NAME, "a")
+
     # Perform initial checks
-    print('Checking Python interpreter version...')
+    lprint('Checking Python interpreter version...')
     lower_supported = '3.8.0'
     upper_supported = '3.11.99'
     if version_scalar(lower_supported) > version_scalar(python_version):
@@ -469,6 +481,7 @@ if __name__ == "__main__":
     palettes_location = assets_location / 'palettes_location'
     views_location = assets_location / 'views'
     db_file = data_location / f'{PRODUCT.lower()}.db'
+
 
     # Check requisite directory permissions
     directory_check = dir_access(directory_path=install_location)
@@ -504,10 +517,8 @@ if __name__ == "__main__":
     # Switch working directory to the application home
     os.chdir(app_home)
 
-    LOGFILE_NAME = f'theme_builder_setup_{DATE_STAMP}.log'
-    LOG_FILE = open(LOGFILE_NAME, "a")
-
     lprint(f'Starting {PRODUCT_NAME} deployment.')
+    log_os_details()
     lprint(f'Installation base location: {str(install_location)}')
     lprint(action)
 
@@ -564,9 +575,14 @@ if __name__ == "__main__":
         purge_files(directory=app_home / 'lib', file_match='*.py')
         purge_files(directory=app_home / 'lib', file_match='*.sh')
         purge_files(directory=app_home / 'lib', file_match='*.bat')
+        purge_files(directory=app_home / 'module', file_match='*.py')
+        purge_files(directory=app_home / 'view', file_match='*.py')
+        purge_files(directory=app_home / 'controller', file_match='*.py')
+        purge_files(directory=app_home / 'utils', file_match='*.sh')
+        purge_files(directory=app_home / 'utils', file_match='*.py')
         unpack_package(zip_pathname=package_path, install_location=install_location)
 
-    version_script = PRODUCT.lower() + '_m.py'
+    version_script = PRODUCT.lower() + '.py'
 
     lprint(f'Inspecting {PRODUCT_NAME} application home directory...')
     if app_home_contents_ok():
@@ -579,6 +595,7 @@ if __name__ == "__main__":
         lprint('')
         lprint('Launching build_app.bat')
         os.system('.\\build_app.bat > build_app.log 2>&1')
+
         # Include the build_app.log to the main logfile.
         with open('build_app.log') as f:
             lines = [line for line in f]
@@ -600,7 +617,7 @@ if __name__ == "__main__":
         lprint('Set execute permissions for ctk_theme_builder')
         os.system('chmod 750 ctk_theme_builder')
 
-    app_version = app_file_version(app_home / 'lib' / f'{version_script}')
+    app_version = app_file_version(app_home / 'model' / f'{version_script}')
 
     apply_repo_updates(data_directory=data_location, app_file_version=app_version, db_file_path=db_file)
     lprint(f'App Home for {PRODUCT_NAME}: ' + str(os.path.abspath(app_home)))
@@ -611,5 +628,5 @@ if __name__ == "__main__":
     print(f'Installation log can be found at: {log_location / LOGFILE_NAME}')
     lprint("\nDone.")
     LOG_FILE.close()
-    os.rename(LOGFILE_NAME, log_location / LOGFILE_NAME)
+    os.rename(Path(stage_dir) / LOGFILE_NAME, log_location / LOGFILE_NAME)
     os.remove('build_app.log')

@@ -2,15 +2,12 @@ __title__ = 'CTk Theme Builder'
 __author__ = 'Clive Bostock'
 __license__ = 'MIT - see LICENSE.md'
 
-import configparser
-import copy
-
 # A hat tip and thankyou, to Tom Schimansky for is excellent work with CustomTkinter.
 # Credit to my friend and colleague Jan Bejec, as well as my wife for their contributions to my logo.
 # Also, a thankyou to Akash Bora for producing the excellent CTkToolTip and CTkMessagebox widgets.
 
 import argparse
-from lib.control_panel_v import ControlPanel
+from view.control_panel import ControlPanel
 from argparse import HelpFormatter
 from operator import attrgetter
 import os
@@ -23,7 +20,6 @@ DEBUG = 0
 
 preview_panel = None
 PROG = os.path.basename(__file__)
-
 
 def valid_theme_name(theme_name):
     pattern = re.compile(r"[A-Za-z0-9_()\s]+")

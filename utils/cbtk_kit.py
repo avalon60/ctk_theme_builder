@@ -10,7 +10,7 @@ from PIL import Image
 import textwrap
 import json
 from matplotlib.colors import is_color_like
-import lib.color_constants as color_constants
+import utils.color_constants as color_constants
 
 # Constants
 # These aren't true sizes as per WEB design

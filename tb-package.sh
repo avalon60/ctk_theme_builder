@@ -4,8 +4,14 @@
 #
 PROG=`basename $0`
 ART_CODE="ctk_theme_builder"
-VERSION_FILE="lib/ctk_theme_builder_m.py"
+VERSION_FILE="model/ctk_theme_builder.py"
 E="-e"
+if [ ! -f "${VERSION_FILE}" ]
+then
+  echo $E "Unable to locate file ${VERSION_FILE}!"
+  echo "Deploying chute and bailing out!"
+  exit 1
+fi
 
 APP_HOME=`dirname $0` 
 cd ${APP_HOME}
@@ -90,6 +96,7 @@ done
 
 cd ${STAGE_LOC}
 echo -e "\nWorking from : `pwd`"
+find ctk_theme_builder -name "__pycache__" -exec rm -r "{}" ";" 2> /dev/null
 export arch_file="${ART_CODE}-${VERSION_TAG}.zip"
 echo "Creaing artifact archive:  ${arch_file}"
 if [ -f ${arch_file} ]
