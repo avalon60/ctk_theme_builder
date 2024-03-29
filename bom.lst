@@ -1,5 +1,9 @@
 assets
 lib
+model
+view
+controller
+utils
 build_app.bat
 build_app.sh
 ctk_theme_builder.bat

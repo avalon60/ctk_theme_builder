@@ -1,16 +1,15 @@
 """Class container for the Preferences dialogue."""
 
-import sys
-import lib.ctk_theme_builder_m as mod
+import model.ctk_theme_builder as mod
 import customtkinter as ctk
 import tkinter as tk
 import platform
 import os
 from lib.CTkToolTip import *
-import lib.cbtk_kit as cbtk
-import lib.loggerutl as log
+import utils.cbtk_kit as cbtk
+import utils.loggerutl as log
 from pathlib import Path
-import lib.preferences_m as pref
+import model.preferences as pref
 
 APP_THEMES_DIR = mod.APP_THEMES_DIR
 APP_IMAGES = mod.APP_IMAGES
