@@ -1,6 +1,7 @@
 """Class container for CTk Theme Builder theme merger dialogue."""
 
 import model.ctk_theme_builder as mod
+from model.ctk_theme_builder import log_call
 import customtkinter as ctk
 import tkinter as tk
 import os
@@ -229,10 +230,12 @@ class ThemeMerger(ctk.CTkToplevel):
         self.lift()
         self.bind('<Escape>', self.close_dialog)
 
+    @log_call
     def close_dialog(self, event=None):
         log.log_debug(log_text='Theme merger dialogue cancelled', class_name='ThemeMerger', method_name='close_dialog')
         self.destroy()
 
+    @log_call
     def validate_and_merge(self):
         """This method processes the "Merge Themes" dialog (launch_merge_dialog) submission, and is activated by the
         Merge button."""
@@ -300,8 +303,10 @@ class ThemeMerger(ctk.CTkToplevel):
             self.new_theme = new_theme_name
             self.open_when_merged = open_on_merge
 
+    @log_call
     def open_on_merge(self):
         return self.open_when_merged
 
+    @log_call
     def new_theme_name(self):
         return self.new_theme

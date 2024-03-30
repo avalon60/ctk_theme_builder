@@ -17,7 +17,7 @@ import socket
 import re
 import model.preferences as pref
 import utils.loggerutl as log
-
+import functools
 
 application_title = 'CTk Theme Builder'
 # Constants
@@ -236,14 +236,22 @@ def close_qa_app_requested():
 
 def complete_qa_stop():
     time.sleep(0.5)
-    log.log_debug(log_text=f'Slept, now calling remove_qa_status_files() and closing QA app', class_name='ctk_theme_builder.py',
+    log.log_debug(log_text=f'Slept, now calling remove_qa_status_files() and closing QA app',
+                  class_name='ctk_theme_builder.py',
                   method_name='complete_qa_stop')
     remove_qa_status_files()
 
 
+def log_call(func):
+    @functools.wraps(func)
+    def wrapper(*args, **kwargs):
+        log.log_debug(f"Calling function {func.__name__} with args: {args}, kwargs: {kwargs}")
+        return func(*args, **kwargs)
+
+    return wrapper
+
+
 def remove_qa_status_files():
-    log.log_debug(log_text=f'Cleaning up...', class_name='ctk_theme_builder.py',
-                  method_name='remove_qa_status_files')
     if QA_STOP_FILE.exists():
         try:
             log.log_debug(log_text=f'Removing QA_STOP_FILE', class_name='ctk_theme_builder.py',
@@ -260,9 +268,8 @@ def remove_qa_status_files():
             pass
 
 
+@log_call
 def qa_app_started():
-    log.log_debug(log_text=f'QA app launched', class_name='ctk_theme_builder.py',
-                  method_name='qa_app_started')
     # current dateTime
     now = datetime.now()
     # convert to string
@@ -278,9 +285,8 @@ def qa_app_started():
         f.write(f'[{pid}] CTk Theme Builder QA app started at: {date_started}')
 
 
+@log_call
 def request_close_qa_app():
-    log.log_debug(log_text=f'Request QA app closure', class_name='ctk_theme_builder.py',
-                  method_name='request_close_qa_app')
     # current dateTime
     now = datetime.now()
     # convert to string
@@ -290,6 +296,7 @@ def request_close_qa_app():
         f.write(f'[{pid}] CTk Theme Builder QA app close requested at: {date_started}')
 
 
+@log_call
 def db_file_exists(db_file_path: Path):
     global db_file_found
     if db_file_found is None:
@@ -300,6 +307,7 @@ def db_file_exists(db_file_path: Path):
     return db_file_found
 
 
+@log_call
 def patch_theme(theme_json: dict):
     """The patch_theme function, checks for incorrect theme properties. These were fixed in CustomTkinter 5.2.0.
     However, the fix in CustomTkinter included an allowance for the older, wrong names. We correct the older property
@@ -323,6 +331,7 @@ def patch_theme(theme_json: dict):
     return _theme_json
 
 
+@log_call
 def keys_exist(element, *keys):
     '''
     Check if *keys (nested) exists in `element` (dict).
@@ -344,6 +353,7 @@ def keys_exist(element, *keys):
     return True
 
 
+@log_call
 def cascade_dict(palette_id: int) -> list:
     """The cascade_dict function, extracts all the colour_cascade_properties entries, for a specified palette_id. Each
     dictionary entry represents a row from the colour_cascade_properties table.
@@ -366,6 +376,7 @@ def cascade_dict(palette_id: int) -> list:
     return _cascade_dict
 
 
+@log_call
 def cascade_display_string(palette_id: int) -> str:
     """The cascade_list function, extracts all the colour_cascade_properties entries, for a specified palette_id. Each
      entry represents a widget/property from the colour_cascade_properties table.
@@ -384,6 +395,7 @@ def cascade_display_string(palette_id: int) -> str:
     return _properties_string
 
 
+@log_call
 def cascade_enabled(palette_id: int) -> bool:
     """The cascade_enabled function, checks for any entries in colour_cascade_properties for the specified palette slot.
     If any exist, it returns True, otherwise it returns False.
@@ -409,6 +421,7 @@ def cascade_enabled(palette_id: int) -> bool:
         return False
 
 
+@log_call
 def colour_dictionary(theme_file: Path) -> dict:
     """Within a theme file CustomTkinter V5, now bundles geometry and colour properties together for each widget.
     We need to filter out the non-colour properties, in addition to the font settings at the end of the theme file.
@@ -434,6 +447,7 @@ def colour_dictionary(theme_file: Path) -> dict:
     return _colour_dictionary
 
 
+@log_call
 def hex_to_rgb(hex_colour):
     """ Convert a hex colour code to an RGB tuple."""
     rgb = []
@@ -445,12 +459,14 @@ def hex_to_rgb(hex_colour):
     return tuple(rgb)
 
 
+@log_call
 def rgb_to_hex(rgb: tuple):
     """Convert RGB tuple to a hex colour code."""
     r, g, b = rgb
     return '#{:02x}{:02x}{:02x}'.format(r, g, b)
 
 
+@log_call
 def str_mode_to_int(mode=None):
     """Returns the integer representing the CustomTkinter theme appearance mode, 0 for "Light", 1 for "Dark". If
     "Dark" or "Light" is not passed as a parameter, the current theme mode is detected and the return value is based
@@ -464,12 +480,14 @@ def str_mode_to_int(mode=None):
     return 1
 
 
+@log_call
 def scaling_float(scale_pct: str) -> float:
     """Expects a scaling percentage, including the % symbol and converts to a fractional decimal."""
     scaling_float = int(scale_pct.replace("%", "")) / 100
     return scaling_float
 
 
+@log_call
 def valid_theme_file_name(theme_name):
     pattern = re.compile("[A-Za-z0-9_()]+")
     if pattern.fullmatch(theme_name):
@@ -478,6 +496,7 @@ def valid_theme_file_name(theme_name):
         return False
 
 
+@log_call
 def flip_appearance_modes(theme_file_path: Path):
     """Function, which accepts the pathname to a CustomTkinter theme file. It then proceeds to swap
     all light (appearance) mode colours, with those of the dark mode."""
@@ -492,10 +511,12 @@ def flip_appearance_modes(theme_file_path: Path):
         json.dump(new_theme_dict, f, indent=2)
 
 
+@log_call
 def ui_scaling_list():
     return ['70%', '80%', '90%', '100%', '110%', '120%', '130%']
 
 
+@log_call
 def merge_themes(primary_theme_name: str, primary_mode: str, secondary_theme_name: str, secondary_mode: str,
                  new_theme_name: str, mapped_primary_mode: str = 'Light'):
     """Function, which accepts details of two themes and a new theme name, and merges the two themes, into one new
@@ -528,6 +549,7 @@ def merge_themes(primary_theme_name: str, primary_mode: str, secondary_theme_nam
         json.dump(new_theme_dict, f, indent=2)
 
 
+@log_call
 def widget_property_split(widget_property: str) -> tuple:
     """Function which accepts a widget property, in the form "<widget_type>: <widget_property>" and breaks out the
     components returning a tuple with <widget_type> and <widget_property>, resurrecting  the "CTk" prefix of the
@@ -542,6 +564,7 @@ def widget_property_split(widget_property: str) -> tuple:
     return widget_type, _property
 
 
+@log_call
 def widget_member(widget_entries: dict, filter_list: list):
     """Generator method to run through our widgets, primarily in the render_widget_properties method.
     @param widget_entries:
@@ -552,6 +575,7 @@ def widget_member(widget_entries: dict, filter_list: list):
             yield property_key
 
 
+@log_call
 def json_dict(json_file_path: Path) -> dict:
     """The json_dict function accepts the pathname to a JSON file, loads the file, and returns a dictionary
     representing the JSON content.
@@ -563,6 +587,7 @@ def json_dict(json_file_path: Path) -> dict:
     return _json_dict
 
 
+@log_call
 def user_themes_list():
     """This method generates a list of theme names, based on the json files found in the user's themes folder
     (i.e. self.theme_json_dir). These are basically the theme file names, with the .json extension stripped out."""
@@ -578,6 +603,7 @@ def user_themes_list():
     return theme_names
 
 
+@log_call
 def listener_port():
     """The listener_port function obtains and returns the listener port, used for comms from the Control Panel to the
     Preview Panel."""
@@ -588,6 +614,7 @@ def listener_port():
     return _listener_port
 
 
+@log_call
 def method_listener_address():
     _listener_port = listener_port()
     _method_listener_address = (SERVER, _listener_port)
@@ -600,6 +627,7 @@ def method_listener_address():
 METHOD_LISTENER_ADDRESS = method_listener_address()
 
 
+@log_call
 def send_command_json(command_type: str, command: str, parameters: list = None):
     """Format our command into a JSON payload in string format. We have two command type. These are 'control' and
     'filter'. The parameters' parameter, can be used to accept a list to filter against, of a list to be used to pass
@@ -641,6 +669,7 @@ def send_command_json(command_type: str, command: str, parameters: list = None):
     send_message(message=message_json_str)
 
 
+@log_call
 def sqlite_dict_factory(cursor, row):
     """The sqlite_dict_factory (SQL dictionary factory) method converts a row from a returned sqlite3  dataset
     into a dictionary, keyed on column names.
@@ -654,6 +683,7 @@ def sqlite_dict_factory(cursor, row):
     return d
 
 
+@log_call
 def update_preference_value(db_file_path: Path, scope: str, preference_name, preference_value):
     if not db_file_exists(db_file_path=db_file_path):
         print(f'Unable to locate database file located at {db_file_path}')
@@ -673,6 +703,7 @@ def update_preference_value(db_file_path: Path, scope: str, preference_name, pre
     return rowcount
 
 
+@log_call
 def colour_palette_entries(db_file_path: Path):
     if not db_file_exists(db_file_path=db_file_path):
         print(f'Unable to locate database file located at {db_file_path}')
@@ -690,6 +721,7 @@ def colour_palette_entries(db_file_path: Path):
     return colour_tiles
 
 
+@log_call
 def prepare_message(message):
     message = message.encode(ENCODING_FORMAT)
     msg_length = len(message)
@@ -698,6 +730,7 @@ def prepare_message(message):
     return send_length, message
 
 
+@log_call
 def send_message(message):
     listener_checks = 0
     listener_started = False
@@ -779,6 +812,7 @@ class PropertyVector:
                 f'The widget_property, {self.component_property}, is not a module registered CustomTkinter '
                 f'property.')
 
+    @log_call
     def __repr__(self):
         return f'{self.__class__.__name__} of {self._display_property()} (old_value = {self.old_value}, ' \
                f'new_value = {self.new_value}, command_type = {self.command_type})'
@@ -801,16 +835,19 @@ class CommandStack:
     for maintaining undo and redo. This build on the PropertyVector class, instances of which are maintained within
     the two stacks."""
 
+    @log_call
     def __init__(self):
         self.undo_stack = []
         self.redo_stack = []
 
+    @log_call
     def add_vector(self, new_vector: PropertyVector):
         """The add_vector method, accepts a property vector and adds it to the undo stack. It also ensures that
         the redo stack is wiped, since this method is called for non undo/redo operations."""
         self.undo_stack.append(new_vector)
         self.redo_stack.clear()
 
+    @log_call
     def undo_command(self) -> tuple:
         """Execute the command from the top vector entry of the undo stack. The undone command is placed on the redo
         stack. A tuple is returned and for widget related vectors includes, an action description string, describing
@@ -850,6 +887,7 @@ class CommandStack:
         else:
             return '', _command_type, _command, _component_property, _old_property_value
 
+    @log_call
     def redo_command(self) -> tuple:
         """Execute the command from the top vector entry of the redo stack. The redone command is placed on the undo
         stack. A tuple is returned and for widget related vectors includes, an action description string, describing
@@ -892,8 +930,6 @@ class CommandStack:
     def exec_command(self, property_vector: PropertyVector):
         """The exec_command is responsible for actioning non undo/redo changes to the preview panel. Also ensures that
         the redo stack is left empty, since we can't execute redo, when we branch commands after an undo."""
-        log.log_debug(log_text=f'Parameters: property_vector={property_vector}',
-                      class_name='CommandStack', method_name='exec_command')
         _command_type = property_vector.command_type
         _command = property_vector.command
         _component_type = property_vector.component_type
@@ -905,16 +941,14 @@ class CommandStack:
         self.redo_stack.clear()
 
     @staticmethod
+    @log_call
     def do_command(command_type: str, command: str, component_type: str = '',
                    component_property: str = '', property_value: Union[int, str] = ''):
         """This method is the common method called by exec_command, undo_command and redo_command. It is responsible
         for marshalling the required data in the appropriate format for the send_command_json function. Any changes
         instigated here result in update requests to the Preview Panel."""
         parameters = []
-        log.log_debug(log_text=f'Parameters: command_type={command_type}, command={command},'
-                               f'component_type={component_type}, component_property={component_property},'
-                               f'property_value={property_value}',
-                      class_name='CommandStack', method_name='do_command')
+
         if command != 'set_appearance_mode':
             parameters.append(component_type)
             parameters.append(component_property)
@@ -924,14 +958,17 @@ class CommandStack:
                           command=command,
                           parameters=parameters)
 
+    @log_call
     def undo_length(self):
         """Method to return the length of the undo stack."""
         return len(self.undo_stack)
 
+    @log_call
     def redo_length(self):
         """Method to return the length of the redo stack."""
         return len(self.redo_stack)
 
+    @log_call
     def reset_stacks(self):
         """Method to empty the command stacks."""
         self.undo_stack.clear()

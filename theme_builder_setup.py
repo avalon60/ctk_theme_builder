@@ -27,7 +27,7 @@ __version__ = "2.0.0"
 
 # Constants
 ASSET_DIRS = ['etc', 'themes', 'images', 'config', 'palettes', 'views']
-KEY_INV_FILES = ['ctk_theme_builder.bat', 'ctk_theme_builder.sh', 'ctk_theme_preview.py',
+KEY_INV_FILES = ['ctk_theme_builder.bat', 'ctk_theme_builder.sh',
                  'build_app.sh',
                  'build_app.bat', 'get-pip.py', 'requirements.txt',
                  'assets/config/repo_updates.json', 'assets/themes/GreyGhost.json']
@@ -40,6 +40,7 @@ if platform.system() == 'Windows':
 else:
     os_user_name = os.getenv("LOGNAME")
 
+
 def log_os_details():
     # Get the operating system name
     os_name = platform.system()
@@ -47,8 +48,23 @@ def log_os_details():
     # Get the operating system version
     os_version = platform.version()
     if os_name == 'Darwin':
-        os_name = 'MacOS'
-    lprint(f'\nOperating System: {os_name} version {os_version}')
+        os_name = f'MacOS {os_version}'
+    elif os_name == 'Linux':
+        os_name = get_linux_distribution(f'{os_name} {os_version}')
+    else:
+        os_name = f'{os_name} {os_version}'
+
+    lprint(f'\nOperating System: {os_name} {os_version}')
+
+
+def get_linux_distribution(fallback_os: str):
+    try:
+        with open('/etc/os-release', 'r') as f:
+            for line in f:
+                if line.startswith('PRETTY_NAME='):
+                    return line.split('=')[1].strip().strip('"')
+    except FileNotFoundError:
+        return fallback_os
 
 
 def lprint(output_text: str, inc_newline: bool = True):
@@ -396,7 +412,6 @@ def app_home_contents_ok():
 
 
 def dir_access(directory_path: Path):
-
     if platform.system() == 'Windows':
         return ''
 
@@ -482,7 +497,6 @@ if __name__ == "__main__":
     views_location = assets_location / 'views'
     db_file = data_location / f'{PRODUCT.lower()}.db'
 
-
     # Check requisite directory permissions
     directory_check = dir_access(directory_path=install_location)
     if directory_check:
@@ -533,7 +547,8 @@ if __name__ == "__main__":
     if str(install_location).endswith('ctk_theme_builder') and greenfield:
         lprint(f'\nWARNING: Over-cooked base install location. Install base path includes "ctk_theme_builder".')
         lprint(f'This will cause an application home folder to be {app_home}')
-        lprint(f"To rectify, delete the upper ctk_theme_builder folder, once the install has finished, and re-run with a simpler install path.\n")
+        lprint(
+            f"To rectify, delete the upper ctk_theme_builder folder, once the install has finished, and re-run with a simpler install path.\n")
     if not exists(assets_location):
         lprint(f'Creating application assets location: {assets_location}')
         os.mkdir(assets_location)
