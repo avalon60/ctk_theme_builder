@@ -13,6 +13,7 @@ from operator import attrgetter
 import os
 import re
 from view.ctk_theme_preview import PreviewPanel
+from model.ctk_theme_builder import log_call
 
 # import lib.CTkMessagebox.ctkmessagebox
 
@@ -21,6 +22,8 @@ DEBUG = 0
 preview_panel = None
 PROG = os.path.basename(__file__)
 
+
+@log_call
 def valid_theme_name(theme_name):
     pattern = re.compile(r"[A-Za-z0-9_()\s]+")
     if pattern.fullmatch(theme_name):
@@ -29,6 +32,7 @@ def valid_theme_name(theme_name):
         return False
 
 
+@log_call
 def all_widget_attributes(widget_attributes):
     """This function receives a dictionary, based on JSON theme builder view file content,
     and scans it, to build a list of all the widget properties included in the view."""

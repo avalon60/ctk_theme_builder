@@ -1,6 +1,7 @@
 """" Class container for the About dialogue. """
 
 import model.ctk_theme_builder as mod
+from model.ctk_theme_builder import log_call
 
 import customtkinter as ctk
 import tkinter as tk
@@ -8,7 +9,6 @@ import utils.cbtk_kit as cbtk
 import utils.loggerutl as log
 
 APP_IMAGES = mod.APP_IMAGES
-
 
 class About(ctk.CTkToplevel):
     """About application pop-up dialogue class."""
@@ -70,6 +70,7 @@ class About(ctk.CTkToplevel):
         self.lift()
         self.bind('<Escape>', self.close_dialog)
 
+    @log_call
     def close_dialog(self, event=None):
         log.log_debug(log_text='Closing About dialogue',
                       class_name='About', method_name='close_dialog')

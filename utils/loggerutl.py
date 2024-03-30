@@ -24,7 +24,7 @@ import sys
 parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 sys.path.append(parent_dir)
 
-import model.ctk_theme_builder as mod
+# import model.ctk_theme_builder as mod
 from loguru import logger as logr
 from pathlib import Path
 import datetime
@@ -136,7 +136,8 @@ def log_stamp(post_underscore: bool = True, pref_underscore: bool = False) -> st
     :param pref_underscore: If set to True (default is False), the return string is prefixed with an underscore.
     :return str: log stamp string.
     """
-    log_stamping = mod.preference_setting(scope='logger', preference_name='log_stamping', default="y")
+    log_stamping = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='logger',
+                                           preference_name='log_stamping')
     _log_stamp = LOG_STAMP
     if post_underscore:
         _log_stamp = str(_log_stamp) + '_'

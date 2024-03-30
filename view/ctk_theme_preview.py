@@ -17,6 +17,7 @@ from pathlib import Path
 from datetime import datetime
 import utils.cbtk_kit as cbtk
 import model.ctk_theme_builder as mod
+from model.ctk_theme_builder import log_call
 import utils.loggerutl as log
 from lib.CTkToolTip import *
 from CTkMessagebox import CTkMessagebox
@@ -51,6 +52,7 @@ DEFAULT_VIEW = mod.DEFAULT_VIEW
 listener_status = 0
 
 
+@log_call
 def update_widget_geometry(widget, widget_property, property_value):
     if widget_property == 'corner_radius':
         widget.configure(corner_radius=property_value)
@@ -156,6 +158,7 @@ class PreviewPanel:
         self.start_method_listener()
         self.preview.mainloop()
 
+    @log_call
     def render_preview_frames(self):
 
         ipadx = 10
@@ -241,18 +244,21 @@ class PreviewPanel:
         self.frm_preview_base.rowconfigure(1, weight=1)
         self.frm_preview_top.columnconfigure(0, weight=1)
 
+    @log_call
     def _switch_theme(self, theme_file: Path):
         self._theme_file = theme_file
         ctk.set_default_color_theme(str(self._theme_file))
 
         self.render_preview_frames()
 
+    @log_call
     def _switch_appearance_mode(self, appearance_mode: str):
         ctk.set_default_color_theme(self._theme_file)
         self._appearance_mode = appearance_mode
         ctk.set_appearance_mode(self._appearance_mode)
         self.render_preview_frames()
 
+    @log_call
     def _render_frame_top_preview(self):
         def slider_callback(slider_value):
             self.progressbar_1.set(slider_value)
@@ -529,16 +535,20 @@ class PreviewPanel:
                                                      'The text in the main body of the preview is produced '
                                                      'via an embedded CTkLabel.')
 
+    @log_call
     def _render_preview_disabled(self):
         self._toggle_preview_disabled(render_state=tk.DISABLED)
 
+    @log_call
     def _render_preview_enabled(self):
         self._toggle_preview_disabled(render_state=tk.NORMAL)
 
+    @log_call
     def render_base_frame(self):
         self.lbl_preview_heading.configure(text='Frame (Base) Preview')
         self.frm_preview_top.configure(fg_color="transparent", border_width=0)
 
+    @log_call
     def render_top_frame(self):
         self.lbl_preview_heading.configure(text='Frame (Top) Preview')
         self._ctl_frame_top_fg_color = cbtk.theme_property_color(theme_file_path=self._theme_file,
@@ -550,6 +560,7 @@ class PreviewPanel:
                                            widget_property='border_width')
         self.frm_preview_top.configure(fg_color=self._ctl_frame_top_fg_color, border_width=border_width)
 
+    @log_call
     def _toggle_preview_disabled(self, render_state):
         """Toggle between the normal and disabled states for the previewed widgets. Here we take advantage of the
         established self._rendered_widgets list, to determine the widgets which need updating."""
@@ -603,9 +614,11 @@ class PreviewPanel:
             enable = 1
         self._render_disabled = enable
 
+    @log_call
     def block_closing(self, event=0):
         pass
 
+    @log_call
     def _restore_preview_geometry(self):
         panel_geometry = pref.preference_setting(db_file_path=DB_FILE_PATH,
                                                  scope='window_geometry',
@@ -613,6 +626,7 @@ class PreviewPanel:
         self.preview.geometry(panel_geometry)
         # self.preview.resizable(True, True)
 
+    @log_call
     def _save_preview_geometry(self):
         # save current geometry to the preferences
         geometry_row = pref.preference_row(db_file_path=DB_FILE_PATH,
@@ -622,6 +636,7 @@ class PreviewPanel:
         geometry_row["preference_value"] = panel_geometry
         pref.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
 
+    @log_call
     def exec_program_command(self):
 
         command_json = self._command_json
@@ -676,6 +691,7 @@ class PreviewPanel:
                           method_name='exec_program_command')
             self.render_base_frame()
 
+    @log_call
     def _exec_colour_command(self):
         command_json = self._command_json
         command = command_json['command']
@@ -690,6 +706,7 @@ class PreviewPanel:
             log.log_error(log_text=f'Unrecognised method request: {command}', class_name='PreviewPanel',
                           method_name='exec_program_command')
 
+    @log_call
     def _exec_geometry_command(self):
         """This method is responsible for updating widget geometry, based on commands JSON received from the
         Control Panel."""
@@ -756,6 +773,7 @@ class PreviewPanel:
             if self._enable_tooltips:
                 self.entry_2_tooltip.configure(message=f'CTkEntry - with border setting of {second_border_width}')
 
+    @log_call
     def _exec_client_command(self, evt):
         command_json = self._command_json
         command_type = command_json['command_type']
@@ -770,6 +788,7 @@ class PreviewPanel:
             # print('Calling exec_geometry_command')
             self._exec_geometry_command()
 
+    @log_call
     def _handle_client(self, conn, address: str):
         """Here, handle client, expects a header frame, followed by a command frame.
         The header frame tells us how long the content of the subsequent command
@@ -802,6 +821,7 @@ class PreviewPanel:
         conn.close()
         return
 
+    @log_call
     def _method_listener(self):
         """Initialise our listener's client_handlers dictionary. This will keep track of connected
         sessions (there should normally be only one). Each incoming request, is handed off to the
@@ -853,6 +873,7 @@ class PreviewPanel:
             # print(f'[ ACTIVE CONNECTIONS ] {threading.active_count() - 2}')
 
     @staticmethod
+    @log_call
     def _prepare_message(message):
 
         message = message.encode(ENCODING_FORMAT)
@@ -861,6 +882,7 @@ class PreviewPanel:
         send_length += b' ' * (HEADER_SIZE - len(send_length))
         return send_length, message
 
+    @log_call
     def start_method_listener(self):
         listener_thread = threading.Thread(target=self._method_listener, daemon=True)
         listener_thread.start()
@@ -881,6 +903,7 @@ class PreviewPanel:
             if confirm.get() == 'OK':
                 exit(1)
 
+    @log_call
     def update_widget_colour(self, widget_type, widget_property, widget_colour):
         # print(f'Updating widget colour {widget_type} / {widget_property} / {widget_colour}')
         if widget_type == 'CTkFrame' and widget_property not in ['fg_color', 'top_fg_color']:
