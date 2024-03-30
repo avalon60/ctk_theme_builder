@@ -8,15 +8,18 @@
 PROG=`basename $0`
 PROG_PATH=`dirname $0`
 FULL_PATH=$0
-cd ${PROG_PATH}; cd ..
+APP_HOME=$(realpath  ${FULL_PATH})
+APP_HOME=$(dirname ${APP_HOME})
+APP_HOME=$(dirname ${APP_HOME})
+
 if [[ "${PROG}" == *\.sh ]]
 then
   DCCM_PY=`echo ${FULL_PATH} | sed "s/\.sh/.py/"`
 else
   DCCM_PY="${FULL_PATH}.py"
 fi
-APP_HOME=`echo ${FULL_PATH} | sed "s/${PROG}//; s/\/$//"`
-APP_ENV=${PROG_PATH}/venv
+
+APP_ENV=${APP_HOME}/venv
 if [ -f ${APP_ENV}/bin/activate ]
 then
   source ${APP_ENV}/bin/activate
