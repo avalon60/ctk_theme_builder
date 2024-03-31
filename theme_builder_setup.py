@@ -425,7 +425,7 @@ def dir_access(directory_path: Path):
     return ''
 
 
-def purge_files(directory, file_match):
+def purge_files(directory: Path, file_match: Path):
     """Pattern match and delete files in specified directory."""
     file_list = glob.glob(pathname=f'{directory}/{file_match}')
 
@@ -435,6 +435,17 @@ def purge_files(directory, file_match):
             os.remove(file_path)
         except OSError:
             lprint(f'Failed to delete file: {file_path} (OSError)')
+
+
+def purge_file(directory: Path, file_name: Path):
+    """purge_file purges an individual file, assuming that the file exists."""
+    if not os.path.exists(directory / file_name):
+        return
+    try:
+        lprint(f'Removing previous: {directory / file_name}')
+        os.remove(directory / file_name)
+    except OSError:
+        lprint(f'Failed to delete file: {directory / file_name} (OSError)')
 
 
 def unpack_package(zip_pathname: Path, install_location: Path):
@@ -595,6 +606,10 @@ if __name__ == "__main__":
         purge_files(directory=app_home / 'controller', file_match='*.py')
         purge_files(directory=app_home / 'utils', file_match='*.sh')
         purge_files(directory=app_home / 'utils', file_match='*.py')
+        if operating_system != 'Windows':
+            # Remove the ctk_theme_builder.sh -> ctk_theme_builder hard-link.
+            # We reinstate it later.
+            purge_file(directory=app_home, file_name='ctk_theme_builder')
         unpack_package(zip_pathname=package_path, install_location=install_location)
 
     version_script = PRODUCT.lower() + '.py'
@@ -618,8 +633,8 @@ if __name__ == "__main__":
                 lprint(line, inc_newline=False)
         lprint('')
     else:
-        lprint('Set execute permissions for build_app.sh')
-        os.system('chmod 750 *.sh')
+        lprint('Set execute permissions for scripts')
+        os.system('find . -name "*.sh" -exec chmod 750 "{}" ";"')
         lprint('')
         lprint('Launching build_app.sh')
         os.system('./build_app.sh > build_app.log 2>&1')

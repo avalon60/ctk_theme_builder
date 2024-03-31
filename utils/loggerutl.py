@@ -19,12 +19,6 @@
 
 import os
 import sys
-
-# Add the parent directory to the Python path
-parent_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
-sys.path.append(parent_dir)
-
-# import model.ctk_theme_builder as mod
 from loguru import logger as logr
 from pathlib import Path
 import datetime

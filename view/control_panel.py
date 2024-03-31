@@ -718,9 +718,9 @@ class ControlPanel(ctk.CTk):
             return
         self.update_wip_file()
         if platform.system() == 'Windows':
-            qa_app_launcher = 'ctk_theme_builder_qa_app.bat'
+            qa_app_launcher = 'utils\\ctk_theme_builder_qa_app.bat'
         else:
-            qa_app_launcher = 'ctk_theme_builder_qa_app.sh'
+            qa_app_launcher = 'utils/ctk_theme_builder_qa_app.sh'
 
         qa_app = APP_HOME / qa_app_launcher
         program = [qa_app, '-a', self.appearance_mode, '-t', self.wip_json]

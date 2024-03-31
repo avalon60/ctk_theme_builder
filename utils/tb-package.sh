@@ -13,9 +13,10 @@ then
   exit 1
 fi
 
-APP_HOME=`dirname $0` 
+APP_HOME=$(realpath $0)
+APP_HOME=$(dirname ${APP_HOME})
+APP_HOME=$(dirname ${APP_HOME})
 cd ${APP_HOME}
-APP_HOME=`pwd`
 
 date_time()
 {
@@ -62,13 +63,13 @@ fi
 echo -e "Application home: ${APP_HOME}\n"
 cd ${APP_HOME}
 rm ${APP_HOME}/log/*.log 2> /dev/null
-${APP_HOME}/freeze.sh
+${APP_HOME}/utils/freeze.sh
 if [ -d ../stage/ctk_theme_builder ]
 then 
   rm -fr ../stage/ctk_theme_builder
 fi
 mkdir -p ../stage/ctk_theme_builder
-for file in `cat bom.lst`
+for file in `cat utils/bom.lst`
 do 
   cp -r $file ../stage/ctk_theme_builder
 done

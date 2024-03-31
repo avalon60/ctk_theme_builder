@@ -5,18 +5,25 @@
 #   Name: ctk_theme_builder_test_app.sh
 #  Descr: CustomTkinter Theme Builder Test App Launcher (Linux/Mac)
 ##############################################################################
-PROG=`basename $0`
-PROG_PATH=`dirname $0`
-FULL_PATH=$0
-cd ${PROG_PATH}; cd ..
+PROG=$(basename $0)
+PROG_DIR=$(dirname $0)
+APP_HOME=$(realpath  ${PROG_DIR})
+APP_HOME=$(dirname ${APP_HOME})
+APP_ENV=${APP_HOME}/venv
+APP_UTILS=${APP_HOME}/utils
+APP_MODEL=${APP_HOME}/model
+APP_VIEW=${APP_HOME}/view
+
+export PYTHONPATH=${PYTHONPATH}:${APP_UTILS}:${APP_MODEL}:${APP_VIEW}
+
 if [[ "${PROG}" == *\.sh ]]
 then
-  DCCM_PY=`echo ${FULL_PATH} | sed "s/\.sh/.py/"`
+  QA_PY="${APP_UTILS}/$(echo ${PROG} | sed 's/.sh/.py/')"
 else
-  DCCM_PY="${FULL_PATH}.py"
+  QA_PY="${FULL_PATH}.py"
 fi
-APP_HOME=`echo ${FULL_PATH} | sed "s/${PROG}//; s/\/$//"`
-APP_ENV=${PROG_PATH}/venv
+
+
 if [ -f ${APP_ENV}/bin/activate ]
 then
   source ${APP_ENV}/bin/activate
@@ -38,5 +45,5 @@ else
     exit 1
   fi
 fi
-${PYTHON} ${DCCM_PY} $*
 
+${PYTHON} ${QA_PY} $*

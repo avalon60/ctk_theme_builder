@@ -1,4 +1,6 @@
 import os
+import sys
+# Add the parent directory to the Python path
 import tkinter as tk
 import customtkinter
 import argparse
