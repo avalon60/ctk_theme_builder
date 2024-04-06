@@ -17,15 +17,13 @@
 # context.logger.debug('Debug message')
 # context.logger.info('Info message') etc.
 
+import os
 import sys
-import lib.ctk_theme_builder_m as mod
 from loguru import logger as logr
 from pathlib import Path
 import datetime
 import time
-import os
-import lib.preferences_m as pref
-import enum
+import model.preferences as pref
 
 APP_HOME = os.path.dirname(os.path.realpath(__file__))
 APP_HOME = Path(os.path.dirname(APP_HOME))
@@ -54,16 +52,14 @@ logger = logr
 run_stamp = None
 db_file_found = None
 
-
-
 # Get custom login level colours
 supplementary_colour = pref.preference_setting(scope='logger', preference_name='supplementary',
-                                              default="light-green")
+                                               default="light-green")
 scenario_started_colour = pref.preference_setting(scope='logger', preference_name='scenario_started',
 
-                                                 default="light-blue")
+                                                  default="light-blue")
 scenario_completed_colour = pref.preference_setting(scope='logger', preference_name='scenario_completed',
-                                                   default="light-blue")
+                                                    default="light-blue")
 
 log_level_code = pref.preference_setting(scope='logger', preference_name='log_level', default="Info")
 log_level_code = log_level_code.upper()
@@ -110,6 +106,7 @@ def db_file_exists(db_file_path: Path):
             db_file_found = False
     return db_file_found
 
+
 def format_log_text(log_text, class_name: str = None, method_name: str = None) -> str:
     if log_text:
         sep = ':'
@@ -133,7 +130,8 @@ def log_stamp(post_underscore: bool = True, pref_underscore: bool = False) -> st
     :param pref_underscore: If set to True (default is False), the return string is prefixed with an underscore.
     :return str: log stamp string.
     """
-    log_stamping = mod.preference_setting(scope='logger', preference_name='log_stamping', default="y")
+    log_stamping = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='logger',
+                                           preference_name='log_stamping')
     _log_stamp = LOG_STAMP
     if post_underscore:
         _log_stamp = str(_log_stamp) + '_'

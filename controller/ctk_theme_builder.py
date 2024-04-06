@@ -2,20 +2,18 @@ __title__ = 'CTk Theme Builder'
 __author__ = 'Clive Bostock'
 __license__ = 'MIT - see LICENSE.md'
 
-import configparser
-import copy
-
 # A hat tip and thankyou, to Tom Schimansky for is excellent work with CustomTkinter.
 # Credit to my friend and colleague Jan Bejec, as well as my wife for their contributions to my logo.
 # Also, a thankyou to Akash Bora for producing the excellent CTkToolTip and CTkMessagebox widgets.
 
 import argparse
-from lib.control_panel_v import ControlPanel
+from view.control_panel import ControlPanel
 from argparse import HelpFormatter
 from operator import attrgetter
 import os
 import re
-from ctk_theme_preview import PreviewPanel
+from view.ctk_theme_preview import PreviewPanel
+from model.ctk_theme_builder import log_call
 
 # import lib.CTkMessagebox.ctkmessagebox
 
@@ -25,6 +23,7 @@ preview_panel = None
 PROG = os.path.basename(__file__)
 
 
+@log_call
 def valid_theme_name(theme_name):
     pattern = re.compile(r"[A-Za-z0-9_()\s]+")
     if pattern.fullmatch(theme_name):
@@ -33,6 +32,7 @@ def valid_theme_name(theme_name):
         return False
 
 
+@log_call
 def all_widget_attributes(widget_attributes):
     """This function receives a dictionary, based on JSON theme builder view file content,
     and scans it, to build a list of all the widget properties included in the view."""

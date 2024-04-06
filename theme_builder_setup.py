@@ -27,7 +27,7 @@ __version__ = "2.0.0"
 
 # Constants
 ASSET_DIRS = ['etc', 'themes', 'images', 'config', 'palettes', 'views']
-KEY_INV_FILES = ['ctk_theme_builder.bat', 'ctk_theme_builder.sh', 'ctk_theme_preview.py',
+KEY_INV_FILES = ['ctk_theme_builder.bat', 'ctk_theme_builder.sh',
                  'build_app.sh',
                  'build_app.bat', 'get-pip.py', 'requirements.txt',
                  'assets/config/repo_updates.json', 'assets/themes/GreyGhost.json']
@@ -41,7 +41,31 @@ else:
     os_user_name = os.getenv("LOGNAME")
 
 
-# Get the data location, required for the config file etc
+def log_os_details():
+    # Get the operating system name
+    os_name = platform.system()
+
+    # Get the operating system version
+    os_version = platform.version()
+    if os_name == 'Darwin':
+        os_name = f'MacOS {os_version}'
+    elif os_name == 'Linux':
+        os_name = get_linux_distribution(f'{os_name} {os_version}')
+    else:
+        os_name = f'{os_name} {os_version}'
+
+    lprint(f'\nOperating System: {os_name} {os_version}')
+
+
+def get_linux_distribution(fallback_os: str):
+    try:
+        with open('/etc/os-release', 'r') as f:
+            for line in f:
+                if line.startswith('PRETTY_NAME='):
+                    return line.split('=')[1].strip().strip('"')
+    except FileNotFoundError:
+        return fallback_os
+
 
 def lprint(output_text: str, inc_newline: bool = True):
     """Function to duplex output across stdout and the logfile."""
@@ -388,7 +412,6 @@ def app_home_contents_ok():
 
 
 def dir_access(directory_path: Path):
-
     if platform.system() == 'Windows':
         return ''
 
@@ -402,7 +425,7 @@ def dir_access(directory_path: Path):
     return ''
 
 
-def purge_files(directory, file_match):
+def purge_files(directory: Path, file_match: Path):
     """Pattern match and delete files in specified directory."""
     file_list = glob.glob(pathname=f'{directory}/{file_match}')
 
@@ -412,6 +435,17 @@ def purge_files(directory, file_match):
             os.remove(file_path)
         except OSError:
             lprint(f'Failed to delete file: {file_path} (OSError)')
+
+
+def purge_file(directory: Path, file_name: Path):
+    """purge_file purges an individual file, assuming that the file exists."""
+    if not os.path.exists(directory / file_name):
+        return
+    try:
+        lprint(f'Removing previous: {directory / file_name}')
+        os.remove(directory / file_name)
+    except OSError:
+        lprint(f'Failed to delete file: {directory / file_name} (OSError)')
 
 
 def unpack_package(zip_pathname: Path, install_location: Path):
@@ -430,6 +464,7 @@ def unpack_package(zip_pathname: Path, install_location: Path):
 
 
 if __name__ == "__main__":
+    stage_dir = os.getcwd()
     if args_list["install_location"] is None:
         install_location = Path(home_directory)
 
@@ -443,8 +478,11 @@ if __name__ == "__main__":
     if package:
         package = os.path.abspath(package_path)
 
+    LOGFILE_NAME = f'theme_builder_setup_{DATE_STAMP}.log'
+    LOG_FILE = open(LOGFILE_NAME, "a")
+
     # Perform initial checks
-    print('Checking Python interpreter version...')
+    lprint('Checking Python interpreter version...')
     lower_supported = '3.8.0'
     upper_supported = '3.11.99'
     if version_scalar(lower_supported) > version_scalar(python_version):
@@ -504,10 +542,8 @@ if __name__ == "__main__":
     # Switch working directory to the application home
     os.chdir(app_home)
 
-    LOGFILE_NAME = f'theme_builder_setup_{DATE_STAMP}.log'
-    LOG_FILE = open(LOGFILE_NAME, "a")
-
     lprint(f'Starting {PRODUCT_NAME} deployment.')
+    log_os_details()
     lprint(f'Installation base location: {str(install_location)}')
     lprint(action)
 
@@ -522,7 +558,8 @@ if __name__ == "__main__":
     if str(install_location).endswith('ctk_theme_builder') and greenfield:
         lprint(f'\nWARNING: Over-cooked base install location. Install base path includes "ctk_theme_builder".')
         lprint(f'This will cause an application home folder to be {app_home}')
-        lprint(f"To rectify, delete the upper ctk_theme_builder folder, once the install has finished, and re-run with a simpler install path.\n")
+        lprint(
+            f"To rectify, delete the upper ctk_theme_builder folder, once the install has finished, and re-run with a simpler install path.\n")
     if not exists(assets_location):
         lprint(f'Creating application assets location: {assets_location}')
         os.mkdir(assets_location)
@@ -564,9 +601,18 @@ if __name__ == "__main__":
         purge_files(directory=app_home / 'lib', file_match='*.py')
         purge_files(directory=app_home / 'lib', file_match='*.sh')
         purge_files(directory=app_home / 'lib', file_match='*.bat')
+        purge_files(directory=app_home / 'module', file_match='*.py')
+        purge_files(directory=app_home / 'view', file_match='*.py')
+        purge_files(directory=app_home / 'controller', file_match='*.py')
+        purge_files(directory=app_home / 'utils', file_match='*.sh')
+        purge_files(directory=app_home / 'utils', file_match='*.py')
+        if operating_system != 'Windows':
+            # Remove the ctk_theme_builder.sh -> ctk_theme_builder hard-link.
+            # We reinstate it later.
+            purge_file(directory=app_home, file_name='ctk_theme_builder')
         unpack_package(zip_pathname=package_path, install_location=install_location)
 
-    version_script = PRODUCT.lower() + '_m.py'
+    version_script = PRODUCT.lower() + '.py'
 
     lprint(f'Inspecting {PRODUCT_NAME} application home directory...')
     if app_home_contents_ok():
@@ -579,6 +625,7 @@ if __name__ == "__main__":
         lprint('')
         lprint('Launching build_app.bat')
         os.system('.\\build_app.bat > build_app.log 2>&1')
+
         # Include the build_app.log to the main logfile.
         with open('build_app.log') as f:
             lines = [line for line in f]
@@ -586,8 +633,8 @@ if __name__ == "__main__":
                 lprint(line, inc_newline=False)
         lprint('')
     else:
-        lprint('Set execute permissions for build_app.sh')
-        os.system('chmod 750 *.sh')
+        lprint('Set execute permissions for scripts')
+        os.system('find . -name "*.sh" -exec chmod 750 "{}" ";"')
         lprint('')
         lprint('Launching build_app.sh')
         os.system('./build_app.sh > build_app.log 2>&1')
@@ -600,7 +647,7 @@ if __name__ == "__main__":
         lprint('Set execute permissions for ctk_theme_builder')
         os.system('chmod 750 ctk_theme_builder')
 
-    app_version = app_file_version(app_home / 'lib' / f'{version_script}')
+    app_version = app_file_version(app_home / 'model' / f'{version_script}')
 
     apply_repo_updates(data_directory=data_location, app_file_version=app_version, db_file_path=db_file)
     lprint(f'App Home for {PRODUCT_NAME}: ' + str(os.path.abspath(app_home)))
@@ -611,5 +658,5 @@ if __name__ == "__main__":
     print(f'Installation log can be found at: {log_location / LOGFILE_NAME}')
     lprint("\nDone.")
     LOG_FILE.close()
-    os.rename(LOGFILE_NAME, log_location / LOGFILE_NAME)
+    os.rename(Path(stage_dir) / LOGFILE_NAME, log_location / LOGFILE_NAME)
     os.remove('build_app.log')

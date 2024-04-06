@@ -5,18 +5,32 @@
 #   Name: ctk_theme_builder.sh
 #  Descr: CustomTkinter Theme Builder Launcher (Linux/Mac)
 ##############################################################################
-PROG=`basename $0`
-PROG_PATH=`dirname $0`
-FULL_PATH=$0
-if [[ "${PROG}" == *\.sh ]]
+PROG=$(basename $0)
+PROG_DIR=$(dirname $0)
+APP_HOME=$(realpath  ${PROG_DIR})
+
+APP_ENV=${APP_HOME}/venv
+APP_UTILS=${APP_HOME}/utils
+APP_MODEL=${APP_HOME}/model
+APP_VIEW=${APP_HOME}/view
+APP_CTL=${APP_HOME}/controller
+
+export PYTHONPATH=${PYTHONPATH}:${APP_HOME}
+
+if [[ "${PROG}" != *\.py ]]
 then
-  DCCM_PY=`echo ${FULL_PATH} | sed "s/\.sh/.py/"`
+  if [[ "${PROG}" == *\.sh ]]
+  then
+    THEME_BUILDER_PY="${APP_CTL}/$(echo ${PROG} | sed 's/.sh/.py/')"
+  else
+    THEME_BUILDER_PY="${APP_CTL}/${PROG}.py"
+  fi
 else
-  DCCM_PY="${FULL_PATH}.py"
+  THEME_BUILDER_PY="${FULL_PATH}.py"
 fi
 
-APP_HOME=`echo ${FULL_PATH} | sed "s/${PROG}//; s/\/$//"`
-APP_ENV=${PROG_PATH}/venv
+echo "Application Home: $APP_HOME"
+
 if [ -f ${APP_ENV}/bin/activate ]
 then
   source ${APP_ENV}/bin/activate
@@ -39,5 +53,4 @@ else
     exit 1
   fi
 fi
-${PYTHON} ${DCCM_PY} $*
-
+${PYTHON} ${THEME_BUILDER_PY} $*

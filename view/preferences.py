@@ -1,16 +1,16 @@
 """Class container for the Preferences dialogue."""
 
-import sys
-import lib.ctk_theme_builder_m as mod
+import model.ctk_theme_builder as mod
+from model.ctk_theme_builder import log_call
 import customtkinter as ctk
 import tkinter as tk
 import platform
 import os
 from lib.CTkToolTip import *
-import lib.cbtk_kit as cbtk
-import lib.loggerutl as log
+import utils.cbtk_kit as cbtk
+import utils.loggerutl as log
 from pathlib import Path
-import lib.preferences_m as pref
+import model.preferences as pref
 
 APP_THEMES_DIR = mod.APP_THEMES_DIR
 APP_IMAGES = mod.APP_IMAGES
@@ -18,6 +18,7 @@ DB_FILE_PATH = mod.DB_FILE_PATH
 
 
 class PreferencesDialog(ctk.CTkToplevel):
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -204,7 +205,10 @@ class PreferencesDialog(ctk.CTkToplevel):
                                                        padding=(10, 10),
                                                        corner_radius=6,
                                                        message="When enabled, this causes tool-tips to be enabled "
-                                                               "throughout the theme builder application.")
+                                                               "throughout the theme builder application."
+                                                               "\n\n"
+                                                               "Any changes will not take effect until after you "
+                                                               "re-start the application.")
 
         self.tk_confirm_cascade = tk.IntVar(master=frm_widgets)
         self.tk_confirm_cascade.set(self.confirm_cascade)
@@ -381,6 +385,20 @@ class PreferencesDialog(ctk.CTkToplevel):
         lbl_log_level = ctk.CTkLabel(master=frm_widgets, text='Logging Level', justify="right")
         lbl_log_level.grid(row=widget_start_row, column=0, padx=5, pady=10, sticky='e')
 
+        if self.enable_tooltips:
+            lbl_log_level_tooltip = CTkToolTip(lbl_log_level,
+                                               wraplength=400,
+                                               justify="left",
+                                               border_width=1,
+                                               padding=(10, 10),
+                                               corner_radius=6,
+                                               message="Allows you to adjust logging level. More details are logged, "
+                                                       "with selections made closer to the top of the list. "
+                                                       "Typically you should have this set to Info or Warning."
+                                                       "\n\n"
+                                                       "Any changes will not take effect until after you "
+                                                       "re-start the application.")
+
         self.opm_log_level = ctk.CTkOptionMenu(master=frm_widgets,
                                                width=12,
                                                values=log.LOG_LEVEL_DISP)
@@ -391,13 +409,14 @@ class PreferencesDialog(ctk.CTkToplevel):
         lbl_log_stderr = ctk.CTkLabel(master=frm_widgets, text='Log to stderr', justify="right")
         lbl_log_stderr.grid(row=widget_start_row, column=2, padx=5, pady=10, sticky='e')
 
-        lbl_log_stderr_tooltip = CTkToolTip(lbl_log_stderr,
-                                            border_width=1,
-                                            justify="left",
-                                            padding=(10, 10),
-                                            corner_radius=6,
-                                            message='Typically, we only log to the ctk_tb.log file, in the log '
-                                                    'folder.\n\nSelect "Yes", to duplex logging to the terminal.')
+        if self.enable_tooltips:
+            lbl_log_stderr_tooltip = CTkToolTip(lbl_log_stderr,
+                                                border_width=1,
+                                                justify="left",
+                                                padding=(10, 10),
+                                                corner_radius=6,
+                                                message="Typically, we only log to the ctk_tb.log file, in the log "
+                                                        'folder.\n\nSelect "Yes", to duplex logging to the terminal.')
 
         self.opm_log_stderr = ctk.CTkOptionMenu(master=frm_widgets,
                                                 width=12,
@@ -415,27 +434,34 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.lift()
         self.bind('<Escape>', self.close_preferences)
 
+    @log_call
     def close_preferences(self, event=None):
         log.log_debug(log_text='Closing preferences dialogue',
                       class_name='PreferencesDialog',
                       method_name='close_preferences')
         self.destroy()
 
+    @log_call
     def get_cascade_setting(self):
         self.confirm_cascade = int(self.tk_confirm_cascade.get())
 
+    @log_call
     def get_tooltips_setting(self):
         self.enable_tooltips = int(self.tk_enable_tooltips.get())
 
+    @log_call
     def get_palette_label_setting(self):
         self.enable_palette_labels = int(self.tk_enable_palette_labels.get())
 
+    @log_call
     def get_last_theme_on_start(self):
         self.last_theme_on_start = int(self.tk_last_theme_on_start.get())
 
+    @log_call
     def get_single_click_paste_setting(self):
         self.enable_single_click_paste = int(self.tk_enable_single_click_paste.get())
 
+    @log_call
     def save_preferences(self):
         """Save the selected preferences."""
         # Save JSON Directory:
@@ -564,6 +590,7 @@ class PreferencesDialog(ctk.CTkToplevel):
         # self.status_bar.set_status_text(status_text=f'Preferences saved.')
         self.destroy()
 
+    @log_call
     def preferred_json_location(self):
         """A simple method which asks the themes author to navigate to where
          the themes JSON are to be stored/maintained."""

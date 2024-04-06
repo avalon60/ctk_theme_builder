@@ -2,19 +2,22 @@
 
 import customtkinter as ctk
 import tkinter as tk
-import lib.cbtk_kit as cbtk
-import lib.ctk_theme_builder_m as mod
-from ctk_theme_preview import update_widget_geometry
+import utils.cbtk_kit as cbtk
+import model.ctk_theme_builder as mod
+from model.ctk_theme_builder import log_call
+from view.ctk_theme_preview import update_widget_geometry
 import json
-import lib.loggerutl as log
+import utils.loggerutl as log
 from pathlib import Path
 from lib.CTkToolTip import *
-import lib.preferences_m as pref
+import model.preferences as pref
 
 ETC_DIR = mod.ETC_DIR
 DB_FILE_PATH = mod.DB_FILE_PATH
 
+
 class GeometryDialog(ctk.CTkToplevel):
+
     def __init__(self, widget_type: str, theme_json_data: dict, appearance_mode: str,
                  command_stack: mod.CommandStack, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -23,9 +26,11 @@ class GeometryDialog(ctk.CTkToplevel):
         log.log_debug(log_text='Geometry dialog launched.')
 
         self.enable_tooltips = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
-                                                      preference_name='enable_tooltips')
+                                                       preference_name='enable_tooltips')
+
         # The interactions between this dialog and the Control Panel are strongly linked, making it less
         # straight forward to define as a class.
+        @log_call
         def slider_callback(property_name, value):
             label_text = property_name.replace('_', ' ')
             base_label_text = label_text.replace(widget_type.lower(), '') + ': '
@@ -41,6 +46,7 @@ class GeometryDialog(ctk.CTkToplevel):
 
             update_widget_geometry(widget=geometry_widget, widget_property=config_param, property_value=property_value)
 
+        @log_call
         def deselect_widget(widget_id):
             """This local function is provided as a means to deselect the CTkRadioButton. This is for when the user
             clicks on the rendered button, in the geometry edit dialogue, and they subsequently need to show it
@@ -461,6 +467,7 @@ class GeometryDialog(ctk.CTkToplevel):
 
         self.wait_window()
 
+    @log_call
     def save_geometry_edits(self, widget_type):
         self.force_refresh = False
         for widget_property, property_value in self.geometry_edit_values.items():
@@ -490,26 +497,28 @@ class GeometryDialog(ctk.CTkToplevel):
                 json.dump(self.theme_json_data, f, indent=2)
             self.master.set_option_states()
 
-
         self.close_geometry_dialog()
 
+    @log_call
     def close_geometry_dialog(self, event=None):
         self.save_widget_geom_geometry()
         log.log_debug(log_text='Geometry dialog closing.')
         self.destroy()
 
+    @log_call
     def restore_geom_geometry(self):
         """Restore window geometry of the Widget Geometry dialog from auto-saved preferences"""
         saved_geometry = pref.preference_setting(db_file_path=DB_FILE_PATH,
-                                                scope='window_geometry',
-                                                preference_name='widget_geometry')
+                                                 scope='window_geometry',
+                                                 preference_name='widget_geometry')
         # self.geometry(saved_geometry)
 
+    @log_call
     def save_widget_geom_geometry(self):
         """Save the widget geometry dialog's geometry to the repo, for the next time the dialog is launched."""
         geometry_row = pref.preference_row(db_file_path=DB_FILE_PATH,
-                                          scope='window_geometry',
-                                          preference_name='widget_geometry')
+                                           scope='window_geometry',
+                                           preference_name='widget_geometry')
         panel_geometry = self.geometry()
         geometry_row["preference_value"] = panel_geometry
         pref.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)

@@ -4,12 +4,19 @@
 #
 PROG=`basename $0`
 ART_CODE="ctk_theme_builder"
-VERSION_FILE="lib/ctk_theme_builder_m.py"
+VERSION_FILE="model/ctk_theme_builder.py"
 E="-e"
+if [ ! -f "${VERSION_FILE}" ]
+then
+  echo $E "Unable to locate file ${VERSION_FILE}!"
+  echo "Deploying chute and bailing out!"
+  exit 1
+fi
 
-APP_HOME=`dirname $0` 
+APP_HOME=$(realpath $0)
+APP_HOME=$(dirname ${APP_HOME})
+APP_HOME=$(dirname ${APP_HOME})
 cd ${APP_HOME}
-APP_HOME=`pwd`
 
 date_time()
 {
@@ -56,13 +63,13 @@ fi
 echo -e "Application home: ${APP_HOME}\n"
 cd ${APP_HOME}
 rm ${APP_HOME}/log/*.log 2> /dev/null
-${APP_HOME}/freeze.sh
+${APP_HOME}/utils/freeze.sh
 if [ -d ../stage/ctk_theme_builder ]
 then 
   rm -fr ../stage/ctk_theme_builder
 fi
 mkdir -p ../stage/ctk_theme_builder
-for file in `cat bom.lst`
+for file in `cat utils/bom.lst`
 do 
   cp -r $file ../stage/ctk_theme_builder
 done
@@ -90,6 +97,7 @@ done
 
 cd ${STAGE_LOC}
 echo -e "\nWorking from : `pwd`"
+find ctk_theme_builder -name "__pycache__" -exec rm -r "{}" ";" 2> /dev/null
 export arch_file="${ART_CODE}-${VERSION_TAG}.zip"
 echo "Creaing artifact archive:  ${arch_file}"
 if [ -f ${arch_file} ]

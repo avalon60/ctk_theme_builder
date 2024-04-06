@@ -2,9 +2,10 @@
 
 import customtkinter as ctk
 import tkinter as tk
-import lib.ctk_theme_builder_m as mod
-import lib.cbtk_kit as cbtk
-import lib.loggerutl as log
+import model.ctk_theme_builder as mod
+from model.ctk_theme_builder import log_call
+import utils.cbtk_kit as cbtk
+import utils.loggerutl as log
 
 APP_IMAGES = mod.APP_IMAGES
 
@@ -16,7 +17,9 @@ HEADING4 = mod.HEADING4
 REGULAR_TEXT = cbtk.REGULAR_TEXT
 SMALL_TEXT = mod.SMALL_TEXT
 
+
 class ProvenanceDialog(ctk.CTkToplevel):
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.title('Theme Provenance')
@@ -111,11 +114,13 @@ class ProvenanceDialog(ctk.CTkToplevel):
         btn_close.grid(row=0, column=0, padx=10, pady=(5, 5), sticky='we')
         self.bind('<Escape>', self.close_dialog)
 
+    @log_call
     def close_dialog(self, event=None):
         log.log_debug(log_text='Close provenance dialogue', class_name='ProvenanceDialog',
                       method_name='close_dialog')
         self.destroy()
 
+    @log_call
     def modify_property(self, property_name, value):
         if property_name == "theme_name":
             self.lbl_theme_name.configure(text=value)
@@ -138,5 +143,3 @@ class ProvenanceDialog(ctk.CTkToplevel):
         elif property_name == 'keystone_colour':
             self.lbl_keystone_colour.configure(text=value)
             self.btn_keystone_colour.configure(fg_color=value, hover_color=value, text=value)
-
-

@@ -1,12 +1,16 @@
+import os
+import sys
+# Add the parent directory to the Python path
 import tkinter as tk
 import customtkinter
 import argparse
-import os
+
 from pathlib import Path
-import lib.ctk_theme_builder_m as mod
-import lib.preferences_m as pref
+import model.ctk_theme_builder as mod
+import model.preferences as pref
 import threading
 import time
+
 
 prog_path = os.path.realpath(__file__)
 app_home = Path(os.path.dirname(os.path.realpath(__file__)))

@@ -2,17 +2,18 @@
 
 import customtkinter as ctk
 import tkinter as tk
-import lib.cbtk_kit as cbtk
-import lib.ctk_theme_builder_m as mod
-import lib.loggerutl as log
-from lib.harmonics_dialog_v import HarmonicsDialog
-from lib.preferences_v import PreferencesDialog
-from lib.theme_merger_v import ThemeMerger
-from lib.about_v import About
-from lib.provenance_dialog_v import ProvenanceDialog
-from lib.geometry_dialog_v import GeometryDialog
+import utils.cbtk_kit as cbtk
+import model.ctk_theme_builder as mod
+from model.ctk_theme_builder import log_call
+import utils.loggerutl as log
+from view.harmonics_dialog import HarmonicsDialog
+from view.preferences import PreferencesDialog
+from view.theme_merger import ThemeMerger
+from view.about import About
+from view.provenance_dialog import ProvenanceDialog
+from view.geometry_dialog import GeometryDialog
 from lib.CTkToolTip import *
-import lib.preferences_m as pref
+import model.preferences as pref
 import operator
 import platform
 import pyperclip
@@ -43,6 +44,7 @@ LISTENER_FILE = mod.LISTENER_FILE
 PROG_NAME = mod.PROG_NAME
 
 APP_HOME = mod.APP_HOME
+APP_UTILS = APP_HOME / 'utils'
 APP_THEMES_DIR = mod.APP_THEMES_DIR
 DB_FILE_PATH = mod.DB_FILE_PATH
 ETC_DIR = mod.ETC_DIR
@@ -61,6 +63,7 @@ class ControlPanel(ctk.CTk):
     THEME_PALETTE_ROWS = 2
     command_stack = mod.CommandStack()
 
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.theme_palette_tiles = []
@@ -78,7 +81,7 @@ class ControlPanel(ctk.CTk):
         if sys.prefix == sys.base_prefix:
             log.log_warning(class_name='ControlPanel',
                             log_text='This instance of CTk Theme Builder, does not appear to be running in a'
-                                     'virtual environment!',
+                                     ' virtual environment!',
                             supplementary_text='CTk Theme Builder should normally run via ctk_theme_builder.bat ('
                                                'Windows) or ctk_theme_builder.sh (Linux/MacOS)')
         # Grab the JSON for one of the JSON files released with the
@@ -510,9 +513,12 @@ class ControlPanel(ctk.CTk):
         self.load_theme()
         self.mainloop()
 
+    @log_call
     def block_window_close(self):
+        """Don't allow the window closure."""
         pass
 
+    @log_call
     def flip_appearance_modes(self):
         if self.json_state == 'dirty':
             confirm = CTkMessagebox(master=self,
@@ -539,14 +545,12 @@ class ControlPanel(ctk.CTk):
         mod.flip_appearance_modes(theme_file_path=theme_json_file)
         self.load_theme()
 
+    @log_call
     def set_widget_colour(self, widget_property, new_colour):
         """Update the widget colour on the preview panel."""
         if not cbtk.valid_colour(new_colour):
             self.status_bar.set_status_text(status_text=f'Paste action ignored - not a valid colour code.')
             return
-
-        log.log_debug(log_text='Set widget colour',
-                      class_name='ControlPanel', method_name='set_widget_colour')
 
         prev_colour = self.widgets[widget_property]["colour"]
         # We don't know whether the widget is displayed for sure, when we are using cascade from the colour palette
@@ -577,6 +581,7 @@ class ControlPanel(ctk.CTk):
             self.json_state = 'dirty'
             self.set_option_states()
 
+    @log_call
     def create_theme_palette(self, theme_name):
         self.theme_palette = mod.json_dict(json_file_path=ETC_DIR / 'default_palette.json')
         palette_json = theme_name.replace('.json', '') + '.json'
@@ -584,6 +589,7 @@ class ControlPanel(ctk.CTk):
         with open(self.palette_file, "w") as f:
             json.dump(self.theme_palette, f, indent=2)
 
+    @log_call
     def create_menu(self):
         # Set up the core of our menu
         self.des_menu = cbtk.CBtkMenu(self, tearoff=0)
@@ -628,6 +634,7 @@ class ControlPanel(ctk.CTk):
 
         self.set_option_states()
 
+    @log_call
     def launch_theme_merger(self):
         log.log_debug(log_text='Launching Theme Merger',
                       class_name='ControlPanel', method_name='launch_theme_merger')
@@ -640,6 +647,7 @@ class ControlPanel(ctk.CTk):
             self.opm_theme.set(new_theme_name)
             self.load_theme()
 
+    @log_call
     def copy_property_colour(self, event=None, widget_property=None):
         colour = None
         try:
@@ -657,11 +665,13 @@ class ControlPanel(ctk.CTk):
             self.status_bar.set_status_text(
                 status_text=f'Copy for {colour} failed!')
 
+    @log_call
     def about(self):
         log.log_debug(log_text='Launching About dialogue',
                       class_name='ControlPanel', method_name='about')
         about_dialog = About()
 
+    @log_call
     def launch_preferences_dialog(self):
         log.log_debug(log_text='Launching preferences dialogue',
                       class_name='ControlPanel', method_name='launch_preferences_dialog')
@@ -678,6 +688,7 @@ class ControlPanel(ctk.CTk):
         self.load_preferences()
         self.status_bar.set_status_text(status_text=f'Preference updates {action}.')
 
+    @log_call
     def launch_provenance_dialog(self):
         log.log_debug(log_text='Launching provenance dialogue',
                       class_name='ControlPanel', method_name='launch_provenance_dialog')
@@ -699,6 +710,7 @@ class ControlPanel(ctk.CTk):
         provenance_dialog.modify_property(property_name='harmony_method', value=harmony_method)
         provenance_dialog.modify_property(property_name='keystone_colour', value=keystone_colour)
 
+    @log_call
     def launch_qa_app(self):
         log.log_debug(log_text='Launching QA app',
                       class_name='ControlPanel', method_name='launch_qa_app')
@@ -706,15 +718,16 @@ class ControlPanel(ctk.CTk):
             return
         self.update_wip_file()
         if platform.system() == 'Windows':
-            qa_app_launcher = 'ctk_theme_builder_qa_app.bat'
+            qa_app_launcher = 'utils\\ctk_theme_builder_qa_app.bat'
         else:
-            qa_app_launcher = 'ctk_theme_builder_qa_app.sh'
+            qa_app_launcher = 'utils/ctk_theme_builder_qa_app.sh'
 
         qa_app = APP_HOME / qa_app_launcher
         program = [qa_app, '-a', self.appearance_mode, '-t', self.wip_json]
         self.process = sp.Popen(program)
         self.qa_launched = True
 
+    @log_call
     def load_preferences(self):
         """Load preferences. We may need to do this after a preference dialog call."""
         log.log_debug(log_text='Loading preferences',
@@ -776,6 +789,7 @@ class ControlPanel(ctk.CTk):
         self.min_ctk_version = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='system',
                                                        preference_name='min_ctk_version')
 
+    @log_call
     def sync_palette_mode_colours(self):
         """Sync the theme colour palette colours to both modes."""
         log.log_debug(log_text='Sync palette mode colours',
@@ -787,6 +801,7 @@ class ControlPanel(ctk.CTk):
             fg_colour = self.theme_palette_tiles[entry_id].cget('fg_color')
             self.theme_palette[str(entry_id)][1] = fg_colour
 
+    @log_call
     def stash_theme_palette(self, mode):
         """Stash the theme colour palette colours to disk. We do this when switching appearance mode."""
         log.log_debug(log_text='Stash the theme colour palette colours to disk',
@@ -798,6 +813,7 @@ class ControlPanel(ctk.CTk):
         with open(self.wip_palette_file, "w") as f:
             json.dump(self.theme_palette, f, indent=2)
 
+    @log_call
     def load_stashed_theme_palette(self, mode):
         self.theme_palette = mod.json_dict(json_file_path=self.wip_palette_file)
         # Marry the palette buttons to their palette colours
@@ -809,6 +825,7 @@ class ControlPanel(ctk.CTk):
         except IndexError:
             pass
 
+    @log_call
     def save_theme_palette(self, theme_name: str = None):
         """Save the colour palette colours back to disk."""
         if theme_name is None:
@@ -837,6 +854,7 @@ class ControlPanel(ctk.CTk):
 
         shutil.copyfile(self.wip_palette_file, self.source_palette_file)
 
+    @log_call
     def render_geometry_buttons(self):
         """Set up the geometry buttons near the top of the Control Panel"""
         log.log_debug(log_text=f'Set up the geometry buttons near the top of the Control Panel',
@@ -1048,6 +1066,7 @@ class ControlPanel(ctk.CTk):
                             pady=pad_y)
         column += 1
 
+    @log_call
     def launch_widget_geometry(self, widget_type):
         log.log_debug(log_text=f'Launch widget geometry dialogue',
                       class_name='ControlPanel', method_name='launch_widget_geometry')
@@ -1061,6 +1080,7 @@ class ControlPanel(ctk.CTk):
             # the widget.
             self.refresh_preview(set_scaling=False)
 
+    @log_call
     def set_option_states(self):
         """This function sets the button and menu option states. The states are set based upon a combination of,
         whether a theme is currently selected, and the state of the theme ('dirty'/'clean')"""
@@ -1136,6 +1156,7 @@ class ControlPanel(ctk.CTk):
         elif not self.harmony_palette_running and self.theme and 'provenance' in self.theme_json_data:
             self.tools_menu.entryconfig('Colour Harmonics', state=tk.NORMAL)
 
+    @log_call
     def switch_preview_appearance_mode(self, event='event'):
         """Actions to choice of preview panel's appearance mode (Light / Dark)"""
         preview_appearance_mode = self.tk_seg_mode.get()
@@ -1179,9 +1200,8 @@ class ControlPanel(ctk.CTk):
         self.set_option_states()
         self.toggle_frame_mode()
 
+    @log_call
     def render_theme_palette(self):
-        log.log_debug(log_text=f'Render theme palette',
-                      class_name='ControlPanel', method_name='render_theme_palette')
         render_labels = self.enable_palette_labels
         palette_entries = mod.colour_palette_entries(db_file_path=DB_FILE_PATH)
         menus = []
@@ -1327,9 +1347,8 @@ class ControlPanel(ctk.CTk):
                                  lambda event, menu=menus[entry_id], button_id=entry_id: self.context_menu(event,
                                                                                                            menu))
 
+    @log_call
     def cascade_colour(self, palette_id):
-        log.log_debug(log_text=f'Cascade colour; palette_id: {palette_id}',
-                      class_name='ControlPanel', method_name='cascade_colour')
         cascade_dict_list = mod.cascade_dict(palette_id=palette_id)
         property_colour = self.palette_button_list[palette_id].cget("fg_color")
         cascade_impact = mod.cascade_display_string(palette_id=palette_id)
@@ -1356,15 +1375,15 @@ class ControlPanel(ctk.CTk):
             # property colour directly, as a parameter.
             self.paste_colour(event=None, widget_property=_widget_property, property_colour=property_colour)
 
+    @log_call
     def cascade_enabled(self, palette_id: int) -> bool:
         return mod.cascade_enabled(palette_id=palette_id)
 
+    @log_call
     def toggle_frame_mode(self):
         """We need the ability to render the frames in the preview panel as they would appear when we have a top frame
         (a frame whose parent widget is a frame. Conversely, we also need to see how our other widgets render within
         a single frame. This method toggles the preview panel, between the 2 states."""
-        log.log_debug(log_text=f'Toggle frame mode',
-                      class_name='ControlPanel', method_name='toggle_frame_mode')
         if not self.theme:
             return
         frame_mode = self.tk_swt_frame_mode.get()
@@ -1378,20 +1397,18 @@ class ControlPanel(ctk.CTk):
             mod.send_command_json(command_type='program', command='render_base_frame')
         self.top_frame = frame_mode
 
+    @log_call
     def toggle_render_disabled(self):
         render_state = self.swt_render_disabled.get()
-        log.log_debug(log_text=f'render state = {render_state}',
-                      class_name='ControlPanel', method_name='toggle_render_disabled')
         if render_state:
             mod.send_command_json(command_type='program', command='render_preview_disabled')
         else:
             mod.send_command_json(command_type='program', command='render_preview_enabled')
 
+    @log_call
     def update_properties_filter(self, view_name):
         """When a different view is selected, we need to update the Properties Filter list accordingly. This method,
         loads the requisite JSON files and derives the new list for us. """
-        log.log_debug(log_text=f'Update properties filter; view_name: {view_name}',
-                      class_name='ControlPanel', method_name='update_properties_filter')
         view_file = str(VIEWS_DIR / view_name) + '.json'
         view_file = Path(view_file)
         self.widget_attributes = mod.json_dict(json_file_path=view_file)
@@ -1404,11 +1421,10 @@ class ControlPanel(ctk.CTk):
         # self.send_preview_command('Update properties filter...')
 
     @staticmethod
+    @log_call
     def view_list():
         """This method generates a list of view names, based on the json files found in the assets/views folder.
         These are basically the theme file names, with the .json extension stripped out."""
-        log.log_debug(log_text=f'Generate a list of view names',
-                      class_name='ControlPanel', method_name='view_list')
         json_files = list(VIEWS_DIR.glob('*.json'))
         theme_names = []
         for file in json_files:
@@ -1418,9 +1434,8 @@ class ControlPanel(ctk.CTk):
         theme_names.sort()
         return theme_names
 
+    @log_call
     def undo_change(self):
-        log.log_debug(log_text=f'Undo a change',
-                      class_name='ControlPanel', method_name='undo_change')
         undo_text, _command_type, _widget_type, _widget_property, _property_value = self.command_stack.undo_command()
         _command = _widget_type
         if _command_type == 'colour':
@@ -1455,9 +1470,8 @@ class ControlPanel(ctk.CTk):
         self.status_bar.set_status_text(
             status_text=undo_text)
 
+    @log_call
     def redo_change(self):
-        log.log_debug(log_text=f'Redo a change',
-                      class_name='ControlPanel', method_name='redo_change')
         redo_text, _command_type, _widget_type, _widget_property, _property_value = self.command_stack.redo_command()
         _command = _widget_type
         if _command_type == 'colour':
@@ -1492,16 +1506,14 @@ class ControlPanel(ctk.CTk):
         self.status_bar.set_status_text(
             status_text=redo_text)
 
+    @log_call
     def update_wip_file(self):
         """Updates the work in progress, theme JSON file."""
-        log.log_debug(log_text=f'Update the WIP, theme JSON file',
-                      class_name='ControlPanel', method_name='update_wip_file')
         with open(self.wip_json, "w") as f:
             json.dump(self.theme_json_data, f, indent=2)
 
+    @log_call
     def load_theme(self, event=None, reload_preview: bool = True):
-        log.log_debug(log_text=f'Load/reload theme: reload_preview = {reload_preview}',
-                      class_name='ControlPanel', method_name='load_theme')
         if self.json_state == 'dirty':
             confirm = CTkMessagebox(master=self,
                                     title='Confirm Action',
@@ -1603,10 +1615,9 @@ class ControlPanel(ctk.CTk):
         self.json_state = 'clean'
         self.set_option_states()
 
+    @log_call
     def save_harmonics_geometry(self):
         """Save the harmonics panel geometry to the repo, for the next time the dialog is launched."""
-        log.log_debug(log_text=f'Save the harmonics panel geometry to the repo',
-                      class_name='ControlPanel', method_name='save_harmonics_geometry')
         geometry_row = pref.preference_row(db_file_path=DB_FILE_PATH,
                                            scope='window_geometry',
                                            preference_name='harmonics_panel')
@@ -1614,37 +1625,33 @@ class ControlPanel(ctk.CTk):
         geometry_row["preference_value"] = panel_geometry
         pref.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
 
+    @log_call
     def close_harmonics(self):
-        log.log_debug(log_text=f'Close colour harmonics dialogue',
-                      class_name='ControlPanel', method_name='close_harmonics')
         self.rendered_keystone_shades.clear()
         self.save_harmonics_geometry()
         self.destroy()
         self.harmony_palette_running = False
         self.set_option_states()
 
+    @log_call
     def restore_harmony_geometry(self):
         """Restore window geometry from auto-saved preferences"""
-        log.log_debug(log_text=f'Restore window geometry from auto-saved preferences',
-                      class_name='ControlPanel', method_name='restore_harmony_geometry')
         saved_geometry = pref.preference_setting(db_file_path=DB_FILE_PATH,
                                                  scope='window_geometry',
                                                  preference_name='harmonics_panel')
         self.geometry(saved_geometry)
         self.resizable(False, False)
 
+    @log_call
     def launch_harmony_dialog(self):
-        log.log_debug(log_text=f'Launch colour harmonics dialogue',
-                      class_name='ControlPanel', method_name='launch_harmony_dialog')
         harmonics_dialog = HarmonicsDialog(theme_name=self.theme,
                                            theme_json_data=self.theme_json_data)
 
+    @log_call
     def darken_palette_tile(self, palette_button: ctk.CTkButton,
                             palette_button_id: int,
                             shade_step: int,
                             multiplier: int = 1):
-        log.log_debug(log_text=f'Darken palette title',
-                      class_name='ControlPanel', method_name='darken_palette_tile')
         self.set_option_states()
         widget_colour = palette_button.cget('fg_color')
         darker_shade = cbtk.shade_down(color=widget_colour, differential=shade_step, multiplier=multiplier)
@@ -1658,12 +1665,12 @@ class ControlPanel(ctk.CTk):
             # Leverage the paste_palette_colour method to update the widget and the preview panel.
             self.paste_palette_colour(event=None, palette_button_id=palette_button_id)
 
+    @log_call
     def lighten_palette_tile(self, palette_button: ctk.CTkButton,
                              palette_button_id: int,
                              shade_step: int,
                              multiplier: int = 1):
-        log.log_debug(log_text=f'Lighten palette title',
-                      class_name='ControlPanel', method_name='lighten_palette_tile')
+
         self.set_option_states()
         widget_colour = palette_button.cget('fg_color')
         lighter_shade = cbtk.shade_up(color=widget_colour, differential=shade_step, multiplier=multiplier)
@@ -1677,14 +1684,14 @@ class ControlPanel(ctk.CTk):
             # Leverage the _paste_palette_colour method to update the widget and the preview panel.
             self.paste_palette_colour(event=None, palette_button_id=palette_button_id)
 
+    @log_call
     def lighten_widget_property_shade(self, property_widget: ctk.CTkButton,
                                       widget_property: str,
                                       shade_step: int,
                                       multiplier: int = 1):
         """Lighten the specified widget property shade, by a specified shade_step, optionally multiplied by a
         coefficient (multiplier)."""
-        log.log_debug(log_text=f'Lighten the specified widget property shade',
-                      class_name='ControlPanel', method_name='lighten_widget_property_shade')
+
         self.set_option_states()
         widget_colour = property_widget.cget('fg_color')
 
@@ -1699,14 +1706,13 @@ class ControlPanel(ctk.CTk):
             # Leverage the _paste_color method to update the widget and the preview panel.
             self.paste_colour(event=None, widget_property=widget_property)
 
+    @log_call
     def darken_widget_property_shade(self, property_widget: ctk.CTkButton,
                                      widget_property: str,
                                      shade_step: int,
                                      multiplier: int = 1):
         """Darken the specified widget property shade, by a specified shade_step, optionally multiplied by a
         coefficient (multiplier)."""
-        log.log_debug(log_text=f'Darken the specified widget property shade',
-                      class_name='ControlPanel', method_name='darken_widget_property_shade')
         self.set_option_states()
         widget_colour = property_widget.cget('fg_color')
 
@@ -1721,11 +1727,11 @@ class ControlPanel(ctk.CTk):
             # Leverage the _paste_color method to update the widget and the preview panel.
             self.paste_colour(event=None, widget_property=widget_property)
 
+    @log_call
     def load_theme_palette(self):
         """Determine and open the JSON theme palette file, for the selected theme, and marry the colours mapped in
         the file, to the palette widgets. """
-        log.log_debug(log_text=f'Load theme palette, marrying colours to widgets',
-                      class_name='ControlPanel', method_name='load_theme_palette')
+
         theme_name = self.theme_file
         palette_json = theme_name
 
@@ -1753,6 +1759,7 @@ class ControlPanel(ctk.CTk):
             pass
         pass
 
+    @log_call
     def reset_theme(self):
         """Reset the theme file, to the state of the last save operation, or the state when it was opened,
         if there has been no intervening save. """
@@ -1763,9 +1770,6 @@ class ControlPanel(ctk.CTk):
         if confirm.get() == 'No':
             return
 
-        log.log_debug(log_text=f'Reset the theme file, to the state of the last save operation (or save)',
-                      class_name='ControlPanel', method_name='reset_theme')
-
         self.json_state = 'clean'
         # TODO: Remove this line below
         # self.load_theme_palette()
@@ -1774,6 +1778,7 @@ class ControlPanel(ctk.CTk):
         self.command_stack.reset_stacks()
         self.set_option_states()
 
+    @log_call
     def create_theme(self):
         """Create a new theme. This is based on the default_theme.json file."""
         if self.json_state == 'dirty':
@@ -1783,8 +1788,7 @@ class ControlPanel(ctk.CTk):
                                     options=["Yes", "No"])
             if confirm.get() == 'No':
                 return
-        log.log_debug(log_text=f'Create a new theme',
-                      class_name='ControlPanel', method_name='create_theme')
+
         source_file = ETC_DIR / 'default_theme.json'
         dialog = ctk.CTkInputDialog(text="Enter new theme name:", title="Create New Theme")
         new_theme = dialog.get_input()
@@ -1822,6 +1826,7 @@ class ControlPanel(ctk.CTk):
             self.status_bar.set_status_text(status_text=f'New theme {new_theme} created.')
             self.reload_preview()
 
+    @log_call
     def delete_theme(self):
         """Delete the currently selected theme."""
 
@@ -1834,8 +1839,6 @@ class ControlPanel(ctk.CTk):
             self.seg_mode.set(self.appearance_mode)
             return
 
-        log.log_debug(log_text=f'Delete the currently selected theme',
-                      class_name='ControlPanel', method_name='delete_theme')
         # Force the preview panel to look like the default (grey) theme.
         default_file = ETC_DIR / 'default_theme.json'
         self.theme_json_data = mod.json_dict(json_file_path=default_file)
@@ -1865,13 +1868,13 @@ class ControlPanel(ctk.CTk):
                                         status_text=f'Theme, "{self.theme}", has been deleted. ')
         self.json_state = 'clean'
 
+    @log_call
     def save_theme_as(self):
         """Save's the currently selected theme to a new theme. If the current theme has been modified, the modified
         state is saved. The new "save as" theme, becomes the current theme. This operation, also duplicates the
         palette file, to the new theme. """
         # current dateTime
-        log.log_debug(log_text=f'Save theme as',
-                      class_name='ControlPanel', method_name='save_theme_as')
+
         source_file = self.source_json_file
         dialog = ctk.CTkInputDialog(text="Enter new theme name:", title="Create New Theme")
 
@@ -1943,6 +1946,7 @@ class ControlPanel(ctk.CTk):
                 log.log_warning(log_text=f'Row miss: on update of auto save of selected theme.')
             self.set_option_states()
 
+    @log_call
     def paste_colour(self, event, widget_property, property_colour: str = None):
         """Paste the colour currently stored in the paste buffer, to the selected button, where the paste operation
         was invoked. Note that we can circumvent the copy/paste process, by receiving the colour as a parameter."""
@@ -1975,11 +1979,11 @@ class ControlPanel(ctk.CTk):
             self.json_state = 'dirty'
             self.set_option_states()
 
+    @log_call
     def paste_palette_colour(self, event, palette_button_id):
 
         new_colour = pyperclip.paste()
-        log.log_debug(log_text=f'Paste palette colour: new_colour={new_colour}; palette_button_id={palette_button_id}',
-                      class_name='ControlPanel', method_name='paste_palette_colour')
+
         if not cbtk.valid_colour(new_colour):
             self.status_bar.set_status_text(status_text='Attempted paste of non colour code - pasted text ignored.')
             return
@@ -1999,22 +2003,20 @@ class ControlPanel(ctk.CTk):
         self.status_bar.set_status_text(
             status_text=f'Colour {new_colour} assigned to palette entry {palette_button_id + 1}.')
 
+    @log_call
     def set_palette_colour(self, palette_button_id, colour):
-        log.log_debug(log_text=f'Set palette colour: palette_button_id={palette_button_id}; colour={colour}',
-                      class_name='ControlPanel', method_name='set_palette_colour')
+
         hover_colour = cbtk.contrast_colour(colour)
         self.theme_palette_tiles[palette_button_id].configure(fg_color=colour, hover_color=hover_colour)
         self.json_state = 'dirty'
         self.set_option_states()
 
+    @log_call
     def set_filtered_widget_display(self, dummy='dummy'):
-        log.log_debug(log_text=f'Set filtered widget display',
-                      class_name='ControlPanel', method_name='set_filtered_widget_display')
         self.render_widget_properties()
 
+    @log_call
     def property_colour_picker(self, event, widget_property):
-        log.log_debug(log_text=f'Property colour picker: widget_property={widget_property}',
-                      class_name='ControlPanel', method_name='property_colour_picker')
         prev_colour = self.widgets[widget_property]["colour"]
         new_colour = askcolor(master=self, title='Pick colour for : ' + widget_property,
                               initialcolor=prev_colour)
@@ -2022,9 +2024,8 @@ class ControlPanel(ctk.CTk):
             new_colour = new_colour[1]
             self.set_widget_colour(widget_property=widget_property, new_colour=new_colour)
 
+    @log_call
     def palette_colour_picker(self, palette_button_id):
-        log.log_debug(log_text=f'Palette colour picker: palette_button_id={palette_button_id}',
-                      class_name='ControlPanel', method_name='property_colour_picker')
         prev_colour = self.theme_palette_tiles[palette_button_id].cget('fg_color')
         new_colour = askcolor(master=self.frm_theme_palette,
                               title=f'Pick colour for palette entry number {palette_button_id + 1}',
@@ -2051,9 +2052,11 @@ class ControlPanel(ctk.CTk):
             self.set_option_states()
 
     @staticmethod
+    @log_call
     def context_menu(event: tk.Event = None, menu: cbtk.CBtkMenu = None):
         menu.tk_popup(event.x_root, event.y_root)
 
+    @log_call
     def copy_palette_colour(self, event=None, palette_button_id=None, shade_copy=False):
         log.log_debug(log_text=f'Copy palette colour: palette_button_id={palette_button_id}; shade_copy={shade_copy}',
                       class_name='ControlPanel', method_name='copy_palette_colour')
@@ -2064,6 +2067,7 @@ class ControlPanel(ctk.CTk):
         self.status_bar.set_status_text(
             status_text=f'Colour {colour} copied from palette entry {palette_button_id + 1} to clipboard.')
 
+    @log_call
     def render_widget_properties(self, dummy=None):
         """Here we render the widget properties, within the control panel, along with their colour settings."""
         log.log_debug(log_text=f'Render the widget properties, within the control panel',
@@ -2257,6 +2261,7 @@ class ControlPanel(ctk.CTk):
 
                     btn_idx += 1
 
+    @log_call
     def update_rendered_widget(self, widget_type, widget_property, property_value):
         # TODO: Is this required vvvv
         composite_property = mod.PropertyVector.display_property(widget_type=widget_type,
@@ -2274,6 +2279,7 @@ class ControlPanel(ctk.CTk):
                 if _display_tile.winfo_exists():
                     _display_tile.configure(fg_color=property_value)
 
+    @log_call
     def sync_appearance_mode(self):
         """This method allows us to copy our Dark configuration (if Dark is our current selection, to our Light and
         vice-versa """
@@ -2323,6 +2329,7 @@ class ControlPanel(ctk.CTk):
         self.set_option_states()
         self.reload_preview()
 
+    @log_call
     def sync_theme_palette(self):
         """Sync the theme palette for the current appearance mode to its counter-part."""
         current_mode = self.seg_mode.get()
@@ -2355,6 +2362,7 @@ class ControlPanel(ctk.CTk):
         self.json_state = 'dirty'
         self.set_option_states()
 
+    @log_call
     def refresh_preview(self, set_scaling: bool = True):
         """The refresh_preview method, instructs the Preview Panel to perform a re-rendering of all widgets."""
         log.log_debug(log_text=f'Refresh preview set_scaling={set_scaling}',
@@ -2369,6 +2377,7 @@ class ControlPanel(ctk.CTk):
                                   command='set_widget_scaling',
                                   parameters=[self.preview_panel_scaling_pct])
 
+    @log_call
     def reload_preview(self):
         """The reload_preview method causes a full reload of the preview panel."""
         log.log_debug(log_text=f'Reload preview panel',
@@ -2396,6 +2405,7 @@ class ControlPanel(ctk.CTk):
         if frame_mode == 'base':
             mod.send_command_json(command_type='program', command='render_base_frame')
 
+    @log_call
     def close_panels(self, event=None):
         if self.json_state == 'dirty':
             confirm = CTkMessagebox(master=self,
@@ -2420,6 +2430,7 @@ class ControlPanel(ctk.CTk):
         log.log_complete(class_name='ControlPanel', supplementary_text='Theme Builder Control Panel exiting')
         self.destroy()
 
+    @log_call
     def launch_preview(self):
         log.log_info(log_text='Launching preview panel', class_name='ControlPanel',
                      method_name='launch_preview')
@@ -2480,6 +2491,7 @@ class ControlPanel(ctk.CTk):
 
         self.protocol("WM_DELETE_WINDOW", self.close_panels)
 
+    @log_call
     def restore_controller_geometry(self):
         log.log_debug(log_text=f'Restore Control Panel geometry',
                       class_name='ControlPanel', method_name='restore_controller_geometry')
@@ -2489,6 +2501,7 @@ class ControlPanel(ctk.CTk):
         self.geometry(controller_geometry)
         # self.resizable(False, True)
 
+    @log_call
     def save_controller_geometry(self):
         """Save the control panel geometry to the repo, for the next time the program is launched."""
         log.log_debug(log_text=f'Save Control Panel geometry',
@@ -2500,6 +2513,7 @@ class ControlPanel(ctk.CTk):
         geometry_row["preference_value"] = panel_geometry
         pref.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=geometry_row)
 
+    @log_call
     def save_theme(self):
         log.log_debug(log_text=f'Save theme',
                       class_name='ControlPanel', method_name='save_theme')
@@ -2527,3 +2541,4 @@ class ControlPanel(ctk.CTk):
         self.command_stack.reset_stacks()
         self.set_option_states()
         self.save_theme_palette()
+

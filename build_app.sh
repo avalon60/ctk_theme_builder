@@ -5,6 +5,20 @@
 #   Name: build_app.sh
 #  Descr: Setup Python environment and modules for Ctk Theme Builder
 ##############################################################################
+PROG=$(basename $0)
+PROG_DIR=$(dirname $0)
+APP_HOME=$(realpath  ${PROG_DIR})
+
+APP_ENV=${APP_HOME}/venv
+APP_UTILS=${APP_HOME}/utils
+APP_MODEL=${APP_HOME}/model
+APP_VIEW=${APP_HOME}/view
+APP_CTL=${APP_HOME}/controller
+E="-e"
+
+echo $E "Application Home: ${APP_HOME}"
+cd ${APP_HOME}
+
 fix_eols ()
 {
   echo "Ensuring Linux style line terminators."
