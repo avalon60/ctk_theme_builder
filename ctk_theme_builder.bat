@@ -10,7 +10,7 @@ set APP_ENV=%PROG_PATH%\venv
 cd %PROG_PATH%
 call %APP_ENV%\Scripts\activate.bat
 
-set PYTHONPATH=%PYTHONPATH%;%PROG_PATH%\utils;%PROG_PATH%\model;%PROG_PATH%\view
+set PYTHONPATH=%PYTHONPATH%;%PROG_PATH%
 
 call %APP_ENV%\Scripts\activate.bat
 

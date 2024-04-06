@@ -15,7 +15,7 @@ APP_MODEL=${APP_HOME}/model
 APP_VIEW=${APP_HOME}/view
 APP_CTL=${APP_HOME}/controller
 
-export PYTHONPATH=${PYTHONPATH}:${APP_UTILS}:${APP_MODEL}:${APP_VIEW}
+export PYTHONPATH=${PYTHONPATH}:${APP_HOME}
 
 if [[ "${PROG}" != *\.py ]]
 then
