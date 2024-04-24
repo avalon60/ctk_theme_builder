@@ -5,7 +5,7 @@ from model.ctk_theme_builder import log_call
 import customtkinter as ctk
 import tkinter as tk
 import os
-from lib.CTkToolTip import *
+from CTkToolTip import *
 import utils.cbtk_kit as cbtk
 import model.preferences as pref
 import utils.loggerutl as log
