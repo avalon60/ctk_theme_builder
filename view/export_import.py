@@ -2,6 +2,7 @@
 
 import model.ctk_theme_builder as mod
 from model.ctk_theme_builder import log_call
+from model.ctk_theme_builder import os_attribute
 import customtkinter as ctk
 import tkinter as tk
 import os
@@ -9,20 +10,160 @@ from CTkToolTip import *
 import utils.cbtk_kit as cbtk
 import model.preferences as pref
 import utils.loggerutl as log
+from tkinter import filedialog
+from pathlib import Path
+from view.view_utils import position_child_widget
+import shutil
+
 
 APP_THEMES_DIR = mod.APP_THEMES_DIR
 APP_IMAGES = mod.APP_IMAGES
 DB_FILE_PATH = mod.DB_FILE_PATH
 
 
-class ThemeMerger(ctk.CTkToplevel):
+class Exporter(ctk.CTkToplevel):
     """This class is used to merge two themes, to create an entirely new theme."""
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
-        self.iconphoto(False, icon_photo)
+        self.theme_json_dir = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                      preference_name='theme_json_dir')
+        self.enable_tooltips = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
+                                                       preference_name='enable_tooltips')
+
+        self.open_when_merged = 0
+
+        self.master = self.master
+        self.title('Export Theme')
+        self.geometry('350x150')
+
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=0)
+        self.columnconfigure(0, weight=1)
+        self.os_name = os_attribute("os_name")
+        self.download_directory = None
+
+        frm_main = ctk.CTkFrame(master=self, corner_radius=10)
+        frm_main.grid(column=0, row=0, sticky='nsew')
+        frm_main.columnconfigure(0, weight=1)
+        frm_main.rowconfigure(0, weight=1)
+
+        frm_main = ctk.CTkFrame(master=self, corner_radius=10)
+        frm_main.grid(column=0, row=0, sticky='nsew')
+        frm_main.columnconfigure(0, weight=1)
+        frm_main.rowconfigure(0, weight=1)
+
+        frm_widgets = ctk.CTkFrame(master=frm_main, corner_radius=10)
+        frm_widgets.grid(column=0, row=0, padx=5, pady=5, sticky='nsew')
+
+        frm_buttons = ctk.CTkFrame(master=frm_main, corner_radius=0)
+        frm_buttons.grid(column=0, row=1, padx=0, pady=(0, 0), sticky='ew')
+
+        widget_start_row = 0
+
+        lbl_export_theme = ctk.CTkLabel(master=frm_widgets, text='Theme', justify="right")
+        lbl_export_theme.grid(row=widget_start_row, column=0, padx=15, pady=(20, 5), sticky='e')
+
+        if self.enable_tooltips:
+            lbl_export_theme_tooltip = CTkToolTip(lbl_export_theme,
+                                                  wraplength=250,
+                                                  justify="left",
+                                                  border_width=1,
+                                                  padding=(10, 10),
+                                                  corner_radius=6,
+                                                  message="Select the theme you wish to export.")
+
+        self.tk_export_theme = ctk.StringVar()
+        self.tk_export_theme.set("-- Select Theme --")
+        self.opm_export_theme = ctk.CTkOptionMenu(master=frm_widgets,
+                                                  variable=self.tk_export_theme,
+                                                  command=self.get_export_directory,
+                                                  values=mod.user_themes_list())
+        self.opm_export_theme.grid(row=widget_start_row, column=1, padx=(0, 10), pady=(20, 5), sticky='w')
+
+        widget_start_row += 1
+
+        # Control buttons
+        btn_close = ctk.CTkButton(master=frm_buttons, text='Cancel', command=self.close_dialog)
+        btn_close.grid(row=0, column=0, padx=(15, 35), pady=5)
+
+        btn_export = ctk.CTkButton(master=frm_buttons, text='Export', command=self.export_theme)
+        btn_export.grid(row=0, column=1, padx=(15, 15), pady=5)
+
+        self.status_bar = cbtk.CBtkStatusBar(master=self,
+                                             status_text_life=30,
+                                             use_grid=True)
+        self.bind("<Configure>", self.status_bar.auto_size_status_bar)
+        position_child_widget(parent_widget=self.master, child_widget=self, y_offset=0.2)
+        # self.get_export_directory()
+        self.grab_set()
+        self.lift()
+        self.bind('<Escape>', self.close_dialog)
+
+
+    @log_call
+    def close_dialog(self):
+        log.log_debug(log_text='Theme merger dialogue cancelled', class_name='ThemeMerger', method_name='close_dialog')
+        self.destroy()
+
+    @log_call
+    def export_theme(self):
+        export_directory = self.download_directory
+
+        theme = self.tk_export_theme.get() + ".json"
+        export_theme_path = export_directory / theme
+
+        shutil.copyfile(self.theme_json_dir / theme, export_theme_path)
+        self.status_bar.set_status_text(status_text=f"Exported: {export_theme_path}")
+
+    @log_call
+    def get_export_directory(self, event):
+        """The get_export_directory() method, determines where the theme file should be exported to. It determines
+        the default downloads location, based on operating system, and initially assumes that location for exports.
+        If the user navigates to a new location, this is remembered in case another theme is exported, within the same
+        dialogue session, becoming a temporary default."""
+
+        # Open a file dialog to select a directory
+
+        home_dir = None
+        os_name = os_attribute("os_name")
+        if os_name in ["Linux", "MacOS"]:
+            home_dir = Path(os.environ.get("HOME"))
+        elif os_name == "Windows" and os.environ.get("HOMEPATH") is not None:
+            home_dir = Path(os.environ.get("HOMEPATH"))
+        elif os_name == "Windows" and os.environ.get("USERPROFILE")is not None:
+            home_dir = Path(os.environ.get("USERPROFILE"))
+
+        if not home_dir.exists():
+            home_dir = "/"
+
+        # If user has already selected a download directory, default to that...
+        if self.download_directory:
+            download_dir = self.download_directory
+        else:
+            download_dir = home_dir / "Downloads"
+
+        if not download_dir.exists():
+            download_dir = home_dir
+        select = True
+        if select:
+            download_directory = filedialog.askdirectory(initialdir=download_dir)
+            if not download_directory:
+                download_directory = download_dir
+        else:
+            download_directory = download_dir
+        print("Selected directory:", download_directory)
+        self.download_directory = Path(download_directory)
+        # Print the selected directory
+
+
+class Importer(ctk.CTkToplevel):
+    """This class is used to merge two themes, to create an entirely new theme."""
+
+    @log_call
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
         self.theme_json_dir = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                       preference_name='theme_json_dir')
@@ -31,7 +172,7 @@ class ThemeMerger(ctk.CTkToplevel):
         self.open_when_merged = 0
 
         self.master = self.master
-        self.title('Merge Themes')
+        self.title('Export Theme')
         # self.geometry('760x350')
 
         self.rowconfigure(0, weight=1)
@@ -56,24 +197,25 @@ class ThemeMerger(ctk.CTkToplevel):
 
         widget_start_row = 0
 
-        lbl_primary_theme = ctk.CTkLabel(master=frm_widgets, text='Primary theme', justify="right")
-        lbl_primary_theme.grid(row=widget_start_row, column=0, padx=5, pady=(20, 5), sticky='e')
+        lbl_export_theme = ctk.CTkLabel(master=frm_widgets, text='Theme', justify="right")
+        lbl_export_theme.grid(row=widget_start_row, column=0, padx=5, pady=(20, 5), sticky='e')
+
+        self.master.update_idletasks()
 
         if self.enable_tooltips:
-            btn_author_tooltip = CTkToolTip(lbl_primary_theme,
-                                            wraplength=250,
-                                            justify="left",
-                                            border_width=1,
-                                            padding=(10, 10),
-                                            corner_radius=6,
-                                            message="The primary theme to merge. The non-colour properties are, "
-                                                    "adopted from the primary theme.")
+            lbl_export_theme_tooltip = CTkToolTip(lbl_export_theme,
+                                                  wraplength=250,
+                                                  justify="left",
+                                                  border_width=1,
+                                                  padding=(10, 10),
+                                                  corner_radius=6,
+                                                  message="Select the theme you wish to export.")
 
-        self.tk_primary_theme = tk.StringVar()
-        self.opm_primary_theme = ctk.CTkOptionMenu(master=frm_widgets,
-                                                   variable=self.tk_primary_theme,
-                                                   values=mod.user_themes_list())
-        self.opm_primary_theme.grid(row=widget_start_row, column=1, padx=(0, 10), pady=(20, 5), sticky='w')
+        self.tk_export_theme = tk.StringVar()
+        self.opm_export_theme = ctk.CTkOptionMenu(master=frm_widgets,
+                                                  variable=self.tk_export_theme,
+                                                  values=mod.user_themes_list())
+        self.opm_export_theme.grid(row=widget_start_row, column=1, padx=(0, 10), pady=(20, 5), sticky='w')
 
         lbl_primary_mode = ctk.CTkLabel(master=frm_widgets, text='Appearance mode', justify="right")
         lbl_primary_mode.grid(row=widget_start_row, column=2, padx=5, pady=(20, 5), sticky='e')
@@ -85,7 +227,7 @@ class ThemeMerger(ctk.CTkToplevel):
                                             padding=(10, 10),
                                             corner_radius=6,
                                             message="Select the appearance mode to be merged from the primary theme.")
-        # The primary_theme_mode holds the CustomTkinter appearance mode (Dark / Light)
+        # The export_theme_mode holds the CustomTkinter appearance mode (Dark / Light)
         self.tk_primary_mode = tk.StringVar()
         rdo_primary_light = ctk.CTkRadioButton(master=frm_widgets, text='Light',
                                                variable=self.tk_primary_mode,
@@ -218,7 +360,7 @@ class ThemeMerger(ctk.CTkToplevel):
         btn_close = ctk.CTkButton(master=frm_buttons, text='Cancel', command=self.close_dialog)
         btn_close.grid(row=0, column=0, padx=(15, 35), pady=5)
 
-        btn_merge = ctk.CTkButton(master=frm_buttons, text='Merge', command=self.validate_and_merge)
+        btn_merge = ctk.CTkButton(master=frm_buttons, text='Merge', command=self.validate_and_import)
         btn_merge.grid(row=0, column=1, padx=(450, 15), pady=5)
 
         self.status_bar = cbtk.CBtkStatusBar(master=self,
@@ -235,14 +377,15 @@ class ThemeMerger(ctk.CTkToplevel):
         log.log_debug(log_text='Theme merger dialogue cancelled', class_name='ThemeMerger', method_name='close_dialog')
         self.destroy()
 
+
     @log_call
-    def validate_and_merge(self):
+    def validate_and_import(self):
         """This method processes the "Merge Themes" dialog (launch_merge_dialog) submission, and is activated by the
         Merge button."""
         log.log_debug(log_text='Validate theme inputs and merge',
                       class_name='ThemeMerger',
                       method_name='validate_and_merge')
-        primary_theme_name = self.tk_primary_theme.get()
+        export_theme_name = self.tk_export_theme.get()
 
         primary_appearance_mode = self.tk_primary_mode.get()
         secondary_theme_name = self.tk_secondary_theme.get()
@@ -253,7 +396,7 @@ class ThemeMerger(ctk.CTkToplevel):
         self.open_when_merged = None
         self.new_theme = None
 
-        if not primary_theme_name:
+        if not export_theme_name:
             self.status_bar.set_status_text('You must select a Primary theme name.')
             log.log_debug(log_text='VALIDATION: You must select a Primary theme name',
                           class_name='ThemeMerger',
@@ -267,7 +410,7 @@ class ThemeMerger(ctk.CTkToplevel):
                           method_name='validate_and_merge')
             return
 
-        if primary_theme_name == secondary_theme_name and primary_appearance_mode == secondary_appearance_mode:
+        if export_theme_name == secondary_theme_name and primary_appearance_mode == secondary_appearance_mode:
             self.status_bar.set_status_text('You cannot merge the same theme / appearance mode to itself.')
             log.log_debug(log_text='VALIDATION: You cannot merge the same theme / appearance mode to itself',
                           class_name='ThemeMerger',
@@ -292,21 +435,9 @@ class ThemeMerger(ctk.CTkToplevel):
             self.status_bar.set_status_text(status_text=f'Theme file, {new_theme}, already exists - '
                                                         f'please choose another name!')
             return
-        self.status_bar.set_status_text(status_text=f'Creating theme, {new_theme_name}, from {primary_theme_name} '
+        self.status_bar.set_status_text(status_text=f'Creating theme, {new_theme_name}, from {export_theme_name} '
                                                     f' and {secondary_theme_name}.')
-        mod.merge_themes(primary_theme_name=primary_theme_name, primary_mode=primary_appearance_mode,
+        mod.merge_themes(export_theme_name=export_theme_name, primary_mode=primary_appearance_mode,
                          secondary_theme_name=secondary_theme_name, secondary_mode=secondary_appearance_mode,
                          new_theme_name=new_theme)
-        if open_on_merge:
-            self.destroy()
-            new_theme_name = os.path.splitext(new_theme)[0]
-            self.new_theme = new_theme_name
-            self.open_when_merged = open_on_merge
 
-    @log_call
-    def open_on_merge(self):
-        return self.open_when_merged
-
-    @log_call
-    def new_theme_name(self):
-        return self.new_theme

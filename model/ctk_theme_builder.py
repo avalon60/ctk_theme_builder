@@ -18,6 +18,7 @@ import re
 import model.preferences as pref
 import utils.loggerutl as log
 import functools
+import platform
 
 application_title = 'CTk Theme Builder'
 # Constants
@@ -250,6 +251,53 @@ def log_call(func):
 
     return wrapper
 
+
+def os_attribute(attribute: str = "os_name"):
+    # Get the operating system name
+    _os_name = platform.system()
+    valid_attributes = ["os_name", "os_version", "os_distribution", "version"]
+
+    if attribute not in valid_attributes:
+        raise AttributeError(f'Invalid attribute received: {attribute}; expected one of {", ".join[valid_attributes]}')
+
+    # Get the operating system name
+    _os_version = platform.version()
+    if _os_name == "Darwin":
+        _os_name = "MacOS"
+
+    if attribute == 'os_name':
+        return _os_name
+
+    _os_version = platform.version()
+    if attribute == "os_version":
+        _os_name = f"{_os_name} {_os_version}"
+    elif attribute == "version":
+        _os_name = f"{_os_version}"
+
+    if attribute == "os_distribution" and _os_name == 'Linux':
+        _os_name = get_linux_distribution(f'{_os_name} {_os_version}')
+        return _os_name
+    elif attribute == "os_distribution" and _os_name == 'MacOS':
+        _mac_version_info = platform.mac_ver()
+        _mac_version_name = _mac_version_info[2]
+        _os_name = get_linux_distribution(f'{_os_name} {_os_version} {_mac_version_name}')
+    elif attribute == "os_distribution" and _os_name == 'Windows':
+        windows_info = platform.win32_ver()
+        _mac_version_info = platform.mac_ver()
+        _mac_version_name = _mac_version_info[2]
+        _os_name = get_linux_distribution(f'{_os_name} {_os_version} {_mac_version_name}')
+
+    return _os_name
+
+
+def get_linux_distribution(fallback_os: str):
+    try:
+        with open('/etc/os-release', 'r') as f:
+            for line in f:
+                if line.startswith('PRETTY_NAME='):
+                    return line.split('=')[1].strip().strip('"')
+    except FileNotFoundError:
+        return fallback_os
 
 def remove_qa_status_files():
     if QA_STOP_FILE.exists():

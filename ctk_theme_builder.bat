@@ -5,7 +5,7 @@
 ::#  Descr: CustomTkinter Theme Builder Launcher (Windows)
 ::##############################################################################
 @echo off
-set PROG_PATH="%~dp0"
+set PROG_PATH=%~dp0
 set APP_ENV=%PROG_PATH%\venv
 cd %PROG_PATH%
 call %APP_ENV%\Scripts\activate.bat
@@ -14,4 +14,4 @@ set PYTHONPATH=%PYTHONPATH%;%PROG_PATH%
 
 call %APP_ENV%\Scripts\activate.bat
 
-%PROG_PATH%\controller\ctk_theme_builder.py %1 %2 %3 %4 %5 %6
+python %PROG_PATH%\controller\ctk_theme_builder.py %1 %2 %3 %4 %5 %6

@@ -103,6 +103,7 @@ home_directory = expanduser("~")
 args_list = vars(ap.parse_args())
 
 package = args_list["package"]
+package = os.path.realpath(package)
 package_path = Path(package)
 
 b_prog = prog.replace(".py", "")
@@ -467,10 +468,9 @@ if __name__ == "__main__":
     stage_dir = os.getcwd()
     if args_list["install_location"] is None:
         install_location = Path(home_directory)
-
     else:
         install_location = args_list["install_location"]
-        install_location = str(os.path.abspath(install_location))
+        install_location = str(os.path.realpath(install_location))
         install_location = Path(install_location)
 
     app_home = Path(install_location) / 'ctk_theme_builder'

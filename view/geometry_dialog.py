@@ -9,7 +9,7 @@ from view.ctk_theme_preview import update_widget_geometry
 import json
 import utils.loggerutl as log
 from pathlib import Path
-from lib.CTkToolTip import *
+from CTkToolTip import *
 import model.preferences as pref
 
 ETC_DIR = mod.ETC_DIR

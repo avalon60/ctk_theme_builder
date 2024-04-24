@@ -6,7 +6,7 @@ import customtkinter as ctk
 import tkinter as tk
 import platform
 import os
-from lib.CTkToolTip import *
+from CTkToolTip import *
 import utils.cbtk_kit as cbtk
 import utils.loggerutl as log
 from pathlib import Path

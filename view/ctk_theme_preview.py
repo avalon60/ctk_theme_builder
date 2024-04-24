@@ -19,7 +19,7 @@ import utils.cbtk_kit as cbtk
 import model.ctk_theme_builder as mod
 from model.ctk_theme_builder import log_call
 import utils.loggerutl as log
-from lib.CTkToolTip import *
+from CTkToolTip import *
 from CTkMessagebox import CTkMessagebox
 from PIL import Image
 import model.preferences as pref
@@ -968,8 +968,8 @@ class PreviewPanel:
                 if widget_property == 'fg_color':
                     widget.configure(fg_color=widget_colour)
                     # Temporary work-around for CustomTkinter issue #1803
-                    for tabs in widget._tab_dict.values():
-                        tabs.configure(fg_color=widget_colour, bg_color=widget_colour)
+                    # for tabs in widget._tab_dict.values():
+                    #    tabs.configure(fg_color=widget_colour, bg_color=widget_colour)
                 elif widget_property == 'border_color':
                     widget.configure(border_color=widget_colour)
 

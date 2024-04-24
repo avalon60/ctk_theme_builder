@@ -11,8 +11,10 @@ from view.preferences import PreferencesDialog
 from view.theme_merger import ThemeMerger
 from view.about import About
 from view.provenance_dialog import ProvenanceDialog
+from view.export_import import Exporter
 from view.geometry_dialog import GeometryDialog
-from lib.CTkToolTip import *
+from CTkToolTip import *
+import view.ctk_button_dnd as dnd
 import model.preferences as pref
 import operator
 import platform
@@ -74,6 +76,8 @@ class ControlPanel(ctk.CTk):
         self.qa_application_scaling = None
         self.listener_port = None
         self.theme_json_data = {}
+        self.theme_json_dir = None
+        self.theme_file = None
         self.top_frame = "top"
         log.log_started(class_name='ControlPanel', supplementary_text='Theme Builder Control Panel started...')
         log.log_info(log_text=f'Application version: {mod.app_version()}')
@@ -171,7 +175,6 @@ class ControlPanel(ctk.CTk):
 
         self.theme_json_dir = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                       preference_name='theme_json_dir')
-
         # If no row found for the user theme directory, fall back to the
         # default location.
         if self.theme_json_dir == 'NO_DATA_FOUND':
@@ -621,6 +624,9 @@ class ControlPanel(ctk.CTk):
         self.file_menu.add_separator()
         self.file_menu.add_command(label='Launch QA App', command=self.launch_qa_app, state=tk.DISABLED)
         self.file_menu.add_separator()
+        self.file_menu.add_command(label='Export Theme', command=self.launch_export_dialog, state=tk.NORMAL)
+        self.file_menu.add_command(label='Import Theme', command=self.launch_export_dialog, state=tk.NORMAL)
+        self.file_menu.add_separator()
         self.file_menu.add_command(label='Quit', command=self.close_panels)
 
         # Now add a Tools sub-menu option
@@ -672,6 +678,15 @@ class ControlPanel(ctk.CTk):
         about_dialog = About()
 
     @log_call
+    def launch_export_dialog(self):
+        log.log_debug(log_text='Launching export dialogue',
+                      class_name='ControlPanel', method_name='launch_export_dialog')
+        export_dialog = Exporter(master=self)
+
+
+
+
+    @log_call
     def launch_preferences_dialog(self):
         log.log_debug(log_text='Launching preferences dialogue',
                       class_name='ControlPanel', method_name='launch_preferences_dialog')
@@ -709,6 +724,7 @@ class ControlPanel(ctk.CTk):
         provenance_dialog.modify_property(property_name='last_modified_date', value=last_modified_date)
         provenance_dialog.modify_property(property_name='harmony_method', value=harmony_method)
         provenance_dialog.modify_property(property_name='keystone_colour', value=keystone_colour)
+
 
     @log_call
     def launch_qa_app(self):
@@ -1119,6 +1135,7 @@ class ControlPanel(ctk.CTk):
         self.file_menu.entryconfig('Flip Modes', state=tk_state)
         self.file_menu.entryconfig('Sync Palette', state=tk_state)
         self.file_menu.entryconfig('Launch QA App', state=tk_state)
+
 
         if 'provenance' in self.theme_json_data:
             self.file_menu.entryconfig('Provenance', state=tk.NORMAL)
@@ -2178,6 +2195,14 @@ class ControlPanel(ctk.CTk):
                     self.widgets[key]['tile'].bind("<Button-1>",
                                                    lambda event, wgt_property=key: self.paste_colour(event,
                                                                                                      wgt_property))
+
+
+                # if not self.enable_single_click_paste and colour_value != "transparent":
+                #    dnd_x = dnd.CTkButtonDnD(master=self, widget=btn_property,
+                #                             enable_drag=True,
+                #                             enable_drop=True,
+                #                             paste_function=self.paste_colour, widget_property=lambda: key)
+
                 if self.enable_tooltips:
                     if colour_value != 'transparent':
                         btn_tooltip = cbtk.CBtkToolTip(btn_property,
