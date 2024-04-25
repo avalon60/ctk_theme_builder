@@ -12,6 +12,7 @@ from view.theme_merger import ThemeMerger
 from view.about import About
 from view.provenance_dialog import ProvenanceDialog
 from view.export_import import Exporter
+from view.export_import import Importer
 from view.geometry_dialog import GeometryDialog
 from CTkToolTip import *
 import view.ctk_button_dnd as dnd
@@ -302,7 +303,7 @@ class ControlPanel(ctk.CTk):
         initial_display = mod.user_themes_list()
         last_theme = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='auto_save',
                                              preference_name='selected_theme')
-        #
+
         if self.last_theme_on_start:
             initial_display.insert(0, last_theme)
         else:
@@ -535,7 +536,7 @@ class ControlPanel(ctk.CTk):
 
         log.log_debug(log_text='Flip appearance modes',
                       class_name='ControlPanel', method_name='flip_appearance_modes')
-        selected_theme = self.opm_theme.get()
+
         confirm = CTkMessagebox(master=self,
                                 title='Confirm Action',
                                 message=f'This will swap around, all of the theme appearance mode colours, between '
@@ -625,7 +626,7 @@ class ControlPanel(ctk.CTk):
         self.file_menu.add_command(label='Launch QA App', command=self.launch_qa_app, state=tk.DISABLED)
         self.file_menu.add_separator()
         self.file_menu.add_command(label='Export Theme', command=self.launch_export_dialog, state=tk.NORMAL)
-        self.file_menu.add_command(label='Import Theme', command=self.launch_export_dialog, state=tk.NORMAL)
+        self.file_menu.add_command(label='Import Theme', command=self.launch_import_dialog, state=tk.NORMAL)
         self.file_menu.add_separator()
         self.file_menu.add_command(label='Quit', command=self.close_panels)
 
@@ -684,6 +685,12 @@ class ControlPanel(ctk.CTk):
         export_dialog = Exporter(master=self)
 
 
+    @log_call
+    def launch_import_dialog(self):
+        log.log_debug(log_text='Launching export dialogue',
+                      class_name='ControlPanel', method_name='launch_export_dialog')
+        import_dialog = Importer(master=self)
+        # We may have one or more newly imported themes, so update the dropdown list in the Control Panel
 
 
     @log_call
@@ -1887,7 +1894,7 @@ class ControlPanel(ctk.CTk):
 
     @log_call
     def save_theme_as(self):
-        """Save's the currently selected theme to a new theme. If the current theme has been modified, the modified
+        """Saves the currently selected theme to a new theme. If the current theme has been modified, the modified
         state is saved. The new "save as" theme, becomes the current theme. This operation, also duplicates the
         palette file, to the new theme. """
         # current dateTime
