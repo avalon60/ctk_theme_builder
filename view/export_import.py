@@ -14,6 +14,7 @@ from tkinter import filedialog
 from pathlib import Path
 from view.view_utils import position_child_widget
 import shutil
+from CTkMessagebox import CTkMessagebox
 
 APP_THEMES_DIR = mod.APP_THEMES_DIR
 APP_IMAGES = mod.APP_IMAGES
@@ -279,6 +280,18 @@ class Importer(ctk.CTkToplevel):
 
         theme = self.theme_import_path.name.rsplit('.', 1)[0]  # Remove file extension
         theme_json = self.theme_import_path.name
+
+        target_file = self.theme_json_dir / theme_json
+        print(f"target_file: {target_file}")
+        if target_file.exists():
+            confirm = CTkMessagebox(master=self,
+                                    title='Confirm Action',
+                                    message=f'A theme with that name already exists in your repository, and will be '
+                                            f'overwritten. Are you sure you wish to proceed?',
+                                    options=["Yes", "No"])
+            response = confirm.get()
+            if response == 'No':
+                return
 
         shutil.copyfile(self.theme_import_path, self.theme_json_dir / theme_json)
         self.status_bar.set_status_text(status_text=f"Imported: {theme}")

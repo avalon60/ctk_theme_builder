@@ -1544,7 +1544,6 @@ class ControlPanel(ctk.CTk):
                                     message=f'You have unsaved changes. Are you sure you wish to proceed?',
                                     options=["Yes", "No"])
             response = confirm.get()
-            response = confirm.get()
             if response == 'No':
                 return
         selected_theme = self.opm_theme.get()
