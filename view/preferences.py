@@ -11,10 +11,26 @@ import utils.cbtk_kit as cbtk
 import utils.loggerutl as log
 from pathlib import Path
 import model.preferences as pref
+import utils.loggerutl as logutl
+from CTkMessagebox import CTkMessagebox
 
 APP_THEMES_DIR = mod.APP_THEMES_DIR
 APP_IMAGES = mod.APP_IMAGES
 DB_FILE_PATH = mod.DB_FILE_PATH
+# Non frame widget padx
+PADX = 5
+# Non-frame widgets to right of first widget
+RPADX = (20, PADX)
+
+# Frame padding
+FRM_PADX = 10
+# Frames to right of left-most frame
+FRM_RPADX = (0, FRM_PADX)
+FRM_PADY = 5
+# Very top frame pady
+FRM_TPADY = (FRM_PADY * 2, FRM_PADY)
+# Very bottom frame pady
+FRM_BPADY = (FRM_PADY, FRM_PADY * 2)
 
 
 class PreferencesDialog(ctk.CTkToplevel):
@@ -25,21 +41,6 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=0)
         self.columnconfigure(0, weight=1)
-
-        # Non frame widget padx
-        PADX = 5
-        # Non-frame widgets to right of first widget
-        RPADX = (20, PADX)
-
-        # Frame padding
-        FRM_PADX = 10
-        # Frames to right of left-most frame
-        FRM_RPADX = (0, FRM_PADX)
-        FRM_PADY = 5
-        # Very top frame pady
-        FRM_TPADY = (FRM_PADY * 2, FRM_PADY)
-        # Very bottom frame pady
-        FRM_BPADY = (FRM_PADY, FRM_PADY * 2)
 
         this_platform = platform.system()
         if this_platform == "Darwin":
@@ -143,14 +144,14 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.ent_author_name.grid(row=1, column=1, padx=(0, 0), pady=(5, 5), sticky='w')
 
         if self.enable_tooltips:
-            btn_author_tooltip = CTkToolTip(lbl_author_name,
-                                            wraplength=250,
-                                            justify="left",
-                                            border_width=1,
-                                            padding=(10, 10),
-                                            corner_radius=6,
-                                            message="The author's name is included to the theme JSON, in the "
-                                                    "provenance section.")
+            CTkToolTip(lbl_author_name,
+                       wraplength=250,
+                       justify="left",
+                       border_width=1,
+                       padding=(10, 10),
+                       corner_radius=6,
+                       message="The author's name is included to the theme JSON, in the "
+                               "provenance section.")
 
         # Appearance frame
         frm_appearance = ctk.CTkFrame(master=frm_main, corner_radius=10)
@@ -235,7 +236,7 @@ class PreferencesDialog(ctk.CTkToplevel):
         # Colour controls frame
         frm_colour = ctk.CTkFrame(master=frm_main, corner_radius=10)
         frm_colour.grid(column=1, row=1,
-                        padx=FRM_PADX, pady=FRM_PADY,
+                        padx=FRM_RPADX, pady=FRM_PADY,
                         sticky='nsew')
         lbl_colour = ctk.CTkLabel(master=frm_colour, text='Colour Controls', justify="right", font=mod.HEADING4)
         lbl_colour.grid(row=0, column=0, padx=PADX, pady=(5, 5), sticky='w')
@@ -274,7 +275,6 @@ class PreferencesDialog(ctk.CTkToplevel):
                                                  command=self.get_tooltips_setting)
         self.swt_enable_tooltips.grid(row=1, column=0, padx=PADX, pady=10, sticky='w')
 
-
         CTkToolTip(self.swt_enable_tooltips,
                    wraplength=250,
                    justify="left",
@@ -294,7 +294,6 @@ class PreferencesDialog(ctk.CTkToplevel):
                                                  variable=self.tk_confirm_cascade,
                                                  command=self.get_cascade_setting)
         self.swt_confirm_cascade.grid(row=1, column=1, padx=RPADX, pady=10, sticky='w')
-
 
         if self.enable_tooltips:
             CTkToolTip(self.swt_confirm_cascade,
@@ -363,7 +362,7 @@ class PreferencesDialog(ctk.CTkToplevel):
         # Comms frame
         frm_comms = ctk.CTkFrame(master=frm_main, corner_radius=10)
         frm_comms.grid(column=1, row=2,
-                       padx=FRM_PADX, pady=FRM_PADY,
+                       padx=FRM_RPADX, pady=FRM_PADY,
                        sticky='nsew')
         lbl_comms = ctk.CTkLabel(master=frm_comms, text='Comms', justify="right", font=mod.HEADING4)
         lbl_comms.grid(row=0, column=0, padx=5, pady=(5, 5), sticky='w')
@@ -389,11 +388,10 @@ class PreferencesDialog(ctk.CTkToplevel):
                                                            "run multiple instances of the application. Each instance "
                                                            "with its own port number.")
 
-
         # Themes frame
         frm_themes = ctk.CTkFrame(master=frm_main, corner_radius=10)
         frm_themes.grid(column=0, row=3,
-                        padx=FRM_PADX, pady=FRM_PADY,
+                        padx=FRM_PADX, pady=FRM_BPADY,
                         sticky='nsew')
         lbl_behaviour = ctk.CTkLabel(master=frm_themes, text='User Themes', justify="right", font=mod.HEADING4)
         lbl_behaviour.grid(row=0, column=0, padx=5, pady=(5, 5), sticky='w')
@@ -419,7 +417,6 @@ class PreferencesDialog(ctk.CTkToplevel):
                                            command=self.preferred_json_location)
         btn_theme_json_dir.grid(row=1, column=1, pady=(10, 0), sticky='w')
 
-
         self.lbl_pref_theme_dir_disp = ctk.CTkLabel(master=frm_themes, text=self.theme_json_dir, justify="left",
                                                     font=mod.REGULAR_TEXT)
         self.lbl_pref_theme_dir_disp.grid(row=2, column=1, columnspan=5, padx=5, pady=5, sticky='w')
@@ -427,7 +424,7 @@ class PreferencesDialog(ctk.CTkToplevel):
         # Logging frame
         frm_logging = ctk.CTkFrame(master=frm_main, corner_radius=10)
         frm_logging.grid(column=1, row=3,
-                         padx=FRM_PADX, pady=FRM_PADY,
+                         padx=FRM_RPADX, pady=FRM_BPADY,
                          sticky='nsew')
         lbl_logging = ctk.CTkLabel(master=frm_logging, text='Logging', justify="right", font=mod.HEADING4)
         lbl_logging.grid(row=0, column=0, padx=5, pady=(5, 5), sticky='w')
@@ -436,18 +433,18 @@ class PreferencesDialog(ctk.CTkToplevel):
         lbl_log_level.grid(row=1, column=0, padx=PADX, pady=10, sticky='e')
 
         if self.enable_tooltips:
-            lbl_log_level_tooltip = CTkToolTip(lbl_log_level,
-                                               wraplength=400,
-                                               justify="left",
-                                               border_width=1,
-                                               padding=(10, 10),
-                                               corner_radius=6,
-                                               message="Allows you to adjust logging level. More details are logged, "
-                                                       "with selections made closer to the top of the list. "
-                                                       "Typically you should have this set to Info or Warning."
-                                                       "\n\n"
-                                                       "Any changes will not take effect until after you "
-                                                       "re-start the application.")
+            CTkToolTip(lbl_log_level,
+                       wraplength=400,
+                       justify="left",
+                       border_width=1,
+                       padding=(10, 10),
+                       corner_radius=6,
+                       message="Allows you to adjust logging level. More details are logged, "
+                               "with selections made closer to the top of the list. "
+                               "Typically you should have this set to Info or Warning."
+                               "\n\n"
+                               "Any changes will not take effect until after you "
+                               "re-start the application.")
 
         self.opm_log_level = ctk.CTkOptionMenu(master=frm_logging,
                                                width=12,
@@ -460,13 +457,13 @@ class PreferencesDialog(ctk.CTkToplevel):
         lbl_log_stderr.grid(row=2, column=0, padx=5, pady=10, sticky='e')
 
         if self.enable_tooltips:
-            lbl_log_stderr_tooltip = CTkToolTip(lbl_log_stderr,
-                                                border_width=1,
-                                                justify="left",
-                                                padding=(10, 10),
-                                                corner_radius=6,
-                                                message="Typically, we only log to the ctk_tb.log file, in the log "
-                                                        'folder.\n\nSelect "Yes", to duplex logging to the terminal.')
+            CTkToolTip(lbl_log_stderr,
+                       border_width=1,
+                       justify="left",
+                       padding=(10, 10),
+                       corner_radius=6,
+                       message=f"Typically, we only log to the {logutl.RUNTIME_LOG} file, in the log "
+                               'folder.\n\nSelect "Yes", to duplex logging to the terminal.')
 
         self.opm_log_stderr = ctk.CTkOptionMenu(master=frm_logging,
                                                 width=12,
@@ -474,7 +471,15 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.opm_log_stderr.grid(row=2, column=1, padx=PADX, pady=10, sticky='w')
         self.opm_log_stderr.set(str(self.log_stderr))
 
+        btn_clear_log = ctk.CTkButton(master=frm_logging, text='Clear Log', command=self.clear_log, width=15)
+        btn_clear_log.grid(row=3, column=3, padx=(15, 0), pady=5)
 
+        CTkToolTip(btn_clear_log,
+                   border_width=1,
+                   justify="left",
+                   padding=(10, 10),
+                   corner_radius=6,
+                   message=f"Clear down the runtime log, which is located at:\n {logutl.LOG_DIR / logutl.RUNTIME_LOG}")
 
         # Dialog buttons frame
         frm_buttons = ctk.CTkFrame(master=frm_main, corner_radius=0)
@@ -487,10 +492,31 @@ class PreferencesDialog(ctk.CTkToplevel):
         btn_save = ctk.CTkButton(master=frm_buttons, text='Save', command=self.save_preferences)
         btn_save.grid(row=0, column=1, padx=(520, 15), pady=5)
 
+        self.status_bar = cbtk.CBtkStatusBar(master=self,
+                                             status_text_life=30,
+                                             use_grid=True)
+
+        self.bind("<Configure>", self.status_bar.auto_size_status_bar)
 
         self.grab_set()
         self.lift()
+        self.resizable(False, False)
         self.bind('<Escape>', self.close_preferences)
+
+    def clear_log(self, event=None):
+        confirm = CTkMessagebox(master=self,
+                                title='Confirm Action',
+                                message=f'Are you sure you wish to erase the runtime log contents?',
+                                options=["Yes", "No"])
+        response = confirm.get()
+        if response == 'No':
+            return
+
+        logutl.truncate_log()
+        self.status_bar.set_status_text('Runtime log contents cleared.')
+        log.log_info(log_text=f'Runtime log contents cleared.',
+                     class_name='ThemeMerger',
+                     method_name='validate_and_merge')
 
     @log_call
     def close_preferences(self, event=None):
@@ -535,6 +561,7 @@ class PreferencesDialog(ctk.CTkToplevel):
                                                preference_value=str(self.theme_json_dir)):
                 print(f'Row miss updating preferences: user_preference > theme_json_dir')
             self.json_files = mod.user_themes_list()
+            # TODO: Implement signal to improve this
             self.master.opm_theme.configure(values=self.json_files)
 
         self.user_name = self.tk_author_name.get()
@@ -602,6 +629,7 @@ class PreferencesDialog(ctk.CTkToplevel):
             scaling_float = mod.scaling_float(scale_pct=control_panel_scaling_pct)
             ctk.set_widget_scaling(scaling_float)
             self.master.control_panel_scaling_pct = control_panel_scaling_pct
+            # TODO: Implement signal to improve this
             self.master.geometry('960x870')
 
         preview_panel_scale_pct = self.opm_preview_panel_scaling.get()
@@ -645,13 +673,12 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.control_panel_mode = control_panel_mode
         self.tk_appearance_mode_var.set(self.control_panel_mode)
         self.action = 'saved'
-        # self.status_bar.set_status_text(status_text=f'Preferences saved.')
         self.destroy()
 
     @log_call
     def preferred_json_location(self):
         """A simple method which asks the themes author to navigate to where
          the themes JSON are to be stored/maintained."""
-        self.new_theme_json_dir = Path(tk.filedialog.askdirectory(initialdir=self.theme_json_dir))
+        self.new_theme_json_dir = Path(ctk.filedialog.askdirectory(initialdir=self.theme_json_dir))
         if str(self.new_theme_json_dir) != '.':
             self.lbl_pref_theme_dir_disp.configure(text=self.new_theme_json_dir)
