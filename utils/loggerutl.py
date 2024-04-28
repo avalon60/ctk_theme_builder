@@ -31,6 +31,7 @@ LOG_DIR = APP_HOME / 'log'
 ASSETS_DIR = APP_HOME / 'assets'
 APP_DATA_DIR = ASSETS_DIR / 'data'
 DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
+RUNTIME_LOG = "runtime.log"
 
 # Initialise the log stamp integer.
 now = datetime.datetime.now()
@@ -66,7 +67,7 @@ log_level_code = log_level_code.upper()
 log_stamping = pref.preference_setting(scope='logger', preference_name='log_stamping', default="Yes")
 inc_stderr = pref.preference_setting(scope='logger', preference_name='log_stderr', default="Yes")
 
-log_filename = pref.preference_setting(scope='logger', preference_name='log_filename', default="ctk_tb.log")
+log_filename = pref.preference_setting(scope='logger', preference_name='log_filename', default=RUNTIME_LOG)
 
 # Configure custom log levels
 logr.level("STARTED", no=21, color=f"<{scenario_started_colour}>", icon="")
@@ -95,6 +96,11 @@ else:
 
 log.info(f'[lib.loggerutl] Logging enabled with a logging level of: {log_level_code}')
 logger = log
+
+def truncate_log():
+    """Clear down the runtime log."""
+    with open(LOG_DIR / RUNTIME_LOG, "w") as f:
+        f.truncate(0)  # Truncate the file to 0 bytes
 
 
 def db_file_exists(db_file_path: Path):
