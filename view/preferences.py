@@ -123,14 +123,11 @@ class PreferencesDialog(ctk.CTkToplevel):
         frm_main.columnconfigure(0, weight=1)
         frm_main.rowconfigure(0, weight=1)
 
-        frm_main = ctk.CTkFrame(master=self, corner_radius=10)
-        frm_main.grid(column=0, row=0, sticky='nsew')
-        frm_main.columnconfigure(0, weight=1)
-        frm_main.rowconfigure(0, weight=1)
-
         # Provenance frame
         frm_provenance = ctk.CTkFrame(master=frm_main, corner_radius=10)
-        frm_provenance.grid(column=0, row=0, padx=FRM_PADX, pady=FRM_PADY, columnspan=2, sticky='nsew')
+        frm_provenance.grid(column=0, row=0,
+                            padx=FRM_PADX, pady=FRM_TPADY,
+                            columnspan=2, sticky='nsew')
         lbl_provenance = ctk.CTkLabel(master=frm_provenance, text='Provenance', justify="right", font=mod.HEADING4)
         lbl_provenance.grid(row=0, column=0, padx=5, pady=(5, 5), sticky='e')
 
@@ -157,7 +154,9 @@ class PreferencesDialog(ctk.CTkToplevel):
 
         # Appearance frame
         frm_appearance = ctk.CTkFrame(master=frm_main, corner_radius=10)
-        frm_appearance.grid(column=0, row=1, padx=FRM_PADX, pady=FRM_PADY, columnspan=1, sticky='nsew')
+        frm_appearance.grid(column=0, row=1,
+                            padx=FRM_PADX, pady=FRM_PADY,
+                            columnspan=1, sticky='nsew')
         lbl_appearance = ctk.CTkLabel(master=frm_appearance,
                                       text='Appearance',
                                       justify="right", font=mod.HEADING4)
@@ -235,7 +234,9 @@ class PreferencesDialog(ctk.CTkToplevel):
 
         # Colour controls frame
         frm_colour = ctk.CTkFrame(master=frm_main, corner_radius=10)
-        frm_colour.grid(column=1, row=1, padx=FRM_RPADX, pady=FRM_PADY, sticky='nsew')
+        frm_colour.grid(column=1, row=1,
+                        padx=FRM_PADX, pady=FRM_PADY,
+                        sticky='nsew')
         lbl_colour = ctk.CTkLabel(master=frm_colour, text='Colour Controls', justify="right", font=mod.HEADING4)
         lbl_colour.grid(row=0, column=0, padx=PADX, pady=(5, 5), sticky='w')
 
@@ -259,9 +260,11 @@ class PreferencesDialog(ctk.CTkToplevel):
 
         # Behaviour frame
         frm_behaviour = ctk.CTkFrame(master=frm_main, corner_radius=10)
-        frm_behaviour.grid(column=0, row=2, padx=FRM_PADX, pady=FRM_PADY, sticky='nsew')
+        frm_behaviour.grid(column=0, row=2,
+                           padx=FRM_PADX, pady=FRM_PADY,
+                           sticky='nsew')
         lbl_behaviour = ctk.CTkLabel(master=frm_behaviour, text='Behaviour', justify="right", font=mod.HEADING4)
-        lbl_behaviour.grid(row=0, column=0, padx=5, pady=(5, 5), sticky='w')
+        lbl_behaviour.grid(row=0, column=0, padx=PADX, pady=(5, 5), sticky='w')
 
         self.tk_enable_tooltips = tk.IntVar(master=frm_behaviour)
         self.tk_enable_tooltips.set(self.enable_tooltips)
@@ -269,7 +272,7 @@ class PreferencesDialog(ctk.CTkToplevel):
                                                  text='Tooltips',
                                                  variable=self.tk_enable_tooltips,
                                                  command=self.get_tooltips_setting)
-        self.swt_enable_tooltips.grid(row=1, column=0, padx=(0, 0), pady=10, sticky='w')
+        self.swt_enable_tooltips.grid(row=1, column=0, padx=PADX, pady=10, sticky='w')
 
 
         CTkToolTip(self.swt_enable_tooltips,
@@ -324,7 +327,7 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.tk_last_theme_on_start = tk.IntVar(master=frm_behaviour, value=self.last_theme_on_start)
         self.tk_last_theme_on_start.set(self.last_theme_on_start)
         self.swt_last_theme_on_start = ctk.CTkSwitch(master=frm_behaviour,
-                                                     text='Load Latest Theme',
+                                                     text='Load Last Theme',
                                                      variable=self.tk_last_theme_on_start,
                                                      command=self.get_last_theme_on_start)
         self.swt_last_theme_on_start.grid(row=2, column=0, padx=PADX, pady=10, sticky='w')
@@ -335,8 +338,8 @@ class PreferencesDialog(ctk.CTkToplevel):
                        border_width=1,
                        padding=(10, 10),
                        corner_radius=6,
-                       message="Enable this switch, to auto-select the last theme "
-                               "you worked on, at application startup.")
+                       message="Enable this switch, to auto-select and open, at application startup, the last theme "
+                               "you worked on.")
 
         self.tk_enable_single_click_paste = tk.IntVar(master=frm_behaviour)
         self.tk_enable_single_click_paste.set(self.enable_single_click_paste)
@@ -359,7 +362,9 @@ class PreferencesDialog(ctk.CTkToplevel):
 
         # Comms frame
         frm_comms = ctk.CTkFrame(master=frm_main, corner_radius=10)
-        frm_comms.grid(column=1, row=2, padx=FRM_PADX, pady=FRM_PADY, sticky='nsew')
+        frm_comms.grid(column=1, row=2,
+                       padx=FRM_PADX, pady=FRM_PADY,
+                       sticky='nsew')
         lbl_comms = ctk.CTkLabel(master=frm_comms, text='Comms', justify="right", font=mod.HEADING4)
         lbl_comms.grid(row=0, column=0, padx=5, pady=(5, 5), sticky='w')
 
@@ -387,7 +392,9 @@ class PreferencesDialog(ctk.CTkToplevel):
 
         # Themes frame
         frm_themes = ctk.CTkFrame(master=frm_main, corner_radius=10)
-        frm_themes.grid(column=0, row=3, padx=FRM_PADX, pady=FRM_PADY, sticky='nsew')
+        frm_themes.grid(column=0, row=3,
+                        padx=FRM_PADX, pady=FRM_PADY,
+                        sticky='nsew')
         lbl_behaviour = ctk.CTkLabel(master=frm_themes, text='User Themes', justify="right", font=mod.HEADING4)
         lbl_behaviour.grid(row=0, column=0, padx=5, pady=(5, 5), sticky='w')
 
@@ -419,12 +426,14 @@ class PreferencesDialog(ctk.CTkToplevel):
 
         # Logging frame
         frm_logging = ctk.CTkFrame(master=frm_main, corner_radius=10)
-        frm_logging.grid(column=1, row=3, padx=FRM_PADX, pady=FRM_PADY, sticky='nsew')
+        frm_logging.grid(column=1, row=3,
+                         padx=FRM_PADX, pady=FRM_PADY,
+                         sticky='nsew')
         lbl_logging = ctk.CTkLabel(master=frm_logging, text='Logging', justify="right", font=mod.HEADING4)
         lbl_logging.grid(row=0, column=0, padx=5, pady=(5, 5), sticky='w')
 
         lbl_log_level = ctk.CTkLabel(master=frm_logging, text='Logging Level', justify="right")
-        lbl_log_level.grid(row=1, column=0, padx=5, pady=10, sticky='e')
+        lbl_log_level.grid(row=1, column=0, padx=PADX, pady=10, sticky='e')
 
         if self.enable_tooltips:
             lbl_log_level_tooltip = CTkToolTip(lbl_log_level,
@@ -444,7 +453,7 @@ class PreferencesDialog(ctk.CTkToplevel):
                                                width=12,
                                                values=log.LOG_LEVEL_DISP)
 
-        self.opm_log_level.grid(row=1, column=1, padx=0, pady=10, sticky='w')
+        self.opm_log_level.grid(row=1, column=1, padx=PADX, pady=10, sticky='w')
         self.opm_log_level.set(str(self.log_level.title()))
 
         lbl_log_stderr = ctk.CTkLabel(master=frm_logging, text='Log to stderr', justify="right")
@@ -462,7 +471,7 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.opm_log_stderr = ctk.CTkOptionMenu(master=frm_logging,
                                                 width=12,
                                                 values=['Yes', 'No'])
-        self.opm_log_stderr.grid(row=2, column=1, padx=0, pady=10, sticky='w')
+        self.opm_log_stderr.grid(row=2, column=1, padx=PADX, pady=10, sticky='w')
         self.opm_log_stderr.set(str(self.log_stderr))
 
 
