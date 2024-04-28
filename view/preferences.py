@@ -514,9 +514,9 @@ class PreferencesDialog(ctk.CTkToplevel):
 
         logutl.truncate_log()
         self.status_bar.set_status_text('Runtime log contents cleared.')
-        log.log_info(log_text=f'Runtime log contents cleared.',
-                     class_name='ThemeMerger',
-                     method_name='validate_and_merge')
+        log.log_warning(log_text=f'Runtime log contents cleared.',
+                     class_name='PreferencesDialog',
+                     method_name='clear_log')
 
     @log_call
     def close_preferences(self, event=None):
