@@ -15,7 +15,7 @@ from view.export_import import Exporter
 from view.export_import import Importer
 from view.geometry_dialog import GeometryDialog
 from CTkToolTip import *
-import view.ctk_button_dnd as dnd
+# import view.ctk_button_dnd as dnd
 import model.preferences as pref
 import operator
 import platform
