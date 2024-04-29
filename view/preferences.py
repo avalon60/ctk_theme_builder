@@ -471,6 +471,14 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.opm_log_stderr.grid(row=2, column=1, padx=PADX, pady=10, sticky='w')
         self.opm_log_stderr.set(str(self.log_stderr))
 
+        lbl_log_size_label = ctk.CTkLabel(master=frm_logging, text='Log size (bytes):', justify="right")
+        lbl_log_size_label.grid(row=3, column=0, padx=PADX, pady=10, sticky='e')
+
+        log_size = logutl.logfile_size()
+        formatted_log_size = format(log_size, ",")
+        self.lbl_log_size = ctk.CTkLabel(master=frm_logging, text=formatted_log_size, justify="right")
+        self.lbl_log_size.grid(row=3, column=1, padx=PADX, pady=10, sticky='w')
+
         btn_clear_log = ctk.CTkButton(master=frm_logging, text='Clear Log', command=self.clear_log, width=15)
         btn_clear_log.grid(row=3, column=3, padx=(15, 0), pady=5)
 
@@ -513,6 +521,10 @@ class PreferencesDialog(ctk.CTkToplevel):
             return
 
         logutl.truncate_log()
+        log_size = logutl.logfile_size()
+        formatted_log_size = format(log_size, ",")
+        self.lbl_log_size.configure(text=formatted_log_size)
+
         self.status_bar.set_status_text('Runtime log contents cleared.')
         log.log_warning(log_text=f'Runtime log contents cleared.',
                      class_name='PreferencesDialog',
