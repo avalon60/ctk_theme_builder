@@ -35,8 +35,8 @@
       "#086a97"
     ],
     "hover_color": [
-      "#404c59",
-      "#404c59"
+      "#1779a6",
+      "#1779a6"
     ],
     "border_color": [
       "#a5bdc9",
@@ -129,7 +129,7 @@
     ],
     "button_hover_color": [
       "#343f4a",
-      "#343f4a"
+      "#1779a6"
     ],
     "text_color": [
       "#b4ccd8",
@@ -153,8 +153,8 @@
       "#a5bdc9"
     ],
     "hover_color": [
-      "#5c6b78",
-      "#5c6b78"
+      "#1779a6",
+      "#1779a6"
     ],
     "text_color": [
       "#b4ccd8",
@@ -200,7 +200,7 @@
     ],
     "button_hover_color": [
       "#5c6b78",
-      "#5c6b78"
+      "#1779a6"
     ]
   },
   "CTkOptionMenu": {
@@ -214,8 +214,8 @@
       "#086a97"
     ],
     "button_hover_color": [
-      "#5d6d81",
-      "#5d6d81"
+      "#1779a6",
+      "#1779a6"
     ],
     "text_color": [
       "#b4ccd8",
@@ -242,8 +242,8 @@
       "#086a97"
     ],
     "button_hover_color": [
-      "#5c636c",
-      "#5c636c"
+      "#1779a6",
+      "#1779a6"
     ],
     "text_color": [
       "#b4ccd8",
@@ -263,8 +263,8 @@
       "#086a97"
     ],
     "button_hover_color": [
-      "#4c7b98",
-      "#4c7b98"
+      "#1779a6",
+      "#1779a6"
     ]
   },
   "CTkSegmentedButton": {
@@ -279,16 +279,16 @@
       "#086a97"
     ],
     "selected_hover_color": [
-      "#c6ced8",
-      "#c6ced8"
+      "#1779a6",
+      "#1779a6"
     ],
     "unselected_color": [
       "#002240",
       "#002240"
     ],
     "unselected_hover_color": [
-      "#586b78",
-      "#586b78"
+      "#0f314f",
+      "#0f314f"
     ],
     "text_color": [
       "#b4ccd8",
@@ -332,7 +332,7 @@
   "DropdownMenu": {
     "fg_color": [
       "#748498",
-      "#748498"
+      "#557795"
     ],
     "hover_color": [
       "#d3dbe1",
@@ -366,7 +366,7 @@
     "date created": "Apr 27 2024 16:53:52",
     "last modified by": "Clive Bostock",
     "created with": "CTk Theme Builder v3.0.2",
-    "last modified": "Apr 28 2024 10:32:45",
+    "last modified": "Apr 29 2024 18:15:36",
     "keystone colour": "#002240",
     "harmony method": "Split-complementary",
     "harmony differential": 5
