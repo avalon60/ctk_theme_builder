@@ -102,6 +102,9 @@ def truncate_log():
     with open(LOG_DIR / RUNTIME_LOG, "w") as f:
         f.truncate(0)  # Truncate the file to 0 bytes
 
+def logfile_size():
+    file_size = os.path.getsize(LOG_DIR / RUNTIME_LOG)
+    return file_size
 
 def db_file_exists(db_file_path: Path):
     global db_file_found
