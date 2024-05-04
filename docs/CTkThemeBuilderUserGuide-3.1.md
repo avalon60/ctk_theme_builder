@@ -2,7 +2,7 @@
 # Introduction
 
 ### Acknowledegments
-*A thank-you to my ever patient, ever loving beautiful wife, who has let me hide in my office and beaver away at this project, for many an hour.* 
+*A thank-you to my ever patient, ever loving, beautiful wife, who has let me hide in my office and beaver away at this project, for many an hour.* 
    
 *I would also like to thank my friend and colleague, Jan Bajec, for his graphics contribution.*
 
@@ -88,8 +88,7 @@ The options of the File menu, bear a close correspondence to the buttons display
 
 ## The File Menu
 
-
-![file-menu](https://github.com/avalon60/ctk_theme_builder/assets/89534395/ad7475fb-39d4-4e53-bd4e-acf3ed5dc89a)
+![file-menu](https://github.com/avalon60/ctk_theme_builder/assets/89534395/cf98d1ee-1ce6-4d55-863a-a8e2d711120e)
 
 When you first start CTk Theme Builder, if you don't have a theme selected, you will find that most of the *File* menu options are disabled. They only become enabled when you start working on a theme.
 
@@ -129,6 +128,8 @@ The QA application, once launched is semi-autonomous; You can close it via the _
 #### Export Theme
 When selected, causes an Export theme dialogue to appear. When selecting a theme from the option (drop-down) menu, a navigation dialogue is presented and you can choose a directory to export the theme to. If you export another theme, within the same dialogue instance, the last location you exported to is remembered and the dialogue will start from there.
 
+Once you have selected the export location, click the _Export_ button to proceed with the export.
+
 The default export location whenever the dialogue is launched, will be your *Downloads* directory, should one exist. Failing this it will be your home directory.
 
 #### Import Theme
@@ -154,13 +155,13 @@ The Colour Harmonics option is only enabled, when you start working on a theme.
 Each of these options, are covered in their own dedicated section of the guide. 
 
 
-### Preferences
+### User Preferences
 The Preferences dialogue is accessed via the *Tools->Preferences* menu option.
 The preferences screen will appear something like this:
 
-![image](https://github.com/avalon60/ctk_theme_builder/assets/89534395/4d332851-41cb-497d-9095-4940abd82e9a)
+![preferences](https://github.com/avalon60/ctk_theme_builder/assets/89534395/1e3e0021-438c-4b9a-b303-196467d44c9f)
 
-As of version 3.1 the Preferences dialogue is split out into the following regions:
+As of version 3.1 the User Preferences dialogue is split out into the following regions:
 
 + Provenance
 + Appearance
@@ -547,9 +548,9 @@ The CTkTabview widget is a composite of CTkFrame and CTkSegmentedButton. It has 
 * Themes can now be Imported / Exported via the *File* menu;
 * The preferences screen has been somewhat redesigned;
 * Further Improvements to the installation routines;
-* Clear Log function has been added to the Preferences dialogue;
+* Clear (runtime) Log function has been added to the Preferences dialogue;
 * A display of the log file size is added to the Preferences dialogue;
-* A new theme "Cobalt" has been added.
+* A new theme "Cobalt" has been added.	
 
 These are provided to assist in troubleshooting issues.
 
