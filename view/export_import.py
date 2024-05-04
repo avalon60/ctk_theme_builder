@@ -36,7 +36,7 @@ class Exporter(ctk.CTkToplevel):
 
         self.master = self.master
         self.title('Export Theme')
-        self.geometry('350x150')
+        self.geometry('400x150')
 
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=0)
@@ -88,8 +88,8 @@ class Exporter(ctk.CTkToplevel):
         btn_close = ctk.CTkButton(master=frm_buttons, text='Close', command=self.close_dialog)
         btn_close.grid(row=0, column=0, padx=(15, 35), pady=5)
 
-        self.btn_export = ctk.CTkButton(master=frm_buttons, text='Export', command=self.export_theme, state=ctk.DISABLED)
-        self.btn_export.grid(row=0, column=1, padx=(15, 15), pady=5)
+        self.btn_export = ctk.CTkButton(master=frm_buttons, text="Export", command=self.export_theme, state=ctk.DISABLED)
+        self.btn_export.grid(row=0, column=1, padx=(120, 15), pady=5)
 
         self.status_bar = cbtk.CBtkStatusBar(master=self,
                                              status_text_life=30,
@@ -97,6 +97,7 @@ class Exporter(ctk.CTkToplevel):
         self.bind("<Configure>", self.status_bar.auto_size_status_bar)
         position_child_widget(parent_widget=self.master, child_widget=self, y_offset=0.2)
         # self.get_export_directory()
+        self.geometry("425x200")
         self.grab_set()
         self.lift()
         self.bind('<Escape>', self.close_dialog)
@@ -114,7 +115,7 @@ class Exporter(ctk.CTkToplevel):
         export_theme_path = export_directory / theme
 
         shutil.copyfile(self.theme_pathname / theme, export_theme_path)
-        self.status_bar.set_status_text(status_text=f"Exported: {export_theme_path}")
+        self.status_bar.set_status_text(status_text=f"Theme exported: {export_theme_path}")
 
     @log_call
     def get_export_directory(self, event):
@@ -254,7 +255,8 @@ class Importer(ctk.CTkToplevel):
                                              use_grid=True)
         self.bind("<Configure>", self.status_bar.auto_size_status_bar)
         position_child_widget(parent_widget=self.master, child_widget=self, y_offset=0.2)
-        # self.get_export_directory()
+
+        self.geometry("325x200")
         self.grab_set()
         self.lift()
         self.bind('<Escape>', self.close_dialog)
@@ -270,6 +272,9 @@ class Importer(ctk.CTkToplevel):
         theme_file = filedialog.askopenfilename(initialdir=self.default_import_dir,
                                                 title="Select a Theme File",
                                                 filetypes=filetypes)
+        if not theme_file:
+            return
+
         self.default_import_dir = Path(theme_file).parent
         self.lbl_selected_theme_path.configure(text=theme_file)
         self.btn_import.configure(state=ctk.NORMAL)
@@ -294,7 +299,7 @@ class Importer(ctk.CTkToplevel):
                 return
 
         shutil.copyfile(self.theme_import_path, self.theme_json_dir / theme_json)
-        self.status_bar.set_status_text(status_text=f"Imported: {theme}")
+        self.status_bar.set_status_text(status_text=f"Theme imported: {theme}")
         self.master.json_files = mod.user_themes_list()
         self.master.opm_theme.configure(values=self.master.json_files)
 
