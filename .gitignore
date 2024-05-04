@@ -58,3 +58,5 @@ log/ctk_tb.log
 theme_builder_setup.tar
 
 *.log
+
+.python-version
