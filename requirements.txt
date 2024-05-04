@@ -2,6 +2,7 @@ colorharmonies==1.0.5
 colour==0.1.5
 contourpy==1.2.0
 CTkMessagebox==2.5
+CTkToolTip==0.8
 customtkinter==5.2.2
 cycler==0.12.1
 darkdetect==0.8.0
