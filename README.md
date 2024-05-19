@@ -19,6 +19,8 @@ CTk Theme Builder is your one-stop shop for crafting and managing custom themes 
 
 #### Get Started Now!
 
+Download the latest release by clicking the link on the right hand side, below <i><b>Releases</b></i> (don't click the <i><b>\<\> Code</b></i> button download for installations.)
+
 Jump right to the installation guide here: 
 Jump straight to the deployment instructions by going [here](https://github.com/avalon60/ctk_theme_builder/wiki/Installing-&-Upgrading-CTk-Theme-Builder).
 
