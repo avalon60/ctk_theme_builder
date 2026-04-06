@@ -239,8 +239,9 @@ class HarmonicsDialog(ctk.CTkToplevel):
         # self.master.set_option_states()
         self.protocol("WM_DELETE_WINDOW", self.close_harmonics)
         self.bind('<Escape>', self.close_harmonics)
-        self.grab_set()
+
         self.lift()
+        self.grab_set()
 
     @staticmethod
     @log_call

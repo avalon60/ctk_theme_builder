@@ -28,6 +28,10 @@ class GeometryDialog(ctk.CTkToplevel):
         self.enable_tooltips = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                        preference_name='enable_tooltips')
 
+
+        self.lift()
+        self.grab_set()
+
         # The interactions between this dialog and the Control Panel are strongly linked, making it less
         # straight forward to define as a class.
         @log_call

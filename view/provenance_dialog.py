@@ -109,8 +109,10 @@ class ProvenanceDialog(ctk.CTkToplevel):
 
         # Add the close button into the bottom frame (frm_buttons).
         btn_close = ctk.CTkButton(master=frm_buttons, text='Close', command=self.close_dialog, width=550)
-        self.grab_set()
+
         self.lift()
+        self.grab_set()
+
         btn_close.grid(row=0, column=0, padx=10, pady=(5, 5), sticky='we')
         self.bind('<Escape>', self.close_dialog)
 

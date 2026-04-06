@@ -506,8 +506,8 @@ class PreferencesDialog(ctk.CTkToplevel):
 
         self.bind("<Configure>", self.status_bar.auto_size_status_bar)
 
-        self.grab_set()
         self.lift()
+        self.grab_set()
         self.resizable(False, False)
         self.bind('<Escape>', self.close_preferences)
 

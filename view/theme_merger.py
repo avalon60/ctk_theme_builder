@@ -226,8 +226,9 @@ class ThemeMerger(ctk.CTkToplevel):
                                              use_grid=True)
         self.bind("<Configure>", self.status_bar.auto_size_status_bar)
 
-        self.grab_set()
         self.lift()
+        self.grab_set()
+
         self.bind('<Escape>', self.close_dialog)
 
     @log_call
