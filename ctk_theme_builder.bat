@@ -6,7 +6,7 @@
 ::##############################################################################
 @echo off
 set PROG_PATH=%~dp0
-set APP_ENV=%PROG_PATH%\venv
+set APP_ENV=%PROG_PATH%\.venv
 cd %PROG_PATH%
 call %APP_ENV%\Scripts\activate.bat
 
