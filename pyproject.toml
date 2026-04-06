@@ -1,0 +1,47 @@
+[project]
+name = "ctk-theme-builder"
+version = "3.1.0"
+description = "CTk Theme Builder development environment managed by Poetry."
+readme = "README.md"
+requires-python = ">=3.9,<3.13"
+authors = [
+  { name = "Clive Bostock" },
+]
+license = "MIT"
+dependencies = [
+  "colorharmonies==1.0.5",
+  "colour==0.1.5",
+  "contourpy==1.2.0",
+  "CTkMessagebox==2.5",
+  "CTkToolTip==0.8",
+  "customtkinter==5.2.2",
+  "cycler==0.12.1",
+  "darkdetect==0.8.0",
+  "distro==1.9.0",
+  "fonttools==4.49.0",
+  "importlib-resources==6.1.1",
+  "kiwisolver==1.4.5",
+  "loguru==0.7.2",
+  "matplotlib==3.8.3",
+  "numpy==1.26.4",
+  "packaging==23.2",
+  "pathvalidate==3.2.0",
+  "pillow==10.2.0",
+  "pyparsing==3.1.1",
+  "pyperclip==1.8.2",
+  "python-dateutil==2.8.2",
+  "scikit-build==0.17.6",
+  "six==1.16.0",
+  "tomli==2.0.1",
+  "zipp==3.15.0",
+]
+
+[tool.poetry]
+package-mode = false
+
+[tool.poetry.requires-plugins]
+poetry-plugin-export = ">=1.8"
+
+[build-system]
+requires = ["poetry-core>=2.0.0"]
+build-backend = "poetry.core.masonry.api"
