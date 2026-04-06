@@ -9,7 +9,7 @@ PROG=$(basename $0)
 PROG_DIR=$(dirname $0)
 APP_HOME=$(realpath  ${PROG_DIR})
 
-APP_ENV=${APP_HOME}/venv
+APP_ENV=${APP_HOME}/.venv
 APP_UTILS=${APP_HOME}/utils
 APP_MODEL=${APP_HOME}/model
 APP_VIEW=${APP_HOME}/view
@@ -65,9 +65,14 @@ else
   fi
 fi
 
+if [ -d "${PROG_PATH}/venv" ]
+then
+  echo "Removing deprecated venv directory."
+  rm -fr ${PROG_PATH}/venv
+fi
 
-${PYTHON} -m venv venv
-APP_ENV=${PROG_PATH}/venv
+${PYTHON} -m venv .venv
+APP_ENV=${PROG_PATH}/.venv
 source ${APP_ENV}/bin/activate
 ${PYTHON} get-pip.py
 

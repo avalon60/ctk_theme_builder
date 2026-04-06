@@ -7,11 +7,19 @@ __license__ = 'MIT - see LICENSE.md'
 # Also, a thankyou to Akash Bora for producing the excellent CTkToolTip and CTkMessagebox widgets.
 
 import argparse
-from view.control_panel import ControlPanel
 from argparse import HelpFormatter
 from operator import attrgetter
 import os
 import re
+import sys
+from pathlib import Path
+
+# Allow direct execution from IDEs without relying on shell launchers to set PYTHONPATH.
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
+from view.control_panel import ControlPanel
 from view.ctk_theme_preview import PreviewPanel
 from model.ctk_theme_builder import log_call
 

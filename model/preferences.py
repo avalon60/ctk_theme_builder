@@ -145,8 +145,9 @@ def preference_setting(scope: str, preference_name, db_file_path: Path = DB_FILE
     :return (str): The preference value"""
 
     if not db_file_exists(db_file_path=db_file_path):
+        message = f'Unable to locate database file located at {db_file_path}'
         print(f'Unable to locate database file located at {db_file_path}')
-        raise FileNotFoundError
+        raise FileNotFoundError(message)
 
     db_conn = sqlite3.connect(db_file_path)
     cur = db_conn.cursor()

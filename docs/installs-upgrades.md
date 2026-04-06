@@ -1,8 +1,8 @@
 # Requirements
 
-You must have Python installed. The recommended version of Python is 3.10, although anything above Python 3.8 should suffice. 
+You must have Python installed. The recommended version of Python is 3.10, although anything above Python 3.9 should suffice. 
 
-Note the application has not been tested against Python 3.11. 
+The application has been tested against Python 3.12. 
 
 The application has been tested on Linux Mint and Windows 10, although there is no obvious reason as to why it shouldn't work on MacOS or other Linux ports.
 
@@ -10,10 +10,10 @@ You will require around 160MB of disk space.
 
 ## Ubuntu Based Linux Distributions
 
-For Ubuntu based distros (e.g. Linux Mint, Elementary OS, Zorin OS...), ,
-Please ensure that you have ensurepip installed. This can be installed via the command:
+For Ubuntu based distros (e.g. Linux Mint, Elementary OS, Zorin OS...), please ensure that the `venv` package is
+installed for the Python version you intend to use. For example:
 
-`apt install python3.10-venv`
+`apt install python3.12-venv`
 
 ## Installation
 
