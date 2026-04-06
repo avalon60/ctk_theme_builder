@@ -1,5 +1,4 @@
 assets
-lib
 model
 view
 controller
@@ -7,17 +6,11 @@ utils
 build_app.bat
 build_app.sh
 ctk_theme_builder.bat
-ctk_theme_builder.py
 ctk_theme_builder.sh
-ctk_theme_migrate.bat
-ctk_theme_migrate.py
-ctk_theme_preview.py
-ctk_theme_viewgen.py
-ctk_theme_builder_qa_app.bat
-ctk_theme_builder_qa_app.py
-ctk_theme_builder_qa_app.sh
 get-pip.py
+poetry.lock
+poetry.toml
+pyproject.toml
 requirements.txt
-tb-artefact.sh
 theme_builder_setup.py
 user_themes

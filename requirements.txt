@@ -1,25 +1,29 @@
-colorharmonies==1.0.5
-colour==0.1.5
-contourpy==1.2.0
-CTkMessagebox==2.5
-CTkToolTip==0.8
-customtkinter==5.2.2
-cycler==0.12.1
-darkdetect==0.8.0
-distro==1.9.0
-fonttools==4.49.0
-importlib-resources==6.1.1
-kiwisolver==1.4.5
-loguru==0.7.2
-matplotlib==3.8.3
-numpy==1.26.4
-packaging==23.2
-pathvalidate==3.2.0
-pillow==10.2.0
-pyparsing==3.1.1
-pyperclip==1.8.2
-python-dateutil==2.8.2
-scikit-build==0.17.6
-six==1.16.0
-tomli==2.0.1
-zipp==3.15.0
+colorama==0.4.6 ; python_version >= "3.9" and python_version < "3.13" and sys_platform == "win32"
+colorharmonies==1.0.5 ; python_version >= "3.9" and python_version < "3.13"
+colour==0.1.5 ; python_version >= "3.9" and python_version < "3.13"
+contourpy==1.2.0 ; python_version >= "3.9" and python_version < "3.13"
+ctkmessagebox==2.5 ; python_version >= "3.9" and python_version < "3.13"
+ctktooltip==0.8 ; python_version >= "3.9" and python_version < "3.13"
+customtkinter==5.2.2 ; python_version >= "3.9" and python_version < "3.13"
+cycler==0.12.1 ; python_version >= "3.9" and python_version < "3.13"
+darkdetect==0.8.0 ; python_version >= "3.9" and python_version < "3.13"
+distro==1.9.0 ; python_version >= "3.9" and python_version < "3.13"
+fonttools==4.49.0 ; python_version >= "3.9" and python_version < "3.13"
+importlib-resources==6.1.1 ; python_version >= "3.9" and python_version < "3.13"
+kiwisolver==1.4.5 ; python_version >= "3.9" and python_version < "3.13"
+loguru==0.7.2 ; python_version >= "3.9" and python_version < "3.13"
+matplotlib==3.8.3 ; python_version >= "3.9" and python_version < "3.13"
+numpy==1.26.4 ; python_version >= "3.9" and python_version < "3.13"
+packaging==23.2 ; python_version >= "3.9" and python_version < "3.13"
+pathvalidate==3.2.0 ; python_version >= "3.9" and python_version < "3.13"
+pillow==10.2.0 ; python_version >= "3.9" and python_version < "3.13"
+pyparsing==3.1.1 ; python_version >= "3.9" and python_version < "3.13"
+pyperclip==1.8.2 ; python_version >= "3.9" and python_version < "3.13"
+python-dateutil==2.8.2 ; python_version >= "3.9" and python_version < "3.13"
+scikit-build==0.17.6 ; python_version >= "3.9" and python_version < "3.13"
+setuptools==82.0.1 ; python_version >= "3.9" and python_version < "3.13"
+six==1.16.0 ; python_version >= "3.9" and python_version < "3.13"
+tomli==2.0.1 ; python_version >= "3.9" and python_version < "3.13"
+wheel==0.45.1 ; python_version >= "3.9" and python_version < "3.13"
+win32-setctime==1.2.0 ; python_version >= "3.9" and python_version < "3.13" and sys_platform == "win32"
+zipp==3.15.0 ; python_version >= "3.9" and python_version < "3.13"
