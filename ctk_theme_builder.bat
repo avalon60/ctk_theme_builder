@@ -6,7 +6,7 @@
 ::##############################################################################
 @echo off
 set PROG_PATH=%~dp0
-set APP_ENV=%PROG_PATH%\venv
+set APP_ENV=%PROG_PATH%\.venv
 cd %PROG_PATH%
 call %APP_ENV%\Scripts\activate.bat
 
@@ -14,4 +14,4 @@ set PYTHONPATH=%PYTHONPATH%;%PROG_PATH%
 
 call %APP_ENV%\Scripts\activate.bat
 
-python %PROG_PATH%\controller\ctk_theme_builder.py %1 %2 %3 %4 %5 %6
+python %PROG_PATH%\ctk_tb\controller\ctk_theme_builder.py %1 %2 %3 %4 %5 %6
