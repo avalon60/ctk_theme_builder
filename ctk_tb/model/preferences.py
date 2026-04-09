@@ -6,22 +6,22 @@ from pathlib import Path
 import customtkinter as ctk
 import sqlite3
 import os
+import ctk_tb.paths as app_paths
 
 
 
 # Constants
-APP_HOME = os.path.dirname(os.path.realpath(__file__))
-APP_HOME = Path(os.path.dirname(APP_HOME))
+APP_HOME = app_paths.INSTALL_ROOT
 CTK_SITE_PACKAGES = Path(ctk.__file__)
 CTK_SITE_PACKAGES = os.path.dirname(CTK_SITE_PACKAGES)
 CTK_ASSETS = CTK_SITE_PACKAGES / Path('assets')
 CTK_THEMES = CTK_ASSETS / 'themes'
 
-ASSETS_DIR = APP_HOME / 'assets'
-CONFIG_DIR = ASSETS_DIR / 'config'
-APP_DATA_DIR = ASSETS_DIR / 'data'
-DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
-LOG_DIR = APP_HOME / 'log'
+ASSETS_DIR = app_paths.ASSETS_DIR
+CONFIG_DIR = app_paths.CONFIG_DIR
+APP_DATA_DIR = app_paths.STATE_DIR
+DB_FILE_PATH = app_paths.DB_FILE_PATH
+LOG_DIR = app_paths.LOG_DIR
 
 db_file_found = None
 

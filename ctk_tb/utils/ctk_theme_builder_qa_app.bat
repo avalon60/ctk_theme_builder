@@ -8,11 +8,12 @@
 :: Get the directory of the batch script
 set PROG_PATH=%~dp0
 
-:: Derive the parent directory of PROG_PATH
+:: Derive the project root from ctk_tb\utils
 for %%I in ("%PROG_PATH%\..") do set "APP_HOME=%%~fI"
+for %%I in ("%APP_HOME%\..") do set "APP_HOME=%%~fI"
 
-set APP_ENV=%APP_HOME%\venv
-set PYTHONPATH=%PYTHONPATH%;%APP_HOME%\utils;%APP_HOME%\model;%APP_HOME%\view
+set APP_ENV=%APP_HOME%\.venv
+set PYTHONPATH=%PYTHONPATH%;%APP_HOME%
 
 call %APP_ENV%\Scripts\activate.bat
-%APP_HOME%\utils\ctk_theme_builder_qa_app.py %1 %2 %3 %4 %5 %6
+python %APP_HOME%\ctk_tb\utils\ctk_theme_builder_qa_app.py %1 %2 %3 %4 %5 %6

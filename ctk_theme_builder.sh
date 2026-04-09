@@ -10,10 +10,8 @@ PROG_DIR=$(dirname $0)
 APP_HOME=$(realpath  ${PROG_DIR})
 
 APP_ENV=${APP_HOME}/.venv
-APP_UTILS=${APP_HOME}/utils
-APP_MODEL=${APP_HOME}/model
-APP_VIEW=${APP_HOME}/view
-APP_CTL=${APP_HOME}/controller
+APP_PKG=${APP_HOME}/ctk_tb
+APP_CTL=${APP_PKG}/controller
 
 export PYTHONPATH=${PYTHONPATH}:${APP_HOME}
 

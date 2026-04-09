@@ -2,21 +2,21 @@
 
 import customtkinter as ctk
 import tkinter as tk
-import utils.cbtk_kit as cbtk
-import model.ctk_theme_builder as mod
-from model.ctk_theme_builder import log_call
-import utils.loggerutl as log
-from view.harmonics_dialog import HarmonicsDialog
-from view.preferences import PreferencesDialog
-from view.theme_merger import ThemeMerger
-from view.about import About
-from view.provenance_dialog import ProvenanceDialog
-from view.export_import import Exporter
-from view.export_import import Importer
-from view.geometry_dialog import GeometryDialog
+import ctk_tb.utils.cbtk_kit as cbtk
+import ctk_tb.model.ctk_theme_builder as mod
+from ctk_tb.model.ctk_theme_builder import log_call
+import ctk_tb.utils.loggerutl as log
+from ctk_tb.view.harmonics_dialog import HarmonicsDialog
+from ctk_tb.view.preferences import PreferencesDialog
+from ctk_tb.view.theme_merger import ThemeMerger
+from ctk_tb.view.about import About
+from ctk_tb.view.provenance_dialog import ProvenanceDialog
+from ctk_tb.view.export_import import Exporter
+from ctk_tb.view.export_import import Importer
+from ctk_tb.view.geometry_dialog import GeometryDialog
 from CTkToolTip import *
-# import view.ctk_button_dnd as dnd
-import model.preferences as pref
+# import ctk_tb.view.ctk_button_dnd as dnd
+import ctk_tb.model.preferences as pref
 import operator
 import platform
 import pyperclip
@@ -47,7 +47,7 @@ LISTENER_FILE = mod.LISTENER_FILE
 PROG_NAME = mod.PROG_NAME
 
 APP_HOME = mod.APP_HOME
-APP_UTILS = APP_HOME / 'utils'
+APP_UTILS = APP_HOME / 'ctk_tb' / 'utils'
 APP_THEMES_DIR = mod.APP_THEMES_DIR
 DB_FILE_PATH = mod.DB_FILE_PATH
 ETC_DIR = mod.ETC_DIR
@@ -75,6 +75,7 @@ class ControlPanel(ctk.CTk):
         self.control_panel_scaling = None
         self.preview_panel_scaling = None
         self.qa_application_scaling = None
+        self.icon_browser_scaling = None
         self.listener_port = None
         self.theme_json_data = {}
         self.theme_json_dir = None
@@ -105,6 +106,11 @@ class ControlPanel(ctk.CTk):
         self.palettes_dir = mod.PALETTES_DIR
         self.listener_port = mod.listener_port()
         self.qa_launched = False
+        self.qa_process = None
+        self.icon_browser_process = None
+        self.undo_icon = cbtk.rotate_left_icon()
+        self.redo_icon = cbtk.rotate_right_icon()
+        self.reset_icon = cbtk.backward_fast_icon()
 
         icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
         self.iconphoto(False, icon_photo)
@@ -173,13 +179,23 @@ class ControlPanel(ctk.CTk):
         self.qa_application_scaling_pct = pref.preference_setting(db_file_path=DB_FILE_PATH,
                                                                   scope='scaling',
                                                                   preference_name='qa_application')
+        self.icon_browser_scaling_pct = pref.preference_setting(db_file_path=DB_FILE_PATH,
+                                                                scope='scaling',
+                                                                preference_name='icon_browser')
+        if self.icon_browser_scaling_pct == 'NO_DATA_FOUND':
+            self.icon_browser_scaling_pct = '100%'
+            icon_browser_scaling_row = pref.new_preference_dict(scope='scaling',
+                                                                preference_name='icon_browser',
+                                                                data_type='str',
+                                                                preference_value=self.icon_browser_scaling_pct)
+            pref.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=icon_browser_scaling_row)
 
         self.theme_json_dir = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                       preference_name='theme_json_dir')
         # If no row found for the user theme directory, fall back to the
         # default location.
         if self.theme_json_dir == 'NO_DATA_FOUND':
-            self.theme_json_dir = APP_HOME / 'user_themes'
+            self.theme_json_dir = mod.USER_THEMES_DIR
             theme_dir_row = pref.new_preference_dict(scope='user_preference',
                                                      preference_name='theme_json_dir',
                                                      preference_value=str(self.theme_json_dir),
@@ -187,7 +203,7 @@ class ControlPanel(ctk.CTk):
             pref.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=theme_dir_row)
 
         elif not self.theme_json_dir.exists():
-            self.theme_json_dir = APP_HOME / 'user_themes'
+            self.theme_json_dir = mod.USER_THEMES_DIR
             theme_dir_row = pref.new_preference_dict(data_type='Path',
                                                      scope='user_preference',
                                                      preference_name='theme_json_dir',
@@ -427,18 +443,24 @@ class ControlPanel(ctk.CTk):
 
         self.btn_undo = ctk.CTkButton(master=button_frame,
                                       text='Undo',
+                                      image=self.undo_icon,
+                                      compound='left',
                                       state=tk.DISABLED,
                                       command=self.undo_change)
         self.btn_undo.grid(row=15, column=0, padx=5, pady=(30, 5))
 
         self.btn_redo = ctk.CTkButton(master=button_frame,
                                       text='Redo',
+                                      image=self.redo_icon,
+                                      compound='left',
                                       state=tk.DISABLED,
                                       command=self.redo_change)
         self.btn_redo.grid(row=17, column=0, padx=5, pady=(5, 5))
 
         self.btn_reset = ctk.CTkButton(master=button_frame,
                                        text='Reset',
+                                       image=self.reset_icon,
+                                       compound='left',
                                        state=tk.DISABLED,
                                        command=self.reset_theme)
         self.btn_reset.grid(row=18, column=0, padx=5, pady=(5, 5))
@@ -545,9 +567,13 @@ class ControlPanel(ctk.CTk):
         response = confirm.get()
         if response == 'No':
             return
-        theme_json_file = self.theme_json_dir / self.theme_file
-        mod.flip_appearance_modes(theme_file_path=theme_json_file)
-        self.load_theme()
+        self.theme_json_data = mod.flip_appearance_modes(theme_json=self.theme_json_data)
+        self.update_wip_file()
+        self.load_theme_palette()
+        self.set_filtered_widget_display()
+        self.json_state = 'dirty'
+        self.set_option_states()
+        self.reload_preview()
 
     @log_call
     def set_widget_colour(self, widget_property, new_colour):
@@ -636,7 +662,7 @@ class ControlPanel(ctk.CTk):
         self.tools_menu.add_command(label='Preferences', command=self.launch_preferences_dialog)
         self.tools_menu.add_command(label='Colour Harmonics', command=self.launch_harmony_dialog, state=tk.DISABLED)
         self.tools_menu.add_command(label='Merge Themes', command=self.launch_theme_merger)
-
+        self.tools_menu.add_command(label='Browse Icons', command=self.launch_icon_browser)
         self.tools_menu.add_command(label='About', command=self.about)
 
         self.set_option_states()
@@ -665,8 +691,13 @@ class ControlPanel(ctk.CTk):
             log.log_error(f'Key Error on shade copy: Widget Property = {widget_property}',
                           class_name='ControlPanel', method_name='copy_property_colour()')
         if colour:
-            pyperclip.copy(colour)
-            message = f'Colour {colour} copied to clipboard.'
+            ok, error = cbtk.clipboard_copy(colour, self)
+            if ok:
+                message = f'Colour {colour} copied to clipboard.'
+            else:
+                message = 'Clipboard copy is unavailable on this system.'
+                log.log_warning(log_text=f'Clipboard copy unavailable: {error}',
+                                class_name='ControlPanel', method_name='copy_property_colour')
             self.status_bar.set_status_text(status_text=message)
         elif not colour:
             self.status_bar.set_status_text(
@@ -677,6 +708,19 @@ class ControlPanel(ctk.CTk):
         log.log_debug(log_text='Launching About dialogue',
                       class_name='ControlPanel', method_name='about')
         about_dialog = About()
+
+    @log_call
+    def launch_icon_browser(self):
+        log.log_debug(log_text='Launching icon browser',
+                      class_name='ControlPanel', method_name='launch_icon_browser')
+        if self.icon_browser_process and self.icon_browser_process.poll() is None:
+            return
+        program = [
+            sys.executable,
+            '-m',
+            'ctk_tb.view.ctk_fa_browser',
+        ]
+        self.icon_browser_process = sp.Popen(program)
 
     @log_call
     def launch_export_dialog(self):
@@ -739,16 +783,70 @@ class ControlPanel(ctk.CTk):
                       class_name='ControlPanel', method_name='launch_qa_app')
         if self.wip_json is None:
             return
+        if self.qa_process and self.qa_process.poll() is None:
+            return
         self.update_wip_file()
-        if platform.system() == 'Windows':
-            qa_app_launcher = 'utils\\ctk_theme_builder_qa_app.bat'
-        else:
-            qa_app_launcher = 'utils/ctk_theme_builder_qa_app.sh'
-
-        qa_app = APP_HOME / qa_app_launcher
-        program = [qa_app, '-a', self.appearance_mode, '-t', self.wip_json]
-        self.process = sp.Popen(program)
+        program = [
+            sys.executable,
+            '-m',
+            'ctk_tb.utils.ctk_theme_builder_qa_app',
+            '-a',
+            self.appearance_mode,
+            '-t',
+            str(self.wip_json),
+        ]
+        self.qa_process = sp.Popen(program)
         self.qa_launched = True
+
+    @log_call
+    def _stop_preview_process(self):
+        if not self.process:
+            return
+        if self.process.poll() is None:
+            mod.send_command_json(command_type='program',
+                                  command='quit',
+                                  parameters=None)
+            try:
+                self.process.wait(timeout=2)
+            except sp.TimeoutExpired:
+                self.process.terminate()
+                try:
+                    self.process.wait(timeout=2)
+                except sp.TimeoutExpired:
+                    self.process.kill()
+                    self.process.wait(timeout=2)
+        self.process = None
+
+    @log_call
+    def _stop_qa_process(self):
+        if not self.qa_process:
+            return
+        if self.qa_process.poll() is None:
+            mod.request_close_qa_app()
+            try:
+                self.qa_process.wait(timeout=2)
+            except sp.TimeoutExpired:
+                self.qa_process.terminate()
+                try:
+                    self.qa_process.wait(timeout=2)
+                except sp.TimeoutExpired:
+                    self.qa_process.kill()
+                    self.qa_process.wait(timeout=2)
+        self.qa_process = None
+        self.qa_launched = False
+
+    @log_call
+    def _stop_icon_browser_process(self):
+        if not self.icon_browser_process:
+            return
+        if self.icon_browser_process.poll() is None:
+            self.icon_browser_process.terminate()
+            try:
+                self.icon_browser_process.wait(timeout=2)
+            except sp.TimeoutExpired:
+                self.icon_browser_process.kill()
+                self.icon_browser_process.wait(timeout=2)
+        self.icon_browser_process = None
 
     @log_call
     def load_preferences(self):
@@ -804,6 +902,10 @@ class ControlPanel(ctk.CTk):
         self.qa_application_scaling = pref.preference_setting(db_file_path=DB_FILE_PATH,
                                                               scope='scaling',
                                                               preference_name='qa_application')
+        self.icon_browser_scaling = pref.preference_setting(db_file_path=DB_FILE_PATH,
+                                                            scope='scaling',
+                                                            preference_name='icon_browser',
+                                                            default='100%')
 
         self.listener_port = pref.preference_setting(db_file_path=DB_FILE_PATH,
                                                      scope='user_preference',
@@ -1684,9 +1786,8 @@ class ControlPanel(ctk.CTk):
         else:
             mode_idx = 1
         if darker_shade != widget_colour:
-            pyperclip.copy(darker_shade)
             # Leverage the paste_palette_colour method to update the widget and the preview panel.
-            self.paste_palette_colour(event=None, palette_button_id=palette_button_id)
+            self.paste_palette_colour(event=None, palette_button_id=palette_button_id, property_colour=darker_shade)
 
     @log_call
     def lighten_palette_tile(self, palette_button: ctk.CTkButton,
@@ -1703,9 +1804,8 @@ class ControlPanel(ctk.CTk):
         else:
             mode_idx = 1
         if lighter_shade != widget_colour:
-            pyperclip.copy(lighter_shade)
             # Leverage the _paste_palette_colour method to update the widget and the preview panel.
-            self.paste_palette_colour(event=None, palette_button_id=palette_button_id)
+            self.paste_palette_colour(event=None, palette_button_id=palette_button_id, property_colour=lighter_shade)
 
     @log_call
     def lighten_widget_property_shade(self, property_widget: ctk.CTkButton,
@@ -1725,9 +1825,8 @@ class ControlPanel(ctk.CTk):
         else:
             mode_idx = 1
         if lighter_shade != widget_colour:
-            pyperclip.copy(lighter_shade)
             # Leverage the _paste_color method to update the widget and the preview panel.
-            self.paste_colour(event=None, widget_property=widget_property)
+            self.paste_colour(event=None, widget_property=widget_property, property_colour=lighter_shade)
 
     @log_call
     def darken_widget_property_shade(self, property_widget: ctk.CTkButton,
@@ -1746,9 +1845,8 @@ class ControlPanel(ctk.CTk):
         else:
             mode_idx = 1
         if darker_shade != widget_colour:
-            pyperclip.copy(darker_shade)
             # Leverage the _paste_color method to update the widget and the preview panel.
-            self.paste_colour(event=None, widget_property=widget_property)
+            self.paste_colour(event=None, widget_property=widget_property, property_colour=darker_shade)
 
     @log_call
     def load_theme_palette(self):
@@ -1976,7 +2074,12 @@ class ControlPanel(ctk.CTk):
         log.log_debug(log_text=f'Paste colour: widget_property={widget_property}; property_colour={property_colour}',
                       class_name='ControlPanel', method_name='paste_colour')
         if property_colour is None:
-            new_colour = pyperclip.paste()
+            new_colour, error = cbtk.clipboard_paste(self)
+            if error:
+                self.status_bar.set_status_text(status_text='Clipboard paste is unavailable on this system.')
+                log.log_warning(log_text=f'Clipboard paste unavailable: {error}',
+                                class_name='ControlPanel', method_name='paste_colour')
+                return
         else:
             new_colour = property_colour
 
@@ -2003,9 +2106,16 @@ class ControlPanel(ctk.CTk):
             self.set_option_states()
 
     @log_call
-    def paste_palette_colour(self, event, palette_button_id):
-
-        new_colour = pyperclip.paste()
+    def paste_palette_colour(self, event, palette_button_id, property_colour: str = None):
+        if property_colour is None:
+            new_colour, error = cbtk.clipboard_paste(self)
+            if error:
+                self.status_bar.set_status_text(status_text='Clipboard paste is unavailable on this system.')
+                log.log_warning(log_text=f'Clipboard paste unavailable: {error}',
+                                class_name='ControlPanel', method_name='paste_palette_colour')
+                return
+        else:
+            new_colour = property_colour
 
         if not cbtk.valid_colour(new_colour):
             self.status_bar.set_status_text(status_text='Attempted paste of non colour code - pasted text ignored.')
@@ -2086,9 +2196,14 @@ class ControlPanel(ctk.CTk):
         colour = self.theme_palette_tiles[palette_button_id].cget('fg_color')
         if shade_copy:
             colour = cbtk.contrast_colour(colour, self.shade_adjust_differential)
-        pyperclip.copy(colour)
-        self.status_bar.set_status_text(
-            status_text=f'Colour {colour} copied from palette entry {palette_button_id + 1} to clipboard.')
+        ok, error = cbtk.clipboard_copy(colour, self)
+        if ok:
+            self.status_bar.set_status_text(
+                status_text=f'Colour {colour} copied from palette entry {palette_button_id + 1} to clipboard.')
+        else:
+            self.status_bar.set_status_text(status_text='Clipboard copy is unavailable on this system.')
+            log.log_warning(log_text=f'Clipboard copy unavailable: {error}',
+                            class_name='ControlPanel', method_name='copy_palette_colour')
 
     @log_call
     def render_widget_properties(self, dummy=None):
@@ -2413,15 +2528,8 @@ class ControlPanel(ctk.CTk):
         """The reload_preview method causes a full reload of the preview panel."""
         log.log_debug(log_text=f'Reload preview panel',
                       class_name='ControlPanel', method_name='reload_preview')
-        if self.process:
-            mod.send_command_json(command_type='program',
-                                  command='quit',
-                                  parameters=None)
-
         self.update_wip_file()
-
-        self.process = None
-
+        self._stop_preview_process()
         self.launch_preview()
         if self.tk_render_disabled.get():
             mod.send_command_json(command_type='program',
@@ -2443,19 +2551,19 @@ class ControlPanel(ctk.CTk):
                                     title='Confirm Action',
                                     message=f'You have unsaved changes. Do you wish to save these before quitting?',
                                     options=["Yes", "No", "Cancel"])
-            response = confirm.get()
+            try:
+                response = confirm.get()
+            except AttributeError:
+                response = 'Cancel'
             if response == 'Cancel':
                 return
             elif response == 'Yes':
                 self.save_theme()
         log.log_debug(log_text=f'Close panels',
                       class_name='ControlPanel', method_name='close_panels')
-        if self.qa_launched:
-            mod.request_close_qa_app()
-        if self.process:
-            mod.send_command_json(command_type='program',
-                                  command='quit',
-                                  parameters=None)
+        self._stop_icon_browser_process()
+        self._stop_qa_process()
+        self._stop_preview_process()
 
         self.save_controller_geometry()
         log.log_complete(class_name='ControlPanel', supplementary_text='Theme Builder Control Panel exiting')
@@ -2470,16 +2578,18 @@ class ControlPanel(ctk.CTk):
         self.protocol("WM_DELETE_WINDOW", self.block_window_close)
         appearance_mode_ = self.appearance_mode
         self.update_wip_file()
-        designer = str(APP_HOME / 'ctk_theme_builder.py')
-        if platform.system() == 'Windows':
-            designer = designer.replace('.py', '.bat')
-        else:
-            designer = designer.replace('.py', '.sh')
 
         if self.process is None:
-            designer = APP_HOME / designer
-            program = [designer, '-a', appearance_mode_, '-t', self.wip_json]
-            log.log_debug(log_text=f'Launching designer: {designer}', class_name='ControlPanel',
+            program = [
+                sys.executable,
+                '-m',
+                'ctk_tb',
+                '-a',
+                appearance_mode_,
+                '-t',
+                str(self.wip_json),
+            ]
+            log.log_debug(log_text=f'Launching designer: {program}', class_name='ControlPanel',
                           method_name='launch_preview')
             self.process = sp.Popen(program)
             listener_started = False
@@ -2572,4 +2682,3 @@ class ControlPanel(ctk.CTk):
         self.command_stack.reset_stacks()
         self.set_option_states()
         self.save_theme_palette()
-

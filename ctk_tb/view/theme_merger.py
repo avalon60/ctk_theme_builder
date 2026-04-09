@@ -1,14 +1,14 @@
 """Class container for CTk Theme Builder theme merger dialogue."""
 
-import model.ctk_theme_builder as mod
-from model.ctk_theme_builder import log_call
+import ctk_tb.model.ctk_theme_builder as mod
+from ctk_tb.model.ctk_theme_builder import log_call
 import customtkinter as ctk
 import tkinter as tk
 import os
 from CTkToolTip import *
-import utils.cbtk_kit as cbtk
-import model.preferences as pref
-import utils.loggerutl as log
+import ctk_tb.utils.cbtk_kit as cbtk
+import ctk_tb.model.preferences as pref
+import ctk_tb.utils.loggerutl as log
 
 APP_THEMES_DIR = mod.APP_THEMES_DIR
 APP_IMAGES = mod.APP_IMAGES

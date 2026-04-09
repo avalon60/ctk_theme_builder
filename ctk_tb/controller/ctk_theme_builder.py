@@ -15,13 +15,13 @@ import sys
 from pathlib import Path
 
 # Allow direct execution from IDEs without relying on shell launchers to set PYTHONPATH.
-PROJECT_ROOT = Path(__file__).resolve().parent.parent
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from view.control_panel import ControlPanel
-from view.ctk_theme_preview import PreviewPanel
-from model.ctk_theme_builder import log_call
+from ctk_tb.view.control_panel import ControlPanel
+from ctk_tb.view.ctk_theme_preview import PreviewPanel
+from ctk_tb.model.ctk_theme_builder import log_call
 
 # import lib.CTkMessagebox.ctkmessagebox
 
@@ -62,7 +62,7 @@ class SortingHelpFormatter(HelpFormatter):
         super(SortingHelpFormatter, self).add_arguments(actions)
 
 
-if __name__ == "__main__":
+def main():
     ap = argparse.ArgumentParser(formatter_class=SortingHelpFormatter
                                  , description=f"{PROG}: Welcome to CTk Theme Designer, which is designed to help you "
                                                f"design, themes to run with the CustomTkinter framework")
@@ -85,3 +85,7 @@ if __name__ == "__main__":
         run_preview_panel(appearance_mode=appearance_mode, theme_file=theme_file)
     else:
         controller = ControlPanel()
+
+
+if __name__ == "__main__":
+    main()

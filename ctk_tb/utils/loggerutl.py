@@ -23,14 +23,14 @@ from loguru import logger as logr
 from pathlib import Path
 import datetime
 import time
-import model.preferences as pref
+import ctk_tb.model.preferences as pref
+import ctk_tb.paths as app_paths
 
-APP_HOME = os.path.dirname(os.path.realpath(__file__))
-APP_HOME = Path(os.path.dirname(APP_HOME))
-LOG_DIR = APP_HOME / 'log'
-ASSETS_DIR = APP_HOME / 'assets'
-APP_DATA_DIR = ASSETS_DIR / 'data'
-DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
+APP_HOME = app_paths.INSTALL_ROOT
+LOG_DIR = app_paths.LOG_DIR
+ASSETS_DIR = app_paths.ASSETS_DIR
+APP_DATA_DIR = app_paths.STATE_DIR
+DB_FILE_PATH = app_paths.DB_FILE_PATH
 RUNTIME_LOG = "runtime.log"
 
 # Initialise the log stamp integer.

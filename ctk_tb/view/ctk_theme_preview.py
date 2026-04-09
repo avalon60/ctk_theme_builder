@@ -15,14 +15,13 @@ import platform
 import threading
 from pathlib import Path
 from datetime import datetime
-import utils.cbtk_kit as cbtk
-import model.ctk_theme_builder as mod
-from model.ctk_theme_builder import log_call
-import utils.loggerutl as log
+import ctk_tb.utils.cbtk_kit as cbtk
+import ctk_tb.model.ctk_theme_builder as mod
+from ctk_tb.model.ctk_theme_builder import log_call
+import ctk_tb.utils.loggerutl as log
 from CTkToolTip import *
 from CTkMessagebox import CTkMessagebox
-from PIL import Image
-import model.preferences as pref
+import ctk_tb.model.preferences as pref
 
 PROG = os.path.basename(__file__)
 APP_HOME = Path(os.path.dirname(os.path.realpath(__file__)))
@@ -86,12 +85,12 @@ class PreviewPanel:
 
         self.refresh_widgets = []
 
-        self._ASSETS_DIR = APP_HOME / 'assets'
+        self._ASSETS_DIR = ASSETS_DIR
         self._CONFIG_DIR = ASSETS_DIR / 'config'
         self._ETC_DIR = ASSETS_DIR / 'etc'
         self._VIEWS_DIR = ASSETS_DIR / 'views'
-        self._palettes_dir = ASSETS_DIR / 'palettes'
-        self._theme_json_dir = ASSETS_DIR / 'themes'
+        self._palettes_dir = mod.PALETTES_DIR
+        self._theme_json_dir = mod.APP_THEMES_DIR
 
         # If the listener file exists, we assume someone has gone a bit
         # bonkers, hitting the 'Refresh Preview' button. Things
@@ -335,9 +334,7 @@ class PreviewPanel:
         self._rendered_widgets['CTkComboBox'].append(self.combobox_1)
 
         # CTkButton
-        eye_con = ctk.CTkImage(light_image=Image.open(APP_IMAGES / 'eye_lm.png'),
-                               dark_image=Image.open(APP_IMAGES / 'eye_dm.png'),
-                               size=(25, 18))
+        eye_con = cbtk.eye_icon()
         # We contrive to always show a contrast of a button widget with and without a border.
         button_border_width = ThemeManager.theme['CTkButton']['border_width']
         self.button_1 = ctk.CTkButton(master=widget_frame, border_width=button_border_width)

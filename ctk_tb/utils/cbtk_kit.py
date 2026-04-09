@@ -6,11 +6,18 @@ __license__ = 'MIT - see LICENSE.md'
 import tkinter as tk
 import customtkinter as ctk
 from customtkinter import ThemeManager
-from PIL import Image
+from PIL import Image, ImageDraw
+import pyperclip
 import textwrap
 import json
 from matplotlib.colors import is_color_like
-import utils.color_constants as color_constants
+import ctk_tb.utils.color_constants as color_constants
+
+try:
+    from ctkfontawesome import icon_to_ctkimage, icon_to_pil
+except ImportError:
+    icon_to_ctkimage = None
+    icon_to_pil = None
 
 # Constants
 # These aren't true sizes as per WEB design
@@ -34,6 +41,48 @@ def rgb2hex(rgb_color: tuple) -> str:
     return "#{:02x}{:02x}{:02x}".format(round(rgb_color[0]), round(rgb_color[1]), round(rgb_color[2]))
 
 
+def clipboard_copy(text: str, widget=None) -> tuple[bool, str | None]:
+    if widget is not None:
+        try:
+            widget.clipboard_clear()
+            widget.clipboard_append(text)
+            widget.update()
+            return True, None
+        except tk.TclError as exc:
+            tk_error = str(exc).strip()
+        else:
+            tk_error = None
+    else:
+        tk_error = None
+    try:
+        pyperclip.copy(text)
+        return True, None
+    except pyperclip.PyperclipException as exc:
+        pyperclip_error = str(exc).strip()
+        if tk_error:
+            return False, f"{tk_error}; {pyperclip_error}"
+        return False, pyperclip_error
+
+
+def clipboard_paste(widget=None) -> tuple[str | None, str | None]:
+    if widget is not None:
+        try:
+            return widget.clipboard_get(), None
+        except tk.TclError as exc:
+            tk_error = str(exc).strip()
+        else:
+            tk_error = None
+    else:
+        tk_error = None
+    try:
+        return pyperclip.paste(), None
+    except pyperclip.PyperclipException as exc:
+        pyperclip_error = str(exc).strip()
+        if tk_error:
+            return None, f"{tk_error}; {pyperclip_error}"
+        return None, pyperclip_error
+
+
 def contrast_colour(color: str, differential: int = 20):
     """The contrast_colour function, accepts a hex colour code (format #RRGGBB) and generates a slightly contrasting
     colour, based upon the specified increment. The larger the increment, the bigger the deviation from the original
@@ -42,6 +91,8 @@ def contrast_colour(color: str, differential: int = 20):
         # This occurs where we have a colour property set to "transparent", these render as white
         # so return a grey as a contrast.
         return '#b0b0b0'
+    if isinstance(color, str) and len(color) == 6 and all(ch in '0123456789abcdefABCDEF' for ch in color):
+        color = f'#{color}'
     if not str(color).startswith("#"):
         convert_hex = color_constants.colors[color].hex_format()
         color_rgb = hex2rgb(convert_hex)
@@ -75,6 +126,8 @@ def shade_up(color: str, differential: int = 20, multiplier: int = 1):
         # This occurs where we have a colour property set to "transparent", these render as white
         # so return a grey as a contrast.
         return '#b0b0b0'
+    if isinstance(color, str) and len(color) == 6 and all(ch in '0123456789abcdefABCDEF' for ch in color):
+        color = f'#{color}'
     if not str(color).startswith("#"):
         convert_hex = color_constants.colors[color].hex_format()
         color_rgb = hex2rgb(convert_hex)
@@ -102,6 +155,8 @@ def shade_down(color: str, differential: int = 20, multiplier: int = 1):
         # This occurs where we have a colour property set to "transparent", these render as white
         # so return a grey as a contrast.
         return '#b0b0b0'
+    if isinstance(color, str) and len(color) == 6 and all(ch in '0123456789abcdefABCDEF' for ch in color):
+        color = f'#{color}'
     if not str(color).startswith("#"):
         convert_hex = color_constants.colors[color].hex_format()
         color_rgb = hex2rgb(convert_hex)
@@ -180,6 +235,188 @@ def load_image(light_image, dark_image=None, image_size: tuple = (30, 30)):
                         dark_image=Image.open(dark_image),
                         size=image_size)
     # return ImageTk.PhotoImage(Image.open(path).resize((image_size, image_size)))
+
+
+def _fontawesome_icon(
+    name: str,
+    image_size: tuple,
+    light_color: str,
+    dark_color: str,
+):
+    if icon_to_pil is not None:
+        try:
+            return ctk.CTkImage(
+                light_image=icon_to_pil(name, fill=light_color, scale_to_width=image_size[0]),
+                dark_image=icon_to_pil(name, fill=dark_color, scale_to_width=image_size[0]),
+                size=image_size,
+            )
+        except Exception:
+            pass
+
+    if icon_to_ctkimage is not None:
+        try:
+            return icon_to_ctkimage(name, fill=light_color, scale_to_width=image_size[0])
+        except Exception:
+            pass
+
+    return None
+
+
+def rotate_right_icon(
+    image_size: tuple = (21, 21),
+    light_color: str = "#1f1f1f",
+    dark_color: str = "#f2f2f2",
+    stroke_width: int = 2,
+):
+    """Return a small rotate-right icon suitable for CTk buttons."""
+
+    icon = _fontawesome_icon("arrow-rotate-right", image_size, light_color, dark_color)
+    if icon is not None:
+        return icon
+
+    def _build_icon(colour: str) -> Image.Image:
+        width, height = image_size
+        image = Image.new("RGBA", image_size, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(image)
+
+        pad = 3
+        bbox = (pad, pad + 1, width - pad, height - pad + 1)
+        draw.arc(bbox, start=35, end=305, fill=colour, width=stroke_width)
+
+        arrow_tip = (width - pad - 1, height // 2 - 1)
+        arrow_left = (width - pad - 7, height // 2 - 5)
+        arrow_right = (width - pad - 7, height // 2 + 3)
+        draw.polygon((arrow_tip, arrow_left, arrow_right), fill=colour)
+        return image
+
+    return ctk.CTkImage(
+        light_image=_build_icon(light_color),
+        dark_image=_build_icon(dark_color),
+        size=image_size,
+    )
+
+
+def rotate_left_icon(
+    image_size: tuple = (21, 21),
+    light_color: str = "#1f1f1f",
+    dark_color: str = "#f2f2f2",
+    stroke_width: int = 2,
+):
+    """Return a small rotate-left icon suitable for CTk buttons."""
+
+    icon = _fontawesome_icon("arrow-rotate-left", image_size, light_color, dark_color)
+    if icon is not None:
+        return icon
+
+    def _build_icon(colour: str) -> Image.Image:
+        width, height = image_size
+        image = Image.new("RGBA", image_size, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(image)
+
+        pad = 3
+        bbox = (pad, pad + 1, width - pad, height - pad + 1)
+        draw.arc(bbox, start=235, end=505, fill=colour, width=stroke_width)
+
+        arrow_tip = (pad + 1, height // 2 - 1)
+        arrow_left = (pad + 7, height // 2 - 5)
+        arrow_right = (pad + 7, height // 2 + 3)
+        draw.polygon((arrow_tip, arrow_left, arrow_right), fill=colour)
+        return image
+
+    return ctk.CTkImage(
+        light_image=_build_icon(light_color),
+        dark_image=_build_icon(dark_color),
+        size=image_size,
+    )
+
+
+def backward_fast_icon(
+    image_size: tuple = (21, 21),
+    light_color: str = "#1f1f1f",
+    dark_color: str = "#f2f2f2",
+):
+    """Return a small backward-fast icon suitable for CTk buttons."""
+
+    icon = _fontawesome_icon("backward-fast", image_size, light_color, dark_color)
+    if icon is not None:
+        return icon
+
+    def _build_icon(colour: str) -> Image.Image:
+        width, height = image_size
+        image = Image.new("RGBA", image_size, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(image)
+
+        bar_x = 4
+        top_y = 4
+        bottom_y = height - 4
+        mid_y = height // 2
+
+        draw.line((bar_x, top_y, bar_x, bottom_y), fill=colour, width=2)
+        draw.polygon(((bar_x + 2, mid_y), (bar_x + 9, top_y), (bar_x + 9, bottom_y)), fill=colour)
+        draw.polygon(((bar_x + 8, mid_y), (bar_x + 15, top_y), (bar_x + 15, bottom_y)), fill=colour)
+        return image
+
+    return ctk.CTkImage(
+        light_image=_build_icon(light_color),
+        dark_image=_build_icon(dark_color),
+        size=image_size,
+    )
+
+
+def folder_open_icon(
+    image_size: tuple = (21, 21),
+    light_color: str = "#1f1f1f",
+    dark_color: str = "#f2f2f2",
+):
+    """Return a small folder-open icon suitable for CTk buttons."""
+
+    icon = _fontawesome_icon("folder-open", image_size, light_color, dark_color)
+    if icon is not None:
+        return icon
+
+    def _build_icon(colour: str) -> Image.Image:
+        width, height = image_size
+        image = Image.new("RGBA", image_size, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(image)
+
+        draw.rounded_rectangle((2, 6, width - 2, height - 3), radius=2, outline=colour, width=2)
+        draw.polygon(((3, 9), (7, 4), (width - 4, 4), (width - 6, 9)), outline=colour, fill=None, width=2)
+        return image
+
+    return ctk.CTkImage(
+        light_image=_build_icon(light_color),
+        dark_image=_build_icon(dark_color),
+        size=image_size,
+    )
+
+
+def eye_icon(
+    image_size: tuple = (25, 20),
+    light_color: str = "#1f1f1f",
+    dark_color: str = "#f2f2f2",
+    stroke_width: int = 2,
+):
+    """Return a small eye icon suitable for CTk buttons."""
+
+    icon = _fontawesome_icon("eye", image_size, light_color, dark_color)
+    if icon is not None:
+        return icon
+
+    def _build_icon(colour: str) -> Image.Image:
+        width, height = image_size
+        image = Image.new("RGBA", image_size, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(image)
+
+        draw.ellipse((width * 0.35, height * 0.3, width * 0.65, height * 0.7), fill=colour)
+        draw.arc((2, 3, width - 2, height - 3), start=15, end=165, fill=colour, width=stroke_width)
+        draw.arc((2, 1, width - 2, height - 1), start=195, end=345, fill=colour, width=stroke_width)
+        return image
+
+    return ctk.CTkImage(
+        light_image=_build_icon(light_color),
+        dark_image=_build_icon(dark_color),
+        size=image_size,
+    )
 
 
 def theme_property_color(theme_file_path, widget_type: str, widget_property: str, mode: str):

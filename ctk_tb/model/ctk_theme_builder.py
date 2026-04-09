@@ -1,6 +1,6 @@
 __title__ = 'CB CustomTkinter Theme Builder Module'
 __author__ = 'Clive Bostock'
-__version__ = "3.1.0"
+__version__ = "3.2.0"
 __license__ = 'MIT - see LICENSE.md'
 
 import copy
@@ -15,35 +15,36 @@ from dataclasses import dataclass
 from typing import Union
 import socket
 import re
-import model.preferences as pref
-import utils.loggerutl as log
+import ctk_tb.model.preferences as pref
+import ctk_tb.utils.loggerutl as log
+import ctk_tb.paths as app_paths
 import functools
 import platform
 
 application_title = 'CTk Theme Builder'
 # Constants
-APP_HOME = os.path.dirname(os.path.realpath(__file__))
-APP_HOME = Path(os.path.dirname(APP_HOME))
+APP_HOME = app_paths.INSTALL_ROOT
 CTK_SITE_PACKAGES = Path(ctk.__file__)
 CTK_SITE_PACKAGES = os.path.dirname(CTK_SITE_PACKAGES)
 CTK_ASSETS = CTK_SITE_PACKAGES / Path('assets')
 CTK_THEMES = CTK_ASSETS / 'themes'
 
-ASSETS_DIR = APP_HOME / 'assets'
-LIB_DIR = APP_HOME / 'lib'
-CONFIG_DIR = ASSETS_DIR / 'config'
-ETC_DIR = ASSETS_DIR / 'etc'
-LOG_DIR = ASSETS_DIR / 'log'
-TEMP_DIR = APP_HOME / 'tmp'
-VIEWS_DIR = ASSETS_DIR / 'views'
-APP_THEMES_DIR = ASSETS_DIR / 'themes'
-APP_DATA_DIR = ASSETS_DIR / 'data'
-DB_FILE_PATH = APP_DATA_DIR / 'ctk_theme_builder.db'
-APP_IMAGES = ASSETS_DIR / 'images'
-QA_STOP_FILE = ETC_DIR / 'qa_application.stop'
-QA_STARTED_FILE = ETC_DIR / 'qa_application.started'
-LISTENER_FILE = ETC_DIR / 'listener.started'
-PALETTES_DIR = ASSETS_DIR / 'palettes'
+ASSETS_DIR = app_paths.ASSETS_DIR
+LIB_DIR = app_paths.LIB_DIR
+CONFIG_DIR = app_paths.CONFIG_DIR
+ETC_DIR = app_paths.ETC_DIR
+LOG_DIR = app_paths.LOG_DIR
+TEMP_DIR = app_paths.TMP_DIR
+VIEWS_DIR = app_paths.VIEWS_DIR
+APP_THEMES_DIR = app_paths.APP_THEMES_DIR
+APP_DATA_DIR = app_paths.STATE_DIR
+DB_FILE_PATH = app_paths.DB_FILE_PATH
+APP_IMAGES = app_paths.APP_IMAGES
+QA_STOP_FILE = app_paths.QA_STOP_FILE
+QA_STARTED_FILE = app_paths.QA_STARTED_FILE
+LISTENER_FILE = app_paths.LISTENER_FILE
+PALETTES_DIR = app_paths.PALETTES_DIR
+USER_THEMES_DIR = app_paths.THEMES_DIR
 PROG_NAME = 'CTk Theme Builder'
 
 log.log_debug(log_text=f'APP_HOME={APP_HOME}',
@@ -545,18 +546,16 @@ def valid_theme_file_name(theme_name):
 
 
 @log_call
-def flip_appearance_modes(theme_file_path: Path):
-    """Function, which accepts the pathname to a CustomTkinter theme file. It then proceeds to swap
-    all light (appearance) mode colours, with those of the dark mode."""
-    theme_dict = json_dict(theme_file_path)
+def flip_appearance_modes(theme_json: dict):
+    """Swap all light-mode colour values with their dark-mode counterparts and return the updated theme JSON."""
+    theme_dict = theme_json
     new_theme_dict = copy.deepcopy(theme_dict)
     for widget_type, dict_ in theme_dict.items():
         for property_, value_ in dict_.items():
             if "_color" in property_ and value_ != 'transparent':
                 new_theme_dict[widget_type][property_][0] = theme_dict[widget_type][property_][1]
                 new_theme_dict[widget_type][property_][1] = theme_dict[widget_type][property_][0]
-    with open(theme_file_path, "w") as f:
-        json.dump(new_theme_dict, f, indent=2)
+    return new_theme_dict
 
 
 @log_call

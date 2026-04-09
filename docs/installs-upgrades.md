@@ -1,91 +1,121 @@
 # Requirements
 
-You must have Python installed. The recommended version of Python is 3.10, although anything above Python 3.9 should suffice. 
+You must have Python installed. CTk Theme Builder supports Python 3.10 through Python 3.13. Python 3.12 is a good default choice.
 
-The application has been tested against Python 3.12. 
+The application has been tested against Python 3.12.
 
-The application has been tested on Linux Mint and Windows 10, although there is no obvious reason as to why it shouldn't work on MacOS or other Linux ports.
+The application has been tested on Linux Mint and Windows 11.
+
+macOS is expected to work, but the current wheel-based deployment flow has not yet been validated there.
+
+There is no obvious reason as to why the application should not work on other Linux distributions.
 
 You will require around 160MB of disk space.
 
 ## Ubuntu Based Linux Distributions
 
-For Ubuntu based distros (e.g. Linux Mint, Elementary OS, Zorin OS...), please ensure that the `venv` package is
-installed for the Python version you intend to use. For example:
+For Ubuntu based distros (for example Linux Mint, Elementary OS and Zorin OS), please ensure that the `venv` package is installed for the Python version you intend to use. For example:
 
 `apt install python3.12-venv`
 
 ## Installation
 
-### The theme\_builder\_setup.py Utility
-Installations and upgrades are performed using the <i>theme\_builder\_setup.py</i> utility. In situ upgrades or patching can be performed using <i>theme\_builder\_setup.py</i>, but it can also install/upgrade from a package in the form of a ZIP file. This latter method, using a ZIP package, is the recommended way to install or update the application.
+CTk Theme Builder is now installed as a Python package. The preferred deployment modes are:
 
-The <i>theme\_builder\_setup.py</i> utility expects a parent directory to be supplied. For new installations, using a ZIP package, it will create a sub-directory, *ctk\_theme\_builder*, in which the application is installed. 
+- install from PyPI with `pip`
+- install from a downloaded wheel
 
-To obtain a list of options, run the command:  
-  
-  `python theme_builder_setup.py -h`
-  
-Note that with some Python installations, you may need to run the above command with *python3*, instead of *python*.
+The installed application command is:
 
-## ZIP Packages
+`ctk-theme-builder`
 
-To obtain a ZIP package, look at the available releases of CTk Theme Builder, on the GitHub project page. The installable archives start with "ctk\_theme\_builder-", followed by the version, and ending with .zip. For example: <i>ctk\_theme\_builder-2.0.0.zip`</i>
+## Install From PyPI
 
-Install using the following steps:  
-  
-1. From the zip file, extract the theme\_builder\_setup.py file.
-2. Run the install command using both the -i and -a flags.
+If the package has been published to PyPI, install it with:
 
-You need a command window to run the setup utility. On windows, you should be able to right click a folder in Windows Explorer, and select _CMD Prompt Here_. Another option is to click the Windows search (bottom left) and where it says _Type search here_, enter the commend _CMD_ and press _Enter_. There is also a further option, simply enter the text _CMD_, into the navigation field at the top of Windows Explorer and press Enter.
+`python -m pip install ctk-theme-builder`
 
-For Linux, you can open a Terminal. This is often available as a menu option, but if not, you may need to Google the subject for your specific Linux distribution. 
+If your platform prefers `python3`, use:
+
+`python3 -m pip install ctk-theme-builder`
+
+## Install From A Wheel
+
+If you have downloaded a wheel artefact, install it with:
+
+`python -m pip install ctk_theme_builder-3.2.0-py3-none-any.whl`
+
+Adjust the filename to match the version you downloaded.
+
+## Upgrades
+
+Upgrade an existing installation with:
+
+`python -m pip install --upgrade ctk-theme-builder`
+
+Or, when installing from a wheel:
+
+`python -m pip install --upgrade ctk_theme_builder-3.2.0-py3-none-any.whl`
+
+## Launching CTk Theme Builder
+
+Once installed, launch the application from a terminal or command prompt with:
+
+`ctk-theme-builder`
+
+This command is provided by the Python environment into which the package was installed.
+
+## User Data Location
+
+CTk Theme Builder now keeps mutable user data outside the install location.
+
+The default user data home is:
+
+`~/CTkThemeBuilder`
+
+This contains the working directories for:
+
+- themes
+- palettes
+- logs
+- temporary files
+- application state, including the SQLite database
+
+## Migrating Themes And Palettes From An Older Install
+
+If you are moving from an older directory-based installation, use:
+
+`ctktb-migrate-assets <old-install-root>`
 
 Example:
 
-`python theme_builder_setup.py -i /home/clive/utilities -a /tmp/ctk_theme_builder-2.0.0.zip`
+`ctktb-migrate-assets /home/clive/utilities/ctk_theme_builder`
 
-In the example, the utilities folder, is just an arbitrary parent folder location, which must be created in advance.
+The migration command:
 
-If one doesn't already exist, this will cause a ctk\_theme\_builder directory to be created, below the utilities folder. The ZIP file will be unpacked to the folder and the application will be set up into an executable state. 
+- inspects the old install database to find the legacy theme location
+- copies only themes that do not already exist in your current user-data theme folder
+- copies matching palette files for each newly copied theme
+- reports which themes were copied and which were skipped
 
-  If there is already an installation of ctk\_theme\_builder, below the specified installation location, theme\_builder\_setup.py will attempt an upgrade.   
-  
-  If the installation is already at the same version as that contained in the ZIP archive, the theme\_builder\_setup.py will run in a "fix" mode. For example if you have accidentally removed your venv folder, it will fix it.
-  
-# Launching CTk Theme Builder
-There are a number of options, for launching CTk Theme Builder, and these vary slightly depending on the operating system. One common method for them all is to launch using the *ctk\_theme\_builder* command. The most basic way is to open a CMD/Terminal window and type in a command. 
+## PATH
 
-For example, if you had installed CTk Theme Builder in a ``/u01/utilities/ctk_theme_builder`folder, then you could launch, using the following:-  
-  
-Linux/MacOS example:  
+If `ctk-theme-builder` is not found, the Python environment's scripts directory may not be on your `PATH`.
 
-`/u01/utilities/ctk_theme_builder/ctk_theme_builder`
-  
-Windows example:  
+Typical fixes are:
 
-`C:\utilities\ctk_theme_builder\ctk_theme_builder`
+- activate the virtual environment before launching
+- install into an environment that already exposes scripts on your `PATH`
+- use `pipx` if you want the command exposed as a standalone user tool
 
-On Windows, the above should cause the *ctk\_theme\_builder.bat* file, located in the CTk Theme builder application home directory to be executed. 
+## Desktop Launchers And Shortcuts
 
-On Linux and MacOS, the *ctk\_theme\_builder* is a hard link to *ctk\_theme\_builder.sh*. 
+Desktop launchers and shortcuts are still possible, but they should now target the installed command rather than old repo-local `.sh` or `.bat` wrapper scripts.
 
-The upshot is that you can also invoke a launch of CTk Theme Builder with *ctk\_theme\_builder.bat* or *ctk\_theme\_builder.sh*, depending on your operating system.
+Use one of these approaches:
 
-If you open the CMD/Terminal window inside the *ctk\_theme\_builder* folder, then instead of typing the full pathname, you could simply type:  
-  
-`./ctk_theme_builder` (Linux / MacOS)  
-	
-OR
+- Linux desktop launcher: set the command to `ctk-theme-builder`
+- Windows shortcut: point to the `ctk-theme-builder` launcher created in the Python environment's `Scripts` directory
+- macOS launcher: create a launcher that runs `ctk-theme-builder` from the environment where it was installed
 
-`.\ctk_theme_builder` (Windows)
-
-## PATH Variable
-If you don't want to include the path-name to the CTk Theme Builder script, you can always change your operating system PATH variable, to include the installation directory. You may need to Google how to do this, based on whichever operating system you are using.
-
-## Desktop Launchers
-Most operating systems, with a Graphical User Interface, tend to provide a launcher mechanism which can be set up on the desktop. 
-
-For example, you can create a desktop shortcut on Windows, in order to launch the *ctk\_theme\_builder* script described earlier. Linux ports tend to have similar(ish) facilities. 
-
-You'll need to Google how to set up a shortcut / launcher for your specific operating system. 
+If you install into a virtual environment, the launcher or shortcut must target the command from that same environment.

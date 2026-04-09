@@ -14,4 +14,4 @@ set PYTHONPATH=%PYTHONPATH%;%PROG_PATH%
 
 call %APP_ENV%\Scripts\activate.bat
 
-python %PROG_PATH%\controller\ctk_theme_builder.py %1 %2 %3 %4 %5 %6
+python %PROG_PATH%\ctk_tb\controller\ctk_theme_builder.py %1 %2 %3 %4 %5 %6

@@ -1,17 +1,17 @@
 """Class container for the Preferences dialogue."""
 
-import model.ctk_theme_builder as mod
-from model.ctk_theme_builder import log_call
+import ctk_tb.model.ctk_theme_builder as mod
+from ctk_tb.model.ctk_theme_builder import log_call
 import customtkinter as ctk
 import tkinter as tk
 import platform
 import os
 from CTkToolTip import *
-import utils.cbtk_kit as cbtk
-import utils.loggerutl as log
+import ctk_tb.utils.cbtk_kit as cbtk
+import ctk_tb.utils.loggerutl as log
 from pathlib import Path
-import model.preferences as pref
-import utils.loggerutl as logutl
+import ctk_tb.model.preferences as pref
+import ctk_tb.utils.loggerutl as logutl
 from CTkMessagebox import CTkMessagebox
 
 APP_THEMES_DIR = mod.APP_THEMES_DIR
@@ -100,6 +100,16 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.qa_application_scaling = pref.preference_setting(db_file_path=DB_FILE_PATH,
                                                               scope='scaling',
                                                               preference_name='qa_application')
+        self.icon_browser_scaling = pref.preference_setting(db_file_path=DB_FILE_PATH,
+                                                            scope='scaling',
+                                                            preference_name='icon_browser')
+        if self.icon_browser_scaling == 'NO_DATA_FOUND':
+            self.icon_browser_scaling = '100%'
+            icon_browser_scaling_row = pref.new_preference_dict(scope='scaling',
+                                                                preference_name='icon_browser',
+                                                                data_type='str',
+                                                                preference_value=self.icon_browser_scaling)
+            pref.upsert_preference(db_file_path=DB_FILE_PATH, preference_row_dict=icon_browser_scaling_row)
 
         log_level = pref.preference_setting(scope='logger', preference_name='log_level', default="Info")
 
@@ -109,6 +119,7 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.action = 'cancelled'
 
         self.new_theme_json_dir = self.theme_json_dir
+        self.tk_theme_json_dir = tk.StringVar(value=str(self.theme_json_dir))
         # Establish the user login name and home directory        this_platform = platform.system()
         if this_platform == "Windows":
             self.user_home_dir = os.getenv("UserProfile")
@@ -232,6 +243,15 @@ class PreferencesDialog(ctk.CTkToplevel):
                                                             values=mod.ui_scaling_list())
         self.opm_qa_application_scaling.grid(row=4, column=1, padx=0, pady=10, sticky='w')
         self.opm_qa_application_scaling.set(self.qa_application_scaling)
+
+        lbl_icon_browser_scaling = ctk.CTkLabel(master=frm_appearance, text='Icon Browser Scaling', justify="right")
+        lbl_icon_browser_scaling.grid(row=4, column=2, padx=(0, 5), pady=10, sticky='e')
+
+        self.opm_icon_browser_scaling = ctk.CTkOptionMenu(master=frm_appearance,
+                                                          width=12,
+                                                          values=mod.ui_scaling_list())
+        self.opm_icon_browser_scaling.grid(row=4, column=3, padx=0, pady=10, sticky='w')
+        self.opm_icon_browser_scaling.set(self.icon_browser_scaling)
 
         # Colour controls frame
         frm_colour = ctk.CTkFrame(master=frm_main, corner_radius=10)
@@ -393,12 +413,13 @@ class PreferencesDialog(ctk.CTkToplevel):
         frm_themes.grid(column=0, row=3,
                         padx=FRM_PADX, pady=FRM_BPADY,
                         sticky='nsew')
+        frm_themes.columnconfigure(1, weight=1)
         lbl_behaviour = ctk.CTkLabel(master=frm_themes, text='User Themes', justify="right", font=mod.HEADING4)
         lbl_behaviour.grid(row=0, column=0, padx=5, pady=(5, 5), sticky='w')
 
-        self.folder_image = cbtk.load_image(light_image=APP_IMAGES / 'folder.png', image_size=(20, 20))
-        lbl_theme_json_dir = ctk.CTkLabel(master=frm_themes, text='Themes Location', justify="right")
-        lbl_theme_json_dir.grid(row=1, column=0, padx=5, pady=(15, 5), sticky='e')
+        self.folder_open_icon = cbtk.folder_open_icon()
+        lbl_theme_json_dir = ctk.CTkLabel(master=frm_themes, text='Themes Location', justify="left")
+        lbl_theme_json_dir.grid(row=1, column=0, columnspan=3, padx=5, pady=(15, 5), sticky='w')
 
         if self.enable_tooltips:
             lbl_theme_json_dir_tooltip = CTkToolTip(lbl_theme_json_dir,
@@ -408,18 +429,23 @@ class PreferencesDialog(ctk.CTkToplevel):
                                                     corner_radius=6,
                                                     message="Select a location to store your themes.")
 
-        btn_theme_json_dir = ctk.CTkButton(master=frm_themes,
-                                           text='',
-                                           width=30,
-                                           height=30,
-                                           fg_color='#748696',
-                                           image=self.folder_image,
-                                           command=self.preferred_json_location)
-        btn_theme_json_dir.grid(row=1, column=1, pady=(10, 0), sticky='w')
+        self.ent_theme_json_dir = ctk.CTkEntry(master=frm_themes,
+                                               textvariable=self.tk_theme_json_dir,
+                                               width=320,
+                                               state='disabled')
+        self.ent_theme_json_dir.grid(row=2, column=0, columnspan=2, padx=(5, 10), pady=(0, 10), sticky='ew')
 
-        self.lbl_pref_theme_dir_disp = ctk.CTkLabel(master=frm_themes, text=self.theme_json_dir, justify="left",
-                                                    font=mod.REGULAR_TEXT)
-        self.lbl_pref_theme_dir_disp.grid(row=2, column=1, columnspan=5, padx=5, pady=5, sticky='w')
+        btn_theme_json_dir = ctk.CTkButton(master=frm_themes,
+                                           text='Browse…',
+                                           width=110,
+                                           height=30,
+                                           corner_radius=6,
+                                           border_width=1,
+                                           fg_color='transparent',
+                                           image=self.folder_open_icon,
+                                           compound='left',
+                                           command=self.preferred_json_location)
+        btn_theme_json_dir.grid(row=2, column=2, padx=(0, 10), pady=(0, 10), sticky='e')
 
         # Logging frame
         frm_logging = ctk.CTkFrame(master=frm_main, corner_radius=10)
@@ -662,6 +688,17 @@ class PreferencesDialog(ctk.CTkToplevel):
                                            preference_value=qa_application_scale_pct):
             log.log_error(log_text=f'Row miss updating preferences: scaling > qa_application')
 
+        icon_browser_scale_pct = self.opm_icon_browser_scaling.get()
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='scaling',
+                                           preference_name='icon_browser',
+                                           preference_value=icon_browser_scale_pct):
+            log.log_error(log_text=f'Row miss updating preferences: scaling > icon_browser')
+        if icon_browser_scale_pct != self.master.icon_browser_scaling_pct:
+            self.master.icon_browser_scaling_pct = icon_browser_scale_pct
+            if self.master.icon_browser_process and self.master.icon_browser_process.poll() is None:
+                self.master._stop_icon_browser_process()
+                self.master.launch_icon_browser()
+
         listener_port = self.opm_listener_port.get()
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='user_preference',
                                            preference_name='listener_port',
@@ -693,4 +730,4 @@ class PreferencesDialog(ctk.CTkToplevel):
          the themes JSON are to be stored/maintained."""
         self.new_theme_json_dir = Path(ctk.filedialog.askdirectory(initialdir=self.theme_json_dir))
         if str(self.new_theme_json_dir) != '.':
-            self.lbl_pref_theme_dir_disp.configure(text=self.new_theme_json_dir)
+            self.tk_theme_json_dir.set(str(self.new_theme_json_dir))

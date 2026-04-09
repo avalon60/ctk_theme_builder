@@ -9,12 +9,11 @@ PROG=$(basename $0)
 PROG_DIR=$(dirname $0)
 APP_HOME=$(realpath  ${PROG_DIR})
 APP_HOME=$(dirname ${APP_HOME})
-APP_ENV=${APP_HOME}/venv
-APP_UTILS=${APP_HOME}/utils
-APP_MODEL=${APP_HOME}/model
-APP_VIEW=${APP_HOME}/view
+APP_HOME=$(dirname ${APP_HOME})
+APP_ENV=${APP_HOME}/.venv
+APP_UTILS=${APP_HOME}/ctk_tb/utils
 
-export PYTHONPATH=${PYTHONPATH}:${APP_UTILS}:${APP_MODEL}:${APP_VIEW}
+export PYTHONPATH=${PYTHONPATH}:${APP_HOME}
 
 if [[ "${PROG}" == *\.sh ]]
 then

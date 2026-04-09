@@ -1,129 +1,147 @@
 #!/usr/bin/env bash
-#
-# Script to package up CTk Theme Builder
-#
+##############################################################################
+# Author: Clive Bostock
+#   Date: 7 Apr 2026
+#   Name: package.sh
+#  Descr: Build wheel-era release artefacts for CTk Theme Builder.
+##############################################################################
 set -euo pipefail
 
-PROG=$(basename "$0")
-ART_CODE="ctk_theme_builder"
-VERSION_FILE="model/ctk_theme_builder.py"
-
-if [ ! -f "${VERSION_FILE}" ]
-then
-  echo "Unable to locate file ${VERSION_FILE}!"
-  echo "Deploying chute and bailing out!"
-  exit 1
-fi
-
-APP_HOME=$(realpath "$0")
-APP_HOME=$(dirname "${APP_HOME}")
-APP_HOME=$(dirname "${APP_HOME}")
-cd "${APP_HOME}"
-
-app_version()
-{
-  head -30 "${VERSION_FILE}" | grep "__version__" | cut -f3 -d " " | sed 's/"//g'
-}
-
-export_requirements()
-{
-  if command -v poetry >/dev/null 2>&1
-  then
-    POETRY_CMD=(poetry)
-  elif [ -x "${HOME}/.local/bin/poetry" ]
-  then
-    POETRY_CMD=("${HOME}/.local/bin/poetry")
+realpath_fallback() {
+  if command -v realpath >/dev/null 2>&1; then
+    realpath "$1"
+  elif command -v readlink >/dev/null 2>&1; then
+    readlink -f "$1"
   else
-    POETRY_CMD=()
+    cd "$(dirname "$1")" && pwd
   fi
-
-  if [ ${#POETRY_CMD[@]} -eq 0 ]
-  then
-    echo "ERROR: Poetry is required on the build system to export requirements.txt."
-    echo "Install Poetry and rerun ${PROG}."
-    exit 1
-  fi
-
-  echo "Exporting requirements.txt from Poetry lock data..."
-  "${POETRY_CMD[@]}" export --format requirements.txt --without-hashes --output requirements.txt
 }
 
-display_usage()
-{
-  echo "Usage: ${PROG} -v <version_tag>"
+find_poetry() {
+  if command -v poetry >/dev/null 2>&1; then
+    echo "poetry"
+  elif [ -x "${HOME}/.local/bin/poetry" ]; then
+    echo "${HOME}/.local/bin/poetry"
+  else
+    echo ""
+  fi
+}
+
+display_usage() {
+  echo "Usage: $0 -v <version_tag>"
+  echo "       $0 -V"
   echo
   echo "Example:"
-  echo "  ./${PROG} -v 3.1.0"
-  exit
+  echo "  ./utils/package.sh -v 3.2.0"
+  echo "  ./utils/package.sh -V"
+  echo ""
+  echo "Use -V to obtain the version according to $(basename ${PYPROJECT_FILE}) (authoratative truth)."
+  exit 1
 }
 
-while getopts "v:l" options;
-do
-  case $options in
-    v) VERSION_TAG=${OPTARG};;
-    l) WRITE_LOG=Y;;
-    *) display_usage;
-       exit 1;;
-   \?) display_usage;
-       exit 1;;
+PROG_PATH=$(realpath_fallback "$0")
+PROG_DIR=$(dirname "${PROG_PATH}")
+APP_HOME=$(dirname "${PROG_DIR}")
+PROJECT_NAME="ctk-theme-builder"
+DIST_DIR="${APP_HOME}/dist"
+RELEASE_DIR="${DIST_DIR}/release"
+VERSION_FILE="${APP_HOME}/ctk_tb/model/ctk_theme_builder.py"
+PYPROJECT_FILE="${APP_HOME}/pyproject.toml"
+REQUIREMENTS_FILE="${APP_HOME}/requirements.txt"
+RELEASE_GUIDE="${APP_HOME}/docs/release-artefact-guide.md"
+
+while getopts "v:V" options; do
+  case "${options}" in
+    v) VERSION_TAG="${OPTARG}" ;;
+    V) SHOW_VERSION=Y ;;
+    *) display_usage ;;
   esac
 done
 
-app_vers=$(app_version)
-if [ "${VERSION_TAG:-}" != "${app_vers}" ]
-then
-  echo "ERROR: A version tag of \"${VERSION_TAG:-}\", when ${VERSION_FILE}, thinks that it is version \"${app_vers}\""
+POETRY=$(find_poetry)
+if [ -z "${POETRY}" ]; then
+  echo "ERROR: Poetry is required to package this project."
   exit 1
 fi
 
-echo -e "Application home: ${APP_HOME}\n"
-cd "${APP_HOME}"
-rm "${APP_HOME}"/log/*.log 2> /dev/null || true
-export_requirements
+pushd "${APP_HOME}" >/dev/null
 
-if [ -d ../stage/ctk_theme_builder ]
-then
-  rm -fr ../stage/ctk_theme_builder
+app_version() {
+  grep '__version__' "${VERSION_FILE}" | head -1 | cut -f3 -d " " | tr -d '"'
+}
+
+pyproject_version() {
+  grep '^version = ' "${PYPROJECT_FILE}" | head -1 | cut -f2 -d "=" | tr -d ' "'
+}
+
+if [ "${SHOW_VERSION:-N}" = "Y" ]; then
+  pyproject_version
+  popd >/dev/null
+  exit 0
 fi
-mkdir -p ../stage/ctk_theme_builder
-while IFS= read -r file
-do
-  cp -r "$file" ../stage/ctk_theme_builder
-done < utils/bom.lst
 
-# Make sure we don't include the SQLite3 database.
-rm -f ../stage/ctk_theme_builder/assets/data/*.db
-cd ../stage
-STAGE_LOC=$(pwd)
-cd ctk_theme_builder
-
-dos2unix *.py *.txt *.sh 2> /dev/null || true
-find assets -type f -exec dos2unix "{}" ";" 2> /dev/null || true
-
-cd user_themes
-dos2unix *.json 2> /dev/null || true
-cd ../assets
-for dir in *
-do
-  if [ ! -d "${dir}" ]
-  then
-    continue
-  fi
-  cd "${dir}"
-  dos2unix * 2> /dev/null || true
-  cd ..
-done
-
-cd "${STAGE_LOC}"
-echo -e "\nWorking from : $(pwd)"
-find ctk_theme_builder -name "__pycache__" -exec rm -r "{}" ";" 2> /dev/null || true
-arch_file="${ART_CODE}-${VERSION_TAG}.zip"
-echo "Creating artifact archive: ${arch_file}"
-if [ -f "${arch_file}" ]
-then
-  rm "${arch_file}"
+if [ -z "${VERSION_TAG:-}" ]; then
+  display_usage
 fi
-zip -r "${arch_file}" ctk_theme_builder
-rm -fr ../stage/ctk_theme_builder
-echo -e "\nArtefact written to: ${STAGE_LOC}/${arch_file}\n"
-echo "Done."
+
+APP_VERSION=$(app_version)
+PYPROJECT_VERSION=$(pyproject_version)
+
+if [ "${VERSION_TAG}" != "${APP_VERSION}" ]; then
+  echo "ERROR: Version tag ${VERSION_TAG} does not match ${VERSION_FILE} (${APP_VERSION})."
+  exit 1
+fi
+
+if [ "${VERSION_TAG}" != "${PYPROJECT_VERSION}" ]; then
+  echo "ERROR: Version tag ${VERSION_TAG} does not match ${PYPROJECT_FILE} (${PYPROJECT_VERSION})."
+  exit 1
+fi
+
+echo "App home: ${APP_HOME}"
+echo "Release version: ${VERSION_TAG}"
+
+rm -rf "${RELEASE_DIR}"
+mkdir -p "${RELEASE_DIR}"
+
+echo "Checking Poetry metadata..."
+"${POETRY}" check
+
+echo "Exporting requirements.txt..."
+"${POETRY}" export --format requirements.txt --without-hashes --only main --output "${REQUIREMENTS_FILE}"
+
+echo "Building sdist and wheel..."
+"${POETRY}" build
+
+WHEEL_FILE=$(find "${DIST_DIR}" -maxdepth 1 -type f -name "ctk_theme_builder-${VERSION_TAG}-*.whl" | head -1)
+SDIST_FILE=$(find "${DIST_DIR}" -maxdepth 1 -type f -name "ctk_theme_builder-${VERSION_TAG}.tar.gz" | head -1)
+
+if [ -z "${WHEEL_FILE}" ] || [ -z "${SDIST_FILE}" ]; then
+  echo "ERROR: Expected build artefacts were not produced in ${DIST_DIR}."
+  exit 1
+fi
+
+cp "${WHEEL_FILE}" "${RELEASE_DIR}/"
+cp "${SDIST_FILE}" "${RELEASE_DIR}/"
+cp "${REQUIREMENTS_FILE}" "${RELEASE_DIR}/"
+cp "${RELEASE_GUIDE}" "${RELEASE_DIR}/"
+
+pushd "${RELEASE_DIR}" >/dev/null
+sha256sum "$(basename "${WHEEL_FILE}")" "$(basename "${SDIST_FILE}")" requirements.txt release-artefact-guide.md > SHA256SUMS
+popd >/dev/null
+
+ARTEFACT_ZIP="${DIST_DIR}/${PROJECT_NAME}-${VERSION_TAG}-release.zip"
+rm -f "${ARTEFACT_ZIP}"
+
+pushd "${DIST_DIR}" >/dev/null
+zip -rq "$(basename "${ARTEFACT_ZIP}")" release
+popd >/dev/null
+
+echo
+echo "Built artefacts:"
+echo "  Wheel : ${WHEEL_FILE}"
+echo "  Sdist : ${SDIST_FILE}"
+echo "  Bundle: ${ARTEFACT_ZIP}"
+echo
+echo "Release contents staged in: ${RELEASE_DIR}"
+
+popd >/dev/null

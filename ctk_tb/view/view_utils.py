@@ -1,6 +1,6 @@
 from customtkinter import CTk, CTkToplevel
-from model.ctk_theme_builder import log_call
-import utils.loggerutl as log
+from ctk_tb.model.ctk_theme_builder import log_call
+import ctk_tb.utils.loggerutl as log
 
 
 @log_call

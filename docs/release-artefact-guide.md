@@ -1,6 +1,11 @@
 # Release Artefact Guide
 
-This project now uses Poetry for development dependency management, while deployment artefacts are still built as a ZIP package containing a generated `requirements.txt`.
+This project now uses Poetry for development dependency management and release building. The release flow produces:
+
+- a source distribution (`sdist`)
+- a wheel
+- a generated `requirements.txt`
+- a bundled release ZIP containing the above plus checksums and this guide
 
 ## Prerequisites
 
@@ -35,39 +40,39 @@ poetry export --format requirements.txt --without-hashes --output requirements.t
 
 ## 5. Confirm the application version matches the release version
 
-The packaging script checks the version in `model/ctk_theme_builder.py`.
+The packaging script checks the version in both:
+
+- `ctk_tb/model/ctk_theme_builder.py`
+- `pyproject.toml`
 
 Example check:
 
 ```bash
-rg "__version__" model/ctk_theme_builder.py
+rg "__version__" ctk_tb/model/ctk_theme_builder.py
+rg '^version = ' pyproject.toml
 ```
 
 ## 6. Build the release artefact
 
-Replace `3.1.0` with the version you are releasing.
+Replace `3.2.0` with the version you are releasing.
 
 ```bash
-./utils/package.sh -v 3.1.0
-```
-
-Compatibility wrapper:
-
-```bash
-./utils/tb-package.sh -v 3.1.0
+./utils/package.sh -v 3.2.0
 ```
 
 ## 7. Find the generated ZIP file
 
-The archive is written to the sibling `stage` directory:
+The build products are written under `dist/`.
 
 ```bash
-ls -l /home/clive/PycharmProjects/stage/ctk_theme_builder-3.1.0.zip
+ls -l /home/clive/PycharmProjects/ctk_theme_builder/dist
+ls -l /home/clive/PycharmProjects/ctk_theme_builder/dist/ctk-theme-builder-3.2.0-release.zip
 ```
 
 ## Notes
 
 - `requirements.txt` is generated from Poetry during packaging.
+- `poetry check` runs before the build.
+- `poetry build` produces both the wheel and source distribution.
+- The bundled release ZIP is assembled from `dist/release/`.
 - Poetry is required on the build machine only.
-- Poetry is not required on the target system.
-- The target deployment model remains based on the packaged ZIP and `requirements.txt`.

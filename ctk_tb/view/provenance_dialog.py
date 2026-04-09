@@ -2,10 +2,10 @@
 
 import customtkinter as ctk
 import tkinter as tk
-import model.ctk_theme_builder as mod
-from model.ctk_theme_builder import log_call
-import utils.cbtk_kit as cbtk
-import utils.loggerutl as log
+import ctk_tb.model.ctk_theme_builder as mod
+from ctk_tb.model.ctk_theme_builder import log_call
+import ctk_tb.utils.cbtk_kit as cbtk
+import ctk_tb.utils.loggerutl as log
 
 APP_IMAGES = mod.APP_IMAGES
 
