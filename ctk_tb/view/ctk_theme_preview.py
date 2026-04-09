@@ -32,7 +32,6 @@ TEMP_DIR = mod.TEMP_DIR
 VIEWS_DIR = mod.VIEWS_DIR
 APP_THEMES_DIR = mod.APP_THEMES_DIR
 APP_IMAGES = mod.APP_IMAGES
-LISTENER_FILE = mod.LISTENER_FILE
 APP_DATA_DIR = mod.APP_DATA_DIR
 DB_FILE_PATH = mod.DB_FILE_PATH
 
@@ -91,14 +90,6 @@ class PreviewPanel:
         self._VIEWS_DIR = ASSETS_DIR / 'views'
         self._palettes_dir = mod.PALETTES_DIR
         self._theme_json_dir = mod.APP_THEMES_DIR
-
-        # If the listener file exists, we assume someone has gone a bit
-        # bonkers, hitting the 'Refresh Preview' button. Things
-        # got complicated under Windows controlling this stuff, so
-        # this is a bit of a basic control mechanism, to avoid having
-        # to engineer a network ACK.
-        if LISTENER_FILE.exists():
-            exit(0)
 
         self._config_file = self._CONFIG_DIR / 'ctk_theme_maker.ini'
 
@@ -642,9 +633,6 @@ class PreviewPanel:
             self._save_preview_geometry()
             log.log_debug(log_text='Preview panel received quit command', class_name='PreviewPanel',
                           method_name='exec_program_command')
-            if LISTENER_FILE.exists():
-                os.remove(LISTENER_FILE)
-                log.log_debug('Listener file removed.')
             log.log_complete(class_name='PreviewPanel', supplementary_text='Theme Builder Preview Panel closed')
             exit(0)
         if command == 'refresh':
@@ -797,23 +785,28 @@ class PreviewPanel:
         while connected:
             header_frame = conn.recv(HEADER_SIZE).decode(ENCODING_FORMAT)
             # print(f'[ HEADER_FRAME ] <{header_frame}>')
-            if header_frame:
-                msg_length = int(header_frame)
-                command_json_str = conn.recv(msg_length).decode(ENCODING_FORMAT)
-                command_json = json.loads(command_json_str)
-                # print(command_json)
-                command_type = command_json['command_type']
-                command = command_json['command']
+            if not header_frame:
+                if conn in self._client_handlers:
+                    del self._client_handlers[conn]
+                connected = False
+                continue
 
-                if command == DISCONNECT_MESSAGE and command_type == 'program':
-                    if DEBUG:
-                        log.log_debug(f'[{address}] Session disconnected')
-                    if conn in self._client_handlers:
-                        del self._client_handlers[conn]
-                    connected = False
-                else:
-                    self._command_json = command_json
-                    self.preview.event_generate('<<exec_widget_command>>', when='tail')
+            msg_length = int(header_frame)
+            command_json_str = conn.recv(msg_length).decode(ENCODING_FORMAT)
+            command_json = json.loads(command_json_str)
+            # print(command_json)
+            command_type = command_json['command_type']
+            command = command_json['command']
+
+            if command == DISCONNECT_MESSAGE and command_type == 'program':
+                if DEBUG:
+                    log.log_debug(f'[{address}] Session disconnected')
+                if conn in self._client_handlers:
+                    del self._client_handlers[conn]
+                connected = False
+            else:
+                self._command_json = command_json
+                self.preview.event_generate('<<exec_widget_command>>', when='tail')
 
         conn.close()
         return
@@ -842,20 +835,8 @@ class PreviewPanel:
             listener_status = -1
             raise
         server.listen()
-        # current dateTime
-        now = datetime.now()
-        # convert to string
-        date_started = now.strftime("%b %d %Y %H:%M:%S")
-        log.log_debug(log_text='Preview Panel: Checking for listener file...',
-                      class_name='PreviewPanel', method_name='_method_listener')
-        if not LISTENER_FILE.exists():
-            log.log_debug('Preview Panel: Listener file missing, creating...',
-                          class_name='PreviewPanel', method_name='_method_listener')
-            with open(LISTENER_FILE, 'w') as f:
-                pid = os.getpid()
-                f.write(f'[{pid}] CTk Theme Builder listener started at: {date_started}')
-            log.log_info(f'Method listener successfully started',
-                         class_name='PreviewPanel', method_name='_method_listener')
+        log.log_info(f'Method listener successfully started',
+                     class_name='PreviewPanel', method_name='_method_listener')
         while True:
             log.log_debug(log_text='Waiting for a client request...', class_name='PreviewPanel',
                           method_name='_method_listener')

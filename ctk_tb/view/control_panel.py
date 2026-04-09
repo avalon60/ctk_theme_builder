@@ -43,7 +43,6 @@ HEADING4 = mod.HEADING4
 
 REGULAR_TEXT = cbtk.REGULAR_TEXT
 SMALL_TEXT = mod.SMALL_TEXT
-LISTENER_FILE = mod.LISTENER_FILE
 PROG_NAME = mod.PROG_NAME
 
 APP_HOME = mod.APP_HOME
@@ -117,14 +116,6 @@ class ControlPanel(ctk.CTk):
         self.new_theme_json_dir = None
         self.wip_json = None
 
-        if LISTENER_FILE.exists():
-            try:
-                os.remove(LISTENER_FILE)
-            except PermissionError:
-                log.log_critical(f'ERROR: Could not remove listener semaphore file, {LISTENER_FILE}.')
-                log.log_supplementary(f'Only one instance of {PROG_NAME}, should be running.')
-                exit(0)
-
         # Initialise class properties
         self.process = None
 
@@ -136,6 +127,8 @@ class ControlPanel(ctk.CTk):
         self.harmony_palette_running = False
         self.keystone_colour = None
         self.client_socket = None
+        self.widget_properties_render_job = None
+        self.is_closing = False
 
         self.properties_view = 'All'
         self.widget_attributes = DEFAULT_VIEW_WIDGET_ATTRIBUTES
@@ -275,8 +268,6 @@ class ControlPanel(ctk.CTk):
             log.log_warning(f'Preferred Control Panel, theme file not found. Falling back to "blue" theme.',
                             class_name='ControlPanel', method_name='__init__()')
         ctk.set_appearance_mode(self.control_panel_mode)
-
-        self.restore_controller_geometry()
 
         self.rowconfigure(3, weight=1)
         self.columnconfigure(0, weight=1)
@@ -536,8 +527,14 @@ class ControlPanel(ctk.CTk):
             if confirm.get() == 'OK':
                 exit(1)
 
-        self.load_theme()
+        self.load_theme(defer_widget_render=True)
+        self.after_idle(self._restore_startup_geometry)
         self.mainloop()
+
+    @log_call
+    def _restore_startup_geometry(self):
+        self.update_idletasks()
+        self.restore_controller_geometry()
 
     @log_call
     def block_window_close(self):
@@ -741,8 +738,17 @@ class ControlPanel(ctk.CTk):
     def launch_preferences_dialog(self):
         log.log_debug(log_text='Launching preferences dialogue',
                       class_name='ControlPanel', method_name='launch_preferences_dialog')
+        if self.is_closing:
+            return
         preferences_dialog = PreferencesDialog(master=self)
         self.wait_window(preferences_dialog)
+        if self.is_closing:
+            return
+        try:
+            if not self.winfo_exists():
+                return
+        except tk.TclError:
+            return
         action = preferences_dialog.action
         listener_port = mod.listener_port()
         self.update()
@@ -1639,7 +1645,7 @@ class ControlPanel(ctk.CTk):
             json.dump(self.theme_json_data, f, indent=2)
 
     @log_call
-    def load_theme(self, event=None, reload_preview: bool = True):
+    def load_theme(self, event=None, reload_preview: bool = True, defer_widget_render: bool = False):
         if self.json_state == 'dirty':
             confirm = CTkMessagebox(master=self,
                                     title='Confirm Action',
@@ -1682,7 +1688,10 @@ class ControlPanel(ctk.CTk):
         self.render_geometry_buttons()
         self.render_theme_palette()
         self.load_theme_palette()
-        self.set_filtered_widget_display()
+        if defer_widget_render:
+            self._schedule_widget_properties_render()
+        else:
+            self.set_filtered_widget_display()
 
         try:
             self.btn_refresh.configure(state=tk.NORMAL)
@@ -2149,6 +2158,32 @@ class ControlPanel(ctk.CTk):
         self.render_widget_properties()
 
     @log_call
+    def _schedule_widget_properties_render(self):
+        if self.widget_properties_render_job is not None:
+            try:
+                self.after_cancel(self.widget_properties_render_job)
+            except ValueError:
+                pass
+            self.widget_properties_render_job = None
+
+        for widget in self.frm_colour_edit_widgets.winfo_children():
+            widget.destroy()
+
+        placeholder = ctk.CTkLabel(
+            master=self.frm_colour_edit_widgets,
+            text='Loading colour mappings...',
+            anchor='w',
+            font=REGULAR_TEXT,
+        )
+        placeholder.grid(row=0, column=0, sticky='w', padx=10, pady=10)
+        self.widget_properties_render_job = self.after_idle(self._run_scheduled_widget_properties_render)
+
+    @log_call
+    def _run_scheduled_widget_properties_render(self):
+        self.widget_properties_render_job = None
+        self.render_widget_properties()
+
+    @log_call
     def property_colour_picker(self, event, widget_property):
         prev_colour = self.widgets[widget_property]["colour"]
         new_colour = askcolor(master=self, title='Pick colour for : ' + widget_property,
@@ -2559,6 +2594,7 @@ class ControlPanel(ctk.CTk):
                 return
             elif response == 'Yes':
                 self.save_theme()
+        self.is_closing = True
         log.log_debug(log_text=f'Close panels',
                       class_name='ControlPanel', method_name='close_panels')
         self._stop_icon_browser_process()
@@ -2593,15 +2629,13 @@ class ControlPanel(ctk.CTk):
                           method_name='launch_preview')
             self.process = sp.Popen(program)
             listener_started = False
-            # Wait for Preview Pamel to start the listener.
-            # We expect a semaphore file to be created when this
-            # is so.
             sleep_count = 0
+            listener_address = mod.method_listener_address()
             while not listener_started:
                 log.log_debug(log_text=f'Checking for a listener - try {sleep_count + 1}...', class_name='ControlPanel',
                               method_name='launch_preview')
                 sleep_count += 1
-                if LISTENER_FILE.exists():
+                if mod.wait_for_listener_socket(address=listener_address, timeout_s=0.05, retry_interval_s=0.05):
                     log.log_debug(log_text='Listener started', class_name='ControlPanel',
                                   method_name='launch_preview')
                     listener_started = True
@@ -2619,7 +2653,7 @@ class ControlPanel(ctk.CTk):
                                      method_name='launch_preview')
                     if confirm.get() == 'OK':
                         exit(1)
-                time.sleep(0.5)
+                time.sleep(0.05)
 
             log.log_info(log_text='Listener established', class_name='ControlPanel',
                          method_name='launch_preview')

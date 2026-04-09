@@ -33,6 +33,87 @@ FRM_TPADY = (FRM_PADY * 2, FRM_PADY)
 FRM_BPADY = (FRM_PADY, FRM_PADY * 2)
 
 
+class LogViewerDialog(ctk.CTkToplevel):
+
+    def __init__(self, *args, log_file_path: Path, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        self.log_file_path = log_file_path
+        self.title('Runtime Log')
+        self.geometry('980x620')
+        self.minsize(760, 460)
+
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=0)
+        self.columnconfigure(0, weight=1)
+
+        frm_main = ctk.CTkFrame(master=self, corner_radius=10)
+        frm_main.grid(row=0, column=0, padx=10, pady=10, sticky='nsew')
+        frm_main.rowconfigure(1, weight=1)
+        frm_main.columnconfigure(0, weight=1)
+
+        lbl_title = ctk.CTkLabel(master=frm_main,
+                                 text='Runtime Log',
+                                 justify='left',
+                                 font=mod.HEADING4)
+        lbl_title.grid(row=0, column=0, padx=10, pady=(10, 5), sticky='w')
+
+        self.txt_log = ctk.CTkTextbox(master=frm_main, wrap='none')
+        self.txt_log.grid(row=1, column=0, padx=10, pady=(0, 10), sticky='nsew')
+
+        frm_buttons = ctk.CTkFrame(master=self, corner_radius=0)
+        frm_buttons.grid(row=1, column=0, padx=0, pady=0, sticky='ew')
+        frm_buttons.columnconfigure(1, weight=1)
+
+        btn_close = ctk.CTkButton(master=frm_buttons, text='Close', command=self.close_dialog)
+        btn_close.grid(row=0, column=0, padx=(15, 0), pady=5, sticky='w')
+
+        self.clipboard_icon = cbtk.clipboard_icon(image_size=cbtk.SMALL_ICON_SIZE)
+        btn_copy = ctk.CTkButton(master=frm_buttons,
+                                 text='Copy',
+                                 image=self.clipboard_icon,
+                                 compound='left',
+                                 command=self.copy_log_contents)
+        btn_copy.grid(row=0, column=2, padx=(0, 15), pady=5, sticky='e')
+
+        self.status_bar = cbtk.CBtkStatusBar(master=self,
+                                             status_text_life=15,
+                                             use_grid=True)
+        self.bind("<Configure>", self.status_bar.auto_size_status_bar)
+        self.bind('<Escape>', self.close_dialog)
+
+        self._load_log_contents()
+        self.lift()
+        self.grab_set()
+
+    def _load_log_contents(self):
+        try:
+            log_contents = self.log_file_path.read_text(encoding='utf-8')
+        except FileNotFoundError:
+            log_contents = f'Log file not found:\n{self.log_file_path}'
+        except OSError as error:
+            log_contents = f'Unable to read log file:\n{self.log_file_path}\n\n{error}'
+
+        self.txt_log.configure(state='normal')
+        self.txt_log.delete('1.0', tk.END)
+        self.txt_log.insert('1.0', log_contents)
+        self.txt_log.configure(state='disabled')
+
+    def copy_log_contents(self):
+        log_contents = self.txt_log.get('1.0', tk.END).rstrip()
+        ok, error = cbtk.clipboard_copy(log_contents, self)
+        if ok:
+            self.status_bar.set_status_text('Runtime log copied to clipboard.')
+        else:
+            self.status_bar.set_status_text('Clipboard copy is unavailable on this system.')
+            log.log_warning(log_text=f'Clipboard copy unavailable: {error}',
+                            class_name='LogViewerDialog',
+                            method_name='copy_log_contents')
+
+    def close_dialog(self, event=None):
+        self.destroy()
+
+
 class PreferencesDialog(ctk.CTkToplevel):
 
     def __init__(self, *args, **kwargs):
@@ -117,6 +198,7 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.log_stderr = pref.preference_setting(scope='logger', preference_name='log_stderr', default="Yes")
 
         self.action = 'cancelled'
+        self.log_viewer = None
 
         self.new_theme_json_dir = self.theme_json_dir
         self.tk_theme_json_dir = tk.StringVar(value=str(self.theme_json_dir))
@@ -505,6 +587,16 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.lbl_log_size = ctk.CTkLabel(master=frm_logging, text=formatted_log_size, justify="right")
         self.lbl_log_size.grid(row=3, column=1, padx=PADX, pady=10, sticky='w')
 
+        btn_view_log = ctk.CTkButton(master=frm_logging, text='View Log', command=self.view_log, width=15)
+        btn_view_log.grid(row=2, column=3, padx=(15, 0), pady=5)
+
+        CTkToolTip(btn_view_log,
+                   border_width=1,
+                   justify="left",
+                   padding=(10, 10),
+                   corner_radius=6,
+                   message=f"Open the runtime log, located at:\n {logutl.LOG_DIR / logutl.RUNTIME_LOG}")
+
         btn_clear_log = ctk.CTkButton(master=frm_logging, text='Clear Log', command=self.clear_log, width=15)
         btn_clear_log.grid(row=3, column=3, padx=(15, 0), pady=5)
 
@@ -557,10 +649,22 @@ class PreferencesDialog(ctk.CTkToplevel):
                      method_name='clear_log')
 
     @log_call
+    def view_log(self, event=None):
+        if self.log_viewer is not None and self.log_viewer.winfo_exists():
+            self.log_viewer.lift()
+            self.log_viewer.focus()
+            return
+
+        self.log_viewer = LogViewerDialog(master=self,
+                                          log_file_path=logutl.LOG_DIR / logutl.RUNTIME_LOG)
+
+    @log_call
     def close_preferences(self, event=None):
         log.log_debug(log_text='Closing preferences dialogue',
                       class_name='PreferencesDialog',
                       method_name='close_preferences')
+        if self.log_viewer is not None and self.log_viewer.winfo_exists():
+            self.log_viewer.destroy()
         self.destroy()
 
     @log_call
@@ -722,6 +826,8 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.control_panel_mode = control_panel_mode
         self.tk_appearance_mode_var.set(self.control_panel_mode)
         self.action = 'saved'
+        if self.log_viewer is not None and self.log_viewer.winfo_exists():
+            self.log_viewer.destroy()
         self.destroy()
 
     @log_call

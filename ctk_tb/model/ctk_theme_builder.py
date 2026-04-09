@@ -675,6 +675,22 @@ METHOD_LISTENER_ADDRESS = method_listener_address()
 
 
 @log_call
+def wait_for_listener_socket(address=None, timeout_s: float = 5.0, retry_interval_s: float = 0.05) -> bool:
+    if address is None:
+        address = method_listener_address()
+
+    deadline = time.monotonic() + timeout_s
+    while time.monotonic() < deadline:
+        try:
+            client = socket.create_connection(address, timeout=retry_interval_s)
+            client.close()
+            return True
+        except (ConnectionRefusedError, OSError):
+            time.sleep(retry_interval_s)
+    return False
+
+
+@log_call
 def send_command_json(command_type: str, command: str, parameters: list = None):
     """Format our command into a JSON payload in string format. We have two command type. These are 'control' and
     'filter'. The parameters' parameter, can be used to accept a list to filter against, of a list to be used to pass
@@ -779,31 +795,18 @@ def prepare_message(message):
 
 @log_call
 def send_message(message):
-    listener_checks = 0
-    listener_started = False
-    while not listener_started:
-        if LISTENER_FILE.exists():
-            listener_started = True
-        else:
-            listener_checks += 1
-        if listener_checks > 50:
-            print('Timeout waiting for preview panel listener!')
-            exit(1)
-        time.sleep(0.1)
+    address = method_listener_address()
+    if not wait_for_listener_socket(address=address):
+        print(f'Timeout waiting for preview panel listener on {address}!')
+        exit(1)
 
     client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    connected = False
-    connect_tries = 0
-    while not connected:
-        try:
-            if connect_tries > 10:
-                print(f'Communication error sending message to preview panel, via {METHOD_LISTENER_ADDRESS}!')
-                exit(1)
-            connect_tries += 1
-            client.connect(METHOD_LISTENER_ADDRESS)
-            connected = True
-        except ConnectionRefusedError:
-            time.sleep(0.1)
+    try:
+        client.connect(address)
+    except OSError:
+        print(f'Communication error sending message to preview panel, via {address}!')
+        client.close()
+        exit(1)
 
     send_length, message = prepare_message(message)
     client.send(send_length)

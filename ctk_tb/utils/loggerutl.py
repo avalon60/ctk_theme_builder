@@ -77,7 +77,7 @@ logr.level("SUPPLEMENTARY", no=23, color=f"<{supplementary_colour}>", icon="")
 logr.remove()
 # log_format ='<green>{time:DD/MM/YYYY HH:mm:ss}</green> | <level>{level: <8}</level> | <cyan>{' \
 #             'name}</cyan>:<cyan>{function}</cyan>:<cyan>{line}</cyan> - <level>{message}</level>'
-log_format = '<green>{time:DD/MM/YYYY HH:mm:ss}</green> | <level>{level: <8}</level> | <level>{message}</level>'
+log_format = '<green>{time:DD/MM/YYYY HH:mm:ss.SSS}</green> | <level>{level: <8}</level> | <level>{message}</level>'
 
 if log_stamping.lower() == 'Yes':
     if inc_stderr == 'Yes':
@@ -91,7 +91,7 @@ else:
         logr.add(sink=sys.stderr, level=log_level_code,
                  format=log_format)
     logr.add(sink=Path(f"{LOG_DIR}/{log_filename}"), level=log_level_code,
-             format="{time: DD/MM/YYYY HH:mm:ss} | {level} | {message}")
+             format="{time:DD/MM/YYYY HH:mm:ss.SSS} | {level} | {message}")
     log = logr
 
 log.info(f'[lib.loggerutl] Logging enabled with a logging level of: {log_level_code}')

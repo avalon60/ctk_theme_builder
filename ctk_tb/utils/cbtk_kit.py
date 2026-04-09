@@ -31,6 +31,8 @@ REGULAR_TEXT = ('Roboto', 13)
 
 SMALL_TEXT = ('Roboto', 8)
 TOOLTIP_DELAY = 1
+DEFAULT_ICON_SIZE = (21, 21)
+SMALL_ICON_SIZE = (18, 18)
 
 
 def hex2rgb(hex_color: str) -> tuple:
@@ -263,7 +265,7 @@ def _fontawesome_icon(
 
 
 def rotate_right_icon(
-    image_size: tuple = (21, 21),
+    image_size: tuple = DEFAULT_ICON_SIZE,
     light_color: str = "#1f1f1f",
     dark_color: str = "#f2f2f2",
     stroke_width: int = 2,
@@ -297,7 +299,7 @@ def rotate_right_icon(
 
 
 def rotate_left_icon(
-    image_size: tuple = (21, 21),
+    image_size: tuple = DEFAULT_ICON_SIZE,
     light_color: str = "#1f1f1f",
     dark_color: str = "#f2f2f2",
     stroke_width: int = 2,
@@ -331,7 +333,7 @@ def rotate_left_icon(
 
 
 def backward_fast_icon(
-    image_size: tuple = (21, 21),
+    image_size: tuple = DEFAULT_ICON_SIZE,
     light_color: str = "#1f1f1f",
     dark_color: str = "#f2f2f2",
 ):
@@ -364,7 +366,7 @@ def backward_fast_icon(
 
 
 def folder_open_icon(
-    image_size: tuple = (21, 21),
+    image_size: tuple = DEFAULT_ICON_SIZE,
     light_color: str = "#1f1f1f",
     dark_color: str = "#f2f2f2",
 ):
@@ -410,6 +412,35 @@ def eye_icon(
         draw.ellipse((width * 0.35, height * 0.3, width * 0.65, height * 0.7), fill=colour)
         draw.arc((2, 3, width - 2, height - 3), start=15, end=165, fill=colour, width=stroke_width)
         draw.arc((2, 1, width - 2, height - 1), start=195, end=345, fill=colour, width=stroke_width)
+        return image
+
+    return ctk.CTkImage(
+        light_image=_build_icon(light_color),
+        dark_image=_build_icon(dark_color),
+        size=image_size,
+    )
+
+
+def clipboard_icon(
+    image_size: tuple = DEFAULT_ICON_SIZE,
+    light_color: str = "#1f1f1f",
+    dark_color: str = "#f2f2f2",
+):
+    """Return a small clipboard icon suitable for CTk buttons."""
+
+    icon = _fontawesome_icon("clipboard", image_size, light_color, dark_color)
+    if icon is not None:
+        return icon
+
+    def _build_icon(colour: str) -> Image.Image:
+        width, height = image_size
+        image = Image.new("RGBA", image_size, (0, 0, 0, 0))
+        draw = ImageDraw.Draw(image)
+
+        draw.rounded_rectangle((5, 5, width - 4, height - 3), radius=2, outline=colour, width=2)
+        draw.rounded_rectangle((width * 0.3, 2, width * 0.7, 7), radius=2, outline=colour, width=2)
+        draw.line((8, 10, width - 7, 10), fill=colour, width=2)
+        draw.line((8, 14, width - 7, 14), fill=colour, width=2)
         return image
 
     return ctk.CTkImage(
