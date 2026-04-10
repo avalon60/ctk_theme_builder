@@ -1,13 +1,30 @@
 [project]
 name = "ctk-theme-builder"
 version = "3.2.0"
-description = "CTk Theme Builder development environment managed by Poetry."
+description = "A desktop theme editor for building and previewing CustomTkinter themes."
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
 authors = [
   { name = "Clive Bostock" },
 ]
 license = "MIT"
+keywords = ["customtkinter", "tkinter", "theme", "gui", "desktop"]
+classifiers = [
+  "Development Status :: 5 - Production/Stable",
+  "Environment :: X11 Applications",
+  "Environment :: Win32 (MS Windows)",
+  "Environment :: MacOS X",
+  "Intended Audience :: Developers",
+  "Operating System :: MacOS",
+  "Operating System :: Microsoft :: Windows",
+  "Operating System :: POSIX :: Linux",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Topic :: Software Development :: User Interfaces",
+]
 dependencies = [
   "colorharmonies==1.0.5",
   "colour==0.1.5",
@@ -40,6 +57,8 @@ dependencies = [
 
 [project.urls]
 Homepage = "https://github.com/avalon60/ctk_theme_builder"
+Repository = "https://github.com/avalon60/ctk_theme_builder"
+Issues = "https://github.com/avalon60/ctk_theme_builder/issues"
 
 [project.scripts]
 ctk-theme-builder = "ctk_tb.controller.ctk_theme_builder:main"
