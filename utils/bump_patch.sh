@@ -1,7 +1,17 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PROG_PATH=$(realpath "$0")
+realpath_fallback() {
+  if command -v realpath >/dev/null 2>&1; then
+    realpath "$1"
+  elif command -v readlink >/dev/null 2>&1; then
+    readlink -f "$1"
+  else
+    cd "$(dirname "$1")" && pwd
+  fi
+}
+
+PROG_PATH=$(realpath_fallback "$0")
 PROG_DIR=$(dirname "${PROG_PATH}")
 APP_HOME=$(dirname "${PROG_DIR}")
 cd "${APP_HOME}"

@@ -33,14 +33,14 @@ Key features include:
 
 
 ### CustomTkinter Version
-Version 3.2 of CTk Theme Builder was designed around CustomeTkinter 5.2.0. Any behaviours / features described herein, are based upon this version. When you install CTk Theme Builder, it will install library modules into a virtual environment. Included in this will be CustomTkinter 5.2.0. If you upgrade, or downgrade the installed CustomTkinter version, this may have unpredictable results.
+Version 3.2 of CTk Theme Builder was designed around CustomTkinter 5.2.2. Any behaviours / features described herein are based upon this version. When you install CTk Theme Builder, it will install library modules into a virtual environment. Included in this will be CustomTkinter 5.2.2. If you upgrade, or downgrade the installed CustomTkinter version, this may have unpredictable results.
 
 ## Fundamentals
 
 ### Primary Panels
 There are two main panels, the *Control Panel* and the *Preview Panel*. There are a sections in the guide, which cover these panels as well as other dialogues.
 
-![CTkThemeBuilder-about](https://github.com/avalon60/ctk_theme_builder/assets/89534395/30bf2f6b-47fe-46f0-a656-d74e7772abe9)
+![CTkThemeBuilder-about](CTkThemeBuilder-about.png)
 
 
 The job of the *Control Panel* is to present necessary interface controls, giving you the means to create and manage the appearance of your theme. The controls comprise the main control function along the left side of the panel. The main bulk of the *Control Panel* window, is comprised of property tiles used to assign colours to the theme palette and to individual widget properties. There are also a number of buttons near the top, which allow you to select individual widget types, so that you can adjust the theme geometry properties (corner radius, border width etc) of the CustomTkinter widgets. 
@@ -58,7 +58,7 @@ Copy and Paste functions are accessible via a floating menu, which activates whe
 ### Colour Picker
 Right clicking a colour tile, on any update-able tile, will cause a floating menu to appear. Included on the menu is a *Colour Picker* option. When selected a pop-up will appear, allowing you to choose, or paste a colour.
 
-![colour-picker](https://github.com/avalon60/ctk_theme_builder/assets/89534395/e5ecbb83-c875-47b7-9320-aedad20d30ef)
+![colour-picker](colour-picker.png)
 
 When the colour picker appears, the initial colour will automatically reflect the colour of the tile, from which it was invoked.
 
@@ -73,14 +73,14 @@ When working your themes, you work / see, one appearance mode of a theme, at any
 ### Concurrency
 CTk Theme Builder's control panel, communicates with the preview panel, via sockets. By default the listener port used by the preview panel, is 5051. You can only run one instance of CTk Theme Builder at a time using a given socket.  If you attempt to run two instances of CTk Theme Builder on the same computer, with the same socket, you will see a timeout message similar to the one seen here:
 
-![timeout](https://github.com/avalon60/ctk_theme_builder/assets/89534395/9a62b01f-1993-4933-adb2-142697e255f1)
+![timeout](timeout.png)
 
 You can however change the *Listener Port* in the *Preferences* dialogue. This will then allow you to run another instance of CTk Theme Builder, from a different install location, if required. It also offers you some latitude, in the event that the default port is in use, by another program.
 
 # Menus
 As you have possibly noticed, when you launch CTk Theme Builder, the control panel has a menu toolbar. This includes a *File* menu as well as a *Tools* menu, as we see here:
 
-![main-menus](https://github.com/avalon60/ctk_theme_builder/assets/89534395/002721c9-422a-430f-98a8-6a7236e8dbfd)
+![main-menus](main-menus.png)
 
 Note that these are presented differently on MacOS.
 
@@ -89,7 +89,7 @@ The options of the File menu, bear a close correspondence to the buttons display
 ## The File Menu
 
 
-![file-menu](https://github.com/avalon60/ctk_theme_builder/assets/89534395/ad7475fb-39d4-4e53-bd4e-acf3ed5dc89a)
+![file-menu](file-menu.png)
 
 When you first start CTk Theme Builder, if you don't have a theme selected, you will find that most of the *File* menu options are disabled. They only become enabled when you start working on a theme.
 
@@ -105,7 +105,7 @@ This option allows you to swap around the Light mode colour properties, with tho
 #### Provenance
 The _File_ menu also includes a _Provenance_ option, which provides details of who created the theme, as well as other details, as we can see here:
 
-![Provenance](https://github.com/avalon60/ctk_theme_builder/assets/89534395/2c844dcb-7479-4725-ba70-405cae9d0e4c)
+![Provenance](Provenance.png)
 
 #### Launch QA App
 This option becomes available when you open a theme. 
@@ -118,7 +118,7 @@ A key distinction here, is that the QA app does not employ any frames embedded w
 
 When you select this menu option, the QA app is launched, and renders based upon the current state of your work in progress theme. Make a change and re-launch the QA app and you can see the effect. You don't need to perform a Save operation of your theme, to review the effect of your changes. Here is an example screen shot:
 
-![qa_application](https://github.com/avalon60/ctk_theme_builder/assets/89534395/8584cd7d-5f51-4e3a-b1f8-545bf6ca4cd6)
+![qa_application](qa_application.png)
 
 The default UI Scaling for the QA application, is a setting of 80%. The scale can be modified within the Preferences dialogue. This is accessible via the *Control Panel, Tools* menu.
 
@@ -129,25 +129,47 @@ The QA application, once launched is semi-autonomous; You can close it via the _
 
 ## Tools Menu
 
-![tools-menu](https://github.com/avalon60/ctk_theme_builder/assets/89534395/da6da554-56fd-4bb8-9131-6c4a89deac4c)
+![tools-menu](tools-menu.png)
 
 The *Tools* menu provides access to:
 
 1. User Preferences
 2. Colour Harmonics dialogue
 3. Merge Themes
-4. About (CTk Theme Builder)
+4. Browse Icons
+5. About (CTk Theme Builder)
 
 The Colour Harmonics option is only enabled, when you start working on a theme.
 
 Each of these options, are covered in their own dedicated section of the guide. 
 
 
+### Browse Icons
+The *Browse Icons* option is accessed via the *Tools -> Browse Icons* menu selection.
+
+This launches the *Icon Browser*, which provides a convenient way to browse the Font Awesome icons available for use within CTk Theme Builder and other CustomTkinter applications.
+
+The icons are provided via the `ctkfontawesome` Python module. This is CustomTkinter-aware and supports `CTkImage`, making it suitable for use in CustomTkinter buttons and other widgets where DPI-aware image handling is desirable.
+
+The browser is intended to help you:
+
+* Search for icons by name;
+* Preview an icon before using it;
+* Copy the selected icon name to the clipboard;
+* Copy a ready-made code snippet to the clipboard, for use in your own program.
+
+The icon list is filterable, so you can type a partial name and quickly narrow the displayed entries. Selecting an icon updates the preview panel within the browser and shows the currently selected icon name.
+
+The browser is launched as a separate utility window, and like the other CTk Theme Builder panels, its geometry is remembered between sessions. It also has its own scaling preference, which can be adjusted via the *Preferences* dialogue.
+
+If you are using the browser to help develop your own CustomTkinter programs, it can be a quick way to experiment with icon names without having to repeatedly edit and re-run code.
+
+
 ### Preferences
 The Preferences dialogue is accessed via the *Tools->Preferences* menu option.
 The preferences screen will appear something like this:
 
-![preferences](https://github.com/avalon60/ctk_theme_builder/assets/89534395/f5e8b00b-a725-4cfe-b635-2f0ddfdb112c)
+![preferences](preferences.png)
 
 When you start CTk Theme Builder for the very first time, the theme will be set to _GreyGhost_, as we see in the above image.
 
@@ -174,7 +196,7 @@ By default tooltips are enabled. The application is quite generous with tooltips
 #### Confirm cascade
 The Confirm cascade switch, when enabled, causes a pop-up dialogue, whenever a Cascade colours option is selected from the floating menu of one of the  Theme Palette tiles (by right clicking the tile). 
 
-![cascade-confirm](https://github.com/avalon60/ctk_theme_builder/assets/89534395/60d2c903-250c-40ec-a6f0-8fb6d067c2be)
+![cascade-confirm](cascade-confirm.png)
 
 The dialogue informs of the widget properties, which will be updated to the tile colour, and asks whether you wish to proceed or not. 
 
@@ -184,7 +206,7 @@ If the switch is disabled, then the colour cascade function proceeds without int
 If you wish to save some real-estate, you can disable colour palette labels.
 By default they are enabled, and you should see something similar to what is shown here:  
   
-![palette-labels](https://github.com/avalon60/ctk_theme_builder/assets/89534395/f5545f81-c2a0-4b1f-befe-f6b816d37a77)
+![palette-labels](palette-labels.png)
 
 #### Logfile  
 A runtime log is written to the `~/CTkThemeBuilder/logs` directory.
@@ -199,8 +221,8 @@ Generally you should  have this set to *Info*, or one of the choices further dow
 #### Log to Stderr
 If enabled, then log entries are duplexed to the terminal. Note that this assumes that you are running from a command window.
 
-#### Load Latest Theme
-If enabled, this causes the last theme you were working on to be automatically opened, when you next start CTk Theme Builder.
+#### Load Last Theme
+If enabled, this causes the last theme you were working on to be automatically opened when you next start CTk Theme Builder.
 
 
 Linux users should be aware that by default the clipboard contents are emptied if the application is closed. However, there are tools such as *Clipboard Manager*, which can prevent this.
@@ -225,17 +247,22 @@ Here you can adjust the Widget Scaling of the QA (Quality Assurance) application
 
 Note that you may wish to resize the _QA App_ window, when the change is made. Once resized, CTk Theme Builder will remember the sizing, and display position, when you next start the app. 
 
+#### Icon Browser Scaling
+Here you can adjust the Widget Scaling of the Icon Browser. This scaling is applied when you launch the browser from the *Tools* menu. If the browser is already open when you save the preference, it will be restarted so that the new scaling takes effect.
+
+As with the other utility windows, you may wish to resize the browser after changing the scaling. CTk Theme Builder will remember the window geometry for future sessions.
+
 #### Adjust Shade Step
 This setting allows you to tune the shade step options, which are available when you right click a colour tile. The larger the value chosen, the bigger the colour shade step applied, when the *Lighten Shade/Darken Shade*options are selected.
 
-![shade-steps](https://github.com/avalon60/ctk_theme_builder/assets/89534395/dd1add47-c160-4aaa-998a-24b8f7dd25d3)
+![shade-steps](shade-steps.png)
 
 *Shade Steps* influence the behaviour demonstrated in the above image, which is taken from the *Colour Mappings* region of the *Control Panel*. This is covered later, in the *Control Panel* section. 
 
 #### Harmony Shade Step
 This setting allows you to tune the behaviour of the colours generated in the Colour Harmonics dialogue. The larger the selected value, the bigger the difference in consecutive shades generated to the right side of the dialogue.
 
-![harmonics](https://github.com/avalon60/ctk_theme_builder/assets/89534395/26160748-c1c9-4d6c-9829-715522932459)
+![harmonics](harmonics.png)
 
 The *Harmonics Panel* is covered a little later.
 
@@ -245,7 +272,7 @@ This drop-down, allows you to choose which networking port, the application shou
 If you are wanting to run two instances (separate install locations) of CTk Theme Builder, at the same time, they cannot run on the same port number.
 
 #### Themes Location
-The default folder for storing your themes, is the ctk\_theme\_builder/user_themes folder. However you can elect to change this by clicking the Themes Folder icon. This will allow you to navigate to, and select an alternative location.
+The default folder for storing your themes is `~/CTkThemeBuilder/themes`. However you can elect to change this by using the *Browse...* button beside the *Themes Location* field. This will allow you to navigate to, and select an alternative location.
 
 NOTE: If you change the theme location at any time, you will need to manually copy / paste your themes from the old location, to the new location, as required.  
 
@@ -257,7 +284,7 @@ The *Colour Harmonics* panel, is accessed via the *Tools* menu, and only becomes
 The idea behind it, is that you can generate colours, around which you can base a new theme.
 
 
-![harmonics](https://github.com/avalon60/ctk_theme_builder/assets/89534395/26160748-c1c9-4d6c-9829-715522932459)
+![harmonics](harmonics.png)
 
 
 Amongst other functions, right clicking the *Keystone Colour* tile, presents a *Paste* option, allowing you to seed a hex colour code, which is then used to generate complementary colours. The core generated colours are rendered below the Keystone Colour* on the left. 
@@ -292,7 +319,7 @@ The *Tag Keystone* button, causes the Keystone colour and the chosen harmony met
 ### Merge Themes
 The *Merge Themes* function allows you to create a new theme based upon two existing themes. It allows to to choose an appearance mode from each of the two selected themes, and combine them into a new theme. The dialogue looks like this:  
 
-![merge-themes](https://github.com/avalon60/ctk_theme_builder/assets/89534395/b83e52af-64fe-4376-957f-b13271e3b6f5)
+![merge-themes](merge-themes.png)
 
 As you can see, you can select the appearance mode required from each of your selected themes.
  
@@ -304,7 +331,7 @@ The new theme adopts all non-color properties from the primary theme selection.
 
 About the About dialogue...
 
-![about](https://github.com/avalon60/ctk_theme_builder/assets/89534395/e37d58b7-6e6b-4291-acb5-77d64f22c5d5)
+![about](about.png)
 
 This is accessible, via the Tools menu.  
 
@@ -314,7 +341,7 @@ If you are creating an issue on GitHub, you should quote the reported versions o
 
 # Control Panel
 
-![control-panel2](https://github.com/avalon60/ctk_theme_builder/assets/89534395/04ea2241-2467-4fb1-8ab2-3fbdcffa9856)
+![control-panel2](control-panel2.png)
 
 Here we see the Control Panel. This is where the real work goes on. 
 
@@ -421,7 +448,7 @@ NOTE: You should use the CTk Theme Builder app to delete unwanted theme files. D
 ## Widget Geometry
 The *Widget Geometry* buttons allow you to target a particular widget type, and adjust its geometry properties (corner radius, border width etc).
 
-![geometry-dialog](https://github.com/avalon60/ctk_theme_builder/assets/89534395/2651f55e-8281-44b8-8c31-f7cf760eb228)
+![geometry-dialog](geometry-dialog.png)
 
 
 To make adjustments, move the sliders and the rendered widget will respond, to provide a mini-preview or the effects of your changes.
@@ -447,19 +474,19 @@ An inclusion to the floating menu, is the *Cascade colours* option. Depending on
 *Cascade colours* does a lot of heavy lifting, especially in the early stages of theme development. 
 As an example, consider the current border settings here:
 
-![cascade1](https://github.com/avalon60/ctk_theme_builder/assets/89534395/00bf2392-2549-485a-ad6a-219f1fe6177d)
+![cascade1](cascade1.png)
 
 Note that the border colour in the theme palette is a shade of grey. 
 
 By right clicking the grey tile we see the Cascade colour option:
-![cascade2](https://github.com/avalon60/ctk_theme_builder/assets/89534395/69f218b3-009f-4659-9ef8-2cabc0aa453d)
+![cascade2](cascade2.png)
 When selected we are prompted to confirm the action (you can disable the confirmation in _Preferences_, if desired):
 
-![cascade3](https://github.com/avalon60/ctk_theme_builder/assets/89534395/174d9f36-62ab-410c-a208-c20352232292)
+![cascade3](cascade3.png)
 
 Now with the one extra click, we get:
 
-![cascade4](https://github.com/avalon60/ctk_theme_builder/assets/89534395/e0b77031-12c2-45cd-8bdc-fd5adc889eda)
+![cascade4](cascade4.png)
 There are cascade options available for all the palette tiles, excepting the Scratch tiles. So for example, the Button tile colour, can be applied to button color, of all widgets with a button.
 
 This last feature is arguably, one of the most powerful features of CTk Theme Builder.
@@ -470,7 +497,7 @@ Here is where you target and manage individual widget colour properties. This re
 
 As with the *Theme Palette* tiles, floating menus are available, which allow you to perform operations, as we see here:  
   
-![floating-menu](https://github.com/avalon60/ctk_theme_builder/assets/89534395/8696d5f7-292a-4272-8fed-f506f58878eb)
+![floating-menu](floating-menu.png)
 
 #### Shade Adjustment Operations  
 The *Lighter Shade/Darker Shade* options, cause incremental adjustments in the shade of the colour, based upon the *Adjust Shade Step* setting, as described under user *Preferences*. 
@@ -479,7 +506,7 @@ As you can see there are multiplier options, which allow you to magnify the shad
 
 The *Lighter Shade/Darker Shade* controls maintain the differential between the RGB channels. This means that as soon as one of the channels touches the min or max allowed values (decimal 0, 255), further adjustments have no effect.
 
-![colour-differental-bound](https://github.com/avalon60/ctk_theme_builder/assets/89534395/537b7c7e-3473-43b8-bf82-82ca16df2de5)
+![colour-differental-bound](colour-differental-bound.png)
 
 So in the colour example above, we can see that the red channel is maxed out (0xff = 255). This would therefore block any Lighter Shade operations from having any effect. This is done, to prevent the colour from mutating.
 
@@ -490,7 +517,7 @@ By using the right mouse click, you can also Copy / Paste colours between tiles.
 # Preview Panel
 The *Preview Panel* is launched as soon as a theme is opened. This panel listens for instructions, sent by the *Control Panel*, which tell it what widget   properties, to adjust within the display. It's job, is to make the task of maintaining themes as WYSIWYG as possible.
 
-![image](https://github.com/avalon60/ctk_theme_builder/assets/89534395/cd0003b7-6b94-4efa-bef3-c778084b8d26)
+![image](preview-panel.png)
 
 
 Whenever you change a widget property, whether that be a colour property or a property relating to the widget's geometry, a message is sent to the *Preview Panel*, instructing it as to what needs updating.
@@ -499,7 +526,7 @@ The only way to close the *Preview Panel* is via the *Quit* button, on the *Cont
 
 Please refer to *Known Issues & Behaviours* for details on some behaviours of the *Preview Panel*.
 
-The second CTkButton on the preview panel included an icon (eye-con), which shows as black when the appearance mode is set to Light, and white when the the appearance mode is set to Dark. This is to help you design in colours, with icons in mind, ensuring that your colours don't obscure icons.
+The second CTkButton on the preview panel includes an eye icon, which shows as black when the appearance mode is set to Light, and white when the appearance mode is set to Dark. This is to help you design with icons in mind, ensuring that your colours don't obscure them.
 
 
 # Composite Widgets
@@ -513,15 +540,18 @@ As you can guess by the name, this is an extension of the CTkFrame widget. With 
 
 The CTkTabview widget is a composite of CTkFrame and CTkSegmentedButton. It has no properties of its own in a theme file and so inherits its defaults from these two widget types.
 
-# What's New in CTk Theme Builder 2.5
+# What's New in CTk Theme Builder 3.2
 
-Logging implemented to CTk Theme Builder application;
-Improvements to the installation routines (including installation log).
+Wheel-based deployment support;
+Separation of installed application files from user data under `~/CTkThemeBuilder`;
+Icon Browser added to the *Tools* menu;
+Independent Icon Browser scaling preference;
+Runtime logging improvements, including the built-in log viewer.
 
 
 ### Fixes
 
-* Corrected a Listener timeout pup-up dialogue, which was incorrectly labelled, indicating an incorrect CustomTkinter version had been installed. 
+* Corrected a Listener timeout pop-up dialogue, which was incorrectly labelled, indicating an incorrect CustomTkinter version had been installed.
 
 # Known Issues and Behaviours
 
@@ -531,11 +561,11 @@ Improvements to the installation routines (including installation log).
 There is currently no method or theme property, to set disabled text colour for CTkLabel. When disabled, it currently defaults to what is presumably the underlying Tkinter default. An issue has been raised and it looks like a fix will be made available.
 
 #### CTkSlider Configure button_corner_radius
-An issue has been raised on the CustomTkinter, GITHub repository where CTkSlider.configure(button_corner_radius=...) is called
+An issue has been raised on the CustomTkinter GitHub repository where `CTkSlider.configure(button_corner_radius=...)` is called.
 
 *CTk 5.2.0: Exception encountered when configuring CTkSlider, button_corner_radius* #1790. A fix is pending.
 
-For the time being, adjustments to the button corner radius of CTkSlider, have no visual effect inside the geometry pup up. You can however set a value, save it and hit the *Refresh* button, to preview the effect in the *Preview Panel*. 
+For the time being, adjustments to the button corner radius of CTkSlider have no visual effect inside the geometry pop-up. You can however set a value, save it and hit the *Refresh* button, to preview the effect in the *Preview Panel*.
 
 #### CTkSlider Configure button_length
 Adjusting the button length causes:
@@ -545,7 +575,7 @@ Adjusting the button length causes:
 
 This has been raised as Issue #1905, [https://github.com/TomSchimansky/CustomTkinter/issues/1905](https://github.com/TomSchimansky/CustomTkinter/issues/1905)
 As a partial workaround, CTk Theme Builder, forces a refresh of the Preview Panel, so that the effect of the adjustment can be seen. 
-However, you will not see the changes in rel time, within the CTkSlider geometry dialogue.
+However, you will not see the changes in real time within the CTkSlider geometry dialogue.
 
 #### DropdownMenu
 

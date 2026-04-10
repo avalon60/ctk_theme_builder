@@ -31,8 +31,8 @@ REGULAR_TEXT = ('Roboto', 13)
 
 SMALL_TEXT = ('Roboto', 8)
 TOOLTIP_DELAY = 1
-DEFAULT_ICON_SIZE = (21, 21)
-SMALL_ICON_SIZE = (18, 18)
+DEFAULT_ICON_SIZE = (18, 18)
+SMALL_ICON_SIZE = (16, 16)
 
 
 def hex2rgb(hex_color: str) -> tuple:
