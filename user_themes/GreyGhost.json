@@ -59,8 +59,8 @@
       "#2b3449"
     ],
     "text_color_disabled": [
-      "#2b3449",
-      "#2b3449"
+      "#66707d",
+      "#66707d"
     ]
   },
   "CTkEntry": {
@@ -222,8 +222,8 @@
       "#ffffff"
     ],
     "text_color_disabled": [
-      "#c0c2c4",
-      "#cfd1d3"
+      "#5f6a78",
+      "#d5d9dd"
     ]
   },
   "CTkComboBox": {
@@ -250,8 +250,8 @@
       "#ffffff"
     ],
     "text_color_disabled": [
-      "#dcdee0",
-      "#d7d9db"
+      "#56616f",
+      "#d5d9dd"
     ]
   },
   "CTkScrollbar": {
@@ -295,8 +295,8 @@
       "#2b3449"
     ],
     "text_color_disabled": [
-      "#3a4454",
-      "#495363"
+      "#596372",
+      "#66707d"
     ]
   },
   "CTkTextbox": {

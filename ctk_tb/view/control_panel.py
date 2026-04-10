@@ -109,7 +109,7 @@ class ControlPanel(ctk.CTk):
         self.icon_browser_process = None
         self.undo_icon = cbtk.rotate_left_icon()
         self.redo_icon = cbtk.rotate_right_icon()
-        self.reset_icon = cbtk.backward_fast_icon()
+        self.reset_icon = cbtk.backward_fast_icon(image_size=cbtk.SMALL_ICON_SIZE)
 
         icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
         self.iconphoto(False, icon_photo)

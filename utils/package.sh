@@ -35,7 +35,7 @@ display_usage() {
   echo "  ./utils/package.sh -v 3.2.0"
   echo "  ./utils/package.sh -V"
   echo ""
-  echo "Use -V to obtain the version according to $(basename ${PYPROJECT_FILE}) (authoratative truth)."
+  echo "Use -V to obtain the version according to $(basename ${PYPROJECT_FILE}) (authoritative truth)."
   exit 1
 }
 

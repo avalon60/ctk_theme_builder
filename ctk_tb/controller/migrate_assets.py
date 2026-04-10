@@ -8,7 +8,11 @@ import sqlite3
 import sys
 from pathlib import Path
 
-from ctk_tb import paths as app_paths
+USER_DATA_HOME = Path.home() / "CTkThemeBuilder"
+THEMES_DIR = USER_DATA_HOME / "themes"
+PALETTES_DIR = USER_DATA_HOME / "palettes"
+STATE_DIR = USER_DATA_HOME / "state"
+DB_FILE_PATH = STATE_DIR / "ctk_theme_builder.db"
 
 
 def preference_value(db_file_path: Path, scope: str, preference_name: str) -> str | None:
@@ -59,13 +63,13 @@ def legacy_paths(legacy_install_root: Path) -> tuple[Path, Path, Path]:
 
 def target_theme_dir() -> Path:
     current_theme_dir_pref = preference_value(
-        db_file_path=app_paths.DB_FILE_PATH,
+        db_file_path=DB_FILE_PATH,
         scope="user_preference",
         preference_name="theme_json_dir",
     )
     if current_theme_dir_pref:
         return Path(current_theme_dir_pref).expanduser()
-    return app_paths.THEMES_DIR
+    return THEMES_DIR
 
 
 def copy_if_missing(source_file: Path, target_file: Path) -> bool:
@@ -74,6 +78,11 @@ def copy_if_missing(source_file: Path, target_file: Path) -> bool:
     target_file.parent.mkdir(parents=True, exist_ok=True)
     shutil.copy2(source_file, target_file)
     return True
+
+
+def copy_with_overwrite(source_file: Path, target_file: Path) -> None:
+    target_file.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(source_file, target_file)
 
 
 def migrate_assets(legacy_install_root: Path) -> int:
@@ -98,7 +107,7 @@ def migrate_assets(legacy_install_root: Path) -> int:
         return 1
 
     target_themes_dir = target_theme_dir()
-    target_palettes_dir = app_paths.PALETTES_DIR
+    target_palettes_dir = PALETTES_DIR
     target_themes_dir.mkdir(parents=True, exist_ok=True)
     target_palettes_dir.mkdir(parents=True, exist_ok=True)
 
@@ -118,25 +127,28 @@ def migrate_assets(legacy_install_root: Path) -> int:
 
     for source_theme in sorted(legacy_themes_dir.glob("*.json"), key=lambda path: path.name.lower()):
         target_theme = target_themes_dir / source_theme.name
-        if copy_if_missing(source_theme, target_theme):
+        theme_copied = copy_if_missing(source_theme, target_theme)
+        if theme_copied:
             copied_themes += 1
             print(f"COPIED theme  : {source_theme.name}")
-
-            source_palette = legacy_palettes_dir / source_theme.name
-            target_palette = target_palettes_dir / source_theme.name
-            if source_palette.exists():
-                if copy_if_missing(source_palette, target_palette):
-                    copied_palettes += 1
-                    print(f"COPIED palette: {source_theme.name}")
-                else:
-                    skipped_palettes += 1
-                    print(f"SKIPPED palette: {source_theme.name} already exists")
-            else:
-                missing_palettes += 1
-                print(f"MISSING palette: {source_theme.name}")
         else:
             skipped_themes += 1
             print(f"SKIPPED theme : {source_theme.name} already exists")
+
+        source_palette = legacy_palettes_dir / source_theme.name
+        target_palette = target_palettes_dir / source_theme.name
+        if source_palette.exists():
+            if theme_copied:
+                copy_with_overwrite(source_palette, target_palette)
+                copied_palettes += 1
+            else:
+                if copy_if_missing(source_palette, target_palette):
+                    copied_palettes += 1
+                else:
+                    skipped_palettes += 1
+        else:
+            missing_palettes += 1
+            print(f"WARNING: Missing source palette for {source_theme.name}")
 
     print()
     print(

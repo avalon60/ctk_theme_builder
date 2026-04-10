@@ -291,14 +291,14 @@ test = ["pytest", "ruff"]
 
 [[package]]
 name = "ctkfontawesome"
-version = "0.5.0"
-description = "Use any of the 2k+ free FontAwesome icons in your tkinter application."
+version = "0.6.0"
+description = "Use any of the 2k+ free FontAwesome icons in your CustomTkinter / Tkinter applications."
 optional = false
 python-versions = ">=3.8"
 groups = ["main"]
 files = [
-    {file = "ctkfontawesome-0.5.0-py3-none-any.whl", hash = "sha256:449a6bcb2fe32175bba19d2075077402c7d0cdd0e8d12d6c43958e50b05bc8e5"},
-    {file = "ctkfontawesome-0.5.0.tar.gz", hash = "sha256:812c6d4dea2a8920efc67f530550d0ab75bb2cb8d843d4c0bef9796b5f88cb8a"},
+    {file = "ctkfontawesome-0.6.0-py3-none-any.whl", hash = "sha256:a2713ae5911f7d1eeda57ac56b9d83a304917e6daedc88b65e4039f358d3d8b4"},
+    {file = "ctkfontawesome-0.6.0.tar.gz", hash = "sha256:6c093c52b21a8b371aa69bbc3a76b0da7c62d279e7563d837021a3fb2afc75ab"},
 ]
 
 [package.dependencies]
@@ -1200,4 +1200,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "26b7688371c309fee55897a0848480568ef413d1eb6a56a0c4d2814a7f22a0c9"
+content-hash = "bdfbbb0975b7e5bca384b363dd69c404f30bc9eb0e8a2b0f7ef3826579650d58"

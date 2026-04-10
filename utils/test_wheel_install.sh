@@ -1,6 +1,16 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+realpath_fallback() {
+  if command -v realpath >/dev/null 2>&1; then
+    realpath "$1"
+  elif command -v readlink >/dev/null 2>&1; then
+    readlink -f "$1"
+  else
+    cd "$(dirname "$1")" && pwd
+  fi
+}
+
 usage() {
   cat <<'EOF'
 Usage:
@@ -19,6 +29,7 @@ Behavior:
 Wheel selection:
   - if [wheel-path] is supplied, that file is used
   - otherwise the script looks for the newest *.whl in the current directory
+    and then in ./dist
 EOF
 }
 
@@ -51,7 +62,11 @@ if [ -z "${WHEEL_PATH}" ]; then
 fi
 
 if [ -z "${WHEEL_PATH}" ]; then
-  echo "ERROR: No wheel found in the current directory."
+  WHEEL_PATH=$(find ./dist -maxdepth 1 -type f -name '*.whl' -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -1 | cut -d ' ' -f2-)
+fi
+
+if [ -z "${WHEEL_PATH}" ]; then
+  echo "ERROR: No wheel found in the current directory or ./dist."
   echo "Run this script from the directory containing the wheel, or pass the wheel path explicitly."
   exit 1
 fi
@@ -61,7 +76,7 @@ if [ ! -f "${WHEEL_PATH}" ]; then
   exit 1
 fi
 
-WHEEL_PATH=$(realpath "${WHEEL_PATH}")
+WHEEL_PATH=$(realpath_fallback "${WHEEL_PATH}")
 STAMP=$(date +%Y%m%d-%H%M%S)
 SCRATCH_ROOT="/tmp/ctk-theme-builder-wheel-test-${PYTHON_VERSION}-${STAMP}"
 VENV_DIR="${SCRATCH_ROOT}/venv"

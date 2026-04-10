@@ -1,26 +1,59 @@
 # CTk Theme Builder
-Hello and welcome to the *CTk Theme Builder* repository!
 
- <figure>
-  <img src="docs/CTkThemeBuilder-about.png" alt="About" style="width:100%">
-</figure> 
+CTk Theme Builder is a desktop editor for creating, previewing, and refining themes for [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) applications.
 
-CTk Theme Builder is your one-stop shop for crafting and managing custom themes for your [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) based applications. With its intuitive interface, you can see the results of your adjustments in real-time thanks to the live preview panel.
-#### Key Features:
+It provides a live preview workflow for adjusting colours, geometry, palettes, and theme metadata without editing theme JSON files by hand.
 
-* Visual Theme Editing: Make changes and see the effects instantly with the WYSIWYG interface.
-* Light & Dark Themes: Effortlessly switch between light and dark themes to find the perfect look. 
-* Ability to flip into a render as disabled mode.
-* Theme Customization: Fine-tune every aspect, from widget borders and corner radius to color palettes using the widget geometry editor and color pickers. 
-* Merge & Swap Themes: Combine elements from different themes.
-* Theme Management: Keep track of your creations with built-in theme provenance, including author details, creation/modification dates, and other relevant attributes. 
-* Advanced Color Control: Leverage color palettes associated with each theme and generate complementary color schemes using the Color Harmonics feature. Easily adjust color shades and copy/paste colors between elements. 
-* User-Friendly Features: Get started quickly, with the auto-load option that remembers the theme you last worked on and benefit from helpful tooltips that can be enabled / disabled in the user preferences. 
+## Features
 
-#### Get Started Now!
+- Visual theme editing with live preview
+- Support for light and dark theme variants
+- Theme geometry editing for supported widget properties
+- Palette management and colour harmonics tools
+- Theme merge and import/export support
+- Provenance tracking for theme metadata
+- Built-in theme and palette assets to get started quickly
 
-Download the latest release by clicking the [Releases](https://github.com/avalon60/ctk_theme_builder/releases/tag/v3.2.0) link on the right hand side, (don't click the <i><b>\<\> Code</b></i> button download for installations.)
+## Installation
 
-Jump right to the installation guide [here](https://github.com/avalon60/ctk_theme_builder/wiki/Installing-&-Upgrading-CTk-Theme-Builder).
+Install from PyPI:
 
-The user guides for respective versions, can be found [here](https://github.com/avalon60/ctk_theme_builder/wiki).
+```bash
+pip install ctk-theme-builder
+```
+
+## Usage
+
+Launch the application:
+
+```bash
+ctk-theme-builder
+```
+
+Optional command-line arguments:
+
+```bash
+ctk-theme-builder --set-appearance Dark
+ctk-theme-builder --set-theme /path/to/theme.json
+```
+
+To migrate themes and palettes from a legacy installation:
+
+```bash
+ctktb-migrate-assets /path/to/old/install
+```
+
+## Requirements
+
+- Python 3.10 to 3.13
+- A desktop environment capable of running Tk-based GUI applications
+
+## Documentation
+
+- Installation and upgrade notes: [docs/installs-upgrades.md](docs/installs-upgrades.md)
+- User guides and release notes: [project wiki](https://github.com/avalon60/ctk_theme_builder/wiki)
+- Source code and issue tracker: [GitHub repository](https://github.com/avalon60/ctk_theme_builder)
+
+## Licence
+
+Released under the MIT Licence. See [LICENSE](LICENSE).

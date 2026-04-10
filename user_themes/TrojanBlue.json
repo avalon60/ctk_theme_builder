@@ -59,8 +59,8 @@
       "#ffffff"
     ],
     "text_color_disabled": [
-      "#ffffff",
-      "#ffffff"
+      "#c9dcff",
+      "#c9dcff"
     ]
   },
   "CTkEntry": {
@@ -108,8 +108,8 @@
       "#ffffff"
     ],
     "text_color_disabled": [
-      "#b1d9ff",
-      "#b1d9ff"
+      "#d1e4ff",
+      "#d1e4ff"
     ]
   },
   "CTkProgressBar": {
@@ -169,8 +169,8 @@
       "#ffffff"
     ],
     "text_color_disabled": [
-      "#b1d9ff",
-      "#b1d9ff"
+      "#d1e4ff",
+      "#d1e4ff"
     ]
   },
   "CTkComboBox": {
@@ -197,8 +197,8 @@
       "#ffffff"
     ],
     "text_color_disabled": [
-      "#b1d9ff",
-      "#b1d9ff"
+      "#d1e4ff",
+      "#d1e4ff"
     ]
   },
   "CTkScrollbar": {
