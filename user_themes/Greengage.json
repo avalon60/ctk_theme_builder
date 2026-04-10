@@ -44,11 +44,11 @@
     ],
     "text_color": [
       "#ffffff",
-      "#151a38"
+      "#f4f7ee"
     ],
     "text_color_disabled": [
-      "#586b78",
-      "#303553"
+      "#6f828d",
+      "#7a8698"
     ]
   },
   "CTkLabel": {
@@ -103,8 +103,8 @@
       "#bec6cc"
     ],
     "text_color_disabled": [
-      "#929aa8",
-      "#798697"
+      "#a0a8b5",
+      "#aeb8c6"
     ]
   },
   "CTkSwitch": {
@@ -132,8 +132,8 @@
       "#b5bdc3"
     ],
     "text_color_disabled": [
-      "#929aa8",
-      "#707d8e"
+      "#a0a8b5",
+      "#a8b2c0"
     ]
   },
   "CTkRadiobutton": {
@@ -157,8 +157,8 @@
       "#bec6cc"
     ],
     "text_color_disabled": [
-      "#9ba3b1",
-      "#707d8e"
+      "#a7afbc",
+      "#a8b2c0"
     ]
   },
   "CTkProgressBar": {
@@ -214,12 +214,12 @@
       "#6b8966"
     ],
     "text_color": [
-      "#161f34",
-      "#151a38"
+      "#132131",
+      "#eef3e6"
     ],
     "text_color_disabled": [
-      "#3a4758",
-      "#303553"
+      "#647486",
+      "#93a0b3"
     ]
   },
   "CTkComboBox": {
@@ -242,12 +242,12 @@
       "#5c636c"
     ],
     "text_color": [
-      "#252e43",
-      "#151a38"
+      "#1f2d3d",
+      "#edf2e5"
     ],
     "text_color_disabled": [
-      "#313e4f",
-      "#393e5c"
+      "#5e6e80",
+      "#8e9caf"
     ]
   },
   "CTkScrollbar": {
@@ -272,11 +272,11 @@
     ],
     "selected_color": [
       "#279C97",
-      "#7d9b78"
+      "#86a481"
     ],
     "selected_hover_color": [
       "#45bab5",
-      "#d3dbe1"
+      "#9ab893"
     ],
     "unselected_color": [
       "#c6ced8",
@@ -288,11 +288,11 @@
     ],
     "text_color": [
       "#2b3449",
-      "#1e2341"
+      "#eef3e7"
     ],
     "text_color_disabled": [
-      "#5e6b7c",
-      "#3a4758"
+      "#758394",
+      "#99a6b8"
     ]
   },
   "CTkTextbox": {
@@ -336,7 +336,7 @@
     ],
     "text_color": [
       "#000000",
-      "#151a38"
+      "#edf2e5"
     ]
   },
   "CTkFont": {

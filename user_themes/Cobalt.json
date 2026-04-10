@@ -59,8 +59,8 @@
       "#b4ccd8"
     ],
     "text_color_disabled": [
-      "#515e6f",
-      "#515e6f"
+      "#7f97ab",
+      "#7f97ab"
     ]
   },
   "CTkEntry": {
@@ -107,8 +107,8 @@
       "#b4ccd8"
     ],
     "text_color_disabled": [
-      "#748192",
-      "#8390a1"
+      "#d5e4ee",
+      "#dbe8f1"
     ]
   },
   "CTkSwitch": {
@@ -136,8 +136,8 @@
       "#b4ccd8"
     ],
     "text_color_disabled": [
-      "#748192",
-      "#8390a1"
+      "#d5e4ee",
+      "#dbe8f1"
     ]
   },
   "CTkRadioButton": {
@@ -161,8 +161,8 @@
       "#b4ccd8"
     ],
     "text_color_disabled": [
-      "#748192",
-      "#8390a1"
+      "#d5e4ee",
+      "#dbe8f1"
     ]
   },
   "CTkProgressBar": {
