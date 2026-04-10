@@ -3,6 +3,7 @@ venv/
 .venv/
 **/__pycache__/
 *.pyc
+dist/
 
 assets/data/ctk_theme_builder.db
 
