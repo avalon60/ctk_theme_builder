@@ -4,9 +4,11 @@ import customtkinter as ctk
 import tkinter as tk
 import ctk_tb.utils.cbtk_kit as cbtk
 import ctk_tb.model.ctk_theme_builder as mod
+import ctk_tb.paths as app_paths
 from ctk_tb.model.ctk_theme_builder import log_call
 import ctk_tb.utils.loggerutl as log
 from ctk_tb.view.harmonics_dialog import HarmonicsDialog
+from ctk_tb.view.preferences import LogViewerDialog
 from ctk_tb.view.preferences import PreferencesDialog
 from ctk_tb.view.theme_merger import ThemeMerger
 from ctk_tb.view.about import About
@@ -129,6 +131,7 @@ class ControlPanel(ctk.CTk):
         self.client_socket = None
         self.widget_properties_render_job = None
         self.is_closing = False
+        self.log_viewer = None
 
         self.properties_view = 'All'
         self.widget_attributes = DEFAULT_VIEW_WIDGET_ATTRIBUTES
@@ -527,6 +530,7 @@ class ControlPanel(ctk.CTk):
             if confirm.get() == 'OK':
                 exit(1)
 
+        self.warn_orphaned_runtime_palettes()
         self.load_theme(defer_widget_render=True)
         self.after_idle(self._restore_startup_geometry)
         self.mainloop()
@@ -660,6 +664,7 @@ class ControlPanel(ctk.CTk):
         self.tools_menu.add_command(label='Colour Harmonics', command=self.launch_harmony_dialog, state=tk.DISABLED)
         self.tools_menu.add_command(label='Merge Themes', command=self.launch_theme_merger)
         self.tools_menu.add_command(label='Browse Icons', command=self.launch_icon_browser)
+        self.tools_menu.add_command(label='View Runtime Log', command=self.view_runtime_log)
         self.tools_menu.add_command(label='About', command=self.about)
 
         self.set_option_states()
@@ -759,6 +764,18 @@ class ControlPanel(ctk.CTk):
             self.reload_preview()
         self.load_preferences()
         self.status_bar.set_status_text(status_text=f'Preference updates {action}.')
+
+    @log_call
+    def view_runtime_log(self):
+        log.log_debug(log_text='Launching runtime log viewer',
+                      class_name='ControlPanel', method_name='view_runtime_log')
+        if self.log_viewer is not None and self.log_viewer.winfo_exists():
+            self.log_viewer.lift()
+            self.log_viewer.focus()
+            return
+
+        self.log_viewer = LogViewerDialog(master=self,
+                                          log_file_path=log.LOG_DIR / log.RUNTIME_LOG)
 
     @log_call
     def launch_provenance_dialog(self):
@@ -919,6 +936,31 @@ class ControlPanel(ctk.CTk):
 
         self.min_ctk_version = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='system',
                                                        preference_name='min_ctk_version')
+
+    @log_call
+    def warn_orphaned_runtime_palettes(self):
+        """Log a warning for each runtime palette file with no matching runtime theme."""
+        try:
+            palette_paths = sorted(self.palettes_dir.glob('*.json'))
+            theme_names = {theme_path.name for theme_path in self.theme_json_dir.glob('*.json')}
+            theme_names.update(theme_path.name for theme_path in APP_THEMES_DIR.glob('*.json'))
+        except OSError as err:
+            log.log_exception(err)
+            return
+
+        for palette_path in palette_paths:
+            if palette_path.name not in theme_names:
+                log.log_warning(
+                    log_text=f'Orphaned palette file detected: {palette_path}',
+                    class_name='ControlPanel',
+                    method_name='warn_orphaned_runtime_palettes'
+                )
+
+    def report_callback_exception(self, exc, val, tb):
+        """Log Tk callback exceptions with their full traceback."""
+        log.logger.opt(exception=(exc, val, tb)).error(
+            '[ControlPanel.report_callback_exception]: Unhandled Tk callback exception'
+        )
 
     @log_call
     def sync_palette_mode_colours(self):
@@ -1959,10 +2001,16 @@ class ControlPanel(ctk.CTk):
     @log_call
     def delete_theme(self):
         """Delete the currently selected theme."""
+        if not self.source_json_file or not self.theme:
+            return
+
+        theme_name = self.theme
+        theme_path = Path(self.source_json_file)
+        palette_path = self.palettes_dir / f'{theme_name}.json'
 
         confirm = CTkMessagebox(master=self,
                                 title='Confirm Action',
-                                message=f'All data, for theme "{self.theme}", will be '
+                                message=f'All data, for theme "{theme_name}", will be '
                                         f'purged. Are you sure you wish to continue?',
                                 options=["Yes", "No"])
         if confirm.get() == 'No':
@@ -1974,11 +2022,20 @@ class ControlPanel(ctk.CTk):
         self.theme_json_data = mod.json_dict(json_file_path=default_file)
         self.reload_preview()
 
-        os.remove(self.source_json_file)
-        source_palette_file = self.theme + '.json'
-        source_palette_path = self.palettes_dir / source_palette_file
-        if source_palette_path.exists():
-            os.remove(source_palette_path)
+        if theme_path.exists():
+            theme_path.unlink()
+        if palette_path.exists():
+            palette_path.unlink()
+
+        seeded_theme_path = mod.APP_HOME / 'user_themes' / f'{theme_name}.json'
+        seeded_palette_path = mod.ASSETS_DIR / 'palettes' / f'{theme_name}.json'
+        if seeded_theme_path.exists() or seeded_palette_path.exists():
+            app_paths.mark_seed_theme_deleted(f'{theme_name}.json')
+
+        if self.wip_json and self.wip_json.exists():
+            self.wip_json.unlink()
+        if getattr(self, 'wip_palette_file', None) and self.wip_palette_file.exists():
+            self.wip_palette_file.unlink()
 
         self.json_files = mod.user_themes_list()
         initial_display = mod.user_themes_list()
@@ -1994,8 +2051,17 @@ class ControlPanel(ctk.CTk):
         self.swt_render_disabled.configure(state=tk.DISABLED)
         self.btn_reset.configure(state=tk.DISABLED)
         self.btn_save.configure(state=tk.DISABLED)
+        self.theme = None
+        self.theme_file = None
+        self.source_json_file = None
+        self.source_palette_file = None
+        self.wip_json = None
+        if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='auto_save',
+                                           preference_name='selected_theme',
+                                           preference_value=''):
+            log.log_warning(log_text='Row miss: on clearing auto save of selected theme.')
         self.status_bar.set_status_text(status_text_life=30,
-                                        status_text=f'Theme, "{self.theme}", has been deleted. ')
+                                        status_text=f'Theme, "{theme_name}", has been deleted. ')
         self.json_state = 'clean'
 
     @log_call
@@ -2600,6 +2666,8 @@ class ControlPanel(ctk.CTk):
         self._stop_icon_browser_process()
         self._stop_qa_process()
         self._stop_preview_process()
+        if self.log_viewer is not None and self.log_viewer.winfo_exists():
+            self.log_viewer.destroy()
 
         self.save_controller_geometry()
         log.log_complete(class_name='ControlPanel', supplementary_text='Theme Builder Control Panel exiting')
