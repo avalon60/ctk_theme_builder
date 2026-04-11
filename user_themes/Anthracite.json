@@ -61,6 +61,11 @@
     "text_color_disabled": [
       "#9ea8b5",
       "#9ea8b5"
+    ],
+    "border_width": 0,
+    "border_color": [
+      "#979DA2",
+      "#565B5E"
     ]
   },
   "CTkEntry": {
@@ -80,7 +85,7 @@
     ],
     "placeholder_text_color": [
       "#464e56",
-      "#464e56"
+      "#5a6672"
     ]
   },
   "CTkSwitch": {
@@ -279,15 +284,15 @@
   "DropdownMenu": {
     "fg_color": [
       "#748498",
-      "#748498"
+      "#41515f"
     ],
     "hover_color": [
       "#d3dbe1",
-      "#d3dbe1"
+      "#5d7081"
     ],
     "text_color": [
       "#000000",
-      "#000000"
+      "#f1f5f8"
     ]
   },
   "CTkFont": {

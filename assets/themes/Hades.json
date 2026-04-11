@@ -57,6 +57,11 @@
     "text_color": [
       "#f0e9b6",
       "#f0e9b6"
+    ],
+    "border_width": 0,
+    "border_color": [
+      "#979DA2",
+      "#565B5E"
     ]
   },
   "CTkEntry": {

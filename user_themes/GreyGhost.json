@@ -61,6 +61,11 @@
     "text_color_disabled": [
       "#66707d",
       "#66707d"
+    ],
+    "border_width": 0,
+    "border_color": [
+      "#979DA2",
+      "#565B5E"
     ]
   },
   "CTkEntry": {
@@ -80,7 +85,7 @@
     ],
     "placeholder_text_color": [
       "#464e56",
-      "#464e56"
+      "#5a6672"
     ]
   },
   "CTkCheckBox": {
@@ -332,15 +337,15 @@
   "DropdownMenu": {
     "fg_color": [
       "#748498",
-      "#748498"
+      "#3e4d5a"
     ],
     "hover_color": [
       "#d3dbe1",
-      "#d3dbe1"
+      "#5f7181"
     ],
     "text_color": [
       "#000000",
-      "#000000"
+      "#f2f5f7"
     ]
   },
   "CTkFont": {

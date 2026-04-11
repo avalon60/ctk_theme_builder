@@ -31,6 +31,7 @@ DB_FILE_PATH = STATE_DIR / "ctk_theme_builder.db"
 QA_STOP_FILE = TMP_DIR / "qa_application.stop"
 QA_STARTED_FILE = TMP_DIR / "qa_application.started"
 LISTENER_FILE = TMP_DIR / "listener.started"
+DELETED_SEED_THEMES_FILE = STATE_DIR / "deleted_seed_themes.json"
 
 _BOOTSTRAPPED = False
 
@@ -137,12 +138,42 @@ def update_app_version(db_file_path: Path, new_app_version: str) -> None:
     db_conn.close()
 
 
-def copy_missing_files(source_dir: Path, target_dir: Path) -> None:
+def deleted_seed_themes() -> set[str]:
+    if not DELETED_SEED_THEMES_FILE.exists():
+        return set()
+
+    try:
+        deleted_names = json.loads(DELETED_SEED_THEMES_FILE.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return set()
+
+    if not isinstance(deleted_names, list):
+        return set()
+    return {name for name in deleted_names if isinstance(name, str)}
+
+
+def save_deleted_seed_themes(theme_names: set[str]) -> None:
+    DELETED_SEED_THEMES_FILE.write_text(
+        json.dumps(sorted(theme_names), indent=2),
+        encoding="utf-8",
+    )
+
+
+def mark_seed_theme_deleted(theme_name: str) -> None:
+    deleted_names = deleted_seed_themes()
+    deleted_names.add(theme_name)
+    save_deleted_seed_themes(deleted_names)
+
+
+def copy_missing_files(source_dir: Path, target_dir: Path, skip_names: set[str] | None = None) -> None:
     if not source_dir.exists():
         return
     target_dir.mkdir(parents=True, exist_ok=True)
+    skip_names = skip_names or set()
     for source_file in source_dir.iterdir():
         if not source_file.is_file():
+            continue
+        if source_file.name in skip_names:
             continue
         target_file = target_dir / source_file.name
         if not target_file.exists():
@@ -150,8 +181,9 @@ def copy_missing_files(source_dir: Path, target_dir: Path) -> None:
 
 
 def migrate_legacy_user_files() -> None:
-    copy_missing_files(INSTALL_ROOT / "user_themes", THEMES_DIR)
-    copy_missing_files(ASSETS_DIR / "palettes", PALETTES_DIR)
+    deleted_names = deleted_seed_themes()
+    copy_missing_files(INSTALL_ROOT / "user_themes", THEMES_DIR, skip_names=deleted_names)
+    copy_missing_files(ASSETS_DIR / "palettes", PALETTES_DIR, skip_names=deleted_names)
 
     # If no user themes were shipped separately, seed from the bundled built-in themes.
     if not any(THEMES_DIR.glob("*.json")):
@@ -186,37 +218,53 @@ def apply_repo_updates(db_file_path: Path) -> None:
     os_user_name = getpass.getuser()
 
     db_conn = sqlite3.connect(db_file_path)
-    cur = db_conn.cursor()
+    try:
+        cur = db_conn.cursor()
 
-    for sql_id in updates_dict:
-        sql_apply_version = updates_dict[sql_id]["sql_apply_version"]
-        if not (version_scalar(registered_app_version) < version_scalar(sql_apply_version) <= version_scalar(target_app_version)):
-            continue
+        for sql_id in updates_dict:
+            sql_apply_version = updates_dict[sql_id]["sql_apply_version"]
+            if not (
+                version_scalar(registered_app_version)
+                < version_scalar(sql_apply_version)
+                <= version_scalar(target_app_version)
+            ):
+                continue
 
-        sql_statement = updates_dict[sql_id]["sql_statement"]
-        sql_statement = sql_statement.replace("%os_user_name%", os_user_name)
-        sql_statement = sql_statement.replace("%user_themes_location%", str(THEMES_DIR))
-        cur.execute(sql_statement)
+            sql_statement = updates_dict[sql_id]["sql_statement"]
+            sql_statement = sql_statement.replace("%os_user_name%", os_user_name)
+            sql_statement = sql_statement.replace("%user_themes_location%", str(THEMES_DIR))
+            cur.execute(sql_statement)
 
-    db_conn.commit()
-    db_conn.close()
-    update_app_version(db_file_path, target_app_version)
+        db_conn.commit()
+    except sqlite3.OperationalError:
+        return
+    finally:
+        db_conn.close()
+
+    try:
+        update_app_version(db_file_path, target_app_version)
+    except sqlite3.OperationalError:
+        return
 
 
 def ensure_theme_dir_preference(db_file_path: Path) -> None:
     db_conn = sqlite3.connect(db_file_path)
-    cur = db_conn.cursor()
-    cur.execute(
-        """
-        insert into preferences (scope, preference_name, preference_value, data_type)
-        values ('user_preference', 'theme_json_dir', :preference_value, 'Path')
-        on conflict(scope, preference_name)
-        do update set preference_value = excluded.preference_value, data_type = excluded.data_type
-        """,
-        {"preference_value": str(THEMES_DIR)},
-    )
-    db_conn.commit()
-    db_conn.close()
+    try:
+        cur = db_conn.cursor()
+        cur.execute(
+            """
+            insert into preferences (scope, preference_name, preference_value, data_type)
+            values ('user_preference', 'theme_json_dir', :preference_value, 'Path')
+            on conflict(scope, preference_name)
+            do update set preference_value = excluded.preference_value, data_type = excluded.data_type
+            """,
+            {"preference_value": str(THEMES_DIR)},
+        )
+        db_conn.commit()
+    except sqlite3.OperationalError:
+        return
+    finally:
+        db_conn.close()
 
 
 def bootstrap_user_data() -> None:

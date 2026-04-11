@@ -19,6 +19,7 @@
 
 import os
 import sys
+import threading
 from loguru import logger as logr
 from pathlib import Path
 import datetime
@@ -82,20 +83,50 @@ log_format = '<green>{time:DD/MM/YYYY HH:mm:ss.SSS}</green> | <level>{level: <8}
 if log_stamping.lower() == 'Yes':
     if inc_stderr == 'Yes':
         logr.add(sink=sys.stderr, level=log_level_code,
-                 format=log_format)
+                 format=log_format,
+                 backtrace=True,
+                 diagnose=True)
     logr.add(sink=Path(f"{LOG_DIR}/{log_filename}"), level=log_level_code,
-             format=log_format)
+             format=log_format,
+             backtrace=True,
+             diagnose=True)
     log = logr.bind(ls=LOG_STAMP)
 else:
     if inc_stderr == 'Yes':
         logr.add(sink=sys.stderr, level=log_level_code,
-                 format=log_format)
+                 format=log_format,
+                 backtrace=True,
+                 diagnose=True)
     logr.add(sink=Path(f"{LOG_DIR}/{log_filename}"), level=log_level_code,
-             format="{time:DD/MM/YYYY HH:mm:ss.SSS} | {level} | {message}")
+             format="{time:DD/MM/YYYY HH:mm:ss.SSS} | {level} | {message}",
+             backtrace=True,
+             diagnose=True)
     log = logr
 
 log.info(f'[lib.loggerutl] Logging enabled with a logging level of: {log_level_code}')
 logger = log
+
+
+def _log_unhandled_exception(exc_type, exc_value, exc_traceback) -> None:
+    """Log an uncaught exception with its full traceback."""
+    if issubclass(exc_type, KeyboardInterrupt):
+        sys.__excepthook__(exc_type, exc_value, exc_traceback)
+        return
+    logger.opt(exception=(exc_type, exc_value, exc_traceback)).critical('Unhandled exception')
+
+
+def install_exception_logging() -> None:
+    """Install process-wide exception hooks for uncaught exceptions."""
+    sys.excepthook = _log_unhandled_exception
+
+    if hasattr(threading, 'excepthook'):
+        def _thread_exception_hook(args) -> None:
+            _log_unhandled_exception(args.exc_type, args.exc_value, args.exc_traceback)
+
+        threading.excepthook = _thread_exception_hook
+
+
+install_exception_logging()
 
 def truncate_log():
     """Clear down the runtime log."""
@@ -195,7 +226,10 @@ def log_critical(log_text, supplementary_text: str = None, class_name: str = Non
 
 
 def log_exception(exception):
-    logger.exception(exception)
+    if isinstance(exception, BaseException):
+        logger.opt(exception=exception).error(str(exception))
+    else:
+        logger.exception(exception)
 
 
 def log_debug(log_text, supplementary_text: str = None, class_name: str = None, method_name: str = None) -> None:
