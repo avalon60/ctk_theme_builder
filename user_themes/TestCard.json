@@ -31,7 +31,7 @@
     "corner_radius": 6,
     "border_width": 2,
     "fg_color": [
-      "#76f7f3",
+      "#d7dc57",
       "#843453"
     ],
     "hover_color": [
@@ -44,11 +44,11 @@
     ],
     "text_color": [
       "#000000",
-      "#000000"
+      "#f4f4ee"
     ],
     "text_color_disabled": [
       "#5c5958",
-      "#5c5958"
+      "#2e2829"
     ]
   },
   "CTkLabel": {
@@ -56,7 +56,16 @@
     "fg_color": "transparent",
     "text_color": [
       "#000000",
-      "#000000"
+      "#f4f4ee"
+    ],
+    "text_color_disabled": [
+      "#000000",
+      "#f4f4ee"
+    ],
+    "border_width": 0,
+    "border_color": [
+      "#979DA2",
+      "#565B5E"
     ]
   },
   "CTkEntry": {
@@ -101,11 +110,11 @@
     ],
     "text_color": [
       "#000000",
-      "#000000"
+      "#f4f4ee"
     ],
     "text_color_disabled": [
-      "#d9e0e0",
-      "#d9e0e0"
+      "#5c5958",
+      "#c8d0d6"
     ]
   },
   "CTkProgressBar": {
@@ -165,8 +174,8 @@
       "#2e2829"
     ],
     "text_color_disabled": [
-      "#d9e0e0",
-      "#d9e0e0"
+      "#5c5958",
+      "#5c5958"
     ]
   },
   "CTkComboBox": {
@@ -193,8 +202,8 @@
       "#000000"
     ],
     "text_color_disabled": [
-      "#d9e0e0",
-      "#d9e0e0"
+      "#5c5958",
+      "#5c5958"
     ]
   },
   "CTkScrollbar": {
@@ -219,18 +228,18 @@
     ],
     "selected_color": [
       "#e1e661",
-      "#e1e661"
+      "#5142dd"
     ],
     "selected_hover_color": [
       "#bdc23d",
-      "#bdc23d"
+      "#6354ef"
     ],
     "unselected_color": [
-      "#9c4c6b",
+      "#7b2f4d",
       "#9c4c6b"
     ],
     "unselected_hover_color": [
-      "#813150",
+      "#65223d",
       "#813150"
     ],
     "text_color": [
@@ -238,8 +247,8 @@
       "#000000"
     ],
     "text_color_disabled": [
-      "#d9e0e0",
-      "#d9e0e0"
+      "#252221",
+      "#c8d0d6"
     ]
   },
   "CTkTextbox": {
@@ -283,7 +292,7 @@
     ],
     "text_color": [
       "#000000",
-      "#000000"
+      "#2e2829"
     ]
   },
   "CTkFont": {
@@ -306,9 +315,9 @@
   "provenance": {
     "theme author": "Clive Bostock",
     "date created": "Mar 27 2023 18:16:02",
-    "last modified by": "clive",
+    "last modified by": "Clive Bostock",
     "created with": "CTk Theme Builder",
-    "last modified": "Jul 02 2023 17:28:53",
+    "last modified": "Apr 11 2026 18:33:59",
     "keystone colour": "#263b2b",
     "harmony method": "Tetradic",
     "harmony differential": null,
@@ -335,11 +344,11 @@
     ],
     "text_color": [
       "#000000",
-      "#000000"
+      "#f4f4ee"
     ],
     "text_color_disabled": [
-      "#d9e0e0",
-      "#d9e0e0"
+      "#5c5958",
+      "#c8d0d6"
     ]
   },
   "CTkRadioButton": {
@@ -360,11 +369,11 @@
     ],
     "text_color": [
       "#000000",
-      "#000000"
+      "#f4f4ee"
     ],
     "text_color_disabled": [
-      "#d9e0e0",
-      "#d9e0e0"
+      "#5c5958",
+      "#c8d0d6"
     ]
   }
 }

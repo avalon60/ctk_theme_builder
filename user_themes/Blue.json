@@ -61,6 +61,11 @@
     "text_color_disabled": [
       "gray10",
       "#DCE4EE"
+    ],
+    "border_width": 0,
+    "border_color": [
+      "#979DA2",
+      "#565B5E"
     ]
   },
   "CTkEntry": {

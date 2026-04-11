@@ -61,6 +61,11 @@
     "text_color_disabled": [
       "#dbf2f6",
       "#cdc8ce"
+    ],
+    "border_width": 0,
+    "border_color": [
+      "#979DA2",
+      "#565B5E"
     ]
   },
   "CTkEntry": {
@@ -283,7 +288,7 @@
     ],
     "hover_color": [
       "#0d4171",
-      "#4f34b9"
+      "#314f79"
     ],
     "text_color": [
       "#dbf2f6",
