@@ -8,7 +8,13 @@ import ctk_tb.paths as app_paths
 from ctk_tb.model.ctk_theme_builder import log_call
 import ctk_tb.utils.loggerutl as log
 from ctk_tb.utils.theme_compat import backfill_text_color_disabled
+from ctk_tb.utils.launcher_generator import APPLICATIONS_MENU_DIR
+from ctk_tb.utils.launcher_generator import DESKTOP_DIR
+from ctk_tb.utils.launcher_generator import LauncherBundle
+from ctk_tb.utils.launcher_generator import LauncherGenerationError
+from ctk_tb.utils.launcher_generator import create_desktop_shortcut
 from ctk_tb.utils.launcher_generator import generate_platform_launcher
+from ctk_tb.utils.launcher_generator import install_to_applications_menu
 from ctk_tb.view.harmonics_dialog import HarmonicsDialog
 from ctk_tb.view.preferences import LogViewerDialog
 from ctk_tb.view.preferences import PreferencesDialog
@@ -63,14 +69,14 @@ DEFAULT_VIEW_WIDGET_ATTRIBUTES = mod.json_dict(json_file_path=default_view_file)
 
 
 class LauncherGeneratorDialog(ctk.CTkToplevel):
-    """Simple dialogue to report a generated launcher path."""
+    """Dialogue for reporting and installing generated launcher artefacts."""
 
-    def __init__(self, *args, launcher_path: Path, **kwargs):
+    def __init__(self, *args, launcher_bundle: LauncherBundle, **kwargs):
         super().__init__(*args, **kwargs)
-        self.launcher_path = launcher_path
+        self.launcher_bundle = launcher_bundle
         self.title('Launcher Generated')
-        self.geometry('760x220')
-        self.minsize(640, 200)
+        self.geometry('860x360')
+        self.minsize(760, 320)
 
         self.rowconfigure(0, weight=1)
         self.rowconfigure(1, weight=0)
@@ -87,15 +93,41 @@ class LauncherGeneratorDialog(ctk.CTkToplevel):
                                  font=mod.HEADING4)
         lbl_title.grid(row=0, column=0, padx=10, pady=(10, 5), sticky='w')
 
-        txt_message = ctk.CTkTextbox(master=frm_main, wrap='word', height=80)
-        txt_message.grid(row=1, column=0, padx=10, pady=(0, 10), sticky='nsew')
-        txt_message.insert('1.0',
-                           f'A platform-specific launcher has been created at:\n\n{self.launcher_path}')
-        txt_message.configure(state='disabled')
+        frm_details = ctk.CTkFrame(master=frm_main, corner_radius=10)
+        frm_details.grid(row=1, column=0, padx=10, pady=(0, 10), sticky='nsew')
+        frm_details.columnconfigure(1, weight=1)
+
+        lbl_python = ctk.CTkLabel(master=frm_details, text='Python Interpreter', justify='left')
+        lbl_python.grid(row=0, column=0, padx=(10, 5), pady=(10, 5), sticky='w')
+        self.tk_python_path = tk.StringVar(value=str(self.launcher_bundle.python_executable))
+        ent_python = ctk.CTkEntry(master=frm_details,
+                                  textvariable=self.tk_python_path,
+                                  state='disabled',
+                                  width=520)
+        ent_python.grid(row=0, column=1, padx=(0, 10), pady=(10, 5), sticky='ew')
+
+        lbl_launcher = ctk.CTkLabel(master=frm_details, text='Launcher File', justify='left')
+        lbl_launcher.grid(row=1, column=0, padx=(10, 5), pady=5, sticky='w')
+        self.tk_launcher_path = tk.StringVar(value=str(self.launcher_bundle.launcher_path))
+        ent_launcher = ctk.CTkEntry(master=frm_details,
+                                    textvariable=self.tk_launcher_path,
+                                    state='disabled',
+                                    width=520)
+        ent_launcher.grid(row=1, column=1, padx=(0, 10), pady=5, sticky='ew')
+
+        note_text = 'This launcher is tied to the current Python environment.'
+        if self.launcher_bundle.system_name == 'Linux':
+            note_text = (note_text + ' Linux desktop shortcuts may still require you to use '
+                         '"Allow Launching" in your desktop environment.')
+        lbl_note = ctk.CTkLabel(master=frm_details,
+                                text=note_text,
+                                justify='left',
+                                wraplength=700)
+        lbl_note.grid(row=2, column=0, columnspan=2, padx=10, pady=(5, 10), sticky='w')
 
         frm_buttons = ctk.CTkFrame(master=self, corner_radius=0)
         frm_buttons.grid(row=1, column=0, padx=0, pady=0, sticky='ew')
-        frm_buttons.columnconfigure(1, weight=1)
+        frm_buttons.columnconfigure(2, weight=1)
 
         btn_close = ctk.CTkButton(master=frm_buttons, text='Close', command=self.close_dialog)
         btn_close.grid(row=0, column=0, padx=(15, 0), pady=5, sticky='w')
@@ -106,7 +138,21 @@ class LauncherGeneratorDialog(ctk.CTkToplevel):
                                  image=self.clipboard_icon,
                                  compound='left',
                                  command=self.copy_launcher_path)
-        btn_copy.grid(row=0, column=2, padx=(0, 15), pady=5, sticky='e')
+        btn_copy.grid(row=0, column=3, padx=(0, 10), pady=5, sticky='e')
+
+        self.btn_install_applications = ctk.CTkButton(master=frm_buttons,
+                                                       text='Install to Applications Menu',
+                                                       command=self.install_to_applications_menu)
+        self.btn_install_applications.grid(row=0, column=1, padx=(15, 10), pady=5, sticky='w')
+
+        self.btn_create_desktop = ctk.CTkButton(master=frm_buttons,
+                                                text='Create Desktop Shortcut',
+                                                command=self.create_desktop_shortcut)
+        self.btn_create_desktop.grid(row=0, column=2, padx=(0, 10), pady=5, sticky='w')
+
+        if self.launcher_bundle.system_name != 'Linux':
+            self.btn_install_applications.configure(state=tk.DISABLED)
+            self.btn_create_desktop.configure(state=tk.DISABLED)
 
         self.status_bar = cbtk.CBtkStatusBar(master=self,
                                              status_text_life=15,
@@ -117,7 +163,7 @@ class LauncherGeneratorDialog(ctk.CTkToplevel):
         self.lift()
 
     def copy_launcher_path(self):
-        ok, error = cbtk.clipboard_copy(str(self.launcher_path), self)
+        ok, error = cbtk.clipboard_copy(str(self.launcher_bundle.launcher_path), self)
         if ok:
             self.status_bar.set_status_text('Launcher path copied to clipboard.')
         else:
@@ -125,6 +171,45 @@ class LauncherGeneratorDialog(ctk.CTkToplevel):
             log.log_warning(log_text=f'Clipboard copy unavailable: {error}',
                             class_name='LauncherGeneratorDialog',
                             method_name='copy_launcher_path')
+
+    def _confirm_overwrite(self, target_path: Path, title: str) -> bool:
+        if not target_path.exists():
+            return True
+
+        confirm = CTkMessagebox(master=self,
+                                title=title,
+                                message=f'{target_path} already exists.\n\nDo you want to overwrite it?',
+                                option_1='Cancel',
+                                option_2='Overwrite')
+        return confirm.get() == 'Overwrite'
+
+    def install_to_applications_menu(self):
+        target_path = APPLICATIONS_MENU_DIR / self.launcher_bundle.launcher_path.name
+        if not self._confirm_overwrite(target_path, 'Overwrite Applications Menu Entry'):
+            self.status_bar.set_status_text('Applications menu install cancelled.')
+            return
+
+        try:
+            installed_path = install_to_applications_menu(self.launcher_bundle)
+        except LauncherGenerationError as exc:
+            self.status_bar.set_status_text(str(exc))
+            return
+
+        self.status_bar.set_status_text(f'Launcher installed to applications menu: {installed_path}')
+
+    def create_desktop_shortcut(self):
+        target_path = DESKTOP_DIR / self.launcher_bundle.launcher_path.name
+        if not self._confirm_overwrite(target_path, 'Overwrite Desktop Shortcut'):
+            self.status_bar.set_status_text('Desktop shortcut creation cancelled.')
+            return
+
+        try:
+            shortcut_path = create_desktop_shortcut(self.launcher_bundle)
+        except LauncherGenerationError as exc:
+            self.status_bar.set_status_text(str(exc))
+            return
+
+        self.status_bar.set_status_text(f'Launcher copied to desktop: {shortcut_path}')
 
     def close_dialog(self, event=None):
         self.destroy()
@@ -183,7 +268,7 @@ class ControlPanel(ctk.CTk):
         self.redo_icon = cbtk.rotate_right_icon()
         self.reset_icon = cbtk.backward_fast_icon(image_size=cbtk.SMALL_ICON_SIZE)
 
-        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
+        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'ctk-tb-ico-taskbar.png')
         self.iconphoto(False, icon_photo)
         self.new_theme_json_dir = None
         self.wip_json = None
@@ -801,9 +886,14 @@ class ControlPanel(ctk.CTk):
     def generate_launcher(self):
         log.log_debug(log_text='Generating launcher script',
                       class_name='ControlPanel', method_name='generate_launcher')
-        launcher_path = generate_platform_launcher()
-        self.status_bar.set_status_text(status_text=f'Launcher generated at {launcher_path}')
-        launcher_dialog = LauncherGeneratorDialog(master=self, launcher_path=launcher_path)
+        try:
+            launcher_bundle = generate_platform_launcher()
+        except LauncherGenerationError as exc:
+            self.status_bar.set_status_text(status_text=str(exc))
+            return
+
+        self.status_bar.set_status_text(status_text=f'Launcher generated at {launcher_bundle.launcher_path}')
+        launcher_dialog = LauncherGeneratorDialog(master=self, launcher_bundle=launcher_bundle)
         self.wait_window(launcher_dialog)
 
     @log_call

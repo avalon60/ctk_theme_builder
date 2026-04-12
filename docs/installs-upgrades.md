@@ -1,5 +1,7 @@
 # Installation, Upgrade, And Migration Notes
 
+![CTk Theme Builder](../assets/images/ctk-tb-logo.png)
+
 CTk Theme Builder supports Python 3.10 through Python 3.13.
 
 The main installation guidance now lives in the [README](../README.md). This note is for the parts that are more operational:
@@ -91,9 +93,9 @@ Typical fixes are:
 
 ## Desktop Launchers And Shortcuts
 
-Desktop launchers and shortcuts should target the installed command rather than the old repo-local `.sh` or `.bat` wrapper scripts.
+Desktop launchers and shortcuts can be created in a few different ways, depending on how you run CTk Theme Builder.
 
-Use one of these approaches:
+For an installed package, the preferred target is the installed command:
 
 - Linux desktop launcher: set the command to `ctk-theme-builder`
 - Windows shortcut: point to the `ctk-theme-builder` launcher created in the Python environment's `Scripts` directory
@@ -101,9 +103,19 @@ Use one of these approaches:
 
 If you install into a virtual environment, the launcher or shortcut must target the command from that same environment.
 
+If you prefer not to deal with virtual-environment activation manually, CTk Theme Builder can also generate a convenience launcher for the current environment from:
+
+`Tools -> Generate Launcher`
+
+This writes a platform-specific launcher into:
+
+`~/CTkThemeBuilder/launchers`
+
+The generated launcher uses the interpreter from the currently running CTk Theme Builder session, so it is a practical way to create a clickable shortcut for the exact environment you are using.
+
 ## Wrapper Scripts As A Convenience Option
 
-The repository still includes these launcher scripts:
+The repository also still includes these launcher scripts:
 
 - `ctk_theme_builder.sh`
 - `ctk_theme_builder.bat`
@@ -116,4 +128,8 @@ These are convenience launchers for running CTk Theme Builder directly from a so
 
 They are not the primary packaged install path, and they are not installed automatically by `pip`.
 
-For an installed package, prefer the environment's `ctk-theme-builder` command. For a working copy, the wrapper scripts can be a practical way to launch the application, especially when creating clickable shortcuts on Windows or desktop launchers on Linux.
+In summary:
+
+- installed package: prefer the environment's `ctk-theme-builder` command
+- installed package with convenience launching: use `Tools -> Generate Launcher`
+- source checkout: the repo-local wrapper scripts can be a practical option

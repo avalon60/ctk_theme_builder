@@ -134,7 +134,7 @@ class PreviewPanel:
         self._theme_name = os.path.splitext(theme_name)[0]
 
         self.preview = ctk.CTk()
-        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
+        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'ctk-tb-ico-taskbar.png')
         self.preview.iconphoto(False, icon_photo)
         self.img_selected = cbtk.load_image(light_image=APP_IMAGES / 'colour_wheel.png', image_size=(10, 10))
         self.preview.protocol("WM_DELETE_WINDOW", self.block_closing)

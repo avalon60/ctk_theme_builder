@@ -127,7 +127,7 @@ class PreferencesDialog(ctk.CTkToplevel):
         if this_platform == "Darwin":
             self.platform = "MacOS"
 
-        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
+        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'ctk-tb-ico-taskbar.png')
         self.iconphoto(False, icon_photo)
         control_panel_theme = pref.preference_setting(db_file_path=DB_FILE_PATH,
                                                       scope='user_preference', preference_name='control_panel_theme')

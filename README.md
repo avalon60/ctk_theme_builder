@@ -1,5 +1,7 @@
 # CTk Theme Builder
 
+![CTk Theme Builder](assets/images/ctk-tb-logo.png)
+
 CTk Theme Builder is a desktop editor for creating, previewing, and refining themes for [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) applications.
 
 It provides a live preview workflow for adjusting colours, geometry, palettes, and theme metadata without editing theme JSON files by hand.

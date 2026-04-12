@@ -37,7 +37,7 @@ DB_FILE_PATH = mod.DB_FILE_PATH
 class App(customtkinter.CTk):
     def __init__(self):
         super().__init__()
-        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
+        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'ctk-tb-ico-taskbar.png')
         self.iconphoto(False, icon_photo)
         # Restore preferences
         self.qa_geometry = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='window_geometry',
