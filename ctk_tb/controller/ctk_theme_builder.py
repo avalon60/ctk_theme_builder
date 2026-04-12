@@ -19,9 +19,7 @@ PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
 
-from ctk_tb.view.control_panel import ControlPanel
-from ctk_tb.view.ctk_theme_preview import PreviewPanel
-from ctk_tb.model.ctk_theme_builder import log_call
+from ctk_tb.utils.tooltip_compat import patch_ctk_tooltip_destroy_binding
 
 # import lib.CTkMessagebox.ctkmessagebox
 
@@ -31,7 +29,6 @@ preview_panel = None
 PROG = os.path.basename(__file__)
 
 
-@log_call
 def valid_theme_name(theme_name):
     pattern = re.compile(r"[A-Za-z0-9_()\s]+")
     if pattern.fullmatch(theme_name):
@@ -40,7 +37,6 @@ def valid_theme_name(theme_name):
         return False
 
 
-@log_call
 def all_widget_attributes(widget_attributes):
     """This function receives a dictionary, based on JSON theme builder view file content,
     and scans it, to build a list of all the widget properties included in the view."""
@@ -53,6 +49,7 @@ def all_widget_attributes(widget_attributes):
 def run_preview_panel(appearance_mode, theme_file):
     """ Function to launch the preview panel."""
     global preview_panel
+    from ctk_tb.view.ctk_theme_preview import PreviewPanel
     preview_panel = PreviewPanel(appearance_mode=appearance_mode, theme_file=theme_file)
 
 
@@ -63,6 +60,11 @@ class SortingHelpFormatter(HelpFormatter):
 
 
 def main():
+    from ctk_tb.runtime_init import initialise_runtime_state
+
+    patch_ctk_tooltip_destroy_binding()
+    initialise_runtime_state()
+
     ap = argparse.ArgumentParser(formatter_class=SortingHelpFormatter
                                  , description=f"{PROG}: Welcome to CTk Theme Designer, which is designed to help you "
                                                f"design, themes to run with the CustomTkinter framework")
@@ -84,6 +86,7 @@ def main():
         running_preview = True
         run_preview_panel(appearance_mode=appearance_mode, theme_file=theme_file)
     else:
+        from ctk_tb.view.control_panel import ControlPanel
         controller = ControlPanel()
 
 

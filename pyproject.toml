@@ -1,6 +1,6 @@
 [project]
 name = "ctk-theme-builder"
-version = "3.2.0"
+version = "3.2.3"
 description = "A desktop theme editor for building and previewing CustomTkinter themes."
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
@@ -30,7 +30,7 @@ dependencies = [
   "colour==0.1.5",
   "contourpy==1.3.2",
   "CTkMessagebox==2.5",
-  "CTkToolTip==0.8",
+  "ctktooltip (==0.9)",
   "customtkinter==5.2.2",
   "cycler==0.12.1",
   "darkdetect==0.8.0",

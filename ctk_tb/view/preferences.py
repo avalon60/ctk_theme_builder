@@ -485,10 +485,10 @@ class PreferencesDialog(ctk.CTkToplevel):
                                                    border_width=1,
                                                    padding=(10, 10),
                                                    corner_radius=6,
-                                                   message="Here you can change the listener port for the Preview "
-                                                           "Panel.\n\nYou can modify this, if for example, you want to "
-                                                           "run multiple instances of the application. Each instance "
-                                                           "with its own port number.")
+                                                   message="Here you can change the listener port used by the Preview "
+                                                           "Panel.\n\nChoose a different port number if the default "
+                                                           "port is already in use, or if you need to avoid clashes "
+                                                           "with other software.")
 
         # Themes frame
         frm_themes = ctk.CTkFrame(master=frm_main, corner_radius=10)

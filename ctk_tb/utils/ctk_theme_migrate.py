@@ -109,7 +109,6 @@ class ThemeConverter:
         self.json_theme_v5["CTkButton"]["hover_color"] = self.json_theme_v4["color"]["button_hover"]
         self.json_theme_v5["CTkButton"]["border_color"] = self.json_theme_v4["color"]["button_border"]
         self.json_theme_v5["CTkButton"]["text_color"] = self.json_theme_v4["color"]["text"]
-        self.json_theme_v5["CTkButton"]["text_color_disabled"] = self.json_theme_v4["color"]["text_disabled"]
 
         # CTkLabel
         self.json_theme_v5["CTkLabel"]["fg_color"] = "transparent"
@@ -127,7 +126,6 @@ class ThemeConverter:
         self.json_theme_v5["CTkCheckbox"]["hover_color"] = self.json_theme_v4["color"]["button_hover"]
         self.json_theme_v5["CTkCheckbox"]["checkmark_color"] = self.json_theme_v4["color"]["checkmark"]
         self.json_theme_v5["CTkCheckbox"]["text_color"] = self.json_theme_v4["color"]["text"]
-        self.json_theme_v5["CTkCheckbox"]["text_color_disabled"] = self.json_theme_v4["color"]["text_disabled"]
 
         # CTkSwitch
         self.json_theme_v5["CTkSwitch"]["fg_color"] = self.json_theme_v4["color"]["switch"]
@@ -135,14 +133,12 @@ class ThemeConverter:
         self.json_theme_v5["CTkSwitch"]["button_color"] = self.json_theme_v4["color"]["switch_button"]
         self.json_theme_v5["CTkSwitch"]["button_hover_color"] = self.json_theme_v4["color"]["switch_button_hover"]
         self.json_theme_v5["CTkSwitch"]["text_color"] = self.json_theme_v4["color"]["text"]
-        self.json_theme_v5["CTkSwitch"]["text_color_disabled"] = self.json_theme_v4["color"]["text_disabled"]
 
         # CTkRadiobutton
         self.json_theme_v5["CTkRadiobutton"]["fg_color"] = self.json_theme_v4["color"]["button"]
         self.json_theme_v5["CTkRadiobutton"]["border_color"] = self.json_theme_v4["color"]["checkbox_border"]
         self.json_theme_v5["CTkRadiobutton"]["hover_color"] = self.json_theme_v4["color"]["frame_border"]
         self.json_theme_v5["CTkRadiobutton"]["text_color"] = self.json_theme_v4["color"]["switch_button_hover"]
-        self.json_theme_v5["CTkRadiobutton"]["text_color_disabled"] = self.json_theme_v4["color"]["text_disabled"]
 
         # CTkProgressBar
         self.json_theme_v5["CTkProgressBar"]["fg_color"] = self.json_theme_v4["color"]["progressbar"]
@@ -160,7 +156,6 @@ class ThemeConverter:
         self.json_theme_v5["CTkOptionMenu"]["button_color"] = self.json_theme_v4["color"]["optionmenu_button"]
         self.json_theme_v5["CTkOptionMenu"]["button_hover_color"] = self.json_theme_v4["color"]["optionmenu_button_hover"]
         self.json_theme_v5["CTkOptionMenu"]["text_color"] = self.json_theme_v4["color"]["dropdown_text"]
-        self.json_theme_v5["CTkOptionMenu"]["text_color_disabled"] = self.json_theme_v4["color"]["text_disabled"]
 
         # CTkComboBox
         self.json_theme_v5["CTkComboBox"]["fg_color"] = self.json_theme_v4["color"]["dropdown_color"]
@@ -168,7 +163,6 @@ class ThemeConverter:
         self.json_theme_v5["CTkComboBox"]["button_color"] = self.json_theme_v4["color"]["button"]
         self.json_theme_v5["CTkComboBox"]["button_hover_color"] = self.json_theme_v4["color"]["combobox_button_hover"]
         self.json_theme_v5["CTkComboBox"]["text_color"] = self.json_theme_v4["color"]["text"]
-        self.json_theme_v5["CTkComboBox"]["text_color_disabled"] = self.json_theme_v4["color"]["text_disabled"]
 
         # CTkScrollbar
         self.json_theme_v5["CTkScrollbar"]["fg_color"] = "transparent"
@@ -183,7 +177,6 @@ class ThemeConverter:
         self.json_theme_v5["CTkSegmentedButton"]["unselected_color"] = self.json_theme_v4["color"]["frame_low"]
         self.json_theme_v5["CTkSegmentedButton"]["unselected_hover_color"] = self.json_theme_v4["color"]["frame_border"]
         self.json_theme_v5["CTkSegmentedButton"]["text_color"] = self.json_theme_v4["color"]["text"]
-        self.json_theme_v5["CTkSegmentedButton"]["text_color_disabled"] = self.json_theme_v4["color"]["text_disabled"]
 
         # CTkTextbox
         self.json_theme_v5["CTkTextbox"]["fg_color"] = self.json_theme_v4["color"]["entry"]

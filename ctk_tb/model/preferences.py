@@ -23,9 +23,6 @@ APP_DATA_DIR = app_paths.STATE_DIR
 DB_FILE_PATH = app_paths.DB_FILE_PATH
 LOG_DIR = app_paths.LOG_DIR
 
-db_file_found = None
-
-
 def all_widget_categories(widget_attributes):
     """This function receives a dictionary, based on JSON theme builder view file content,
     and scans it, to build a list of all the widget categories included in the view. The categories
@@ -38,13 +35,7 @@ def all_widget_categories(widget_attributes):
 
 
 def db_file_exists(db_file_path: Path):
-    global db_file_found
-    if db_file_found is None:
-        if db_file_path.exists():
-            db_file_found = True
-        else:
-            db_file_found = False
-    return db_file_found
+    return db_file_path.exists()
 
 
 def delete_preference(db_file_path: Path, scope: str, preference_name):

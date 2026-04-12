@@ -18,8 +18,10 @@
 # context.logger.info('Info message') etc.
 
 import os
+import sqlite3
 import sys
 import threading
+import tkinter as tk
 from loguru import logger as logr
 from pathlib import Path
 import datetime
@@ -52,23 +54,29 @@ class InvalidLoggerLevel(Exception):
 
 logger = logr
 run_stamp = None
-db_file_found = None
+
+
+def _safe_preference_setting(scope: str, preference_name: str, default):
+    """Return a preference value or the supplied default before runtime init exists."""
+    try:
+        return pref.preference_setting(scope=scope, preference_name=preference_name, default=default)
+    except (FileNotFoundError, sqlite3.Error):
+        return default
 
 # Get custom login level colours
-supplementary_colour = pref.preference_setting(scope='logger', preference_name='supplementary',
-                                               default="light-green")
-scenario_started_colour = pref.preference_setting(scope='logger', preference_name='scenario_started',
+supplementary_colour = _safe_preference_setting(scope='logger', preference_name='supplementary',
+                                                default="light-green")
+scenario_started_colour = _safe_preference_setting(scope='logger', preference_name='scenario_started',
+                                                   default="light-blue")
+scenario_completed_colour = _safe_preference_setting(scope='logger', preference_name='scenario_completed',
+                                                     default="light-blue")
 
-                                                  default="light-blue")
-scenario_completed_colour = pref.preference_setting(scope='logger', preference_name='scenario_completed',
-                                                    default="light-blue")
-
-log_level_code = pref.preference_setting(scope='logger', preference_name='log_level', default="Info")
+log_level_code = _safe_preference_setting(scope='logger', preference_name='log_level', default="Info")
 log_level_code = log_level_code.upper()
-log_stamping = pref.preference_setting(scope='logger', preference_name='log_stamping', default="Yes")
-inc_stderr = pref.preference_setting(scope='logger', preference_name='log_stderr', default="Yes")
+log_stamping = _safe_preference_setting(scope='logger', preference_name='log_stamping', default="Yes")
+inc_stderr = _safe_preference_setting(scope='logger', preference_name='log_stderr', default="Yes")
 
-log_filename = pref.preference_setting(scope='logger', preference_name='log_filename', default=RUNTIME_LOG)
+log_filename = _safe_preference_setting(scope='logger', preference_name='log_filename', default=RUNTIME_LOG)
 
 # Configure custom log levels
 logr.level("STARTED", no=21, color=f"<{scenario_started_colour}>", icon="")
@@ -86,10 +94,11 @@ if log_stamping.lower() == 'Yes':
                  format=log_format,
                  backtrace=True,
                  diagnose=True)
-    logr.add(sink=Path(f"{LOG_DIR}/{log_filename}"), level=log_level_code,
-             format=log_format,
-             backtrace=True,
-             diagnose=True)
+    if LOG_DIR.exists():
+        logr.add(sink=Path(f"{LOG_DIR}/{log_filename}"), level=log_level_code,
+                 format=log_format,
+                 backtrace=True,
+                 diagnose=True)
     log = logr.bind(ls=LOG_STAMP)
 else:
     if inc_stderr == 'Yes':
@@ -97,10 +106,11 @@ else:
                  format=log_format,
                  backtrace=True,
                  diagnose=True)
-    logr.add(sink=Path(f"{LOG_DIR}/{log_filename}"), level=log_level_code,
-             format="{time:DD/MM/YYYY HH:mm:ss.SSS} | {level} | {message}",
-             backtrace=True,
-             diagnose=True)
+    if LOG_DIR.exists():
+        logr.add(sink=Path(f"{LOG_DIR}/{log_filename}"), level=log_level_code,
+                 format="{time:DD/MM/YYYY HH:mm:ss.SSS} | {level} | {message}",
+                 backtrace=True,
+                 diagnose=True)
     log = logr
 
 log.info(f'[lib.loggerutl] Logging enabled with a logging level of: {log_level_code}')
@@ -128,6 +138,24 @@ def install_exception_logging() -> None:
 
 install_exception_logging()
 
+
+def install_tk_callback_logging() -> None:
+    """Install global Tk callback exception logging.
+
+    Tkinter widget callbacks do not flow through ``sys.excepthook``. They are
+    routed through ``Tk.report_callback_exception`` instead, which by default
+    prints to stderr. Override that handler so Tk callback stacks are written to
+    the runtime log.
+    """
+
+    def _report_callback_exception(self, exc, val, tb) -> None:
+        logger.opt(exception=(exc, val, tb)).error('Unhandled Tk callback exception')
+
+    tk.Tk.report_callback_exception = _report_callback_exception
+
+
+install_tk_callback_logging()
+
 def truncate_log():
     """Clear down the runtime log."""
     with open(LOG_DIR / RUNTIME_LOG, "w") as f:
@@ -138,13 +166,7 @@ def logfile_size():
     return file_size
 
 def db_file_exists(db_file_path: Path):
-    global db_file_found
-    if db_file_found is None:
-        if db_file_path.exists():
-            db_file_found = True
-        else:
-            db_file_found = False
-    return db_file_found
+    return db_file_path.exists()
 
 
 def format_log_text(log_text, class_name: str = None, method_name: str = None) -> str:
