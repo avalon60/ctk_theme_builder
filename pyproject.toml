@@ -1,6 +1,6 @@
 [project]
 name = "ctk-theme-builder"
-version = "3.2.0"
+version = "3.2.1"
 description = "A desktop theme editor for building and previewing CustomTkinter themes."
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
