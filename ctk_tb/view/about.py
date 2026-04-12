@@ -5,6 +5,7 @@ from ctk_tb.model.ctk_theme_builder import log_call
 
 import customtkinter as ctk
 import tkinter as tk
+import sys
 import ctk_tb.utils.cbtk_kit as cbtk
 import ctk_tb.utils.loggerutl as log
 
@@ -47,12 +48,18 @@ class About(ctk.CTkToplevel):
         lbl_ctk_version = ctk.CTkLabel(master=frm_widgets, text=f'CustomTkinter:  {ctk.__version__}')
         lbl_ctk_version.grid(row=2, column=0, padx=10, pady=(0, 10), sticky='w')
 
+        lbl_python_version = ctk.CTkLabel(master=frm_widgets,
+                                          text=f'Python:  {sys.version_info.major}.'
+                                               f'{sys.version_info.minor}.'
+                                               f'{sys.version_info.micro}')
+        lbl_python_version.grid(row=3, column=0, padx=10, pady=(0, 10), sticky='w')
+
         app_author = mod.app_author()
         lbl_author = ctk.CTkLabel(master=frm_widgets, text=f'Author:  {app_author}')
-        lbl_author.grid(row=3, column=0, padx=10, pady=(0, 10), sticky='w')
+        lbl_author.grid(row=4, column=0, padx=10, pady=(0, 10), sticky='w')
 
         lbl_author = ctk.CTkLabel(master=frm_widgets, text=f'Logo:  Jan Bajec')
-        lbl_author.grid(row=4, column=0, padx=10, pady=(0, 10), sticky='w')
+        lbl_author.grid(row=5, column=0, padx=10, pady=(0, 10), sticky='w')
 
         btn_logo = ctk.CTkButton(master=frm_logo, text='', height=50, width=50, corner_radius=widget_corner_radius,
                                  image=logo_image)
