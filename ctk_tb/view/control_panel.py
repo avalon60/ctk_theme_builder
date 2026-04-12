@@ -8,6 +8,7 @@ import ctk_tb.paths as app_paths
 from ctk_tb.model.ctk_theme_builder import log_call
 import ctk_tb.utils.loggerutl as log
 from ctk_tb.utils.theme_compat import backfill_text_color_disabled
+from ctk_tb.utils.launcher_generator import generate_platform_launcher
 from ctk_tb.view.harmonics_dialog import HarmonicsDialog
 from ctk_tb.view.preferences import LogViewerDialog
 from ctk_tb.view.preferences import PreferencesDialog
@@ -59,6 +60,74 @@ DEFAULT_VIEW = mod.DEFAULT_VIEW
 VIEWS_DIR = mod.VIEWS_DIR
 default_view_file = VIEWS_DIR / f'{DEFAULT_VIEW}.json'
 DEFAULT_VIEW_WIDGET_ATTRIBUTES = mod.json_dict(json_file_path=default_view_file)
+
+
+class LauncherGeneratorDialog(ctk.CTkToplevel):
+    """Simple dialogue to report a generated launcher path."""
+
+    def __init__(self, *args, launcher_path: Path, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.launcher_path = launcher_path
+        self.title('Launcher Generated')
+        self.geometry('760x220')
+        self.minsize(640, 200)
+
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=0)
+        self.columnconfigure(0, weight=1)
+
+        frm_main = ctk.CTkFrame(master=self, corner_radius=10)
+        frm_main.grid(row=0, column=0, padx=10, pady=10, sticky='nsew')
+        frm_main.rowconfigure(1, weight=1)
+        frm_main.columnconfigure(0, weight=1)
+
+        lbl_title = ctk.CTkLabel(master=frm_main,
+                                 text='Launcher Generated',
+                                 justify='left',
+                                 font=mod.HEADING4)
+        lbl_title.grid(row=0, column=0, padx=10, pady=(10, 5), sticky='w')
+
+        txt_message = ctk.CTkTextbox(master=frm_main, wrap='word', height=80)
+        txt_message.grid(row=1, column=0, padx=10, pady=(0, 10), sticky='nsew')
+        txt_message.insert('1.0',
+                           f'A platform-specific launcher has been created at:\n\n{self.launcher_path}')
+        txt_message.configure(state='disabled')
+
+        frm_buttons = ctk.CTkFrame(master=self, corner_radius=0)
+        frm_buttons.grid(row=1, column=0, padx=0, pady=0, sticky='ew')
+        frm_buttons.columnconfigure(1, weight=1)
+
+        btn_close = ctk.CTkButton(master=frm_buttons, text='Close', command=self.close_dialog)
+        btn_close.grid(row=0, column=0, padx=(15, 0), pady=5, sticky='w')
+
+        self.clipboard_icon = cbtk.clipboard_icon(image_size=cbtk.SMALL_ICON_SIZE)
+        btn_copy = ctk.CTkButton(master=frm_buttons,
+                                 text='Copy Path',
+                                 image=self.clipboard_icon,
+                                 compound='left',
+                                 command=self.copy_launcher_path)
+        btn_copy.grid(row=0, column=2, padx=(0, 15), pady=5, sticky='e')
+
+        self.status_bar = cbtk.CBtkStatusBar(master=self,
+                                             status_text_life=15,
+                                             use_grid=True)
+        self.bind("<Configure>", self.status_bar.auto_size_status_bar)
+        self.bind('<Escape>', self.close_dialog)
+        self.grab_set()
+        self.lift()
+
+    def copy_launcher_path(self):
+        ok, error = cbtk.clipboard_copy(str(self.launcher_path), self)
+        if ok:
+            self.status_bar.set_status_text('Launcher path copied to clipboard.')
+        else:
+            self.status_bar.set_status_text('Clipboard copy is unavailable on this system.')
+            log.log_warning(log_text=f'Clipboard copy unavailable: {error}',
+                            class_name='LauncherGeneratorDialog',
+                            method_name='copy_launcher_path')
+
+    def close_dialog(self, event=None):
+        self.destroy()
 
 
 class ControlPanel(ctk.CTk):
@@ -667,6 +736,7 @@ class ControlPanel(ctk.CTk):
         self.tools_menu.add_command(label='Colour Harmonics', command=self.launch_harmony_dialog, state=tk.DISABLED)
         self.tools_menu.add_command(label='Merge Themes', command=self.launch_theme_merger)
         self.tools_menu.add_command(label='Browse Icons', command=self.launch_icon_browser)
+        self.tools_menu.add_command(label='Generate Launcher', command=self.generate_launcher)
         self.tools_menu.add_command(label='View Runtime Log', command=self.view_runtime_log)
         self.tools_menu.add_command(label='About', command=self.about)
 
@@ -726,6 +796,15 @@ class ControlPanel(ctk.CTk):
             'ctk_tb.view.ctk_fa_browser',
         ]
         self.icon_browser_process = sp.Popen(program)
+
+    @log_call
+    def generate_launcher(self):
+        log.log_debug(log_text='Generating launcher script',
+                      class_name='ControlPanel', method_name='generate_launcher')
+        launcher_path = generate_platform_launcher()
+        self.status_bar.set_status_text(status_text=f'Launcher generated at {launcher_path}')
+        launcher_dialog = LauncherGeneratorDialog(master=self, launcher_path=launcher_path)
+        self.wait_window(launcher_dialog)
 
     @log_call
     def launch_export_dialog(self):
@@ -2687,6 +2766,7 @@ class ControlPanel(ctk.CTk):
         self.update_wip_file()
 
         if self.process is None:
+            listener_start_timeout_s = 20.0
             program = [
                 sys.executable,
                 '-m',
@@ -2702,18 +2782,31 @@ class ControlPanel(ctk.CTk):
             listener_started = False
             sleep_count = 0
             listener_address = mod.method_listener_address()
+            listener_deadline = time.monotonic() + listener_start_timeout_s
             while not listener_started:
                 log.log_debug(log_text=f'Checking for a listener - try {sleep_count + 1}...', class_name='ControlPanel',
                               method_name='launch_preview')
                 sleep_count += 1
+                if self.process.poll() is not None:
+                    confirm = CTkMessagebox(master=self,
+                                            title='Preview Launch Failed',
+                                            message='The preview process exited before opening its listener port.\n\n'
+                                                    'Check the runtime log for the underlying error.',
+                                            option_1='OK')
+                    log.log_critical('ERROR: Preview process exited before listener startup.',
+                                     class_name='ControlPanel',
+                                     method_name='launch_preview')
+                    if confirm.get() == 'OK':
+                        exit(1)
                 if mod.wait_for_listener_socket(address=listener_address, timeout_s=0.05, retry_interval_s=0.05):
                     log.log_debug(log_text='Listener started', class_name='ControlPanel',
                                   method_name='launch_preview')
                     listener_started = True
-                if sleep_count > 80:
+                if time.monotonic() >= listener_deadline:
                     confirm = CTkMessagebox(master=self,
                                             title='Listener Timeout',
                                             message=f'TIMEOUT: Waited too long for preview listener!\n\n'
+                                                    f'The preview process may still be starting.\n\n'
                                                     f'Ensure that only one instance of {mod.app_title()} is '
                                                     f'running on port {self.listener_port}, and that no other process '
                                                     f'is using the port.',

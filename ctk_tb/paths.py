@@ -26,6 +26,7 @@ PALETTES_DIR = USER_DATA_HOME / "palettes"
 STATE_DIR = USER_DATA_HOME / "state"
 TMP_DIR = USER_DATA_HOME / "tmp"
 LOG_DIR = USER_DATA_HOME / "logs"
+LAUNCHERS_DIR = USER_DATA_HOME / "launchers"
 DB_FILE_PATH = STATE_DIR / "ctk_theme_builder.db"
 
 QA_STOP_FILE = TMP_DIR / "qa_application.stop"
