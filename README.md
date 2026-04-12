@@ -16,10 +16,27 @@ It provides a live preview workflow for adjusting colours, geometry, palettes, a
 
 ## Installation
 
-Install from PyPI:
+Recommended installation from PyPI, using a virtual environment:
 
 ```bash
+python -m venv .venv
+source .venv/bin/activate
 pip install ctk-theme-builder
+```
+
+On Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install ctk-theme-builder
+```
+
+Alternative install methods for users who already use `uv`:
+
+```bash
+uv pip install ctk-theme-builder
+uvx --from ctk-theme-builder ctk-theme-builder
 ```
 
 ## Usage
