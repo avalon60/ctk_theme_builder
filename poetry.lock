@@ -327,14 +327,14 @@ pillow = "*"
 
 [[package]]
 name = "ctktooltip"
-version = "0.8"
+version = "0.9"
 description = "Customtkinter Tooltip widget"
 optional = false
 python-versions = ">=3.6"
 groups = ["main"]
 files = [
-    {file = "CTkToolTip-0.8-py3-none-any.whl", hash = "sha256:dd91fc208596e14d0eea03eaa57b0d6095be995538ce2b87538e4266fa7a753d"},
-    {file = "CTkToolTip-0.8.tar.gz", hash = "sha256:08596120b12c8fa9b9bff2931a3aef3a29719380def9a0a50380c3b6852b4564"},
+    {file = "ctktooltip-0.9-py3-none-any.whl", hash = "sha256:29c009fd425364197be70c1b9c441696a875daba8f4977d97a0e4c3f7e4fe468"},
+    {file = "ctktooltip-0.9.tar.gz", hash = "sha256:46b20ddbf18f1822cc37c5fcca96ebcf610a53d154670c8448b84898055a45e9"},
 ]
 
 [[package]]
@@ -1200,4 +1200,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "bdfbbb0975b7e5bca384b363dd69c404f30bc9eb0e8a2b0f7ef3826579650d58"
+content-hash = "a9d8e250ee85ecc5eb44ce077976f2a3bad6b6fb47187755411087fcd88efaa2"

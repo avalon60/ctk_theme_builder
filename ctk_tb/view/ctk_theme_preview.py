@@ -19,6 +19,7 @@ import ctk_tb.utils.cbtk_kit as cbtk
 import ctk_tb.model.ctk_theme_builder as mod
 from ctk_tb.model.ctk_theme_builder import log_call
 import ctk_tb.utils.loggerutl as log
+from ctk_tb.utils.theme_compat import backfill_text_color_disabled
 from CTkToolTip import *
 from CTkMessagebox import CTkMessagebox
 import ctk_tb.model.preferences as pref
@@ -80,6 +81,7 @@ class PreviewPanel:
         self._appearance_mode = appearance_mode
         self._theme_file = theme_file
         ctk.set_default_color_theme(self._theme_file)
+        backfill_text_color_disabled()
         ctk.set_appearance_mode(self._appearance_mode)
 
         self.refresh_widgets = []
@@ -238,12 +240,14 @@ class PreviewPanel:
     def _switch_theme(self, theme_file: Path):
         self._theme_file = theme_file
         ctk.set_default_color_theme(str(self._theme_file))
+        backfill_text_color_disabled()
 
         self.render_preview_frames()
 
     @log_call
     def _switch_appearance_mode(self, appearance_mode: str):
         ctk.set_default_color_theme(self._theme_file)
+        backfill_text_color_disabled()
         self._appearance_mode = appearance_mode
         ctk.set_appearance_mode(self._appearance_mode)
         self.render_preview_frames()
@@ -639,6 +643,7 @@ class PreviewPanel:
             log.log_debug(log_text='Preview panel received refresh command', class_name='PreviewPanel',
                           method_name='exec_program_command')
             ctk.set_default_color_theme(self._theme_file)
+            backfill_text_color_disabled()
             ctk.set_appearance_mode(self._appearance_mode)
             # So we need to call the render preview frames method. This
             # will destroy and rebuild the widgets.
@@ -926,8 +931,6 @@ class PreviewPanel:
                 widget.configure(selected_hover_color=widget_colour)
             elif widget_property == 'text_color':
                 widget.configure(text_color=widget_colour)
-            elif widget_property == 'text_color_disabled':
-                widget.configure(text_color_disabled=widget_colour)
             elif widget_property == 'unselected_color':
                 widget.configure(unselected_color=widget_colour)
             elif widget_property == 'unselected_hover_color':
@@ -992,8 +995,6 @@ class PreviewPanel:
                     widget.configure(segmented_button_unselected_color=widget_colour)
                 elif widget_property == 'text_color':
                     widget.configure(text_color=widget_colour)
-                elif widget_property == 'text_color_disabled':
-                    widget.configure(text_color_disabled=widget_colour)
 
 
 if __name__ == "__main__":

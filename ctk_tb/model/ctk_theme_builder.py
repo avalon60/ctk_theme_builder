@@ -106,7 +106,6 @@ COLOUR_PROPERTIES = ["border_color",
                      "selected_color",
                      "selected_hover_color",
                      "text_color",
-                     "text_color_disabled",
                      "top_fg_color",
                      "unselected_color",
                      "unselected_hover_color"]
@@ -152,11 +151,9 @@ FORCE_GEOM_REFRESH_PROPERTIES = [
 
 # We normally list entries here, where the configure method has a bug or is subject to an omission.
 # Issue numbers and descriptions:
-#   CTk 5.1.2 CTkCheckBox.configure(text_color_disabled=...) causes exception #1591 - Fixed in CTk 5.2.0
 #   CTk 5.1.2: Omission: Theme JSON property checkmark_color of CTkCheckBox has no configure option #1586
 #                        - Fixed in CTk 5.2.0
 #   CTk 5.1.2: CTkSegmentedButton property setting issues #1562 - Fixed in CTk 5.2.0
-#   CTk 5.1.2: CTkOptionMenu.configure(text_color_disabled=...) raises exception #1559 - Fixed in CTk 5.2.0
 #   CTk 5.1.3: CTkCheckBox has no supporting configure option for checkmark_color #1703 - Fixed in CTk 5.2.0
 # The DropdownMenu is a different case. This is not a widget in its own right and so has no methods to
 # update the widgets which utilise it. E.g. CTkComboBox, CTkOptionMenu.
@@ -169,15 +166,9 @@ FORCE_COLOR_REFRESH_PROPERTIES = [  # "CheckBox: checkmark_color",
     "DropdownMenu: text_color",
     "ScrollableFrame: corner_radius"
     # "Frame: top_fg_color",
-    # "CheckBox: text_color_disabled",
     # "Scrollbar: button_color",
     # "Scrollbar: button_hover_color",
-    # "OptionMenu: text_color_disabled",
-    # "Switch: text_color_disabled"
 ]
-db_file_found = None
-
-
 def app_title():
     return application_title
 
@@ -347,13 +338,7 @@ def request_close_qa_app():
 
 @log_call
 def db_file_exists(db_file_path: Path):
-    global db_file_found
-    if db_file_found is None:
-        if db_file_path.exists():
-            db_file_found = True
-        else:
-            db_file_found = False
-    return db_file_found
+    return db_file_path.exists()
 
 
 @log_call
@@ -363,8 +348,7 @@ def patch_theme(theme_json: dict):
     names here.
     :param theme_json:
     :return: """
-    if 'CTkCheckbox' in theme_json or 'CTkRadiobutton' in theme_json \
-            or "text_color_disabled" not in theme_json['CTkLabel']:
+    if 'CTkCheckbox' in theme_json or 'CTkRadiobutton' in theme_json:
         _theme_json = copy.deepcopy(theme_json)
     else:
         return theme_json
@@ -373,9 +357,6 @@ def patch_theme(theme_json: dict):
 
     if 'CTkRadiobutton' in _theme_json:
         _theme_json['CTkRadioButton'] = _theme_json.pop('CTkRadiobutton')
-
-    if "text_color_disabled" not in _theme_json['CTkLabel']:
-        _theme_json['CTkLabel']['text_color_disabled'] = _theme_json['CTkLabel']['text_color']
 
     return _theme_json
 
@@ -1027,7 +1008,7 @@ class CommandStack:
 
 if __name__ == "__main__":
     colour_dict = colour_dictionary(Path('../assets/themes/GreyGhost.json'))
-    widget_prop = 'Button: text_color_disabled'
+    widget_prop = 'Button: text_color'
     print(f'Test the widget_property_split function using {widget_prop}')
     test_widget_type, property = widget_property_split(widget_property=widget_prop)
     print(f'Widget type: {test_widget_type}; Widget property: {property}')
@@ -1035,20 +1016,17 @@ if __name__ == "__main__":
                                 "Button: fg_color",
                                 "Button: hover_color",
                                 "Button: text_color",
-                                "Button: text_color_disabled",
                                 "CTk: fg_color",
                                 "Checkbox: border_color",
                                 "Checkbox: checkmark_color",
                                 "Checkbox: fg_color",
                                 "Checkbox: hover_color",
                                 "Checkbox: text_color",
-                                "Checkbox: text_color_disabled",
                                 "ComboBox: border_color",
                                 "ComboBox: button_color",
                                 "ComboBox: button_hover_color",
                                 "ComboBox: fg_color",
                                 "ComboBox: text_color",
-                                "ComboBox: text_color_disabled",
                                 "DropdownMenu: fg_color",
                                 "DropdownMenu: hover_color",
                                 "DropdownMenu: text_color",
@@ -1065,7 +1043,6 @@ if __name__ == "__main__":
                                 "OptionMenu: button_hover_color",
                                 "OptionMenu: fg_color",
                                 "OptionMenu: text_color",
-                                "OptionMenu: text_color_disabled",
                                 "ProgressBar: border_color",
                                 "ProgressBar: fg_color",
                                 "ProgressBar: progress_color",
@@ -1073,7 +1050,6 @@ if __name__ == "__main__":
                                 "Radiobutton: fg_color",
                                 "Radiobutton: hover_color",
                                 "Radiobutton: text_color",
-                                "Radiobutton: text_color_disabled",
                                 "ScrollableFrame: label_fg_color",
                                 "Scrollbar: button_color",
                                 "Scrollbar: button_hover_color",
@@ -1082,7 +1058,6 @@ if __name__ == "__main__":
                                 "SegmentedButton: selected_color",
                                 "SegmentedButton: selected_hover_color",
                                 "SegmentedButton: text_color",
-                                "SegmentedButton: text_color_disabled",
                                 "SegmentedButton: unselected_color",
                                 "SegmentedButton: unselected_hover_color",
                                 "Slider: button_color",
@@ -1094,7 +1069,6 @@ if __name__ == "__main__":
                                 "Switch: fg_color",
                                 "Switch: progress_color",
                                 "Switch: text_color",
-                                "Switch: text_color_disabled",
                                 "Textbox: border_color",
                                 "Textbox: fg_color",
                                 "Textbox: scrollbar_button_color",
@@ -1106,20 +1080,17 @@ if __name__ == "__main__":
                                   'Button: fg_color': ['#48bed4', '#48bed4'],
                                   'Button: hover_color': ['#e1e661', '#e1e661'],
                                   'Button: text_color': ['#000000', '#000000'],
-                                  'Button: text_color_disabled': ['#5c5958', '#5c5958'],
                                   'CTk: fg_color': ['#9c4c6b', '#902e56'],
                                   'Checkbox: border_color': ['#b66426', '#b66426'],
                                   'Checkbox: checkmark_color': ['#ffffff', '#ffffff'],
                                   'Checkbox: fg_color': ['#48bed4', '#48bed4'],
                                   'Checkbox: hover_color': ['#e1e661', '#e1e661'],
                                   'Checkbox: text_color': ['#000000', '#000000'],
-                                  'Checkbox: text_color_disabled': ['#d9e0e0', '#d9e0e0'],
                                   'ComboBox: border_color': ['#ffffff', '#ffffff'],
                                   'ComboBox: button_color': ['#48bed4', '#48bed4'],
                                   'ComboBox: button_hover_color': ['#5c6063', '#5c6063'],
                                   'ComboBox: fg_color': ['#414343', '#414343'],
                                   'ComboBox: text_color': ['#000000', '#000000'],
-                                  'ComboBox: text_color_disabled': ['#d9e0e0', '#d9e0e0'],
                                   'DropdownMenu: fg_color': ['#414343', '#414343'],
                                   'DropdownMenu: hover_color': ['#747676', '#747676'],
                                   'DropdownMenu: text_color': ['#2e2829', '#2e2829'],
@@ -1136,7 +1107,6 @@ if __name__ == "__main__":
                                   'OptionMenu: button_hover_color': ['#505156', '#505156'],
                                   'OptionMenu: fg_color': ['#414343', '#414343'],
                                   'OptionMenu: text_color': ['#2e2829', '#2e2829'],
-                                  'OptionMenu: text_color_disabled': ['#d9e0e0', '#d9e0e0'],
                                   'ProgressBar: border_color': ['#000000', '#000000'],
                                   'ProgressBar: fg_color': ['#5c5e59', '#99e15c'],
                                   'ProgressBar: progress_color': ['#c6c8c8', '#e1e661'],
@@ -1144,7 +1114,6 @@ if __name__ == "__main__":
                                   'Radiobutton: fg_color': ['#48bed4', '#48bed4'],
                                   'Radiobutton: hover_color': ['#000000', '#000000'],
                                   'Radiobutton: text_color': ['#50514e', '#e1e661'],
-                                  'Radiobutton: text_color_disabled': ['#d9e0e0', '#d9e0e0'],
                                   'ScrollableFrame: label_fg_color': ['#4b5c78', '#4b5c78'],
                                   'Scrollbar: button_color': ['#4e4b49', '#4e4b49'],
                                   'Scrollbar: button_hover_color': ['#1c1e18', '#1c1e18'],
@@ -1153,7 +1122,6 @@ if __name__ == "__main__":
                                   'SegmentedButton: selected_color': ['#e1e661', '#e1e661'],
                                   'SegmentedButton: selected_hover_color': ['#4b5c78', '#4b5c78'],
                                   'SegmentedButton: text_color': ['#000000', '#000000'],
-                                  'SegmentedButton: text_color_disabled': ['#d9e0e0', '#d9e0e0'],
                                   'SegmentedButton: unselected_color': ['#9c4c6b', '#9c4c6b'],
                                   'SegmentedButton: unselected_hover_color': ['#000000', '#000000'],
                                   'Slider: button_color': ['#48bed4', '#48bed4'],
@@ -1165,7 +1133,6 @@ if __name__ == "__main__":
                                   'Switch: fg_color': ['#5c5958', '#48bed4'],
                                   'Switch: progress_color': ['#c0c1c0', '#c0c1c0'],
                                   'Switch: text_color': ['#000000', '#000000'],
-                                  'Switch: text_color_disabled': ['#d9e0e0', '#d9e0e0'],
                                   'Textbox: border_color': ['#000000', '#000000'],
                                   'Textbox: fg_color': ['#ccccc9', '#ccccc9'],
                                   'Textbox: scrollbar_button_color': ['#48bed4', '#48bed4'],

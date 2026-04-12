@@ -7,6 +7,7 @@ import ctk_tb.model.ctk_theme_builder as mod
 import ctk_tb.paths as app_paths
 from ctk_tb.model.ctk_theme_builder import log_call
 import ctk_tb.utils.loggerutl as log
+from ctk_tb.utils.theme_compat import backfill_text_color_disabled
 from ctk_tb.view.harmonics_dialog import HarmonicsDialog
 from ctk_tb.view.preferences import LogViewerDialog
 from ctk_tb.view.preferences import PreferencesDialog
@@ -266,8 +267,10 @@ class ControlPanel(ctk.CTk):
 
         try:
             ctk.set_default_color_theme(self.control_panel_theme)
+            backfill_text_color_disabled()
         except FileNotFoundError:
             ctk.set_default_color_theme('blue')
+            backfill_text_color_disabled()
             log.log_warning(f'Preferred Control Panel, theme file not found. Falling back to "blue" theme.',
                             class_name='ControlPanel', method_name='__init__()')
         ctk.set_appearance_mode(self.control_panel_mode)

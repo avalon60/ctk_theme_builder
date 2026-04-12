@@ -316,7 +316,6 @@ class GeometryDialog(ctk.CTkToplevel):
             seg_unselected_color = self.theme_json_data[json_widget_type]['unselected_color'][mode]
             seg_unselected_hover_color = self.theme_json_data[json_widget_type]['unselected_hover_color'][mode]
             seg_text_color = self.theme_json_data[json_widget_type]['text_color'][mode]
-            seg_text_color_disabled = self.theme_json_data[json_widget_type]['text_color_disabled'][mode]
 
             geometry_widget = ctk.CTkSegmentedButton(master=frm_widget_preview_low,
                                                      fg_color=seg_fg_color,
@@ -324,8 +323,7 @@ class GeometryDialog(ctk.CTkToplevel):
                                                      selected_hover_color=seg_selected_hover_color,
                                                      unselected_color=seg_unselected_color,
                                                      unselected_hover_color=seg_unselected_hover_color,
-                                                     text_color=seg_text_color,
-                                                     text_color_disabled=seg_text_color_disabled)
+                                                     text_color=seg_text_color)
             geometry_widget.grid(row=10, column=0, padx=(15, 0), pady=(30, 0), sticky="nsew", rowspan=1)
 
             geometry_widget.configure(values=["CTkSegmentedButton", "Value 2", "Value 3"])
