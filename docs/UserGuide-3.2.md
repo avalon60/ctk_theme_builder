@@ -1,15 +1,21 @@
 
 # Introduction
 
-### Acknowledegments
-*A thank-you to my ever patient, ever loving, beautiful wife, who has let me hide in my office and beaver away at this project, for many an hour.* 
-   
+<p align="center">
+  <img src="ctk-tb-logo.png" alt="CTk Theme Builder" width="720">
+</p>
+
+*A desktop editor for creating, previewing, and refining CustomTkinter themes.*
+
+## Acknowledgements
+*A thank-you to my ever patient, ever loving, beautiful wife, who has let me hide in my office and beaver away at this project for many an hour.*
+
 *I would also like to thank my friend and colleague, Jan Bajec, for his graphics contribution.*
 
-### A Bit of History
+## A Brief History
 In case you are wondering, "so where is CTk Theme Builder version 1.0?", well it was never made public. CTk Theme Builder, started with very humble beginnings. In fact it started with a crude CustomTkinter program which was used to display the results of theme file modifications, performed using a Vim editor (yes I also use Vim - sue me ;o). Features were added and added, and well, the project grew legs and became a bit of an obsession. Version 1.0 was based on CustomTkinter 4, which had a radically different JSON format for the theme files. So when Tom decided to release v5 with a drastically different format, I decided to take a break and let things with the new version, bed in. Anyway, although the initial CTk Theme Builder was functional, it was never as polished as I would have liked.  The CustomTkinter v5 JSON format was actually a game changer - much improved and more object oriented, although it did present some non-trivial re-engineering challenges, but finally, here we are.
 
-### Key Features
+## Key Features
 CTk Theme Builder has been developed and refined, based on experience developing CustomTkinter themes, as well as some input provided by friends and colleagues. 
 
 Key features include:  
@@ -32,7 +38,7 @@ Key features include:
 * Undo / Redo controls, for undoing & redoing individual changes.
 
 
-### CustomTkinter Version
+## CustomTkinter Version
 Version 3.2 of CTk Theme Builder was designed around CustomTkinter 5.2.2. Any behaviours / features described herein are based upon this version. When you install CTk Theme Builder, it will install library modules into a virtual environment. Included in this will be CustomTkinter 5.2.2. If you upgrade, or downgrade the installed CustomTkinter version, this may have unpredictable results.
 
 ## Fundamentals
@@ -41,7 +47,6 @@ Version 3.2 of CTk Theme Builder was designed around CustomTkinter 5.2.2. Any be
 There are two main panels, the *Control Panel* and the *Preview Panel*. There are a sections in the guide, which cover these panels as well as other dialogues.
 
 ![CTkThemeBuilder-about](CTkThemeBuilder-about.png)
-
 
 The job of the *Control Panel* is to present necessary interface controls, giving you the means to create and manage the appearance of your theme. The controls comprise the main control function along the left side of the panel. The main bulk of the *Control Panel* window, is comprised of property tiles used to assign colours to the theme palette and to individual widget properties. There are also a number of buttons near the top, which allow you to select individual widget types, so that you can adjust the theme geometry properties (corner radius, border width etc) of the CustomTkinter widgets. 
 
