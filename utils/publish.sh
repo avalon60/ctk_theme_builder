@@ -18,6 +18,16 @@ realpath_fallback() {
 }
 
 find_twine() {
+  if command -v python >/dev/null 2>&1 && python -m twine --version >/dev/null 2>&1; then
+    echo "python -m twine"
+    return
+  fi
+
+  if command -v python3 >/dev/null 2>&1 && python3 -m twine --version >/dev/null 2>&1; then
+    echo "python3 -m twine"
+    return
+  fi
+
   if command -v twine >/dev/null 2>&1; then
     local twine_path
     twine_path="$(command -v twine)"
@@ -91,6 +101,13 @@ if [ -z "${TWINE}" ]; then
   exit 1
 fi
 
+echo "Using Twine command: ${TWINE}"
+if ! eval "${TWINE}" --version >/dev/null 2>&1; then
+  echo "ERROR: Selected Twine command is not runnable: ${TWINE}"
+  echo "Install Twine into the active environment, or fix the Twine shim on your PATH."
+  exit 1
+fi
+
 pushd "${APP_HOME}" >/dev/null
 
 if [ "${SHOW_VERSION:-N}" = "Y" ]; then
@@ -136,13 +153,13 @@ echo "Release version: ${VERSION_TAG}"
 echo "Target repository: ${REPOSITORY}"
 
 echo "Checking release metadata with twine..."
-"${TWINE}" check "${WHEEL_FILE}" "${SDIST_FILE}"
+eval "${TWINE}" check "${WHEEL_FILE}" "${SDIST_FILE}"
 
 echo "Uploading release artefacts..."
 if [ "${REPOSITORY}" = "pypi" ]; then
-  "${TWINE}" upload "${WHEEL_FILE}" "${SDIST_FILE}"
+  eval "${TWINE}" upload "${WHEEL_FILE}" "${SDIST_FILE}"
 else
-  "${TWINE}" upload --repository testpypi "${WHEEL_FILE}" "${SDIST_FILE}"
+  eval "${TWINE}" upload --repository testpypi "${WHEEL_FILE}" "${SDIST_FILE}"
 fi
 
 popd >/dev/null
