@@ -15,10 +15,12 @@ usage() {
   cat <<'EOF'
 Usage:
   ./utils/test_wheel_install.sh <python-version> [wheel-path]
+  ./utils/test_wheel_install.sh -l
 
 Examples:
   ./utils/test_wheel_install.sh 3.13.5
   ./utils/test_wheel_install.sh 3.12.0 dist/ctk_theme_builder-3.2.0-py3-none-any.whl
+  ./utils/test_wheel_install.sh -l
 
 Behavior:
   - uses pyenv for the requested Python version
@@ -28,13 +30,34 @@ Behavior:
 
 Wheel selection:
   - if [wheel-path] is supplied, that file is used
-  - otherwise the script looks for the newest *.whl in the current directory
-    and then in ./dist
+  - otherwise the script looks for the newest *.whl in ./dist
+    and then in the current directory
 EOF
+}
+
+list_wheels() {
+  if [ ! -d "./dist" ]; then
+    echo "No dist directory found."
+    exit 1
+  fi
+
+  WHEELS=$(find ./dist -maxdepth 1 -type f -name '*.whl' | sort)
+  if [ -z "${WHEELS}" ]; then
+    echo "No wheel files found in ./dist."
+    exit 1
+  fi
+
+  echo "Wheel files in ./dist:"
+  printf '%s\n' "${WHEELS}"
 }
 
 if [ "${1:-}" = "-h" ] || [ "${1:-}" = "--help" ]; then
   usage
+  exit 0
+fi
+
+if [ "${1:-}" = "-l" ]; then
+  list_wheels
   exit 0
 fi
 
@@ -58,16 +81,16 @@ if ! pyenv prefix "${PYTHON_VERSION}" >/dev/null 2>&1; then
 fi
 
 if [ -z "${WHEEL_PATH}" ]; then
-  WHEEL_PATH=$(find . -maxdepth 1 -type f -name '*.whl' -printf '%T@ %p\n' | sort -nr | head -1 | cut -d ' ' -f2-)
-fi
-
-if [ -z "${WHEEL_PATH}" ]; then
   WHEEL_PATH=$(find ./dist -maxdepth 1 -type f -name '*.whl' -printf '%T@ %p\n' 2>/dev/null | sort -nr | head -1 | cut -d ' ' -f2-)
 fi
 
 if [ -z "${WHEEL_PATH}" ]; then
-  echo "ERROR: No wheel found in the current directory or ./dist."
-  echo "Run this script from the directory containing the wheel, or pass the wheel path explicitly."
+  WHEEL_PATH=$(find . -maxdepth 1 -type f -name '*.whl' -printf '%T@ %p\n' | sort -nr | head -1 | cut -d ' ' -f2-)
+fi
+
+if [ -z "${WHEEL_PATH}" ]; then
+  echo "ERROR: No wheel found in ./dist or the current directory."
+  echo "Build the wheel first, or pass the wheel path explicitly."
   exit 1
 fi
 
