@@ -103,6 +103,8 @@ For an installed package, the preferred target is the installed command:
 
 If you install into a virtual environment, the launcher or shortcut must target the command from that same environment.
 
+On Linux, installing from a wheel or via `pip` may also create an application menu entry automatically, depending on the desktop environment and how the Python environment exposes desktop integration.
+
 If you prefer not to deal with virtual-environment activation manually, CTk Theme Builder can also generate a convenience launcher for the current environment from:
 
 `Tools -> Generate Launcher`
@@ -112,6 +114,19 @@ This writes a platform-specific launcher into:
 `~/CTkThemeBuilder/launchers`
 
 The generated launcher uses the interpreter from the currently running CTk Theme Builder session, so it is a practical way to create a clickable shortcut for the exact environment you are using.
+
+On Linux, the launcher generation step creates:
+
+- `ctk-theme-builder.sh` as the runner script
+- `ctk-theme-builder.desktop` as the desktop-entry file
+
+From the launcher result dialogue you can then:
+
+- copy the launcher path
+- install the desktop entry into your applications menu
+- create a desktop shortcut
+
+Some Linux desktop environments may still require you to use `Allow Launching` on the desktop shortcut before it behaves like a normal application launcher.
 
 ## Wrapper Scripts As A Convenience Option
 

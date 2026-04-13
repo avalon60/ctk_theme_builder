@@ -24,6 +24,7 @@ LINUX_DESKTOP_FILENAME = "ctk-theme-builder.desktop"
 LINUX_RUNNER_FILENAME = "ctk-theme-builder.sh"
 MACOS_LAUNCHER_FILENAME = "ctk-theme-builder.command"
 WINDOWS_LAUNCHER_FILENAME = "ctk-theme-builder.bat"
+LINUX_ICON_FILENAME = "CTkThemeBuilder128x128.png"
 
 
 class LauncherGenerationError(RuntimeError):
@@ -116,7 +117,12 @@ def _linux_runner_text(python_executable: Path, controller_script: Path, generat
     )
 
 
-def _linux_desktop_text(runner_script: Path, generated_at: str, python_executable: Path, app_version: str) -> str:
+def _linux_desktop_text(
+        runner_script: Path,
+        icon_path: Path,
+        generated_at: str,
+        python_executable: Path,
+        app_version: str) -> str:
     quoted_runner = shlex.quote(str(runner_script))
     return (
         f"{_header_lines('#', generated_at, python_executable, app_version)}"
@@ -126,6 +132,7 @@ def _linux_desktop_text(runner_script: Path, generated_at: str, python_executabl
         "Name=CTk Theme Builder\n"
         "Comment=Launch CTk Theme Builder\n"
         f"Exec={quoted_runner}\n"
+        f"Icon={icon_path}\n"
         "Terminal=false\n"
         "Categories=Development;\n"
     )
@@ -203,6 +210,7 @@ def generate_platform_launcher(
     if system_name == "Linux":
         runner_path = target_dir / LINUX_RUNNER_FILENAME
         desktop_path = target_dir / LINUX_DESKTOP_FILENAME
+        icon_path = (app_paths.APP_IMAGES / LINUX_ICON_FILENAME).resolve()
         _write_text_file(
             runner_path,
             _linux_runner_text(
@@ -216,6 +224,7 @@ def generate_platform_launcher(
             desktop_path,
             _linux_desktop_text(
                 runner_script=runner_path,
+                icon_path=icon_path,
                 generated_at=generated_at,
                 python_executable=python_path,
                 app_version=app_version,
