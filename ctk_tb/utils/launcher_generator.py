@@ -10,21 +10,24 @@ from dataclasses import dataclass
 from datetime import datetime
 import os
 import platform
+import plistlib
 import re
 import shlex
 import shutil
+import subprocess
 import sys
 from pathlib import Path
 
 import ctk_tb.paths as app_paths
 
-APPLICATIONS_MENU_DIR = Path.home() / ".local" / "share" / "applications"
-DESKTOP_DIR = Path.home() / "Desktop"
 LINUX_DESKTOP_FILENAME = "ctk-theme-builder.desktop"
 LINUX_RUNNER_FILENAME = "ctk-theme-builder.sh"
-MACOS_LAUNCHER_FILENAME = "ctk-theme-builder.command"
+MACOS_APP_BUNDLE_NAME = "CTk Theme Builder.app"
+MACOS_BUNDLE_EXECUTABLE = "ctk-theme-builder"
 WINDOWS_LAUNCHER_FILENAME = "ctk-theme-builder.bat"
-LINUX_ICON_FILENAME = "CTkThemeBuilder128x128.png"
+WINDOWS_SHORTCUT_FILENAME = "CTk Theme Builder.lnk"
+WINDOWS_ICON_FILENAME = "ctk-tb-ico.ico"
+LINUX_ICON_FILENAME = "ctk-tb-ico-256.png"
 
 
 class LauncherGenerationError(RuntimeError):
@@ -42,6 +45,60 @@ class LauncherBundle:
     generated_at: str
     app_version: str
     runner_script_path: Path | None = None
+
+
+def applications_menu_dir(system_name: str) -> Path:
+    """Return the user-writable applications/start-menu directory for a platform."""
+    if system_name == "Linux":
+        return Path.home() / ".local" / "share" / "applications"
+    if system_name == "Darwin":
+        return Path.home() / "Applications"
+
+    appdata = os.getenv("APPDATA")
+    if appdata:
+        return Path(appdata) / "Microsoft" / "Windows" / "Start Menu" / "Programs"
+    return Path.home() / "AppData" / "Roaming" / "Microsoft" / "Windows" / "Start Menu" / "Programs"
+
+
+def desktop_dir(system_name: str) -> Path:
+    """Return the user desktop directory for a platform."""
+    if system_name == "Windows":
+        userprofile = os.getenv("USERPROFILE")
+        if userprofile:
+            return Path(userprofile) / "Desktop"
+    return Path.home() / "Desktop"
+
+
+def applications_menu_label(system_name: str) -> str:
+    """Return the user-facing applications action label for a platform."""
+    if system_name == "Linux":
+        return "Install to Applications Menu"
+    if system_name == "Darwin":
+        return "Install to Applications Folder"
+    return "Install to Start Menu"
+
+
+def desktop_shortcut_label(system_name: str) -> str:
+    """Return the user-facing desktop action label for a platform."""
+    if system_name == "Darwin":
+        return "Create Desktop App"
+    if system_name == "Windows":
+        return "Create Desktop Launcher"
+    return "Create Desktop Shortcut"
+
+
+def applications_menu_target_path(launcher_bundle: LauncherBundle) -> Path:
+    """Return the platform-appropriate target path for application-menu installation."""
+    if launcher_bundle.system_name == "Windows":
+        return applications_menu_dir(launcher_bundle.system_name) / WINDOWS_SHORTCUT_FILENAME
+    return applications_menu_dir(launcher_bundle.system_name) / launcher_bundle.launcher_path.name
+
+
+def desktop_shortcut_target_path(launcher_bundle: LauncherBundle) -> Path:
+    """Return the platform-appropriate target path for desktop shortcut installation."""
+    if launcher_bundle.system_name == "Windows":
+        return desktop_dir(launcher_bundle.system_name) / WINDOWS_SHORTCUT_FILENAME
+    return desktop_dir(launcher_bundle.system_name) / launcher_bundle.launcher_path.name
 
 
 def _application_version() -> str:
@@ -95,16 +152,24 @@ def _header_lines(comment_prefix: str, generated_at: str, python_executable: Pat
     )
 
 
+def _package_root(controller_script: Path) -> Path:
+    """Return the import root that contains the ``ctk_tb`` package."""
+    return controller_script.resolve().parent.parent.parent
+
+
 def _linux_runner_text(python_executable: Path, controller_script: Path, generated_at: str, app_version: str) -> str:
     quoted_python = shlex.quote(str(python_executable))
     quoted_controller = shlex.quote(str(controller_script))
+    quoted_package_root = shlex.quote(str(_package_root(controller_script)))
     return (
         "#!/usr/bin/env bash\n"
         f"{_header_lines('#', generated_at, python_executable, app_version)}"
         "PYTHON_EXE="
         f"{quoted_python}\n"
         "CTK_THEME_BUILDER="
-        f"{quoted_controller}\n\n"
+        f"{quoted_controller}\n"
+        "PACKAGE_ROOT="
+        f"{quoted_package_root}\n\n"
         'if [ ! -x "$PYTHON_EXE" ]; then\n'
         '  echo "Python interpreter not found. Please regenerate this launcher via CTk Theme Builder."\n'
         "  exit 1\n"
@@ -112,6 +177,11 @@ def _linux_runner_text(python_executable: Path, controller_script: Path, generat
         'if [ ! -f "$CTK_THEME_BUILDER" ]; then\n'
         '  echo "CTk Theme Builder entry point not found. Please regenerate this launcher via CTk Theme Builder."\n'
         "  exit 1\n"
+        "fi\n\n"
+        'if [ -n "$PYTHONPATH" ]; then\n'
+        '  export PYTHONPATH="$PACKAGE_ROOT:$PYTHONPATH"\n'
+        "else\n"
+        '  export PYTHONPATH="$PACKAGE_ROOT"\n'
         "fi\n\n"
         'exec "$PYTHON_EXE" "$CTK_THEME_BUILDER" "$@"\n'
     )
@@ -141,13 +211,16 @@ def _linux_desktop_text(
 def _macos_launcher_text(python_executable: Path, controller_script: Path, generated_at: str, app_version: str) -> str:
     quoted_python = shlex.quote(str(python_executable))
     quoted_controller = shlex.quote(str(controller_script))
+    quoted_package_root = shlex.quote(str(_package_root(controller_script)))
     return (
         "#!/usr/bin/env bash\n"
         f"{_header_lines('#', generated_at, python_executable, app_version)}"
         "PYTHON_EXE="
         f"{quoted_python}\n"
         "CTK_THEME_BUILDER="
-        f"{quoted_controller}\n\n"
+        f"{quoted_controller}\n"
+        "PACKAGE_ROOT="
+        f"{quoted_package_root}\n\n"
         'if [ ! -x "$PYTHON_EXE" ]; then\n'
         '  echo "Python interpreter not found. Please regenerate this launcher via CTk Theme Builder."\n'
         "  exit 1\n"
@@ -155,6 +228,11 @@ def _macos_launcher_text(python_executable: Path, controller_script: Path, gener
         'if [ ! -f "$CTK_THEME_BUILDER" ]; then\n'
         '  echo "CTk Theme Builder entry point not found. Please regenerate this launcher via CTk Theme Builder."\n'
         "  exit 1\n"
+        "fi\n\n"
+        'if [ -n "$PYTHONPATH" ]; then\n'
+        '  export PYTHONPATH="$PACKAGE_ROOT:$PYTHONPATH"\n'
+        "else\n"
+        '  export PYTHONPATH="$PACKAGE_ROOT"\n'
         "fi\n\n"
         'exec "$PYTHON_EXE" "$CTK_THEME_BUILDER" "$@"\n'
     )
@@ -165,11 +243,13 @@ def _windows_launcher_text(
         controller_script: Path,
         generated_at: str,
         app_version: str) -> str:
+    package_root = _package_root(controller_script)
     return (
         "@echo off\n"
         f"{_header_lines('::', generated_at, python_executable, app_version)}"
         f"set \"PYTHON_EXE={python_executable}\"\n"
         f"set \"CTK_THEME_BUILDER={controller_script}\"\n\n"
+        f"set \"PACKAGE_ROOT={package_root}\"\n\n"
         "if not exist \"%PYTHON_EXE%\" (\n"
         "  echo Python interpreter not found. Please regenerate this launcher via CTk Theme Builder.\n"
         "  exit /b 1\n"
@@ -177,6 +257,11 @@ def _windows_launcher_text(
         "if not exist \"%CTK_THEME_BUILDER%\" (\n"
         "  echo CTk Theme Builder entry point not found. Please regenerate this launcher via CTk Theme Builder.\n"
         "  exit /b 1\n"
+        ")\n\n"
+        "if defined PYTHONPATH (\n"
+        "  set \"PYTHONPATH=%PACKAGE_ROOT%;%PYTHONPATH%\"\n"
+        ") else (\n"
+        "  set \"PYTHONPATH=%PACKAGE_ROOT%\"\n"
         ")\n\n"
         "\"%PYTHON_EXE%\" \"%CTK_THEME_BUILDER%\" %*\n"
         "if errorlevel 1 exit /b %errorlevel%\n"
@@ -190,6 +275,94 @@ def _write_text_file(path: Path, content: str) -> None:
         path.write_text(content, encoding="utf-8")
     except OSError as exc:
         raise LauncherGenerationError(f"Unable to write launcher file {path}: {exc}") from exc
+
+
+def _write_binary_file(path: Path, content: bytes) -> None:
+    """Write a binary file."""
+    try:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_bytes(content)
+    except OSError as exc:
+        raise LauncherGenerationError(f"Unable to write launcher file {path}: {exc}") from exc
+
+
+def _macos_info_plist(app_version: str) -> bytes:
+    """Return Info.plist content for a lightweight macOS app bundle."""
+    plist_data = {
+        "CFBundleDevelopmentRegion": "en",
+        "CFBundleExecutable": MACOS_BUNDLE_EXECUTABLE,
+        "CFBundleIdentifier": "org.avalon60.ctk-theme-builder.launcher",
+        "CFBundleInfoDictionaryVersion": "6.0",
+        "CFBundleName": "CTk Theme Builder",
+        "CFBundlePackageType": "APPL",
+        "CFBundleShortVersionString": app_version,
+        "CFBundleVersion": app_version,
+        "LSMinimumSystemVersion": "10.13",
+    }
+    return plistlib.dumps(plist_data)
+
+
+def _copy_launcher_artifact(source_path: Path, target_path: Path, system_name: str) -> Path:
+    """Copy a launcher file or bundle to its final destination."""
+    try:
+        target_path.parent.mkdir(parents=True, exist_ok=True)
+        if target_path.exists():
+            if target_path.is_dir():
+                shutil.rmtree(target_path)
+            else:
+                target_path.unlink()
+
+        if source_path.is_dir():
+            shutil.copytree(source_path, target_path)
+        else:
+            shutil.copy2(source_path, target_path)
+    except OSError as exc:
+        raise LauncherGenerationError(f"Unable to copy launcher to {target_path}: {exc}") from exc
+
+    if system_name in {"Linux", "Darwin"}:
+        if target_path.is_dir():
+            executable_path = target_path / "Contents" / "MacOS" / MACOS_BUNDLE_EXECUTABLE
+            if executable_path.exists():
+                _set_executable(executable_path)
+        else:
+            _set_executable(target_path)
+    return target_path
+
+
+def _create_windows_shortcut(target_path: Path, launcher_path: Path, icon_path: Path) -> Path:
+    """Create a Windows .lnk shortcut pointing at the generated batch launcher."""
+    target_path.parent.mkdir(parents=True, exist_ok=True)
+    if target_path.exists():
+        target_path.unlink()
+
+    working_directory = str(launcher_path.parent)
+    powershell_script = (
+        "$WshShell = New-Object -ComObject WScript.Shell; "
+        f"$Shortcut = $WshShell.CreateShortcut('{str(target_path)}'); "
+        f"$Shortcut.TargetPath = '{str(launcher_path)}'; "
+        f"$Shortcut.WorkingDirectory = '{working_directory}'; "
+        f"$Shortcut.IconLocation = '{str(icon_path)},0'; "
+        "$Shortcut.Save()"
+    )
+
+    for executable in ("powershell.exe", "pwsh.exe"):
+        try:
+            subprocess.run(
+                [executable, "-NoProfile", "-ExecutionPolicy", "Bypass", "-Command", powershell_script],
+                check=True,
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.PIPE,
+                text=True,
+            )
+            return target_path
+        except FileNotFoundError:
+            continue
+        except subprocess.CalledProcessError as exc:
+            raise LauncherGenerationError(
+                f"Unable to create Windows shortcut via {executable}: {exc.stderr.strip()}"
+            ) from exc
+
+    raise LauncherGenerationError("Unable to create Windows shortcut: PowerShell is not available.")
 
 
 def generate_platform_launcher(
@@ -243,9 +416,11 @@ def generate_platform_launcher(
         )
 
     if system_name == "Darwin":
-        launcher_path = target_dir / MACOS_LAUNCHER_FILENAME
+        launcher_path = target_dir / MACOS_APP_BUNDLE_NAME
+        executable_path = launcher_path / "Contents" / "MacOS" / MACOS_BUNDLE_EXECUTABLE
+        info_plist_path = launcher_path / "Contents" / "Info.plist"
         _write_text_file(
-            launcher_path,
+            executable_path,
             _macos_launcher_text(
                 python_executable=python_path,
                 controller_script=controller_path,
@@ -253,7 +428,8 @@ def generate_platform_launcher(
                 app_version=app_version,
             ),
         )
-        _set_executable(launcher_path)
+        _write_binary_file(info_plist_path, _macos_info_plist(app_version))
+        _set_executable(executable_path)
         return LauncherBundle(
             system_name=system_name,
             python_executable=python_path,
@@ -284,34 +460,18 @@ def generate_platform_launcher(
 
 
 def install_to_applications_menu(launcher_bundle: LauncherBundle) -> Path:
-    """Install the generated Linux desktop entry into the user applications menu."""
-    if launcher_bundle.system_name != "Linux":
-        raise LauncherGenerationError("Applications menu installation is supported on Linux only.")
-
-    target_path = APPLICATIONS_MENU_DIR / LINUX_DESKTOP_FILENAME
-    try:
-        APPLICATIONS_MENU_DIR.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(launcher_bundle.launcher_path, target_path)
-    except OSError as exc:
-        raise LauncherGenerationError(
-            f"Unable to install launcher to the applications menu: {exc}"
-        ) from exc
-    _set_executable(target_path)
-    return target_path
+    """Install the generated launcher into the user applications/start-menu location."""
+    target_path = applications_menu_target_path(launcher_bundle)
+    if launcher_bundle.system_name == "Windows":
+        icon_path = (app_paths.APP_IMAGES / WINDOWS_ICON_FILENAME).resolve()
+        return _create_windows_shortcut(target_path, launcher_bundle.launcher_path, icon_path)
+    return _copy_launcher_artifact(launcher_bundle.launcher_path, target_path, launcher_bundle.system_name)
 
 
 def create_desktop_shortcut(launcher_bundle: LauncherBundle) -> Path:
-    """Install the generated Linux desktop entry onto the user's desktop."""
-    if launcher_bundle.system_name != "Linux":
-        raise LauncherGenerationError("Desktop shortcut creation is supported on Linux only.")
-
-    target_path = DESKTOP_DIR / LINUX_DESKTOP_FILENAME
-    try:
-        DESKTOP_DIR.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(launcher_bundle.launcher_path, target_path)
-    except OSError as exc:
-        raise LauncherGenerationError(
-            f"Unable to create desktop shortcut: {exc}"
-        ) from exc
-    _set_executable(target_path)
-    return target_path
+    """Install the generated launcher onto the user's desktop."""
+    target_path = desktop_shortcut_target_path(launcher_bundle)
+    if launcher_bundle.system_name == "Windows":
+        icon_path = (app_paths.APP_IMAGES / WINDOWS_ICON_FILENAME).resolve()
+        return _create_windows_shortcut(target_path, launcher_bundle.launcher_path, icon_path)
+    return _copy_launcher_artifact(launcher_bundle.launcher_path, target_path, launcher_bundle.system_name)

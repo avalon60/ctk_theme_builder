@@ -20,6 +20,24 @@ For Ubuntu-based distributions, ensure that the `venv` package is installed for 
 
 `apt install python3.12-venv`
 
+## Create And Activate A Virtual Environment
+
+Recommended installation from PyPI is via a virtual environment.
+
+On Linux or macOS:
+
+```bash
+python -m venv .venv
+source .venv/bin/activate
+```
+
+On Windows PowerShell:
+
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+```
+
 ## Upgrade From PyPI
 
 Upgrade an existing installation with:
