@@ -54,6 +54,10 @@
       "#00bee3",
       "#f4cb29"
     ],
+    "text_color_disabled": [
+      "#00bee3",
+      "#f4cb29"
+    ],
     "border_width": 0,
     "border_color": [
       "#979DA2",

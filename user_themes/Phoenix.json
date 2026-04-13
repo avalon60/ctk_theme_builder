@@ -58,6 +58,10 @@
     "text_color": [
       "#40251c",
       "#f2dfd4"
+    ],
+    "text_color_disabled": [
+      "#40251c",
+      "#f2dfd4"
     ]
   },
   "CTkEntry": {
