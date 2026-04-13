@@ -7,6 +7,19 @@
 
 *A desktop editor for creating, previewing, and refining CustomTkinter themes.*
 
+## Table of Contents
+* [Acknowledgements](#acknowledgements)
+* [A Brief History](#a-brief-history)
+* [Key Features](#key-features)
+* [CustomTkinter Version](#customtkinter-version)
+* [Fundamentals](#fundamentals)
+* [Menus](#menus)
+* [Control Panel](#control-panel)
+* [Preview Panel](#preview-panel)
+* [Composite Widgets](#composite-widgets)
+* [What's New in CTk Theme Builder 3.2](#whats-new-in-ctk-theme-builder-32)
+* [Known Issues and Behaviours](#known-issues-and-behaviours)
+
 ## Acknowledgements
 *A thank-you to my ever patient, ever loving, beautiful wife, who has let me hide in my office and beaver away at this project for many an hour.*
 
@@ -142,7 +155,9 @@ The *Tools* menu provides access to:
 2. Colour Harmonics dialogue
 3. Merge Themes
 4. Browse Icons
-5. About (CTk Theme Builder)
+5. Generate Launcher
+6. View Runtime Log
+7. About (CTk Theme Builder)
 
 The Colour Harmonics option is only enabled, when you start working on a theme.
 
@@ -168,6 +183,37 @@ The icon list is filterable, so you can type a partial name and quickly narrow t
 The browser is launched as a separate utility window, and like the other CTk Theme Builder panels, its geometry is remembered between sessions. It also has its own scaling preference, which can be adjusted via the *Preferences* dialogue.
 
 If you are using the browser to help develop your own CustomTkinter programs, it can be a quick way to experiment with icon names without having to repeatedly edit and re-run code.
+
+### Generate Launcher
+The *Generate Launcher* option is accessed via the *Tools -> Generate Launcher* menu selection.
+
+This creates a launcher for the Python environment from which CTk Theme Builder is currently running. This is useful when you want a clickable shortcut that always uses the correct interpreter and installed package location, without needing to activate a virtual environment manually.
+
+When the launcher is generated, a results dialogue is displayed showing:
+
+* The Python interpreter path;
+* The launcher file path.
+
+The dialogue also provides a *Copy Path* button, which copies the launcher path to the clipboard.
+
+On Linux, the generation step creates both:
+
+* A runner script;
+* A `.desktop` launcher file.
+
+From the same dialogue you can then:
+
+* Install the launcher to the Applications Menu;
+* Create a Desktop Shortcut.
+
+If the target file already exists, you are prompted before it is overwritten.
+
+Linux users should also be aware that some desktop environments may require an additional *Allow Launching* action before a newly created desktop shortcut behaves like a normal application launcher.
+
+### View Runtime Log
+The *View Runtime Log* option is accessed via the *Tools -> View Runtime Log* menu selection.
+
+This opens the current runtime log so that you can inspect recent application activity, warnings, and errors without needing to locate the log file manually.
 
 
 ### Preferences
