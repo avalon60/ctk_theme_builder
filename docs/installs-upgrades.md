@@ -1,6 +1,6 @@
 # Installation, Upgrade, And Migration Notes
 
-![CTk Theme Builder](../assets/images/ctk-tb-logo.png)
+![CTk Theme Builder](./ctk-tb-logo.png)
 
 CTk Theme Builder supports Python 3.10 through Python 3.13.
 
