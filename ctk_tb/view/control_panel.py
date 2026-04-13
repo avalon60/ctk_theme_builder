@@ -8,8 +8,10 @@ import ctk_tb.paths as app_paths
 from ctk_tb.model.ctk_theme_builder import log_call
 import ctk_tb.utils.loggerutl as log
 from ctk_tb.utils.theme_compat import backfill_text_color_disabled
-from ctk_tb.utils.launcher_generator import APPLICATIONS_MENU_DIR
-from ctk_tb.utils.launcher_generator import DESKTOP_DIR
+from ctk_tb.utils.launcher_generator import applications_menu_label
+from ctk_tb.utils.launcher_generator import applications_menu_target_path
+from ctk_tb.utils.launcher_generator import desktop_shortcut_label
+from ctk_tb.utils.launcher_generator import desktop_shortcut_target_path
 from ctk_tb.utils.launcher_generator import LauncherBundle
 from ctk_tb.utils.launcher_generator import LauncherGenerationError
 from ctk_tb.utils.launcher_generator import create_desktop_shortcut
@@ -141,18 +143,15 @@ class LauncherGeneratorDialog(ctk.CTkToplevel):
         btn_copy.grid(row=0, column=3, padx=(0, 10), pady=5, sticky='e')
 
         self.btn_install_applications = ctk.CTkButton(master=frm_buttons,
-                                                       text='Install to Applications Menu',
+                                                       text=applications_menu_label(self.launcher_bundle.system_name),
                                                        command=self.install_to_applications_menu)
-        self.btn_install_applications.grid(row=0, column=1, padx=(15, 10), pady=5, sticky='w')
+        if self.launcher_bundle.system_name != 'Windows':
+            self.btn_install_applications.grid(row=0, column=1, padx=(15, 10), pady=5, sticky='w')
 
         self.btn_create_desktop = ctk.CTkButton(master=frm_buttons,
-                                                text='Create Desktop Shortcut',
+                                                text=desktop_shortcut_label(self.launcher_bundle.system_name),
                                                 command=self.create_desktop_shortcut)
         self.btn_create_desktop.grid(row=0, column=2, padx=(0, 10), pady=5, sticky='w')
-
-        if self.launcher_bundle.system_name != 'Linux':
-            self.btn_install_applications.configure(state=tk.DISABLED)
-            self.btn_create_desktop.configure(state=tk.DISABLED)
 
         self.status_bar = cbtk.CBtkStatusBar(master=self,
                                              status_text_life=15,
@@ -184,7 +183,7 @@ class LauncherGeneratorDialog(ctk.CTkToplevel):
         return confirm.get() == 'Overwrite'
 
     def install_to_applications_menu(self):
-        target_path = APPLICATIONS_MENU_DIR / self.launcher_bundle.launcher_path.name
+        target_path = applications_menu_target_path(self.launcher_bundle)
         if not self._confirm_overwrite(target_path, 'Overwrite Applications Menu Entry'):
             self.status_bar.set_status_text('Applications menu install cancelled.')
             return
@@ -198,7 +197,7 @@ class LauncherGeneratorDialog(ctk.CTkToplevel):
         self.status_bar.set_status_text(f'Launcher installed to applications menu: {installed_path}')
 
     def create_desktop_shortcut(self):
-        target_path = DESKTOP_DIR / self.launcher_bundle.launcher_path.name
+        target_path = desktop_shortcut_target_path(self.launcher_bundle)
         if not self._confirm_overwrite(target_path, 'Overwrite Desktop Shortcut'):
             self.status_bar.set_status_text('Desktop shortcut creation cancelled.')
             return
