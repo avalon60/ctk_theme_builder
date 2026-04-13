@@ -70,7 +70,8 @@ ctktb-migrate-assets /path/to/old/install
 ## Documentation
 
 - Installation and upgrade notes: [docs/installs-upgrades.md](docs/installs-upgrades.md)
-- User guides and release notes: [project wiki](https://github.com/avalon60/ctk_theme_builder/wiki)
+- User guide: [docs/UserGuide-3.2.md](docs/UserGuide-3.2.md)
+- Release notes: [release-notes-3.2.9.md](release-notes-3.2.9.md)
 - Source code and issue tracker: [GitHub repository](https://github.com/avalon60/ctk_theme_builder)
 
 ## Licence
