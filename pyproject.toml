@@ -1,6 +1,6 @@
 [project]
 name = "ctk-theme-builder"
-version = "3.2.3"
+version = "3.2.7"
 description = "A desktop theme editor for building and previewing CustomTkinter themes."
 readme = "README.md"
 requires-python = ">=3.10,<3.14"
@@ -70,6 +70,7 @@ packages = [
 ]
 include = [
   { path = "assets", format = ["sdist", "wheel"] },
+  { path = "user_themes", format = ["sdist", "wheel"] },
   { path = "README.md", format = ["sdist", "wheel"] },
   { path = "LICENSE", format = ["sdist", "wheel"] },
 ]

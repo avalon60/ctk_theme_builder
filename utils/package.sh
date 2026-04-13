@@ -18,7 +18,11 @@ realpath_fallback() {
 }
 
 find_poetry() {
-  if command -v poetry >/dev/null 2>&1; then
+  if command -v python >/dev/null 2>&1 && python -m poetry --version >/dev/null 2>&1; then
+    echo "python -m poetry"
+  elif command -v python3 >/dev/null 2>&1 && python3 -m poetry --version >/dev/null 2>&1; then
+    echo "python3 -m poetry"
+  elif command -v poetry >/dev/null 2>&1; then
     echo "poetry"
   elif [ -x "${HOME}/.local/bin/poetry" ]; then
     echo "${HOME}/.local/bin/poetry"
@@ -64,6 +68,13 @@ if [ -z "${POETRY}" ]; then
   exit 1
 fi
 
+echo "Using Poetry command: ${POETRY}"
+if ! eval "${POETRY}" --version >/dev/null 2>&1; then
+  echo "ERROR: Selected Poetry command is not runnable: ${POETRY}"
+  echo "Install Poetry into the active environment, or fix the Poetry shim on your PATH."
+  exit 1
+fi
+
 pushd "${APP_HOME}" >/dev/null
 
 app_version() {
@@ -104,13 +115,20 @@ rm -rf "${RELEASE_DIR}"
 mkdir -p "${RELEASE_DIR}"
 
 echo "Checking Poetry metadata..."
-"${POETRY}" check
+eval "${POETRY}" check
+
+if ! eval "${POETRY}" export --help >/dev/null 2>&1; then
+  echo "ERROR: The selected Poetry installation does not provide the 'export' command."
+  echo "Install the poetry-plugin-export plugin in the active environment."
+  echo "Example: python -m pip install poetry-plugin-export"
+  exit 1
+fi
 
 echo "Exporting requirements.txt..."
-"${POETRY}" export --format requirements.txt --without-hashes --only main --output "${REQUIREMENTS_FILE}"
+eval "${POETRY}" export --format requirements.txt --without-hashes --only main --output "${REQUIREMENTS_FILE}"
 
 echo "Building sdist and wheel..."
-"${POETRY}" build
+eval "${POETRY}" build
 
 WHEEL_FILE=$(find "${DIST_DIR}" -maxdepth 1 -type f -name "ctk_theme_builder-${VERSION_TAG}-*.whl" | head -1)
 SDIST_FILE=$(find "${DIST_DIR}" -maxdepth 1 -type f -name "ctk_theme_builder-${VERSION_TAG}.tar.gz" | head -1)

@@ -78,6 +78,7 @@ class PreviewPanel:
 
     def __init__(self, theme_file: str, appearance_mode: str = 'Dark'):
         log.log_started(class_name='PreviewPanel', supplementary_text='Theme Builder Preview Panel launched')
+        self._listener_error = None
         self._appearance_mode = appearance_mode
         self._theme_file = theme_file
         ctk.set_default_color_theme(self._theme_file)
@@ -133,7 +134,7 @@ class PreviewPanel:
         self._theme_name = os.path.splitext(theme_name)[0]
 
         self.preview = ctk.CTk()
-        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
+        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'ctk-tb-ico-taskbar.png')
         self.preview.iconphoto(False, icon_photo)
         self.img_selected = cbtk.load_image(light_image=APP_IMAGES / 'colour_wheel.png', image_size=(10, 10))
         self.preview.protocol("WM_DELETE_WINDOW", self.block_closing)
@@ -147,7 +148,9 @@ class PreviewPanel:
         self.render_preview_frames()
         # Start the command listener. This will listen for commands sent by
         # the control panel, and carry out any requested instructions.
-        self.start_method_listener()
+        if not self.start_method_listener():
+            self.preview.destroy()
+            raise SystemExit(1)
         self.preview.mainloop()
 
     @log_call
@@ -823,22 +826,26 @@ class PreviewPanel:
         handle_client function.
         """
         global listener_status
+        listener_status = 0
         self._client_handlers = {}
         log.log_info(log_text=f"Starting method listener on port {METHOD_LISTENER_PORT}...",
                      class_name='PreviewPanel', method_name='_method_listener')
         server = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        server.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
         try:
             server.bind(METHOD_LISTENER_ADDRESS)
-        except OSError:
+        except OSError as exc:
+            self._listener_error = exc
             log.log_critical(f'Preview Panel, socket bind error.',
                              class_name='PreviewPanel', method_name='_method_listener')
 
             log.log_supplementary('Ensure that no other instances of CTk Theme Builder '
                                   f'are running and that port {METHOD_LISTENER_PORT} is free.')
 
-            log.log_exception(OSError)
+            log.log_exception(exc)
             listener_status = -1
-            raise
+            server.close()
+            return
         server.listen()
         log.log_info(f'Method listener successfully started',
                      class_name='PreviewPanel', method_name='_method_listener')
@@ -867,24 +874,33 @@ class PreviewPanel:
 
     @log_call
     def start_method_listener(self):
+        global listener_status
+        listener_status = 0
+        self._listener_error = None
         listener_thread = threading.Thread(target=self._method_listener, daemon=True)
         listener_thread.start()
         # Give the listener time to attempt to attach to the socket,
         # and report if it has a problem.
         time.sleep(0.1)
         if listener_status == -1:
+            error_text = ''
+            if self._listener_error is not None:
+                error_text = f'\n\nSystem error: {self._listener_error}'
             confirm = CTkMessagebox(
                 title='Socket Error',
                 message=f'The listener failed to bind to port {METHOD_LISTENER_PORT}\n\n'
                         f'Ensure that only one instance of {__title__} is running and that no '
-                        f'other process is using the port.',
+                        f'other process is using the port.\n\n'
+                        f'You can also change the listener port in Preferences if needed.'
+                        f'{error_text}',
                 option_1='OK')
             log.log_critical(log_text=f'The listener failed to bind to port {METHOD_LISTENER_PORT}\n\n',
                              class_name='PreviewPanel', method_name='start_method_listener')
             log.log_supplementary(f'Ensure that only one instance of {__title__} is running and that no '
                                   f'other process is using the port.')
             if confirm.get() == 'OK':
-                exit(1)
+                return False
+        return True
 
     @log_call
     def update_widget_colour(self, widget_type, widget_property, widget_colour):

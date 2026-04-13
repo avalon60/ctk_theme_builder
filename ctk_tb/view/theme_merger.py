@@ -21,7 +21,7 @@ class ThemeMerger(ctk.CTkToplevel):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
+        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'ctk-tb-ico-taskbar.png')
         self.iconphoto(False, icon_photo)
 
         self.theme_json_dir = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',

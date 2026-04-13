@@ -40,7 +40,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
 
     def __init__(self, theme_name, theme_json_data: dict, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
+        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'ctk-tb-ico-taskbar.png')
         self.iconphoto(False, icon_photo)
         self.HARMONICS_HEIGHT1 = 550
         self.HARMONICS_HEIGHT2 = 550

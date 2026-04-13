@@ -25,7 +25,7 @@ class ProvenanceDialog(ctk.CTkToplevel):
         self.title('Theme Provenance')
         # self.geometry('520x470')
         # Make sure we pop up in front of Control Panel
-        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'bear-logo-colour-dark.png')
+        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'ctk-tb-ico-taskbar.png')
         self.iconphoto(False, icon_photo)
         self.rowconfigure(1, weight=1)
 

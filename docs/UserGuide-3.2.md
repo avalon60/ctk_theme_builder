@@ -1,15 +1,34 @@
 
 # Introduction
 
-### Acknowledegments
-*A thank-you to my ever patient, ever loving, beautiful wife, who has let me hide in my office and beaver away at this project, for many an hour.* 
-   
+<p align="center">
+  <img src="ctk-tb-logo.png" alt="CTk Theme Builder" width="720">
+</p>
+
+*A desktop editor for creating, previewing, and refining CustomTkinter themes.*
+
+## Table of Contents
+* [Acknowledgements](#acknowledgements)
+* [A Brief History](#a-brief-history)
+* [Key Features](#key-features)
+* [CustomTkinter Version](#customtkinter-version)
+* [Fundamentals](#fundamentals)
+* [Menus](#menus)
+* [Control Panel](#control-panel)
+* [Preview Panel](#preview-panel)
+* [Composite Widgets](#composite-widgets)
+* [What's New in CTk Theme Builder 3.2](#whats-new-in-ctk-theme-builder-32)
+* [Known Issues and Behaviours](#known-issues-and-behaviours)
+
+## Acknowledgements
+*A thank-you to my ever patient, ever loving, beautiful wife, who has let me hide in my office and beaver away at this project for many an hour.*
+
 *I would also like to thank my friend and colleague, Jan Bajec, for his graphics contribution.*
 
-### A Bit of History
+## A Brief History
 In case you are wondering, "so where is CTk Theme Builder version 1.0?", well it was never made public. CTk Theme Builder, started with very humble beginnings. In fact it started with a crude CustomTkinter program which was used to display the results of theme file modifications, performed using a Vim editor (yes I also use Vim - sue me ;o). Features were added and added, and well, the project grew legs and became a bit of an obsession. Version 1.0 was based on CustomTkinter 4, which had a radically different JSON format for the theme files. So when Tom decided to release v5 with a drastically different format, I decided to take a break and let things with the new version, bed in. Anyway, although the initial CTk Theme Builder was functional, it was never as polished as I would have liked.  The CustomTkinter v5 JSON format was actually a game changer - much improved and more object oriented, although it did present some non-trivial re-engineering challenges, but finally, here we are.
 
-### Key Features
+## Key Features
 CTk Theme Builder has been developed and refined, based on experience developing CustomTkinter themes, as well as some input provided by friends and colleagues. 
 
 Key features include:  
@@ -32,7 +51,7 @@ Key features include:
 * Undo / Redo controls, for undoing & redoing individual changes.
 
 
-### CustomTkinter Version
+## CustomTkinter Version
 Version 3.2 of CTk Theme Builder was designed around CustomTkinter 5.2.2. Any behaviours / features described herein are based upon this version. When you install CTk Theme Builder, it will install library modules into a virtual environment. Included in this will be CustomTkinter 5.2.2. If you upgrade, or downgrade the installed CustomTkinter version, this may have unpredictable results.
 
 ## Fundamentals
@@ -41,7 +60,6 @@ Version 3.2 of CTk Theme Builder was designed around CustomTkinter 5.2.2. Any be
 There are two main panels, the *Control Panel* and the *Preview Panel*. There are a sections in the guide, which cover these panels as well as other dialogues.
 
 ![CTkThemeBuilder-about](CTkThemeBuilder-about.png)
-
 
 The job of the *Control Panel* is to present necessary interface controls, giving you the means to create and manage the appearance of your theme. The controls comprise the main control function along the left side of the panel. The main bulk of the *Control Panel* window, is comprised of property tiles used to assign colours to the theme palette and to individual widget properties. There are also a number of buttons near the top, which allow you to select individual widget types, so that you can adjust the theme geometry properties (corner radius, border width etc) of the CustomTkinter widgets. 
 
@@ -137,7 +155,9 @@ The *Tools* menu provides access to:
 2. Colour Harmonics dialogue
 3. Merge Themes
 4. Browse Icons
-5. About (CTk Theme Builder)
+5. Generate Launcher
+6. View Runtime Log
+7. About (CTk Theme Builder)
 
 The Colour Harmonics option is only enabled, when you start working on a theme.
 
@@ -163,6 +183,37 @@ The icon list is filterable, so you can type a partial name and quickly narrow t
 The browser is launched as a separate utility window, and like the other CTk Theme Builder panels, its geometry is remembered between sessions. It also has its own scaling preference, which can be adjusted via the *Preferences* dialogue.
 
 If you are using the browser to help develop your own CustomTkinter programs, it can be a quick way to experiment with icon names without having to repeatedly edit and re-run code.
+
+### Generate Launcher
+The *Generate Launcher* option is accessed via the *Tools -> Generate Launcher* menu selection.
+
+This creates a launcher for the Python environment from which CTk Theme Builder is currently running. This is useful when you want a clickable shortcut that always uses the correct interpreter and installed package location, without needing to activate a virtual environment manually.
+
+When the launcher is generated, a results dialogue is displayed showing:
+
+* The Python interpreter path;
+* The launcher file path.
+
+The dialogue also provides a *Copy Path* button, which copies the launcher path to the clipboard.
+
+On Linux, the generation step creates both:
+
+* A runner script;
+* A `.desktop` launcher file.
+
+From the same dialogue you can then:
+
+* Install the launcher to the Applications Menu;
+* Create a Desktop Shortcut.
+
+If the target file already exists, you are prompted before it is overwritten.
+
+Linux users should also be aware that some desktop environments may require an additional *Allow Launching* action before a newly created desktop shortcut behaves like a normal application launcher.
+
+### View Runtime Log
+The *View Runtime Log* option is accessed via the *Tools -> View Runtime Log* menu selection.
+
+This opens the current runtime log so that you can inspect recent application activity, warnings, and errors without needing to locate the log file manually.
 
 
 ### Preferences

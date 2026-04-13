@@ -54,6 +54,10 @@
       "#2b3449",
       "#ffffff"
     ],
+    "text_color_disabled": [
+      "#2b3449",
+      "#ffffff"
+    ],
     "border_width": 0,
     "border_color": [
       "#979DA2",
