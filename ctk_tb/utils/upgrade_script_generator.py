@@ -37,6 +37,39 @@ class UpgradeScriptBundle:
     app_version: str
 
 
+def _preferred_python_executable(package_dir: Path, fallback: str | None = None) -> Path:
+    """Return the owning virtualenv interpreter when the package is installed from one.
+
+    When CTk Theme Builder is launched via a generated launcher, ``sys.executable``
+    may point at a base interpreter with ``PYTHONPATH`` redirected into a virtual
+    environment. In that case we prefer the virtualenv interpreter derived from the
+    installed package location so upgrade scripts target the same environment that
+    provided the package files.
+    """
+    site_packages_dir = package_dir.resolve().parent
+    if site_packages_dir.name != "site-packages":
+        return Path(fallback or sys.executable).expanduser()
+
+    python_lib_dir = site_packages_dir.parent
+    if python_lib_dir.name.startswith("python"):
+        venv_root = python_lib_dir.parent.parent
+    else:
+        venv_root = python_lib_dir.parent
+    executable_name = Path(fallback or sys.executable).name
+    candidates = [
+        venv_root / "bin" / executable_name,
+        venv_root / "bin" / "python3",
+        venv_root / "bin" / "python",
+        venv_root / "Scripts" / "python.exe",
+        venv_root / "Scripts" / "python",
+    ]
+    for candidate in candidates:
+        if candidate.exists() and os.access(candidate, os.X_OK):
+            return candidate
+
+    return Path(fallback or sys.executable).expanduser()
+
+
 def _application_version() -> str:
     """Return the current CTk Theme Builder application version."""
     model_file = app_paths.PACKAGE_DIR / "model" / "ctk_theme_builder.py"
@@ -116,7 +149,7 @@ def generate_upgrade_script(
     """Generate the upgrade script for the current or specified platform."""
     target_dir = target_dir or app_paths.UPGRADES_DIR
     system_name = system_name or platform.system()
-    python_path = Path(python_executable or sys.executable).expanduser().resolve()
+    python_path = _preferred_python_executable(app_paths.PACKAGE_DIR, python_executable)
     generated_at = _generation_timestamp()
     app_version = _application_version()
 
