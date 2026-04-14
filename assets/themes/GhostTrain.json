@@ -45,6 +45,10 @@
     "text_color": [
       "#ffffff",
       "#ffffff"
+    ],
+    "text_color_disabled": [
+      "#8899a6",
+      "#667081"
     ]
   },
   "CTkLabel": {
