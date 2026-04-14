@@ -118,11 +118,14 @@ def _write_text_file(path: Path, content: str) -> None:
 
 def _linux_upgrade_text(python_executable: Path, generated_at: str) -> str:
     quoted_python = shlex.quote(str(python_executable))
+    app_version = _application_version()
     return (
         "#!/usr/bin/env bash\n"
         "# Author: Clive Bostock\n"
         f"# Date: {generated_at.split()[0]}\n"
         "# Description: Upgrade CTk Theme Builder in its associated virtual environment.\n\n"
+        f"# Python: {python_executable}\n"
+        f"# Version: {app_version}\n\n"
         "set -euo pipefail\n\n"
         "VENV_PYTHON="
         f"{quoted_python}\n\n"
@@ -131,11 +134,14 @@ def _linux_upgrade_text(python_executable: Path, generated_at: str) -> str:
 
 
 def _windows_upgrade_text(python_executable: Path, generated_at: str) -> str:
+    app_version = _application_version()
     return (
         "@echo off\n"
         "REM Author: Clive Bostock\n"
         f"REM Date: {generated_at.split()[0]}\n"
         "REM Description: Upgrade CTk Theme Builder in its associated virtual environment.\n\n"
+        f"REM Python: {python_executable}\n"
+        f"REM Version: {app_version}\n\n"
         f"set \"VENV_PYTHON={python_executable}\"\n\n"
         "\"%VENV_PYTHON%\" -m pip install --upgrade ctk-theme-builder\n"
         "if errorlevel 1 exit /b %errorlevel%\n"
