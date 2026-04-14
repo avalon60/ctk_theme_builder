@@ -154,6 +154,7 @@ def initialise_user_dirs() -> None:
         app_paths.TMP_DIR,
         app_paths.LOG_DIR,
         app_paths.LAUNCHERS_DIR,
+        app_paths.UPGRADES_DIR,
     ):
         directory.mkdir(parents=True, exist_ok=True)
 
