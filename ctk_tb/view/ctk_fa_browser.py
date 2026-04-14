@@ -8,6 +8,7 @@ import ctkfontawesome
 import ctk_tb.model.ctk_theme_builder as mod
 import ctk_tb.model.preferences as pref
 import ctk_tb.utils.cbtk_kit as cbtk
+from ctk_tb.utils.theme_compat import backfill_text_color_disabled
 
 
 APP_IMAGES = mod.APP_IMAGES
@@ -49,6 +50,7 @@ def configure_browser_runtime():
     control_panel_theme_path = str(APP_THEMES_DIR / f"{control_panel_theme}.json")
     try:
         ctk.set_default_color_theme(control_panel_theme_path)
+        backfill_text_color_disabled()
     except FileNotFoundError:
         pass
     ctk.set_appearance_mode(control_panel_mode)
