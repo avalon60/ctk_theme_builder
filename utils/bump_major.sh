@@ -14,6 +14,12 @@ realpath_fallback() {
 PROG_PATH=$(realpath_fallback "$0")
 PROG_DIR=$(dirname "${PROG_PATH}")
 APP_HOME=$(dirname "${PROG_DIR}")
+PYPROJECT_FILE="${APP_HOME}/pyproject.toml"
+
+pyproject_version() {
+  grep '^version = ' "${PYPROJECT_FILE}" | head -1 | cut -f2 -d "=" | tr -d ' "'
+}
+
 cd "${APP_HOME}"
 
 if [ "${1:-}" = "dirty" ]; then
@@ -21,3 +27,5 @@ if [ "${1:-}" = "dirty" ]; then
 else
   poetry run bump2version major
 fi
+
+echo "New version: $(pyproject_version)"
