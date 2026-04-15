@@ -111,6 +111,10 @@
     "text_color": [
       "#dbf2f6",
       "#cdc8ce"
+    ],
+    "text_color_disabled": [
+      "#7a8894",
+      "#7a8894"
     ]
   },
   "CTkProgressBar": {
@@ -168,6 +172,10 @@
     "text_color": [
       "#dbf2f6",
       "#DCE4EE"
+    ],
+    "text_color_disabled": [
+      "#7a8894",
+      "#7a8894"
     ]
   },
   "CTkComboBox": {
@@ -192,6 +200,10 @@
     "text_color": [
       "#def5f9",
       "#cdc8ce"
+    ],
+    "text_color_disabled": [
+      "#7a8894",
+      "#7a8894"
     ]
   },
   "CTkScrollbar": {
@@ -233,6 +245,10 @@
     "text_color": [
       "#dbf2f6",
       "#cdc8ce"
+    ],
+    "text_color_disabled": [
+      "#7a8894",
+      "#7a8894"
     ]
   },
   "CTkTextbox": {
@@ -329,6 +345,10 @@
     "text_color": [
       "#dbf2f6",
       "#cdc8ce"
+    ],
+    "text_color_disabled": [
+      "#7a8894",
+      "#7a8894"
     ]
   },
   "CTkRadioButton": {
@@ -350,6 +370,10 @@
     "text_color": [
       "#dbf2f6",
       "#cdc8ce"
+    ],
+    "text_color_disabled": [
+      "#7a8894",
+      "#7a8894"
     ]
   }
 }

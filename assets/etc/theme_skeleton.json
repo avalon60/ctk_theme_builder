@@ -45,6 +45,10 @@
     "text_color": [
       null,
       null
+    ],
+    "text_color_disabled": [
+      null,
+      null
     ]
   },
   "CTkLabel": {
@@ -97,6 +101,10 @@
     "text_color": [
       null,
       null
+    ],
+    "text_color_disabled": [
+      null,
+      null
     ]
   },
   "CTkSwitch": {
@@ -122,6 +130,10 @@
     "text_color": [
       null,
       null
+    ],
+    "text_color_disabled": [
+      null,
+      null
     ]
   },
   "CTkRadioButton": {
@@ -141,6 +153,10 @@
       null
     ],
     "text_color": [
+      null,
+      null
+    ],
+    "text_color_disabled": [
       null,
       null
     ]
@@ -200,6 +216,10 @@
     "text_color": [
       null,
       null
+    ],
+    "text_color_disabled": [
+      null,
+      null
     ]
   },
   "CTkComboBox": {
@@ -222,6 +242,10 @@
       null
     ],
     "text_color": [
+      null,
+      null
+    ],
+    "text_color_disabled": [
       null,
       null
     ]
@@ -263,6 +287,10 @@
       null
     ],
     "text_color": [
+      null,
+      null
+    ],
+    "text_color_disabled": [
       null,
       null
     ]

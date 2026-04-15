@@ -110,6 +110,10 @@
     "text_color": [
       "gray10",
       "#DCE4EE"
+    ],
+    "text_color_disabled": [
+      "gray60",
+      "gray45"
     ]
   },
   "CTkSwitch": {
@@ -135,6 +139,10 @@
     "text_color": [
       "gray10",
       "#DCE4EE"
+    ],
+    "text_color_disabled": [
+      "gray60",
+      "gray45"
     ]
   },
   "CTkRadioButton": {
@@ -156,6 +164,10 @@
     "text_color": [
       "gray10",
       "#DCE4EE"
+    ],
+    "text_color_disabled": [
+      "gray60",
+      "gray45"
     ]
   },
   "CTkProgressBar": {
@@ -213,6 +225,10 @@
     "text_color": [
       "#DCE4EE",
       "#DCE4EE"
+    ],
+    "text_color_disabled": [
+      "gray74",
+      "gray60"
     ]
   },
   "CTkComboBox": {
@@ -237,6 +253,10 @@
     "text_color": [
       "gray10",
       "#DCE4EE"
+    ],
+    "text_color_disabled": [
+      "gray50",
+      "gray45"
     ]
   },
   "CTkScrollbar": {
@@ -278,6 +298,10 @@
     "text_color": [
       "#DCE4EE",
       "#DCE4EE"
+    ],
+    "text_color_disabled": [
+      "gray74",
+      "gray60"
     ]
   },
   "CTkTextbox": {
