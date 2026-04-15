@@ -1,6 +1,6 @@
 __title__ = 'CB CustomTkinter Theme Builder Module'
 __author__ = 'Clive Bostock'
-__version__ = "3.2.13"
+__version__ = "3.2.14"
 __license__ = 'MIT - see LICENSE.md'
 
 import copy
@@ -106,6 +106,7 @@ COLOUR_PROPERTIES = ["border_color",
                      "selected_color",
                      "selected_hover_color",
                      "text_color",
+                     "text_color_disabled",
                      "top_fg_color",
                      "unselected_color",
                      "unselected_hover_color"]

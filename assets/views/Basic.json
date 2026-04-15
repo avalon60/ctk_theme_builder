@@ -71,21 +71,24 @@
     "Button: border_color",
     "Button: fg_color",
     "Button: hover_color",
-    "Button: text_color"
+    "Button: text_color",
+    "Button: text_color_disabled"
   ],
   "CheckBox": [
     "CheckBox: border_color",
     "CheckBox: checkmark_color",
     "CheckBox: fg_color",
     "CheckBox: hover_color",
-    "CheckBox: text_color"
+    "CheckBox: text_color",
+    "CheckBox: text_color_disabled"
   ],
   "ComboBox": [
     "ComboBox: border_color",
     "ComboBox: button_color",
     "ComboBox: button_hover_color",
     "ComboBox: fg_color",
-    "ComboBox: text_color"
+    "ComboBox: text_color",
+    "ComboBox: text_color_disabled"
   ],
   "DropdownMenu": [
     "DropdownMenu: fg_color",
@@ -112,7 +115,8 @@
     "OptionMenu: button_color",
     "OptionMenu: button_hover_color",
     "OptionMenu: fg_color",
-    "OptionMenu: text_color"
+    "OptionMenu: text_color",
+    "OptionMenu: text_color_disabled"
   ],
   "ProgressBar": [
     "ProgressBar: border_color",
@@ -123,7 +127,8 @@
     "RadioButton: border_color",
     "RadioButton: fg_color",
     "RadioButton: hover_color",
-    "RadioButton: text_color"
+    "RadioButton: text_color",
+    "RadioButton: text_color_disabled"
   ],
   "ScrollableFrame": [
     "ScrollableFrame: label_fg_color"
@@ -138,6 +143,7 @@
     "SegmentedButton: selected_color",
     "SegmentedButton: selected_hover_color",
     "SegmentedButton: text_color",
+    "SegmentedButton: text_color_disabled",
     "SegmentedButton: unselected_color",
     "SegmentedButton: unselected_hover_color"
   ],
@@ -152,7 +158,8 @@
     "Switch: button_hover_color",
     "Switch: fg_color",
     "Switch: progress_color",
-    "Switch: text_color"
+    "Switch: text_color",
+    "Switch: text_color_disabled"
   ],
   "Textbox": [
     "Textbox: border_color",

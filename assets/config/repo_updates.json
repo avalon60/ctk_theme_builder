@@ -434,6 +434,41 @@
     "description": "Colour cascade CTkRadioButton/text color",
     "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (14, 'CTkRadioButton', 'text_color');"
   },
+  "083": {
+    "sql_apply_version": "2.3.0",
+    "description": "Colour cascade CTkButton/text disabled color",
+    "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (15, 'CTkButton', 'text_color_disabled');"
+  },
+  "084": {
+    "sql_apply_version": "2.3.0",
+    "description": "Colour cascade CTkCheckBox/text disabled color",
+    "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (15, 'CTkCheckBox', 'text_color_disabled');"
+  },
+  "085": {
+    "sql_apply_version": "2.3.0",
+    "description": "Colour cascade CTkSwitch/text disabled color",
+    "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (15, 'CTkSwitch', 'text_color_disabled');"
+  },
+  "086": {
+    "sql_apply_version": "2.3.0",
+    "description": "Colour cascade CTkRadioButton/text disabled color",
+    "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (15, 'CTkRadioButton', 'text_color_disabled');"
+  },
+  "087": {
+    "sql_apply_version": "2.3.0",
+    "description": "Colour cascade CTkOptionMenu/text disabled color",
+    "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (15, 'CTkOptionMenu', 'text_color_disabled');"
+  },
+  "088": {
+    "sql_apply_version": "2.3.0",
+    "description": "Colour cascade CTkComboBox/text disabled color",
+    "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (15, 'CTkComboBox', 'text_color_disabled');"
+  },
+  "089": {
+    "sql_apply_version": "2.3.0",
+    "description": "Colour cascade CTkSegmentedButton/text disabled color",
+    "sql_statement": "insert into colour_cascade_properties (entry_id, widget_type, widget_property) values (15, 'CTkSegmentedButton', 'text_color_disabled');"
+  },
   "100": {
     "sql_apply_version": "2.3.0",
     "description": "Scaling Clean-up",

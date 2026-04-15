@@ -223,6 +223,42 @@ def apply_repo_updates(db_file_path: Path) -> None:
         return
 
 
+def ensure_text_disabled_cascade_metadata(db_file_path: Path) -> None:
+    """Ensure the Text Disabled cascade metadata exists in the runtime database.
+
+    Older runtime databases may have been initialised while
+    ``text_color_disabled`` was absent from the colour cascade metadata.
+    This backfills the missing palette mappings without requiring a version
+    bump or a full database rebuild.
+    """
+    cascade_entries = (
+        ("CTkButton", "text_color_disabled"),
+        ("CTkCheckBox", "text_color_disabled"),
+        ("CTkSwitch", "text_color_disabled"),
+        ("CTkRadioButton", "text_color_disabled"),
+        ("CTkOptionMenu", "text_color_disabled"),
+        ("CTkComboBox", "text_color_disabled"),
+        ("CTkSegmentedButton", "text_color_disabled"),
+    )
+
+    db_conn = sqlite3.connect(db_file_path)
+    try:
+        cur = db_conn.cursor()
+        for widget_type, widget_property in cascade_entries:
+            cur.execute(
+                """
+                insert or ignore into colour_cascade_properties (entry_id, widget_type, widget_property)
+                values (15, :widget_type, :widget_property)
+                """,
+                {"widget_type": widget_type, "widget_property": widget_property},
+            )
+        db_conn.commit()
+    except sqlite3.OperationalError:
+        return
+    finally:
+        db_conn.close()
+
+
 def ensure_theme_dir_preference(db_file_path: Path) -> None:
     """Ensure the runtime theme directory preference points at the runtime theme folder."""
     db_conn = sqlite3.connect(db_file_path)
@@ -283,5 +319,6 @@ def initialise_runtime_state() -> None:
         write_runtime_layout_version()
 
     apply_repo_updates(app_paths.DB_FILE_PATH)
+    ensure_text_disabled_cascade_metadata(app_paths.DB_FILE_PATH)
     ensure_theme_dir_preference(app_paths.DB_FILE_PATH)
     _BOOTSTRAPPED = True

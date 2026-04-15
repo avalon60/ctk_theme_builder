@@ -947,6 +947,8 @@ class PreviewPanel:
                 widget.configure(selected_hover_color=widget_colour)
             elif widget_property == 'text_color':
                 widget.configure(text_color=widget_colour)
+            elif widget_property == 'text_color_disabled':
+                widget.configure(text_color_disabled=widget_colour)
             elif widget_property == 'unselected_color':
                 widget.configure(unselected_color=widget_colour)
             elif widget_property == 'unselected_hover_color':
@@ -1011,6 +1013,8 @@ class PreviewPanel:
                     widget.configure(segmented_button_unselected_color=widget_colour)
                 elif widget_property == 'text_color':
                     widget.configure(text_color=widget_colour)
+                elif widget_property == 'text_color_disabled':
+                    widget.configure(text_color_disabled=widget_colour)
 
 
 if __name__ == "__main__":
