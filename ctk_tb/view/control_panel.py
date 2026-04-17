@@ -29,6 +29,9 @@ from ctk_tb.view.provenance_dialog import ProvenanceDialog
 from ctk_tb.view.export_import import Exporter
 from ctk_tb.view.export_import import Importer
 from ctk_tb.view.geometry_dialog import GeometryDialog
+from ctk_tb.view.colour_drag import ColourSwatchDragManager
+from ctk_tb.view.colour_drag import MappingSwatchAdapter
+from ctk_tb.view.colour_drag import PaletteSwatchAdapter
 from CTkToolTip import *
 # import ctk_tb.view.ctk_button_dnd as dnd
 import ctk_tb.model.preferences as pref
@@ -370,6 +373,7 @@ class ControlPanel(ctk.CTk):
 
         self.json_state = 'clean'
         self.widgets = {}
+        self.swatch_drag_manager = ColourSwatchDragManager(self)
         self.rendered_harmony_buttons = []
         self.rendered_harmony_labels = []
         self.rendered_keystone_shades = []
@@ -1790,11 +1794,7 @@ class ControlPanel(ctk.CTk):
                                      command=lambda button_id=entry_id: self.palette_colour_picker(button_id))
 
             menus.append(context_menu)
-
-            if self.enable_single_click_paste:
-                btn_colour_tile.bind("<Button-1>",
-                                     lambda event, button_id=entry_id: self.paste_palette_colour(event,
-                                                                                                 button_id))
+            self._register_palette_swatch(widget=btn_colour_tile, palette_button_id=entry_id)
 
             btn_colour_tile.bind("<Button-3>",
                                  lambda event, menu=menus[entry_id], button_id=entry_id: self.context_menu(event,
@@ -2586,6 +2586,40 @@ class ControlPanel(ctk.CTk):
                             class_name='ControlPanel', method_name='copy_palette_colour')
 
     @log_call
+    def _register_palette_swatch(self, widget: ctk.CTkButton, palette_button_id: int) -> None:
+        click_callback = None
+        if self.enable_single_click_paste:
+            click_callback = lambda event, button_id=palette_button_id: self.paste_palette_colour(
+                event=event,
+                palette_button_id=button_id,
+            )
+
+        PaletteSwatchAdapter(
+            controller=self,
+            widget=widget,
+            palette_button_id=palette_button_id,
+            click_callback=click_callback,
+        )
+        self.swatch_drag_manager.register_swatch(widget)
+
+    @log_call
+    def _register_mapping_swatch(self, widget: ctk.CTkButton, widget_property: str) -> None:
+        click_callback = None
+        if self.enable_single_click_paste:
+            click_callback = lambda event, property_id=widget_property: self.paste_colour(
+                event=event,
+                widget_property=property_id,
+            )
+
+        MappingSwatchAdapter(
+            controller=self,
+            widget=widget,
+            widget_property=widget_property,
+            click_callback=click_callback,
+        )
+        self.swatch_drag_manager.register_swatch(widget)
+
+    @log_call
     def render_widget_properties(self, dummy=None):
         """Here we render the widget properties, within the control panel, along with their colour settings."""
         log.log_debug(log_text=f'Render the widget properties, within the control panel',
@@ -2691,18 +2725,8 @@ class ControlPanel(ctk.CTk):
 
                 self.widgets[key] = {"tile": btn_property, 'label': lbl_property, 'widget_type': widget_type,
                                      'widget_property': widget_property, 'colour': colour}
-                # Set a binding so that we can paste a colour, previously copied into our clipboard
-                if self.enable_single_click_paste and colour_value != "transparent":
-                    self.widgets[key]['tile'].bind("<Button-1>",
-                                                   lambda event, wgt_property=key: self.paste_colour(event,
-                                                                                                     wgt_property))
-
-
-                # if not self.enable_single_click_paste and colour_value != "transparent":
-                #    dnd_x = dnd.CTkButtonDnD(master=self, widget=btn_property,
-                #                             enable_drag=True,
-                #                             enable_drop=True,
-                #                             paste_function=self.paste_colour, widget_property=lambda: key)
+                if colour_value != "transparent":
+                    self._register_mapping_swatch(widget=btn_property, widget_property=key)
 
                 if self.enable_tooltips:
                     if colour_value != 'transparent':

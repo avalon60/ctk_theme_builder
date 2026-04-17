@@ -81,6 +81,7 @@ class PreviewPanel:
         self._listener_error = None
         self._appearance_mode = appearance_mode
         self._theme_file = theme_file
+        self._widget_scaling_pct = None
         ctk.set_default_color_theme(self._theme_file)
         backfill_text_color_disabled()
         ctk.set_appearance_mode(self._appearance_mode)
@@ -665,8 +666,16 @@ class PreviewPanel:
             log.log_debug(log_text='Preview panel received set_widget_scaling command', class_name='PreviewPanel',
                           method_name='exec_program_command')
             scaling_pct = parameters[0]
+            if scaling_pct == self._widget_scaling_pct:
+                return
             scaling_float = mod.scaling_float(scaling_pct)
-            ctk.set_widget_scaling(scaling_float)
+            try:
+                ctk.set_widget_scaling(scaling_float)
+                self._widget_scaling_pct = scaling_pct
+            except tk.TclError as exc:
+                log.log_warning(log_text=f'Preview scaling refresh skipped: {exc}',
+                                class_name='PreviewPanel',
+                                method_name='exec_program_command')
         elif command == 'render_preview_disabled':
             log.log_debug(log_text='Preview panel received render_preview_disabled command', class_name='PreviewPanel',
                           method_name='exec_program_command')
