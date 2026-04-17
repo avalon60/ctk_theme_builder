@@ -65,6 +65,10 @@ class BaseColourSwatchAdapter:
         """Return the currently displayed swatch colour."""
         return str(self.widget.cget("fg_color"))
 
+    def accepts_colour_drop(self) -> bool:
+        """Return True when the swatch should be considered a drop target."""
+        return True
+
     def apply_colour(self, hex_colour: str) -> None:
         """Apply a colour using the owning controller's existing update path."""
         raise NotImplementedError
@@ -158,6 +162,32 @@ class MappingSwatchAdapter(BaseColourSwatchAdapter):
         )
 
 
+class ReadOnlyColourSwatchAdapter(BaseColourSwatchAdapter):
+    """Adapter for swatches that can be dragged from but should not accept drops."""
+
+    def accepts_colour_drop(self) -> bool:
+        """Treat this swatch as source-only."""
+        return False
+
+    def apply_colour(self, hex_colour: str) -> None:
+        """Allow swap fallback to repaint the source swatch when explicitly requested."""
+        hover_colour = cbtk.contrast_colour(hex_colour)
+        self.widget.configure(fg_color=hex_colour, hover_color=hover_colour)
+
+
+class HarmonyKeystoneSwatchAdapter(BaseColourSwatchAdapter):
+    """Adapter for the harmonics keystone swatch."""
+
+    def apply_colour(self, hex_colour: str) -> None:
+        """Update the harmonics keystone via the dialog's normal regeneration flow."""
+        harmony_method = self.controller.opm_harmony_method.get()
+        self.controller.set_harmony_keystone(colour_code=hex_colour, method=harmony_method)
+        self.controller.populate_harmony_colours()
+        self.controller.harmony_status_bar.set_status_text(
+            status_text=f"Colour {hex_colour} assigned."
+        )
+
+
 class ColourSwatchDragManager:
     """Manage ghost-swatch dragging across palette and mapping swatches."""
 
@@ -179,7 +209,7 @@ class ColourSwatchDragManager:
         widget.bind("<Destroy>", self._on_widget_destroy)
 
     def _on_button_press(self, event: tk.Event) -> None:
-        source_adapter = self._resolve_drop_adapter(event.widget)
+        source_adapter = self._resolve_adapter(event.widget)
         self._source_widget = source_adapter.widget if source_adapter is not None else None
         self._press_root_x = event.x_root
         self._press_root_y = event.y_root
@@ -306,11 +336,17 @@ class ColourSwatchDragManager:
         self._highlighted_adapter = target_adapter
 
     def _resolve_drop_adapter(self, widget) -> BaseColourSwatchAdapter | None:
+        adapter = self._resolve_adapter(widget)
+        if adapter is None or not adapter.accepts_colour_drop():
+            return None
+        return adapter
+
+    def _resolve_adapter(self, widget) -> BaseColourSwatchAdapter | None:
         current = widget
         while current is not None:
-            handle_drop = getattr(current, "handle_colour_drop", None)
-            if callable(handle_drop):
-                return getattr(current, "_colour_drag_adapter", None)
+            adapter = getattr(current, "_colour_drag_adapter", None)
+            if adapter is not None:
+                return adapter
             current = getattr(current, "master", None)
         return None
 
