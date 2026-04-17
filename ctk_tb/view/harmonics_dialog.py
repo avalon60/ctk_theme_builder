@@ -9,6 +9,8 @@ import tkinter as tk
 import ctk_tb.utils.cbtk_kit as cbtk
 import ctk_tb.model.preferences as pref
 import ctk_tb.utils.loggerutl as log
+from ctk_tb.view.colour_drag import HarmonyKeystoneSwatchAdapter
+from ctk_tb.view.colour_drag import ReadOnlyColourSwatchAdapter
 
 import colorharmonies as ch
 from tkinter.colorchooser import askcolor
@@ -52,6 +54,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
         self.keystone_colour = None
         self.btn_copy_to_palette = None
         self.btn_save_keystone = None
+        self.swatch_drag_manager = getattr(self.master, 'swatch_drag_manager', None)
 
         self.harmony_contrast_differential = pref.preference_setting(db_file_path=DB_FILE_PATH, scope='user_preference',
                                                                      preference_name='harmony_contrast_differential')
@@ -196,6 +199,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
 
         self.btn_keystone_colour.bind("<Button-3>",
                                       lambda event, menu=mnu_keystone: self.context_menu(event, menu))
+        self._register_keystone_swatch()
 
         if self.theme_name is not None and bg_colour is not None:
             button_state = ctk.NORMAL
@@ -374,6 +378,20 @@ class HarmonicsDialog(ctk.CTkToplevel):
             self.harmony_status_bar.set_status_text(status_text='Clipboard copy is unavailable on this system.')
             log.log_warning(log_text=f'Clipboard copy unavailable: {error}',
                             class_name='HarmonicsDialog', method_name='copy_harmony_colour')
+
+    @log_call
+    def _register_keystone_swatch(self) -> None:
+        if self.swatch_drag_manager is None:
+            return
+        HarmonyKeystoneSwatchAdapter(controller=self, widget=self.btn_keystone_colour)
+        self.swatch_drag_manager.register_swatch(self.btn_keystone_colour)
+
+    @log_call
+    def _register_harmony_source_swatch(self, widget: ctk.CTkButton) -> None:
+        if self.swatch_drag_manager is None:
+            return
+        ReadOnlyColourSwatchAdapter(controller=self, widget=widget)
+        self.swatch_drag_manager.register_swatch(widget)
 
     @log_call
     def harmony_input_colour_picker(self):
@@ -563,6 +581,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
 
             btn_palette.bind("<Button-3>",
                              lambda event, menu=menus[btn_idx], button_id=btn_idx: self.context_menu(event, menu))
+            self._register_harmony_source_swatch(btn_palette)
         if self.has_valid_keystone_colour():
             self.populate_harmony_colours()
             self.render_keystone_shades_palette(
@@ -668,6 +687,7 @@ class HarmonicsDialog(ctk.CTkToplevel):
             btn_keystone_shade.bind("<Button-3>",
                                     lambda event, menu=menus[btn_idx], button_id=btn_idx: self.context_menu(event,
                                                                                                             menu))
+            self._register_harmony_source_swatch(btn_keystone_shade)
 
             if column > harmony_entries:
                 column = 0

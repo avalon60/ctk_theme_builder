@@ -17,6 +17,9 @@ from ctk_tb.utils.launcher_generator import LauncherGenerationError
 from ctk_tb.utils.launcher_generator import create_desktop_shortcut
 from ctk_tb.utils.launcher_generator import generate_platform_launcher
 from ctk_tb.utils.launcher_generator import install_to_applications_menu
+from ctk_tb.utils.upgrade_script_generator import generate_upgrade_script
+from ctk_tb.utils.upgrade_script_generator import UpgradeScriptBundle
+from ctk_tb.utils.upgrade_script_generator import UpgradeScriptGenerationError
 from ctk_tb.view.harmonics_dialog import HarmonicsDialog
 from ctk_tb.view.preferences import LogViewerDialog
 from ctk_tb.view.preferences import PreferencesDialog
@@ -26,6 +29,9 @@ from ctk_tb.view.provenance_dialog import ProvenanceDialog
 from ctk_tb.view.export_import import Exporter
 from ctk_tb.view.export_import import Importer
 from ctk_tb.view.geometry_dialog import GeometryDialog
+from ctk_tb.view.colour_drag import ColourSwatchDragManager
+from ctk_tb.view.colour_drag import MappingSwatchAdapter
+from ctk_tb.view.colour_drag import PaletteSwatchAdapter
 from CTkToolTip import *
 # import ctk_tb.view.ctk_button_dnd as dnd
 import ctk_tb.model.preferences as pref
@@ -214,6 +220,96 @@ class LauncherGeneratorDialog(ctk.CTkToplevel):
         self.destroy()
 
 
+class UpgradeScriptDialog(ctk.CTkToplevel):
+    """Dialogue for reporting generated upgrade-script artefacts."""
+
+    def __init__(self, *args, upgrade_bundle: UpgradeScriptBundle, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.upgrade_bundle = upgrade_bundle
+        self.title('Upgrade Script Generated')
+        self.geometry('860x320')
+        self.minsize(760, 280)
+
+        self.rowconfigure(0, weight=1)
+        self.rowconfigure(1, weight=0)
+        self.columnconfigure(0, weight=1)
+
+        frm_main = ctk.CTkFrame(master=self, corner_radius=10)
+        frm_main.grid(row=0, column=0, padx=10, pady=10, sticky='nsew')
+        frm_main.rowconfigure(1, weight=1)
+        frm_main.columnconfigure(0, weight=1)
+
+        lbl_title = ctk.CTkLabel(master=frm_main,
+                                 text='Upgrade Script Generated',
+                                 justify='left',
+                                 font=mod.HEADING4)
+        lbl_title.grid(row=0, column=0, padx=10, pady=(10, 5), sticky='w')
+
+        frm_details = ctk.CTkFrame(master=frm_main, corner_radius=10)
+        frm_details.grid(row=1, column=0, padx=10, pady=(0, 10), sticky='nsew')
+        frm_details.columnconfigure(1, weight=1)
+
+        lbl_python = ctk.CTkLabel(master=frm_details, text='Python Interpreter', justify='left')
+        lbl_python.grid(row=0, column=0, padx=(10, 5), pady=(10, 5), sticky='w')
+        self.tk_python_path = tk.StringVar(value=str(self.upgrade_bundle.python_executable))
+        ent_python = ctk.CTkEntry(master=frm_details,
+                                  textvariable=self.tk_python_path,
+                                  state='disabled',
+                                  width=520)
+        ent_python.grid(row=0, column=1, padx=(0, 10), pady=(10, 5), sticky='ew')
+
+        lbl_script = ctk.CTkLabel(master=frm_details, text='Upgrade Script', justify='left')
+        lbl_script.grid(row=1, column=0, padx=(10, 5), pady=5, sticky='w')
+        self.tk_script_path = tk.StringVar(value=str(self.upgrade_bundle.script_path))
+        ent_script = ctk.CTkEntry(master=frm_details,
+                                  textvariable=self.tk_script_path,
+                                  state='disabled',
+                                  width=520)
+        ent_script.grid(row=1, column=1, padx=(0, 10), pady=5, sticky='ew')
+
+        lbl_note = ctk.CTkLabel(master=frm_details,
+                                text='This script upgrades CTk Theme Builder in the current Python environment from PyPI.',
+                                justify='left',
+                                wraplength=700)
+        lbl_note.grid(row=2, column=0, columnspan=2, padx=10, pady=(5, 10), sticky='w')
+
+        frm_buttons = ctk.CTkFrame(master=self, corner_radius=0)
+        frm_buttons.grid(row=1, column=0, padx=0, pady=0, sticky='ew')
+        frm_buttons.columnconfigure(1, weight=1)
+
+        btn_close = ctk.CTkButton(master=frm_buttons, text='Close', command=self.close_dialog)
+        btn_close.grid(row=0, column=0, padx=(15, 0), pady=5, sticky='w')
+
+        self.clipboard_icon = cbtk.clipboard_icon(image_size=cbtk.SMALL_ICON_SIZE)
+        btn_copy = ctk.CTkButton(master=frm_buttons,
+                                 text='Copy Path',
+                                 image=self.clipboard_icon,
+                                 compound='left',
+                                 command=self.copy_script_path)
+        btn_copy.grid(row=0, column=2, padx=(0, 10), pady=5, sticky='e')
+
+        self.status_bar = cbtk.CBtkStatusBar(master=self,
+                                             status_text_life=15,
+                                             use_grid=True)
+        self.bind("<Configure>", self.status_bar.auto_size_status_bar)
+        self.bind('<Escape>', self.close_dialog)
+        self.grab_set()
+        self.lift()
+
+    def copy_script_path(self):
+        ok, error = cbtk.clipboard_copy(str(self.upgrade_bundle.script_path), self)
+        if ok:
+            self.status_bar.set_status_text('Upgrade script path copied to clipboard.')
+        else:
+            self.status_bar.set_status_text('Clipboard copy is unavailable on this system.')
+            log.log_warning(log_text=f'Clipboard copy unavailable: {error}',
+                            class_name='UpgradeScriptDialog',
+                            method_name='copy_script_path')
+
+    def close_dialog(self, event=None):
+        self.destroy()
+
+
 class ControlPanel(ctk.CTk):
     _theme_json_dir: Path
     THEME_PALETTE_TILES = 16
@@ -277,6 +373,7 @@ class ControlPanel(ctk.CTk):
 
         self.json_state = 'clean'
         self.widgets = {}
+        self.swatch_drag_manager = ColourSwatchDragManager(self)
         self.rendered_harmony_buttons = []
         self.rendered_harmony_labels = []
         self.rendered_keystone_shades = []
@@ -821,6 +918,7 @@ class ControlPanel(ctk.CTk):
         self.tools_menu.add_command(label='Merge Themes', command=self.launch_theme_merger)
         self.tools_menu.add_command(label='Browse Icons', command=self.launch_icon_browser)
         self.tools_menu.add_command(label='Generate Launcher', command=self.generate_launcher)
+        self.tools_menu.add_command(label='Generate Upgrade Script', command=self.generate_upgrade_script)
         self.tools_menu.add_command(label='View Runtime Log', command=self.view_runtime_log)
         self.tools_menu.add_command(label='About', command=self.about)
 
@@ -894,6 +992,20 @@ class ControlPanel(ctk.CTk):
         self.status_bar.set_status_text(status_text=f'Launcher generated at {launcher_bundle.launcher_path}')
         launcher_dialog = LauncherGeneratorDialog(master=self, launcher_bundle=launcher_bundle)
         self.wait_window(launcher_dialog)
+
+    @log_call
+    def generate_upgrade_script(self):
+        log.log_debug(log_text='Generating upgrade script',
+                      class_name='ControlPanel', method_name='generate_upgrade_script')
+        try:
+            upgrade_bundle = generate_upgrade_script()
+        except UpgradeScriptGenerationError as exc:
+            self.status_bar.set_status_text(status_text=str(exc))
+            return
+
+        self.status_bar.set_status_text(status_text=f'Upgrade script generated at {upgrade_bundle.script_path}')
+        upgrade_dialog = UpgradeScriptDialog(master=self, upgrade_bundle=upgrade_bundle)
+        self.wait_window(upgrade_dialog)
 
     @log_call
     def launch_export_dialog(self):
@@ -1682,11 +1794,7 @@ class ControlPanel(ctk.CTk):
                                      command=lambda button_id=entry_id: self.palette_colour_picker(button_id))
 
             menus.append(context_menu)
-
-            if self.enable_single_click_paste:
-                btn_colour_tile.bind("<Button-1>",
-                                     lambda event, button_id=entry_id: self.paste_palette_colour(event,
-                                                                                                 button_id))
+            self._register_palette_swatch(widget=btn_colour_tile, palette_button_id=entry_id)
 
             btn_colour_tile.bind("<Button-3>",
                                  lambda event, menu=menus[entry_id], button_id=entry_id: self.context_menu(event,
@@ -2478,6 +2586,40 @@ class ControlPanel(ctk.CTk):
                             class_name='ControlPanel', method_name='copy_palette_colour')
 
     @log_call
+    def _register_palette_swatch(self, widget: ctk.CTkButton, palette_button_id: int) -> None:
+        click_callback = None
+        if self.enable_single_click_paste:
+            click_callback = lambda event, button_id=palette_button_id: self.paste_palette_colour(
+                event=event,
+                palette_button_id=button_id,
+            )
+
+        PaletteSwatchAdapter(
+            controller=self,
+            widget=widget,
+            palette_button_id=palette_button_id,
+            click_callback=click_callback,
+        )
+        self.swatch_drag_manager.register_swatch(widget)
+
+    @log_call
+    def _register_mapping_swatch(self, widget: ctk.CTkButton, widget_property: str) -> None:
+        click_callback = None
+        if self.enable_single_click_paste:
+            click_callback = lambda event, property_id=widget_property: self.paste_colour(
+                event=event,
+                widget_property=property_id,
+            )
+
+        MappingSwatchAdapter(
+            controller=self,
+            widget=widget,
+            widget_property=widget_property,
+            click_callback=click_callback,
+        )
+        self.swatch_drag_manager.register_swatch(widget)
+
+    @log_call
     def render_widget_properties(self, dummy=None):
         """Here we render the widget properties, within the control panel, along with their colour settings."""
         log.log_debug(log_text=f'Render the widget properties, within the control panel',
@@ -2583,18 +2725,8 @@ class ControlPanel(ctk.CTk):
 
                 self.widgets[key] = {"tile": btn_property, 'label': lbl_property, 'widget_type': widget_type,
                                      'widget_property': widget_property, 'colour': colour}
-                # Set a binding so that we can paste a colour, previously copied into our clipboard
-                if self.enable_single_click_paste and colour_value != "transparent":
-                    self.widgets[key]['tile'].bind("<Button-1>",
-                                                   lambda event, wgt_property=key: self.paste_colour(event,
-                                                                                                     wgt_property))
-
-
-                # if not self.enable_single_click_paste and colour_value != "transparent":
-                #    dnd_x = dnd.CTkButtonDnD(master=self, widget=btn_property,
-                #                             enable_drag=True,
-                #                             enable_drop=True,
-                #                             paste_function=self.paste_colour, widget_property=lambda: key)
+                if colour_value != "transparent":
+                    self._register_mapping_swatch(widget=btn_property, widget_property=key)
 
                 if self.enable_tooltips:
                     if colour_value != 'transparent':

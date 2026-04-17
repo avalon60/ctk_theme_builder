@@ -15,6 +15,7 @@ import ctk_tb.model.ctk_theme_builder as mod
 import ctk_tb.model.preferences as pref
 import threading
 import time
+from ctk_tb.utils.theme_compat import backfill_text_color_disabled
 
 
 prog_path = os.path.realpath(__file__)
@@ -275,6 +276,7 @@ theme_json_file = args_list["theme_json_file"]
 
 customtkinter.set_appearance_mode(appearance_mode)  # Modes: "System" (standard), "Dark", "Light"
 customtkinter.set_default_color_theme(theme_json_file)
+backfill_text_color_disabled()
 
 if __name__ == "__main__":
     app = App()

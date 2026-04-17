@@ -47,6 +47,39 @@ class LauncherBundle:
     runner_script_path: Path | None = None
 
 
+def _preferred_python_executable(package_dir: Path, fallback: str | None = None) -> Path:
+    """Return the owning virtualenv interpreter when the package is installed from one.
+
+    When the app is launched via a previously generated launcher, ``sys.executable``
+    may resolve to a base interpreter while the installed package is imported from a
+    virtualenv ``site-packages`` path. In that case we prefer the virtualenv
+    interpreter derived from the package location so regenerated launchers continue
+    to target the same install.
+    """
+    site_packages_dir = package_dir.resolve().parent
+    if site_packages_dir.name != "site-packages":
+        return Path(fallback or sys.executable).expanduser()
+
+    python_lib_dir = site_packages_dir.parent
+    if python_lib_dir.name.startswith("python"):
+        venv_root = python_lib_dir.parent.parent
+    else:
+        venv_root = python_lib_dir.parent
+    executable_name = Path(fallback or sys.executable).name
+    candidates = [
+        venv_root / "bin" / executable_name,
+        venv_root / "bin" / "python3",
+        venv_root / "bin" / "python",
+        venv_root / "Scripts" / "python.exe",
+        venv_root / "Scripts" / "python",
+    ]
+    for candidate in candidates:
+        if candidate.exists() and os.access(candidate, os.X_OK):
+            return candidate
+
+    return Path(fallback or sys.executable).expanduser()
+
+
 def applications_menu_dir(system_name: str) -> Path:
     """Return the user-writable applications/start-menu directory for a platform."""
     if system_name == "Linux":
@@ -373,7 +406,7 @@ def generate_platform_launcher(
     """Generate the launcher artefacts for the current or specified platform."""
     target_dir = target_dir or app_paths.LAUNCHERS_DIR
     system_name = system_name or platform.system()
-    python_path = Path(python_executable or sys.executable).expanduser().resolve()
+    python_path = _preferred_python_executable(app_paths.PACKAGE_DIR, python_executable)
     controller_path = (controller_script or (app_paths.PACKAGE_DIR / "controller" / "ctk_theme_builder.py")).resolve()
     generated_at = _generation_timestamp()
     app_version = _application_version()

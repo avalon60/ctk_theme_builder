@@ -54,6 +54,77 @@ find_twine() {
   echo ""
 }
 
+twine_python() {
+  case "${TWINE}" in
+    "python -m twine")
+      echo "python"
+      return
+      ;;
+    "python3 -m twine")
+      echo "python3"
+      return
+      ;;
+    */bin/twine)
+      local candidate_python
+      candidate_python="$(dirname "${TWINE}")/python"
+      if [ -x "${candidate_python}" ]; then
+        echo "${candidate_python}"
+        return
+      fi
+      ;;
+  esac
+  echo ""
+}
+
+check_twine_metadata_support() {
+  local twine_python_cmd
+  twine_python_cmd="$(twine_python)"
+  if [ -z "${twine_python_cmd}" ]; then
+    return 0
+  fi
+
+  if ! "${twine_python_cmd}" - <<'PY' >/dev/null 2>&1
+from packaging.metadata import Metadata, parse_email
+
+raw = b"""Metadata-Version: 2.4
+Name: sample-project
+Version: 0.0.1
+License-Expression: MIT
+License-File: LICENSE
+"""
+
+parsed, _ = parse_email(raw)
+Metadata.from_raw(parsed)
+PY
+  then
+    local packaging_version="unknown"
+    local twine_version="unknown"
+    packaging_version="$("${twine_python_cmd}" - <<'PY'
+import importlib.metadata as md
+try:
+    print(md.version("packaging"))
+except Exception:
+    print("unknown")
+PY
+)"
+    twine_version="$("${twine_python_cmd}" - <<'PY'
+import importlib.metadata as md
+try:
+    print(md.version("twine"))
+except Exception:
+    print("unknown")
+PY
+)"
+    echo "ERROR: Selected Twine environment cannot validate modern wheel metadata." >&2
+    echo "Twine: ${twine_version}" >&2
+    echo "Packaging: ${packaging_version}" >&2
+    echo "This project emits Metadata-Version 2.4 with License-Expression / License-File fields." >&2
+    echo "Upgrade the Twine environment before publishing, for example:" >&2
+    echo "  ${twine_python_cmd} -m pip install --upgrade packaging twine" >&2
+    exit 1
+  fi
+}
+
 display_usage() {
   cat <<'EOF'
 Usage:
@@ -95,6 +166,14 @@ package_version() {
   grep '^__version__ = ' "${PACKAGE_INIT_FILE}" | head -1 | cut -f2 -d "=" | tr -d ' "'
 }
 
+pushd "${APP_HOME}" >/dev/null
+
+if [ "${SHOW_VERSION:-N}" = "Y" ]; then
+  pyproject_version
+  popd >/dev/null
+  exit 0
+fi
+
 TWINE=$(find_twine)
 if [ -z "${TWINE}" ]; then
   echo "ERROR: Twine is required to publish this project."
@@ -108,13 +187,7 @@ if ! eval "${TWINE}" --version >/dev/null 2>&1; then
   exit 1
 fi
 
-pushd "${APP_HOME}" >/dev/null
-
-if [ "${SHOW_VERSION:-N}" = "Y" ]; then
-  pyproject_version
-  popd >/dev/null
-  exit 0
-fi
+check_twine_metadata_support
 
 if [ -z "${VERSION_TAG:-}" ]; then
   display_usage

@@ -156,8 +156,9 @@ The *Tools* menu provides access to:
 3. Merge Themes
 4. Browse Icons
 5. Generate Launcher
-6. View Runtime Log
-7. About (CTk Theme Builder)
+6. Generate Upgrade Script
+7. View Runtime Log
+8. About (CTk Theme Builder)
 
 The Colour Harmonics option is only enabled, when you start working on a theme.
 
@@ -210,6 +211,20 @@ If the target file already exists, you are prompted before it is overwritten.
 
 Linux users should also be aware that some desktop environments may require an additional *Allow Launching* action before a newly created desktop shortcut behaves like a normal application launcher.
 
+### Generate Upgrade Script
+The *Generate Upgrade Script* option is accessed via the *Tools -> Generate Upgrade Script* menu selection.
+
+This creates a small platform-specific script that upgrades CTk Theme Builder in the Python environment from which the application is currently running. It is intended as a convenience when you want a repeatable upgrade command tied to the correct interpreter.
+
+When the script is generated, a results dialogue is displayed showing:
+
+* The Python interpreter path;
+* The generated upgrade script path.
+
+The dialogue also provides a *Copy Path* button, which copies the upgrade script path to the clipboard.
+
+The generated script runs `python -m pip install --upgrade ctk-theme-builder` by using the interpreter displayed in the dialogue. On Linux and MacOS the generated script is made executable automatically.
+
 ### View Runtime Log
 The *View Runtime Log* option is accessed via the *Tools -> View Runtime Log* menu selection.
 
@@ -225,6 +240,16 @@ The preferences screen will appear something like this:
 When you start CTk Theme Builder for the very first time, the theme will be set to _GreyGhost_, as we see in the above image.
 
 For new installations, the Preferences dialogue should be the first port of call, if only to ensure that you have updated the Author (see below), to ensure you are adequately credited for your good work.
+
+The dialogue is organised into these sections:
+
+* Provenance;
+* Appearance;
+* Colour Controls;
+* Behaviour;
+* Comms;
+* User Themes;
+* Logging.
 
 #### Author
 For a new installation the Author defaults to the user name that you are logged in as. You can simply over-type this, to whatever suits. 
@@ -262,6 +287,9 @@ By default they are enabled, and you should see something similar to what is sho
 #### Logfile  
 A runtime log is written to the `~/CTkThemeBuilder/logs` directory.
 
+#### Log size
+The Logging section displays the current size of the runtime log in bytes. This is useful if you are trying to confirm whether detailed logging is generating a large amount of output.
+
 #### Logging Level
 This effects the level of detail written, during logging, based on a choice of a  number of different levels. Selecting a log level further down the drop-down list, causes less log detail to be written. To assist in trouble shooting a problem, you should temporarily set this to *Debug* or *Trace*. 
 
@@ -271,6 +299,12 @@ Generally you should  have this set to *Info*, or one of the choices further dow
 
 #### Log to Stderr
 If enabled, then log entries are duplexed to the terminal. Note that this assumes that you are running from a command window.
+
+#### View Log
+The *View Log* button in the Logging section opens the same runtime log viewer that is available from *Tools -> View Runtime Log*. From there you can inspect the current log contents and copy the full text to the clipboard.
+
+#### Clear Log
+The *Clear Log* button erases the current runtime log after confirmation. This can be useful before reproducing a problem so that the resulting log contains only the new activity you are interested in.
 
 #### Load Last Theme
 If enabled, this causes the last theme you were working on to be automatically opened when you next start CTk Theme Builder.
