@@ -22,6 +22,8 @@ For Ubuntu-based distributions, ensure that the `venv` package is installed for 
 
 ## Create And Activate A Virtual Environment
 
+Before installing CTk Theme Builder from PyPI, create and activate a Python virtual environment so the application and its dependencies are isolated from other Python packages on your system.
+
 Recommended installation from PyPI is via a virtual environment.
 
 On Linux or macOS:
@@ -38,6 +40,26 @@ python -m venv .venv
 .venv\Scripts\Activate.ps1
 ```
 
+## Install From PyPI
+
+Install CTk Theme Builder with:
+
+`python -m pip install ctk-theme-builder`
+
+If your platform prefers `python3`, use:
+
+`python3 -m pip install ctk-theme-builder`
+
+After installation, launch the application with:
+
+`ctk-theme-builder`
+
+Run this command from the same activated virtual environment into which you installed CTk Theme Builder. If the virtual environment is not activated, your shell may not find the `ctk-theme-builder` command, or it may launch a different installed copy.
+
+If you prefer not to activate the virtual environment manually each time, CTk Theme Builder can generate a convenience launcher for the current environment from:
+
+`Tools -> Generate Launcher`
+
 ## Upgrade From PyPI
 
 Upgrade an existing installation with:
@@ -51,6 +73,8 @@ If your platform prefers `python3`, use:
 After upgrading, launch the application with:
 
 `ctk-theme-builder`
+
+As with a new installation, run this command from the same activated virtual environment that contains CTk Theme Builder, unless you are using a generated launcher or another shortcut that already targets that environment.
 
 ## Install Or Upgrade From A Wheel
 
