@@ -1,5 +1,9 @@
 """CustomTkinter browser for Font Awesome icons."""
 
+# Author: Clive Bostock
+# Date: 2026-04-18
+# Description: Browse, filter, and preview bundled Font Awesome icons.
+
 import customtkinter as ctk
 import tkinter as tk
 
@@ -15,6 +19,35 @@ APP_IMAGES = mod.APP_IMAGES
 APP_THEMES_DIR = mod.APP_THEMES_DIR
 DB_FILE_PATH = mod.DB_FILE_PATH
 DEFAULT_GEOMETRY = "1040x680+120+80"
+
+PREVIEW_UNAVAILABLE_TEXT = (
+    "Preview unavailable on this system.\n\n"
+    "Search, filtering, and copy actions still work."
+)
+
+
+def _preview_error_message(exc: Exception) -> str:
+    """Return a concise, user-facing message for icon preview failures."""
+    error_text = str(exc).strip()
+    lowered = error_text.lower()
+
+    if "customtkinter" in lowered:
+        return (
+            "Icon preview is unavailable because CustomTkinter image support "
+            "is not installed."
+        )
+
+    if "pillow" in lowered:
+        return (
+            "Icon preview is unavailable because Pillow image support "
+            "is not installed."
+        )
+
+    if error_text:
+        first_line = error_text.splitlines()[0].strip()
+        return f"Icon preview unavailable: {first_line}"
+
+    return "Icon preview unavailable."
 
 
 def browser_runtime_preferences():
@@ -58,6 +91,8 @@ def configure_browser_runtime():
 
 
 class IconBrowser(ctk.CTkToplevel):
+    """Top-level window for browsing bundled Font Awesome icons."""
+
     def __init__(self, *args, **kwargs):
         configure_browser_runtime()
         super().__init__(*args, **kwargs)
@@ -75,6 +110,7 @@ class IconBrowser(ctk.CTkToplevel):
         self.filtered_icons = self.all_icons[:]
         self.current_image = None
         self.current_name = None
+        self.preview_error = None
 
         self.category_var = tk.StringVar(value="All categories")
         self.search_var = tk.StringVar()
@@ -572,6 +608,15 @@ class IconBrowser(ctk.CTkToplevel):
         size = self._selected_size()
         self._set_code_text(self._build_code_snippet(name))
 
+        if self.preview_error is not None:
+            self.current_image = None
+            self.preview_label.configure(image="", text=PREVIEW_UNAVAILABLE_TEXT)
+            self.meta_name.configure(text=f"Name:  {name}")
+            self.meta_fill.configure(text=f"Fill:  {self.fill_var.get().strip() or 'default'}")
+            self.meta_size.configure(text=f"Size:  {size}px")
+            self.status_var.set(self.preview_error)
+            return
+
         try:
             image = ctkfontawesome.icon_to_ctkimage(
                 name,
@@ -580,11 +625,12 @@ class IconBrowser(ctk.CTkToplevel):
             )
         except Exception as exc:
             self.current_image = None
-            self.preview_label.configure(
-                image="",
-                text="Image preview unavailable\n\nInstall optional image dependencies for ctkfontawesome.",
-            )
-            self.status_var.set(f"{type(exc).__name__}: {exc}")
+            self.preview_error = _preview_error_message(exc)
+            self.preview_label.configure(image="", text=PREVIEW_UNAVAILABLE_TEXT)
+            self.meta_name.configure(text=f"Name:  {name}")
+            self.meta_fill.configure(text=f"Fill:  {self.fill_var.get().strip() or 'default'}")
+            self.meta_size.configure(text=f"Size:  {size}px")
+            self.status_var.set(self.preview_error)
             return
 
         self.current_image = image
