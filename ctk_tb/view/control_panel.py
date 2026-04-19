@@ -1316,6 +1316,11 @@ class ControlPanel(ctk.CTk):
         log.log_debug(log_text=f'Set up the geometry buttons near the top of the Control Panel',
                       class_name='ControlPanel', method_name='render_geometry_buttons')
 
+        # Leave a small amount of internal space below the second row so
+        # button borders are not clipped by the frame edge on tighter themes.
+        self.frm_geometry.grid_rowconfigure(2, pad=4)
+        self.frm_geometry.grid_rowconfigure(3, minsize=4)
+
         button_height = 40
         button_width = 100
         corner_radius = 10
@@ -1663,6 +1668,11 @@ class ControlPanel(ctk.CTk):
         palette_entries = mod.colour_palette_entries(db_file_path=DB_FILE_PATH)
         menus = []
         self.theme_palette_tiles.clear()
+
+        # Leave a small amount of internal space below the palette rows so
+        # button borders and label descenders are not clipped by the frame edge.
+        self.frm_theme_palette.grid_rowconfigure(4, pad=4)
+        self.frm_theme_palette.grid_rowconfigure(5, minsize=4)
 
         preview_appearance_mode = self.tk_seg_mode.get()
         if preview_appearance_mode == 'Light Mode':

@@ -62,7 +62,28 @@ If you prefer not to activate the virtual environment manually each time, CTk Th
 
 ## Upgrade From PyPI
 
-Upgrade an existing installation with:
+If you have used `Tools -> Generate Upgrade Script`, prefer that route first.
+
+CTk Theme Builder can generate a small platform-specific upgrade script tied to the Python interpreter from which the application is currently running. This is useful when you want a repeatable upgrade command for the correct environment without needing to remember or retype the `pip` command yourself.
+
+Generated upgrade scripts are written into:
+
+- Linux and macOS: `~/CTkThemeBuilder/upgrades`
+- Windows: `%USERPROFILE%\CTkThemeBuilder\upgrades`
+
+Platform-specific script names are:
+
+- Linux: `upgrade-ctk-theme-builder.sh`
+- macOS: `upgrade-ctk-theme-builder.command`
+- Windows: `upgrade-ctk-theme-builder.bat`
+
+When the script is generated, the result dialogue shows the full script path and provides a `Copy Path` button. If you are unsure where your generated script is, open that dialogue again from:
+
+`Tools -> Generate Upgrade Script`
+
+The generated script runs the upgrade by using the same Python interpreter as the current CTk Theme Builder session, so it targets the same environment that is already running the application.
+
+If you have not generated an upgrade script, or if you prefer to upgrade manually, use:
 
 `python -m pip install --upgrade ctk-theme-builder`
 
@@ -74,7 +95,7 @@ After upgrading, launch the application with:
 
 `ctk-theme-builder`
 
-As with a new installation, run this command from the same activated virtual environment that contains CTk Theme Builder, unless you are using a generated launcher or another shortcut that already targets that environment.
+As with a new installation, run this command from the same activated virtual environment that contains CTk Theme Builder, unless you are using a generated launcher, a generated upgrade script, or another shortcut that already targets that environment.
 
 ## Install Or Upgrade From A Wheel
 
@@ -94,7 +115,8 @@ CTk Theme Builder keeps mutable user data outside the install location.
 
 The default user data home is:
 
-`~/CTkThemeBuilder`
+- Linux and macOS: `~/CTkThemeBuilder`
+- Windows: `%USERPROFILE%\CTkThemeBuilder`
 
 This contains the working directories for:
 
@@ -153,7 +175,8 @@ If you prefer not to deal with virtual-environment activation manually, CTk Them
 
 This writes a platform-specific launcher into:
 
-`~/CTkThemeBuilder/launchers`
+- Linux and macOS: `~/CTkThemeBuilder/launchers`
+- Windows: `%USERPROFILE%\CTkThemeBuilder\launchers`
 
 The generated launcher uses the interpreter from the currently running CTk Theme Builder session, so it is a practical way to create a clickable shortcut for the exact environment you are using.
 

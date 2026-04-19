@@ -111,10 +111,11 @@ class IconBrowser(ctk.CTkToplevel):
         self.current_image = None
         self.current_name = None
         self.preview_error = None
+        self.default_fill = self._default_icon_fill()
 
         self.category_var = tk.StringVar(value="All categories")
         self.search_var = tk.StringVar()
-        self.fill_var = tk.StringVar(value="#1f6aa5")
+        self.fill_var = tk.StringVar(value=self.default_fill)
         self.size_var = tk.StringVar(value="96")
         self.status_var = tk.StringVar(value="Ready.")
         self.selected_name_var = tk.StringVar(value="Select an icon")
@@ -354,6 +355,13 @@ class IconBrowser(ctk.CTkToplevel):
             return ctk.ThemeManager.theme["CTkButton"]["text_color"][cbtk.str_mode_to_int()]
         except Exception:
             return "#ffffff"
+
+    def _default_icon_fill(self) -> str:
+        """Return a theme-derived default fill colour for icon previews."""
+        try:
+            return ctk.ThemeManager.theme["CTkLabel"]["text_color"][cbtk.str_mode_to_int()]
+        except Exception:
+            return "#1f6aa5"
 
     def _toggle_category_picker(self):
         if self.category_picker is not None and self.category_picker.winfo_exists():
@@ -666,7 +674,7 @@ class IconBrowser(ctk.CTkToplevel):
             self.status_var.set("Clipboard copy is unavailable on this system.")
 
     def _build_code_snippet(self, name: str) -> str:
-        fill = self.fill_var.get().strip() or "#1f6aa5"
+        fill = self.fill_var.get().strip() or self.default_fill
         size = self._selected_size()
         return (
             "import customtkinter as ctk\n"

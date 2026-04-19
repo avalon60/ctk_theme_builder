@@ -199,7 +199,12 @@ If you wish to save some space, palette labels can be disabled.
 ![palette-labels](palette-labels.png)
 
 #### Logging
-A runtime log is written to `~/CTkThemeBuilder/logs`. The dialogue also allows you to adjust logging verbosity, log-to-stderr behaviour, and to open or clear the log.
+A runtime log is written to:
+
+* Linux and macOS: `~/CTkThemeBuilder/logs`
+* Windows: `%USERPROFILE%\CTkThemeBuilder\logs`
+
+The dialogue also allows you to adjust logging verbosity, log-to-stderr behaviour, and to open or clear the log.
 
 #### Load Last Theme
 If enabled, the most recently used theme is automatically opened when CTk Theme Builder starts.
@@ -237,7 +242,12 @@ This controls the contrast differential used when generating shades in the *Colo
 This controls the port used by the Preview Panel listener.
 
 #### Themes Location
-The default folder for storing user themes is `~/CTkThemeBuilder/themes`. You may choose an alternative location if desired.
+The default folder for storing user themes is:
+
+* Linux and macOS: `~/CTkThemeBuilder/themes`
+* Windows: `%USERPROFILE%\CTkThemeBuilder\themes`
+
+You may choose an alternative location if desired.
 
 ### Colour Harmonics
 The *Colour Harmonics* dialogue is accessed via the *Tools* menu and is only enabled when you open a theme.
