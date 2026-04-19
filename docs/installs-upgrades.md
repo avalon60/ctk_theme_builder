@@ -15,6 +15,10 @@ This note is for the parts that are more operational:
 - migrating data from an older directory-based install
 - troubleshooting PATH and launcher issues
 
+CTk Theme Builder is now distributed as a Python package.
+ZIP-file deployments are no longer the supported installation path.
+Use PyPI for normal installs, or install from a `.whl` file when working from a release artefact.
+
 ## Requirements
 
 - Python 3.10 to 3.13
@@ -105,9 +109,12 @@ As with a new installation, run this command from the same activated virtual env
 
 If you have downloaded a wheel artefact, install or upgrade it with:
 
-`python -m pip install --upgrade ctk_theme_builder-<version>-py3-none-any.whl`
+`python -m pip install --upgrade ./ctk_theme_builder-<version>-py3-none-any.whl`
+
+The `./` prefix is optional, but it makes it explicit that the wheel is a local file.
 
 Replace `<version>` with the wheel version you downloaded.
+If you previously used a ZIP download workflow, switch to either the PyPI install commands above or a downloaded wheel file.
 
 After installation, launch the application with:
 
