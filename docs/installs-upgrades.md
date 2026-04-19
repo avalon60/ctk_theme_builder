@@ -4,7 +4,11 @@
 
 CTk Theme Builder supports Python 3.10 through Python 3.13.
 
-The main installation guidance now lives in the [README](../README.md). This note is for the parts that are more operational:
+The main installation guidance now lives in the GitHub-hosted [README](https://github.com/avalon60/ctk_theme_builder/blob/main/README.md).
+
+The wider documentation set, including the user guide and release notes, is also intended to be read from the GitHub repository rather than from the runtime user-data directory.
+
+This note is for the parts that are more operational:
 
 - upgrading an existing installation
 - installing from a wheel artefact
