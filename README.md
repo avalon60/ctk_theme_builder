@@ -4,17 +4,24 @@
 
 CTk Theme Builder is a desktop editor for creating, previewing, and refining themes for [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) applications.
 
-It provides a live preview workflow for adjusting colours, geometry, palettes, and theme metadata without editing theme JSON files by hand.
+It provides a live, visual workflow for editing CustomTkinter theme colours, supported widget geometry, palettes, and theme metadata without hand-editing theme JSON files.
+
+The application is designed to make iterative theme work practical: you can experiment with colours, compare light and dark appearance modes, reuse palette colours across a theme, and validate the result against realistic widget rendering as you work.
 
 ## Features
 
-- Visual theme editing with live preview
-- Support for light and dark theme variants
-- Theme geometry editing for supported widget properties
-- Palette management and colour harmonics tools
-- Theme merge and import/export support
-- Provenance tracking for theme metadata
-- Built-in theme and palette assets to get started quickly
+- Live visual editing of CustomTkinter theme colours with immediate preview feedback
+- Editing of supported widget geometry properties such as corner radius and border width
+- Light and dark appearance-mode workflows, including copying and flipping values between modes
+- Persistent theme palette for planning, reusing, and refining colours across a theme
+- Colour harmonics generation from a keystone colour to help build coherent palettes
+- Bundled icon browsing with CustomTkinter code-snippet generation for available Font Awesome icons
+- Drag-and-drop, clipboard, and shade-adjustment workflows for fast colour iteration
+- Palette-driven cascade updates for applying a colour across related widget properties
+- Theme merge, import, and export support for reuse and distribution
+- Provenance metadata for themes created and maintained in the builder
+- Preview and validation support for realistic widget states, including disabled rendering
+- Built-in theme and palette assets to help you get started quickly
 
 ## Installation
 
@@ -69,9 +76,9 @@ ctktb-migrate-assets /path/to/old/install
 
 ## Documentation
 
-- Installation and upgrade notes: [docs/installs-upgrades.md](docs/installs-upgrades.md)
-- User guide: [docs/UserGuide-3.3.md](docs/UserGuide-3.3.md)
-- Release notes: [release-notes-3.2.4.md](release-notes-3.2.4.md)
+- Installation and upgrade notes: [docs/installs-upgrades.md](https://github.com/avalon60/ctk_theme_builder/blob/main/docs/installs-upgrades.md)
+- User guide: [docs/UserGuide-3.3.md](https://github.com/avalon60/ctk_theme_builder/blob/main/docs/UserGuide-3.3.md)
+- Release notes: [release-notes-3.2.4.md](https://github.com/avalon60/ctk_theme_builder/blob/main/release-notes-3.2.4.md)
 - Source code and issue tracker: [GitHub repository](https://github.com/avalon60/ctk_theme_builder)
 
 ## Licence
