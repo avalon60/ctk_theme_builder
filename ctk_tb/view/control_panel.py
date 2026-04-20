@@ -541,7 +541,11 @@ class ControlPanel(ctk.CTk):
         self.frm_button = ctk.CTkFrame(master=self.frm_control)
         self.frm_geometry = ctk.CTkFrame(master=self.frm_control)
         self.frm_theme_palette = ctk.CTkFrame(master=self.frm_control)
-        self.frm_colour_edit_widgets = ctk.CTkScrollableFrame(master=self.frm_control)
+        self.frm_colour_edit_widgets = ctk.CTkScrollableFrame(
+            master=self.frm_control,
+            corner_radius=0,
+            border_width=0,
+        )
 
         button_frame = self.frm_button
         button_frame.grid(row=0, column=0, rowspan=3, columnspan=1, sticky='ns', padx=(5, 5), pady=(5, 5))
@@ -2647,6 +2651,7 @@ class ControlPanel(ctk.CTk):
         # self.appearance_mode = self.seg_mode.get()
 
         widget_frame = self.frm_colour_edit_widgets
+        widget_frame.grid_anchor("nw")
 
         # The colours dictionary here is composed of a composite key and colour value.
         # The key consists of the display widget type ('CTk' string removed excepting for the CTk() widget).
@@ -2706,6 +2711,7 @@ class ControlPanel(ctk.CTk):
         for row in range(1, 30):
             for column_base in range(0, 3):
                 column = column_base * 2
+                button_pad_x = (1, pad_x) if column_base == 0 else pad_x
                 try:
                     key = next(member_gen)
                     widget_type, widget_property = mod.widget_property_split(key)
@@ -2728,10 +2734,10 @@ class ControlPanel(ctk.CTk):
                                              width=30,
                                              height=30,
                                              text='')
-                btn_property.grid(row=row, column=column + 1, padx=pad_x, pady=pad_y)
+                btn_property.grid(row=row, column=column, padx=button_pad_x, pady=pad_y)
 
                 lbl_property = ctk.CTkLabel(master=widget_frame, text=' ' + label, anchor='e')
-                lbl_property.grid(row=row, column=column + 2, sticky='w', pady=pad_y)
+                lbl_property.grid(row=row, column=column + 1, sticky='w', pady=pad_y)
 
                 self.widgets[key] = {"tile": btn_property, 'label': lbl_property, 'widget_type': widget_type,
                                      'widget_property': widget_property, 'colour': colour}
