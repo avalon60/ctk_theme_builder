@@ -39,6 +39,8 @@ class LogViewerDialog(ctk.CTkToplevel):
         super().__init__(*args, **kwargs)
 
         self.log_file_path = log_file_path
+        self.icon_photo = tk.PhotoImage(file=APP_IMAGES / 'ctk-tb-ico-taskbar.png')
+        self.iconphoto(False, self.icon_photo)
         self.title('Runtime Log')
         self.geometry('980x620')
         self.minsize(760, 460)
@@ -127,8 +129,8 @@ class PreferencesDialog(ctk.CTkToplevel):
         if this_platform == "Darwin":
             self.platform = "MacOS"
 
-        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'ctk-tb-ico-taskbar.png')
-        self.iconphoto(False, icon_photo)
+        self.icon_photo = tk.PhotoImage(file=APP_IMAGES / 'ctk-tb-ico-taskbar.png')
+        self.iconphoto(False, self.icon_photo)
         control_panel_theme = pref.preference_setting(db_file_path=DB_FILE_PATH,
                                                       scope='user_preference', preference_name='control_panel_theme')
 
@@ -215,6 +217,7 @@ class PreferencesDialog(ctk.CTkToplevel):
         frm_main = ctk.CTkFrame(master=self, corner_radius=10)
         frm_main.grid(column=0, row=0, sticky='nsew')
         frm_main.columnconfigure(0, weight=1)
+        frm_main.columnconfigure(1, weight=0, minsize=265)
         frm_main.rowconfigure(0, weight=1)
 
         # Provenance frame
@@ -534,6 +537,8 @@ class PreferencesDialog(ctk.CTkToplevel):
         frm_logging.grid(column=1, row=3,
                          padx=FRM_RPADX, pady=FRM_BPADY,
                          sticky='nsew')
+        frm_logging.columnconfigure(1, weight=1)
+        frm_logging.columnconfigure(3, minsize=110)
         lbl_logging = ctk.CTkLabel(master=frm_logging, text='Logging', justify="right", font=mod.HEADING4)
         lbl_logging.grid(row=0, column=0, padx=5, pady=(5, 5), sticky='w')
 
@@ -587,8 +592,8 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.lbl_log_size = ctk.CTkLabel(master=frm_logging, text=formatted_log_size, justify="right")
         self.lbl_log_size.grid(row=3, column=1, padx=PADX, pady=10, sticky='w')
 
-        btn_view_log = ctk.CTkButton(master=frm_logging, text='View Log', command=self.view_log, width=15)
-        btn_view_log.grid(row=2, column=3, padx=(15, 0), pady=5)
+        btn_view_log = ctk.CTkButton(master=frm_logging, text='View Log', command=self.view_log, width=100)
+        btn_view_log.grid(row=2, column=3, padx=(15, 10), pady=5, sticky='e')
 
         CTkToolTip(btn_view_log,
                    border_width=1,
@@ -597,8 +602,8 @@ class PreferencesDialog(ctk.CTkToplevel):
                    corner_radius=6,
                    message=f"Open the runtime log, located at:\n {logutl.LOG_DIR / logutl.RUNTIME_LOG}")
 
-        btn_clear_log = ctk.CTkButton(master=frm_logging, text='Clear Log', command=self.clear_log, width=15)
-        btn_clear_log.grid(row=3, column=3, padx=(15, 0), pady=5)
+        btn_clear_log = ctk.CTkButton(master=frm_logging, text='Clear Log', command=self.clear_log, width=100)
+        btn_clear_log.grid(row=3, column=3, padx=(15, 10), pady=5, sticky='e')
 
         CTkToolTip(btn_clear_log,
                    border_width=1,

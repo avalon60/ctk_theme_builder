@@ -82,6 +82,8 @@ class LauncherGeneratorDialog(ctk.CTkToplevel):
     def __init__(self, *args, launcher_bundle: LauncherBundle, **kwargs):
         super().__init__(*args, **kwargs)
         self.launcher_bundle = launcher_bundle
+        self.icon_photo = tk.PhotoImage(file=APP_IMAGES / 'ctk-tb-ico-taskbar.png')
+        self.iconphoto(False, self.icon_photo)
         self.title('Launcher Generated')
         self.geometry('860x360')
         self.minsize(760, 320)
@@ -226,6 +228,8 @@ class UpgradeScriptDialog(ctk.CTkToplevel):
     def __init__(self, *args, upgrade_bundle: UpgradeScriptBundle, **kwargs):
         super().__init__(*args, **kwargs)
         self.upgrade_bundle = upgrade_bundle
+        self.icon_photo = tk.PhotoImage(file=APP_IMAGES / 'ctk-tb-ico-taskbar.png')
+        self.iconphoto(False, self.icon_photo)
         self.title('Upgrade Script Generated')
         self.geometry('860x320')
         self.minsize(760, 280)
