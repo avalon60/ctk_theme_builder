@@ -1,0 +1,32 @@
+long_option,short_option,value_metavar,description,overridden
+--area,,<area-spec>,Declare a managed area,N
+--bump,,<version-part>,Select the semantic version component to increment,N
+--config,-c,<file>,Select a configuration file,N
+--description,,<description>,Set a human-readable description,N
+--domain-plugin,,<plugin-id>,Select the owning domain plugin,N
+--dry-run,,,Show planned actions without applying changes,N
+--fetch,-f,,Fetch source updates before continuing,N
+--format,,<format>,Select an output representation,N
+--guardrail,,<guardrail>,Select a guardrail by name or fragment,N
+--harness,,<harness>,Select one or more coding harness integrations,N
+--help,-h,,Display command usage and exit,N
+--json,,,Emit a machine-readable JSON report,N
+--list-templates,,,List available SDK templates,N
+--name,,<name>,Set a human-readable name,N
+--no-contexts,,,Suppress context file materialisation,N
+--no-fetch,-n,,Suppress automatic source fetching,N
+--output,-o,<directory>,Select an output directory,N
+--purge-contexts,,,Remove durable context files during removal,N
+--purge-support-files,,,Remove durable support files during removal,N
+--report,,,Display a detailed comparison report,N
+--set-version,,<version>,Assign a version value,N
+--skill,,<skill>,Select one or more skills by canonical identity,N
+--source,,<path>,Select a source path to inspect,N
+--source-ref,-r,<ref>,Select the source Git reference,N
+--source-repository,-l,<repository>,Select a local SDK source repository,N
+--target,-t,<repository>,Select the repository acted upon,N
+--template,-T,<template-id>,Select an SDK template,N
+--update,,,Write an updated generated contract,N
+--verbose,-v,,Increase diagnostic detail,N
+--version,,,Display program version and exit,N
+--yes,-y,,Accept confirmation prompts non-interactively,N

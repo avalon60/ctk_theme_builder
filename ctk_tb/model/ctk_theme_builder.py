@@ -1,6 +1,6 @@
 __title__ = 'CB CustomTkinter Theme Builder Module'
 __author__ = 'Clive Bostock'
-__version__ = "3.3.2"
+__version__ = "5.2.0"
 __license__ = 'MIT - see LICENSE.md'
 
 import copy

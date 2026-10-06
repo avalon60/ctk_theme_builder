@@ -4,59 +4,19 @@
 # Date: 2026-04-21
 # Description: Displays application metadata and performs a best-effort PyPI update check.
 
-import json
 import sys
 import threading
 import tkinter as tk
-import urllib.error
-import urllib.request
 
 import customtkinter as ctk
-from packaging.version import InvalidVersion
-from packaging.version import Version
 
 import ctk_tb.model.ctk_theme_builder as mod
 import ctk_tb.utils.cbtk_kit as cbtk
 import ctk_tb.utils.loggerutl as log
 from ctk_tb.model.ctk_theme_builder import log_call
+from ctk_tb.utils.update_check import fetch_update_status
 
 APP_IMAGES = mod.APP_IMAGES
-PYPI_PROJECT_JSON_URL = 'https://pypi.org/pypi/ctk-theme-builder/json'
-PYPI_TIMEOUT_S = 2.5
-_UPDATE_CHECK_CACHE: tuple[bool, str] | None = None
-
-
-def _fetch_update_status(current_version: str, timeout_s: float = PYPI_TIMEOUT_S) -> tuple[bool, str] | None:
-    """Return update availability and latest version from PyPI when reachable.
-
-    Args:
-        current_version: The version currently running in the application.
-        timeout_s: Timeout for the PyPI request in seconds.
-
-    Returns:
-        A tuple of ``(update_available, latest_version)`` when the lookup
-        succeeds, otherwise ``None``.
-    """
-    global _UPDATE_CHECK_CACHE
-
-    if _UPDATE_CHECK_CACHE is not None:
-        return _UPDATE_CHECK_CACHE
-
-    try:
-        with urllib.request.urlopen(PYPI_PROJECT_JSON_URL, timeout=timeout_s) as response:
-            payload = json.load(response)
-        latest_version = payload['info']['version']
-        update_available = Version(latest_version) > Version(current_version)
-    except (OSError, ValueError, KeyError, InvalidVersion, urllib.error.URLError) as error:
-        log.log_debug(
-            log_text=f'About dialog update check unavailable: {error}',
-            class_name='About',
-            method_name='_fetch_update_status',
-        )
-        return None
-
-    _UPDATE_CHECK_CACHE = (update_available, latest_version)
-    return _UPDATE_CHECK_CACHE
 
 
 class About(ctk.CTkToplevel):
@@ -154,7 +114,7 @@ class About(ctk.CTkToplevel):
 
     def _check_for_updates(self) -> None:
         """Fetch update information from PyPI and marshal the result back to Tk."""
-        update_status = _fetch_update_status(self.app_version)
+        update_status = fetch_update_status(self.app_version)
         if not self.winfo_exists():
             return
         self.after(0, lambda: self._apply_update_status(update_status))
