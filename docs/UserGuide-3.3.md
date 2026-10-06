@@ -52,7 +52,7 @@ Key features include:
 * Undo and Redo support for colour and palette changes.
 
 ## CustomTkinter Version
-Version 3.3 of CTk Theme Builder is designed around CustomTkinter 5.2.2. Any behaviours or features described herein are based on that version. When you install CTk Theme Builder, it installs library modules into a virtual environment, including CustomTkinter 5.2.2. If you upgrade or downgrade CustomTkinter independently, results may be unpredictable.
+The CTkV6 branch of CTk Theme Builder requires CustomTkinter 6.0.0. Any behaviours or features described herein are based on that version. When you install CTk Theme Builder, it installs library modules into a virtual environment, including CustomTkinter 6.0.0. If you upgrade or downgrade CustomTkinter independently, results may be unpredictable.
 
 ## Fundamentals
 
@@ -462,8 +462,12 @@ Updated drag-aware colour handling while preserving the existing live preview up
 
 ### CustomTkinter
 
-#### CTkLabel Disabled Text
-There is currently no reliable `text_color_disabled` theme property support for `CTkLabel` in CustomTkinter 5.2.2. Disabled label text therefore still follows underlying toolkit behaviour rather than a distinct theme-managed value.
+#### CTkLabel Borders
+The label geometry dialogue includes Corner Radius and Border Width (0–20). The sample uses a contrasting background to show both effects. Save applies geometry changes to the Preview Panel; Cancel discards them.
+
+Use `Label: border_color` in Colour Mappings to edit the border independently in Light and Dark modes. Changes update preview labels immediately and support undo/redo. Borders become visible when Border Width is greater than zero.
+
+Older themes receive missing label border defaults in memory; their original files change only when saved. The v6 label theme schema omits `text_color_disabled`, so Theme Builder removes that legacy label entry when loading and saving themes.
 
 #### CTkSlider Configure button_corner_radius
 CustomTkinter 5.2.2 still has an issue when configuring `CTkSlider.button_corner_radius` dynamically. You can save the value and refresh the Preview Panel to confirm the effect.

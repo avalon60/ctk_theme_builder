@@ -178,14 +178,14 @@ files = [
 
 [[package]]
 name = "customtkinter"
-version = "5.2.2"
+version = "6.0.0"
 description = "Create modern looking GUIs with Python"
 optional = false
 python-versions = ">=3.7"
 groups = ["main"]
 files = [
-    {file = "customtkinter-5.2.2-py3-none-any.whl", hash = "sha256:14ad3e7cd3cb3b9eb642b9d4e8711ae80d3f79fb82545ad11258eeffb2e6b37c"},
-    {file = "customtkinter-5.2.2.tar.gz", hash = "sha256:fd8db3bafa961c982ee6030dba80b4c2e25858630756b513986db19113d8d207"},
+    {file = "customtkinter-6.0.0-py3-none-any.whl", hash = "sha256:704fcbf1d2fca06bd7881b0afacfae72aed9864c9b6de2870e632e55eb3a0456"},
+    {file = "customtkinter-6.0.0.tar.gz", hash = "sha256:c782df167bc64ab3fc3140286df06967ac2de4dcc97dd5958426fe9c1a98057b"},
 ]
 
 [package.dependencies]
@@ -983,4 +983,4 @@ testing = ["big-O", "flake8 (<5)", "jaraco.functools", "jaraco.itertools", "more
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10,<3.14"
-content-hash = "fef0c3d8c5488d28c4aa5800d14eb241cdd542d715facfa986fd5ff694711993"
+content-hash = "d657fc5eae411a9b86aa4a8e5454ae995e4382db83fd72145a79877b0eeb582b"

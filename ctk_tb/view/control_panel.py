@@ -7,7 +7,7 @@ import ctk_tb.model.ctk_theme_builder as mod
 import ctk_tb.paths as app_paths
 from ctk_tb.model.ctk_theme_builder import log_call
 import ctk_tb.utils.loggerutl as log
-from ctk_tb.utils.theme_compat import backfill_text_color_disabled
+from ctk_tb.utils.theme_compat import backfill_text_color_disabled, normalise_label_theme
 from ctk_tb.utils.launcher_generator import applications_menu_label
 from ctk_tb.utils.launcher_generator import applications_menu_target_path
 from ctk_tb.utils.launcher_generator import desktop_shortcut_label
@@ -1722,7 +1722,7 @@ class ControlPanel(ctk.CTk):
         self.lbl_palette_header.grid(row=0,
                                      column=0,
                                      sticky='w',
-                                     columnspan=12,
+                                     columnspan=6,
                                      pady=(5, 0),
                                      padx=10)
 
@@ -2047,6 +2047,7 @@ class ControlPanel(ctk.CTk):
         # The patch function checks to see if the theme, has wrong, pre CustomTkinter 5.2.0 property names.
         # If so, it patches up the theme JSON. These should be CTkCheckBox and CTkRadioButton.
         self.theme_json_data = mod.patch_theme(theme_json=self.theme_json_data)
+        normalise_label_theme(self.theme_json_data)
         with open(self.wip_json, "w") as f:
             json.dump(self.theme_json_data, f, indent=2)
 
@@ -2566,6 +2567,7 @@ class ControlPanel(ctk.CTk):
             font=REGULAR_TEXT,
         )
         placeholder.grid(row=0, column=0, sticky='w', padx=10, pady=10)
+        self.colour_mapping_placeholder = placeholder
         self.widget_properties_render_job = self.after_idle(self._run_scheduled_widget_properties_render)
 
     @log_call
@@ -2682,6 +2684,10 @@ class ControlPanel(ctk.CTk):
         # self.appearance_mode = self.seg_mode.get()
 
         widget_frame = self.frm_colour_edit_widgets
+        placeholder = getattr(self, "colour_mapping_placeholder", None)
+        if placeholder is not None:
+            placeholder.destroy()
+            self.colour_mapping_placeholder = None
         widget_frame.grid_anchor("nw")
 
         # The colours dictionary here is composed of a composite key and colour value.
@@ -2707,7 +2713,7 @@ class ControlPanel(ctk.CTk):
         self.lbl_header.grid(row=0,
                              column=0,
                              sticky='w',
-                             columnspan=12,
+                             columnspan=6,
                              pady=(5, 0),
                              padx=0)
 
@@ -2742,7 +2748,7 @@ class ControlPanel(ctk.CTk):
         for row in range(1, 30):
             for column_base in range(0, 3):
                 column = column_base * 2
-                button_pad_x = (1, pad_x) if column_base == 0 else pad_x
+                button_pad_x = (5, 4)
                 try:
                     key = next(member_gen)
                     widget_type, widget_property = mod.widget_property_split(key)
@@ -2765,10 +2771,12 @@ class ControlPanel(ctk.CTk):
                                              width=30,
                                              height=30,
                                              text='')
-                btn_property.grid(row=row, column=column, padx=button_pad_x, pady=pad_y)
+                btn_property.grid(row=row, column=column, padx=button_pad_x, pady=pad_y, sticky='e')
 
-                lbl_property = ctk.CTkLabel(master=widget_frame, text=' ' + label, anchor='e')
-                lbl_property.grid(row=row, column=column + 1, sticky='w', pady=pad_y)
+                lbl_property = ctk.CTkLabel(master=widget_frame, text=' ' + label,
+                                            anchor='w')
+                lbl_property.grid(row=row, column=column + 1,
+                                  sticky='w', padx=(0, 15), pady=pad_y)
 
                 self.widgets[key] = {"tile": btn_property, 'label': lbl_property, 'widget_type': widget_type,
                                      'widget_property': widget_property, 'colour': colour}

@@ -56,14 +56,10 @@
     "border_width": 0,
     "fg_color": "transparent",
     "border_color": [
-      "#cbb6a5",
-      "#6e5878"
+      "#979DA2",
+      "#565B5E"
     ],
     "text_color": [
-      "#40251c",
-      "#f2dfd4"
-    ],
-    "text_color_disabled": [
       "#40251c",
       "#f2dfd4"
     ]

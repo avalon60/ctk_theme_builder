@@ -209,7 +209,10 @@ class GeometryDialog(ctk.CTkToplevel):
             geometry_widget = ctk.CTkLabel(master=frm_widget_preview_low,
                                            text_color=preview_text_colour,
                                            fg_color=cbtk.contrast_colour(preview_frame_top, 15),
-                                           corner_radius=self.theme_json_data[widget_type]['corner_radius'])
+                                           corner_radius=self.theme_json_data[widget_type]['corner_radius'],
+                                           border_width=self.theme_json_data[widget_type]['border_width'],
+                                           border_color=self.theme_json_data[widget_type]['border_color'],
+                                           width=150, height=80)
             widget_tooltip = CTkToolTip(geometry_widget, wraplength=200,
                                         border_width=1,
                                         justify="left",
@@ -217,7 +220,7 @@ class GeometryDialog(ctk.CTkToplevel):
                                         corner_radius=6,
                                         message='The CTkLabel widget has been intentionally '
                                                 'rendered with a contrasting fg_color, so that '
-                                                'the corner radius effect may be seen.')
+                                                'the corner radius and border effects may be seen.')
         elif widget_type == 'CTkEntry':
             fg_color = self.theme_json_data['CTkEntry']['fg_color'][mode]
             border_color = self.theme_json_data['CTkEntry']['border_color'][mode]

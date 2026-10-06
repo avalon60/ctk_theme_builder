@@ -73,3 +73,107 @@ def test_macos_desktop_shortcut_points_to_applications_copy(tmp_path, monkeypatc
     assert list((tmp_path / "launchers" / ".generated").glob("*.app")) == [launcher.launcher_path]
     assert not legacy_path.exists()
     assert (tmp_path / "launchers" / ".generated" / "CTk Theme Builder.legacy").is_dir()
+
+
+@pytest.mark.parametrize("label", [{}, {"border_width": 7}, {"border_color": ["red", "blue"]},
+                                  {"border_width": 4, "border_color": ["red", "blue"]}])
+def test_v6_label_theme_normalisation_preserves_existing_values(label):
+    """Preserve existing borders while removing only the label legacy colour."""
+    from ctk_tb.utils.theme_compat import backfill_text_color_disabled, normalise_label_theme
+
+    original = dict(label)
+    theme = {"CTkLabel": dict(label, text_color="white", text_color_disabled="grey"),
+             "CTkButton": {"text_color": "black"}, "provenance": {"name": "Test"}}
+    normalise_label_theme(theme)
+    backfill_text_color_disabled(theme)
+    assert theme["CTkLabel"]["border_width"] == original.get("border_width", 0)
+    assert theme["CTkLabel"]["border_color"] == original.get("border_color", ["#979DA2", "#565B5E"])
+    assert "text_color_disabled" not in theme["CTkLabel"]
+    assert theme["CTkButton"]["text_color_disabled"] == "black"
+    assert theme["provenance"] == {"name": "Test"}
+
+
+@pytest.mark.parametrize("kind,prop,new,old", [("geometry", "border_width", 20, 0),
+                                              ("colour", "border_color", "red", "blue")])
+def test_label_border_commands_undo_redo(monkeypatch, kind, prop, new, old):
+    """Keep border changes reversible through the existing preview protocol."""
+    import ctk_tb.model.ctk_theme_builder as model
+
+    commands = []
+    monkeypatch.setattr(model, "send_command_json", lambda **kwargs: commands.append(kwargs))
+    stack = model.CommandStack()
+    command = "update_widget_geometry" if kind == "geometry" else "update_widget_colour"
+    vector = model.PropertyVector(command_type=kind, command=command, component_type="CTkLabel",
+                                  component_property=prop, new_value=new, old_value=old)
+    stack.exec_command(vector)
+    stack.undo_command()
+    stack.redo_command()
+    assert [item["parameters"] for item in commands] == [["CTkLabel", prop, value] for value in (new, old, new)]
+    assert all(item["command"] == command for item in commands)
+
+
+@pytest.mark.parametrize("width", [0, 1, 20])
+def test_preview_label_border_commands_reach_all_labels(width):
+    """Apply received border changes to every registered preview label."""
+    from types import SimpleNamespace
+    from ctk_tb.view.ctk_theme_preview import PreviewPanel
+
+    class Label:
+        def __init__(self):
+            self.values = {}
+
+        def configure(self, **kwargs):
+            self.values.update(kwargs)
+
+    labels = [Label(), Label(), Label()]
+    panel = SimpleNamespace(_rendered_widgets={"CTkLabel": labels},
+                            _command_json={"command": "update_widget_geometry",
+                                           "parameters": ["CTkLabel", "border_width", width]})
+    PreviewPanel._exec_geometry_command(panel)
+    for colour in ("#112233", "#aabbcc"):
+        PreviewPanel.update_widget_colour(panel, "CTkLabel", "border_color", colour)
+        assert all(label.values == {"border_width": width, "border_color": colour} for label in labels)
+
+
+def test_label_geometry_save_records_old_value_and_persists(tmp_path):
+    """Save the width through the geometry dialogue and its command stack."""
+    import json
+    from types import SimpleNamespace
+    from ctk_tb.view.geometry_dialog import GeometryDialog
+
+    vectors = []
+    closed = []
+    theme = {"CTkLabel": {"border_width": 0}}
+    work = tmp_path / "theme.json"
+    master = SimpleNamespace(json_state="clean", wip_json=work, set_option_states=lambda: None)
+    dialog = SimpleNamespace(geometry_edit_values={"border_width": 20}, master=master,
+                             theme_json_data=theme, command_stack=SimpleNamespace(exec_command=lambda property_vector: vectors.append(property_vector)),
+                             close_geometry_dialog=lambda: closed.append(True))
+    GeometryDialog.save_geometry_edits(dialog, "CTkLabel")
+    assert vectors[0].old_value == 0
+    assert vectors[0].new_value == 20
+    assert json.loads(work.read_text())["CTkLabel"]["border_width"] == 20
+    assert master.json_state == "dirty"
+    assert closed == [True]
+
+
+def test_preview_frame_caption_stays_borderless():
+    """Keep the shared Top/Base caption outside label border geometry updates."""
+    from types import SimpleNamespace
+    from ctk_tb.view.ctk_theme_preview import PreviewPanel
+
+    class Label:
+        def __init__(self):
+            self.width = 0
+
+        def configure(self, border_width):
+            self.width = border_width
+
+    caption, sample = Label(), Label()
+    panel = SimpleNamespace(lbl_preview_heading=caption,
+                            _rendered_widgets={"CTkLabel": [caption, sample]},
+                            _command_json={"command": "update_widget_geometry",
+                                           "parameters": ["CTkLabel", "border_width", 20]})
+    PreviewPanel._exec_geometry_command(panel)
+    assert caption.width == 0
+    assert sample.width == 20

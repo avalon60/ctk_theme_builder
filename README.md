@@ -2,6 +2,8 @@
 
 ![CTk Theme Builder](https://raw.githubusercontent.com/avalon60/ctk_theme_builder/develop/assets/images/ctk-tb-logo.png)
 
+The CTkV6 branch requires CustomTkinter 6.0.0 and supports label border width and colour editing.
+
 CTk Theme Builder is a desktop editor for creating, previewing, and refining themes for [CustomTkinter](https://github.com/TomSchimansky/CustomTkinter) applications.
 
 It provides a live, visual workflow for editing CustomTkinter theme colours, supported widget geometry, palettes, and theme metadata without hand-editing theme JSON files.

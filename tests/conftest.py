@@ -10,3 +10,8 @@ os.environ["HOME"] = _TEST_HOME
 PROJECT_ROOT = Path(__file__).resolve().parent.parent
 if str(PROJECT_ROOT) not in sys.path:
     sys.path.insert(0, str(PROJECT_ROOT))
+
+# Bootstrap only the isolated test home before model imports read preferences.
+from ctk_tb.runtime_init import initialise_runtime_state
+
+initialise_runtime_state()

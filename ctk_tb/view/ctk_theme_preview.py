@@ -281,13 +281,14 @@ class PreviewPanel:
 
         self.lbl_preview_heading = ctk.CTkLabel(master=self.frm_preview_top,
                                                 text='Frame (Top) Preview',
+                                                border_width=0,
                                                 font=mod.HEADING4,
                                                 anchor="w")
         self.lbl_preview_heading.grid(row=0, column=0, pady=(10, 20))
 
         self._rendered_widgets['CTkLabel'].append(self.lbl_preview_heading)
 
-        label_1 = ctk.CTkLabel(master=widget_frame, justify=tk.LEFT)
+        label_1 = ctk.CTkLabel(master=widget_frame, justify=tk.LEFT, width=150, height=80)
         label_1.grid(row=1, column=0, padx=pad_x, pady=pad_y)
         self._rendered_widgets['CTkLabel'].append(label_1)
 
@@ -735,6 +736,9 @@ class PreviewPanel:
 
         else:
             for widget in self._rendered_widgets[widget_type]:
+                # Frame captions describe the preview rather than sample label borders.
+                if widget is getattr(self, 'lbl_preview_heading', None) and widget_property == 'border_width':
+                    continue
                 update_widget_geometry(widget, widget_property, int(property_value))
 
         # We contrive to always show a contrast of a button with and without a border.

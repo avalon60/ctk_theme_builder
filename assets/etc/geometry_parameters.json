@@ -25,7 +25,8 @@
       "border_width":[ 0, 20 ]
    },
    "CTkLabel":{
-      "corner_radius":[ 0, 100 ]
+      "corner_radius":[ 0, 100 ],
+      "border_width":[ 0, 20 ]
    },
    "CTkOptionMenu":{
       "corner_radius":[ 0, 12 ]
