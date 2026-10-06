@@ -24,6 +24,8 @@ LINUX_DESKTOP_FILENAME = "ctk-theme-builder.desktop"
 LINUX_RUNNER_FILENAME = "ctk-theme-builder.sh"
 MACOS_APP_BUNDLE_NAME = "CTk Theme Builder.app"
 MACOS_BUNDLE_EXECUTABLE = "ctk-theme-builder"
+MACOS_ICON_FILENAME = "ctk-tb-app.icns"
+MACOS_STAGING_DIRECTORY = ".generated"
 WINDOWS_LAUNCHER_FILENAME = "ctk-theme-builder.bat"
 WINDOWS_SHORTCUT_FILENAME = "CTk Theme Builder.lnk"
 WINDOWS_ICON_FILENAME = "ctk-tb-ico.ico"
@@ -114,7 +116,7 @@ def applications_menu_label(system_name: str) -> str:
 def desktop_shortcut_label(system_name: str) -> str:
     """Return the user-facing desktop action label for a platform."""
     if system_name == "Darwin":
-        return "Create Desktop App"
+        return "Create Desktop Shortcut"
     if system_name == "Windows":
         return "Create Desktop Launcher"
     return "Create Desktop Shortcut"
@@ -324,6 +326,7 @@ def _macos_info_plist(app_version: str) -> bytes:
     plist_data = {
         "CFBundleDevelopmentRegion": "en",
         "CFBundleExecutable": MACOS_BUNDLE_EXECUTABLE,
+        "CFBundleIconFile": MACOS_ICON_FILENAME,
         "CFBundleIdentifier": "org.avalon60.ctk-theme-builder.launcher",
         "CFBundleInfoDictionaryVersion": "6.0",
         "CFBundleName": "CTk Theme Builder",
@@ -333,6 +336,36 @@ def _macos_info_plist(app_version: str) -> bytes:
         "LSMinimumSystemVersion": "10.13",
     }
     return plistlib.dumps(plist_data)
+
+
+def _retire_legacy_macos_launcher(target_dir: Path) -> None:
+    """Move an older visible generated app out of macOS app searches."""
+    legacy_path = target_dir / MACOS_APP_BUNDLE_NAME
+    if not legacy_path.is_dir() or legacy_path.is_symlink():
+        return
+
+    info_path = legacy_path / "Contents" / "Info.plist"
+    runner_path = legacy_path / "Contents" / "MacOS" / MACOS_BUNDLE_EXECUTABLE
+    try:
+        info = plistlib.loads(info_path.read_bytes())
+        runner_header = runner_path.read_bytes()[:64]
+    except (OSError, ValueError):
+        return
+    if (not isinstance(info, dict)
+            or info.get("CFBundleIdentifier") != "org.avalon60.ctk-theme-builder.launcher"
+            or not runner_header.startswith(b"#!/usr/bin/env bash\n# CTk Theme Builder Launcher\n")):
+        return
+
+    staging_dir = target_dir / MACOS_STAGING_DIRECTORY
+    retired_path = staging_dir / "CTk Theme Builder.legacy"
+    suffix = 2
+    while retired_path.exists() or retired_path.is_symlink():
+        retired_path = staging_dir / f"CTk Theme Builder.legacy-{suffix}"
+        suffix += 1
+    try:
+        legacy_path.rename(retired_path)
+    except OSError as exc:
+        raise LauncherGenerationError(f"Unable to retire old macOS launcher {legacy_path}: {exc}") from exc
 
 
 def _copy_launcher_artifact(source_path: Path, target_path: Path, system_name: str) -> Path:
@@ -449,9 +482,13 @@ def generate_platform_launcher(
         )
 
     if system_name == "Darwin":
-        launcher_path = target_dir / MACOS_APP_BUNDLE_NAME
+        icon_source_path = app_paths.APP_IMAGES / MACOS_ICON_FILENAME
+        if not icon_source_path.is_file():
+            raise LauncherGenerationError(f"macOS launcher icon not found: {icon_source_path}")
+        launcher_path = target_dir / MACOS_STAGING_DIRECTORY / MACOS_APP_BUNDLE_NAME
         executable_path = launcher_path / "Contents" / "MacOS" / MACOS_BUNDLE_EXECUTABLE
         info_plist_path = launcher_path / "Contents" / "Info.plist"
+        icon_path = launcher_path / "Contents" / "Resources" / MACOS_ICON_FILENAME
         _write_text_file(
             executable_path,
             _macos_launcher_text(
@@ -462,7 +499,13 @@ def generate_platform_launcher(
             ),
         )
         _write_binary_file(info_plist_path, _macos_info_plist(app_version))
+        try:
+            icon_path.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(icon_source_path, icon_path)
+        except OSError as exc:
+            raise LauncherGenerationError(f"Unable to copy macOS launcher icon to {icon_path}: {exc}") from exc
         _set_executable(executable_path)
+        _retire_legacy_macos_launcher(target_dir)
         return LauncherBundle(
             system_name=system_name,
             python_executable=python_path,
@@ -507,4 +550,18 @@ def create_desktop_shortcut(launcher_bundle: LauncherBundle) -> Path:
     if launcher_bundle.system_name == "Windows":
         icon_path = (app_paths.APP_IMAGES / WINDOWS_ICON_FILENAME).resolve()
         return _create_windows_shortcut(target_path, launcher_bundle.launcher_path, icon_path)
+    if launcher_bundle.system_name == "Darwin":
+        application_path = applications_menu_target_path(launcher_bundle)
+        if not application_path.is_dir():
+            raise LauncherGenerationError("Install to Applications Folder before creating a Desktop shortcut.")
+        try:
+            target_path.parent.mkdir(parents=True, exist_ok=True)
+            if target_path.is_symlink() or target_path.is_file():
+                target_path.unlink()
+            elif target_path.is_dir():
+                shutil.rmtree(target_path)
+            target_path.symlink_to(application_path, target_is_directory=True)
+        except OSError as exc:
+            raise LauncherGenerationError(f"Unable to create macOS desktop shortcut {target_path}: {exc}") from exc
+        return target_path
     return _copy_launcher_artifact(launcher_bundle.launcher_path, target_path, launcher_bundle.system_name)

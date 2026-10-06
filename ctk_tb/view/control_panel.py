@@ -214,7 +214,7 @@ class LauncherGeneratorDialog(ctk.CTkToplevel):
             self.status_bar.set_status_text(str(exc))
             return
 
-        self.status_bar.set_status_text(f'Launcher copied to desktop: {shortcut_path}')
+        self.status_bar.set_status_text(f'Launcher created on desktop: {shortcut_path}')
 
     def close_dialog(self, event=None):
         self.destroy()

@@ -246,6 +246,8 @@ This writes a platform-specific launcher into:
 
 The generated launcher uses the interpreter from the currently running CTk Theme Builder session, so it is a practical way to create a clickable shortcut for the exact environment you are using.
 
+On macOS, generating a launcher creates a working copy at `~/CTkThemeBuilder/launchers/.generated/CTk Theme Builder.app`. The hidden `.generated` folder keeps that working copy out of normal app searches. When upgrading from an older version, generation also moves a recognised old app from the visible `launchers` folder into that hidden folder. The dialogue can copy the new app to `~/Applications` and create a Desktop shortcut. Install to Applications first; the Desktop shortcut points to that copy. Running either action again replaces the same destination after confirmation rather than adding another entry. Older versions also copied the whole app to the Desktop. Use **Create Desktop Shortcut** to replace that old copy with a link. The Applications copy has everything it needs to launch the same Python environment.
+
 On Linux, the launcher generation step creates:
 
 - `ctk-theme-builder.sh` as the runner script
