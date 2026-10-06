@@ -4,6 +4,7 @@ import ctk_tb.model.ctk_theme_builder as mod
 from ctk_tb.model.ctk_theme_builder import log_call
 import customtkinter as ctk
 import tkinter as tk
+from tkinter import messagebox
 import platform
 import os
 from CTkToolTip import *
@@ -81,9 +82,16 @@ class LogViewerDialog(ctk.CTkToplevel):
                                              use_grid=True)
         self.bind("<Configure>", self.status_bar.auto_size_status_bar)
         self.bind('<Escape>', self.close_dialog)
+        self.protocol('WM_DELETE_WINDOW', self.close_dialog)
 
         self._load_log_contents()
-        self.lift()
+        if platform.system() == 'Darwin':
+            self.transient(self.master)
+            self.lift(self.master)
+            self.focus_force()
+        else:
+            self.lift()
+        self._previous_grab = self.grab_current()
         self.grab_set()
 
     def _load_log_contents(self):
@@ -111,7 +119,12 @@ class LogViewerDialog(ctk.CTkToplevel):
                             method_name='copy_log_contents')
 
     def close_dialog(self, event=None):
+        previous_grab = self._previous_grab
         self.destroy()
+        if previous_grab is not None and previous_grab.winfo_exists():
+            previous_grab.grab_set()
+            previous_grab.lift()
+            previous_grab.focus_set()
 
 
 class PreferencesDialog(ctk.CTkToplevel):
@@ -624,18 +637,26 @@ class PreferencesDialog(ctk.CTkToplevel):
 
         self.bind("<Configure>", self.status_bar.auto_size_status_bar)
 
-        self.lift()
+        if this_platform == 'Darwin':
+            self.transient(self.master)
+            self.lift(self.master)
+            self.focus_force()
+        else:
+            self.lift()
         self.grab_set()
         self.resizable(False, False)
         self.bind('<Escape>', self.close_preferences)
 
     def clear_log(self, event=None):
-        confirm = CTkMessagebox(master=self,
-                                title='Confirm Action',
-                                message=f'Are you sure you wish to erase the runtime log contents?',
-                                options=["Yes", "No"])
-        response = confirm.get()
-        if response == 'No':
+        prompt = 'Are you sure you wish to erase the runtime log contents?'
+        if platform.system() == 'Darwin':
+            self.lift(self.master)
+            self.focus_force()
+            confirmed = messagebox.askyesno(title='Confirm Action', message=prompt, parent=self)
+        else:
+            confirm = CTkMessagebox(master=self, title='Confirm Action', message=prompt, options=['Yes', 'No'])
+            confirmed = confirm.get() == 'Yes'
+        if not confirmed:
             return
 
         logutl.truncate_log()

@@ -18,7 +18,7 @@ def patch_ctk_tooltip_destroy_binding() -> None:
     try:
         import customtkinter
         import sys
-        from tkinter import Frame
+        from tkinter import Frame, TclError
         from CTkToolTip import CTkToolTip
     except ImportError:
         return
@@ -126,8 +126,27 @@ def patch_ctk_tooltip_destroy_binding() -> None:
         self.widget.bind("<Leave>", self.on_leave, add="+")
         self.widget.bind("<Motion>", self.on_enter, add="+")
         self.widget.bind("<B1-Motion>", self.on_enter, add="+")
-        self.widget.bind("<Destroy>", lambda *_: self.hide(), add="+")
+        def hide_on_destroy(*_):
+            self.disable = True
+            self.status = "outside"
+
+            def hide_after_destroy():
+                try:
+                    if self.winfo_exists():
+                        self.hide()
+                except TclError:
+                    pass
+
+            try:
+                self.after_idle(hide_after_destroy)
+            except TclError:
+                # The whole application may already be closing.
+                pass
+
+        if sys.platform.startswith("darwin"):
+            self.widget.bind("<Destroy>", hide_on_destroy, add="+")
+        else:
+            self.widget.bind("<Destroy>", lambda *_: self.hide(), add="+")
 
     CTkToolTip.__init__ = patched_init
     CTkToolTip._ctk_tb_destroy_binding_patched = True
-
