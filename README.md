@@ -25,13 +25,17 @@ The application is designed to make iterative theme work practical: you can expe
 
 ## Installation
 
+On macOS, first check that the Python you plan to use has Tk support: `python3 -m tkinter` should open a small test window. If it fails to import `_tkinter`, follow the [macOS Tk instructions](docs/installs-upgrades.md#macos-python-and-tk-support) before creating a virtual environment.
+
 Recommended installation from PyPI, using a virtual environment:
 
 ```bash
-python -m venv .venv
+python3 -m venv .venv
 source .venv/bin/activate
-pip install ctk-theme-builder
+python -m pip install ctk-theme-builder
 ```
+
+If you manage several Python versions, see the [optional pyenv installation route](docs/installs-upgrades.md#optional-pyenv-installation-on-macos).
 
 On Windows PowerShell:
 
