@@ -4,6 +4,7 @@ import ctk_tb.model.ctk_theme_builder as mod
 from ctk_tb.model.ctk_theme_builder import log_call
 import customtkinter as ctk
 import tkinter as tk
+from tkinter import messagebox
 import platform
 import os
 from CTkToolTip import *
@@ -39,6 +40,8 @@ class LogViewerDialog(ctk.CTkToplevel):
         super().__init__(*args, **kwargs)
 
         self.log_file_path = log_file_path
+        self.icon_photo = tk.PhotoImage(file=APP_IMAGES / 'ctk-tb-ico-taskbar.png')
+        self.iconphoto(False, self.icon_photo)
         self.title('Runtime Log')
         self.geometry('980x620')
         self.minsize(760, 460)
@@ -81,9 +84,16 @@ class LogViewerDialog(ctk.CTkToplevel):
                                              use_grid=True)
         self.bind("<Configure>", self.status_bar.auto_size_status_bar)
         self.bind('<Escape>', self.close_dialog)
+        self.protocol('WM_DELETE_WINDOW', self.close_dialog)
 
         self._load_log_contents()
-        self.lift()
+        if platform.system() == 'Darwin':
+            self.transient(self.master)
+            self.lift(self.master)
+            self.focus_force()
+        else:
+            self.lift()
+        self._previous_grab = self.grab_current()
         self.grab_set()
 
     def _load_log_contents(self):
@@ -111,7 +121,12 @@ class LogViewerDialog(ctk.CTkToplevel):
                             method_name='copy_log_contents')
 
     def close_dialog(self, event=None):
+        previous_grab = self._previous_grab
         self.destroy()
+        if previous_grab is not None and previous_grab.winfo_exists():
+            previous_grab.grab_set()
+            previous_grab.lift()
+            previous_grab.focus_set()
 
 
 class PreferencesDialog(ctk.CTkToplevel):
@@ -127,8 +142,8 @@ class PreferencesDialog(ctk.CTkToplevel):
         if this_platform == "Darwin":
             self.platform = "MacOS"
 
-        icon_photo = tk.PhotoImage(file=APP_IMAGES / 'ctk-tb-ico-taskbar.png')
-        self.iconphoto(False, icon_photo)
+        self.icon_photo = tk.PhotoImage(file=APP_IMAGES / 'ctk-tb-ico-taskbar.png')
+        self.iconphoto(False, self.icon_photo)
         control_panel_theme = pref.preference_setting(db_file_path=DB_FILE_PATH,
                                                       scope='user_preference', preference_name='control_panel_theme')
 
@@ -215,6 +230,7 @@ class PreferencesDialog(ctk.CTkToplevel):
         frm_main = ctk.CTkFrame(master=self, corner_radius=10)
         frm_main.grid(column=0, row=0, sticky='nsew')
         frm_main.columnconfigure(0, weight=1)
+        frm_main.columnconfigure(1, weight=0, minsize=265)
         frm_main.rowconfigure(0, weight=1)
 
         # Provenance frame
@@ -534,6 +550,8 @@ class PreferencesDialog(ctk.CTkToplevel):
         frm_logging.grid(column=1, row=3,
                          padx=FRM_RPADX, pady=FRM_BPADY,
                          sticky='nsew')
+        frm_logging.columnconfigure(1, weight=1)
+        frm_logging.columnconfigure(3, minsize=110)
         lbl_logging = ctk.CTkLabel(master=frm_logging, text='Logging', justify="right", font=mod.HEADING4)
         lbl_logging.grid(row=0, column=0, padx=5, pady=(5, 5), sticky='w')
 
@@ -587,8 +605,8 @@ class PreferencesDialog(ctk.CTkToplevel):
         self.lbl_log_size = ctk.CTkLabel(master=frm_logging, text=formatted_log_size, justify="right")
         self.lbl_log_size.grid(row=3, column=1, padx=PADX, pady=10, sticky='w')
 
-        btn_view_log = ctk.CTkButton(master=frm_logging, text='View Log', command=self.view_log, width=15)
-        btn_view_log.grid(row=2, column=3, padx=(15, 0), pady=5)
+        btn_view_log = ctk.CTkButton(master=frm_logging, text='View Log', command=self.view_log, width=100)
+        btn_view_log.grid(row=2, column=3, padx=(15, 10), pady=5, sticky='e')
 
         CTkToolTip(btn_view_log,
                    border_width=1,
@@ -597,8 +615,8 @@ class PreferencesDialog(ctk.CTkToplevel):
                    corner_radius=6,
                    message=f"Open the runtime log, located at:\n {logutl.LOG_DIR / logutl.RUNTIME_LOG}")
 
-        btn_clear_log = ctk.CTkButton(master=frm_logging, text='Clear Log', command=self.clear_log, width=15)
-        btn_clear_log.grid(row=3, column=3, padx=(15, 0), pady=5)
+        btn_clear_log = ctk.CTkButton(master=frm_logging, text='Clear Log', command=self.clear_log, width=100)
+        btn_clear_log.grid(row=3, column=3, padx=(15, 10), pady=5, sticky='e')
 
         CTkToolTip(btn_clear_log,
                    border_width=1,
@@ -624,18 +642,26 @@ class PreferencesDialog(ctk.CTkToplevel):
 
         self.bind("<Configure>", self.status_bar.auto_size_status_bar)
 
-        self.lift()
+        if this_platform == 'Darwin':
+            self.transient(self.master)
+            self.lift(self.master)
+            self.focus_force()
+        else:
+            self.lift()
         self.grab_set()
         self.resizable(False, False)
         self.bind('<Escape>', self.close_preferences)
 
     def clear_log(self, event=None):
-        confirm = CTkMessagebox(master=self,
-                                title='Confirm Action',
-                                message=f'Are you sure you wish to erase the runtime log contents?',
-                                options=["Yes", "No"])
-        response = confirm.get()
-        if response == 'No':
+        prompt = 'Are you sure you wish to erase the runtime log contents?'
+        if platform.system() == 'Darwin':
+            self.lift(self.master)
+            self.focus_force()
+            confirmed = messagebox.askyesno(title='Confirm Action', message=prompt, parent=self)
+        else:
+            confirm = CTkMessagebox(master=self, title='Confirm Action', message=prompt, options=['Yes', 'No'])
+            confirmed = confirm.get() == 'Yes'
+        if not confirmed:
             return
 
         logutl.truncate_log()

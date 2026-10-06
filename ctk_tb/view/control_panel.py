@@ -38,6 +38,7 @@ import ctk_tb.model.preferences as pref
 import operator
 import platform
 import pyperclip
+import threading
 from pathlib import Path
 import time
 from datetime import datetime
@@ -48,6 +49,7 @@ from tkinter.colorchooser import askcolor
 import json
 from CTkMessagebox import CTkMessagebox
 import sys
+from ctk_tb.utils.update_check import fetch_update_status
 
 CTK_SITE_PACKAGES = mod.CTK_SITE_PACKAGES
 CTK_ASSETS = mod.CTK_ASSETS
@@ -82,6 +84,8 @@ class LauncherGeneratorDialog(ctk.CTkToplevel):
     def __init__(self, *args, launcher_bundle: LauncherBundle, **kwargs):
         super().__init__(*args, **kwargs)
         self.launcher_bundle = launcher_bundle
+        self.icon_photo = tk.PhotoImage(file=APP_IMAGES / 'ctk-tb-ico-taskbar.png')
+        self.iconphoto(False, self.icon_photo)
         self.title('Launcher Generated')
         self.geometry('860x360')
         self.minsize(760, 320)
@@ -214,7 +218,7 @@ class LauncherGeneratorDialog(ctk.CTkToplevel):
             self.status_bar.set_status_text(str(exc))
             return
 
-        self.status_bar.set_status_text(f'Launcher copied to desktop: {shortcut_path}')
+        self.status_bar.set_status_text(f'Launcher created on desktop: {shortcut_path}')
 
     def close_dialog(self, event=None):
         self.destroy()
@@ -226,6 +230,8 @@ class UpgradeScriptDialog(ctk.CTkToplevel):
     def __init__(self, *args, upgrade_bundle: UpgradeScriptBundle, **kwargs):
         super().__init__(*args, **kwargs)
         self.upgrade_bundle = upgrade_bundle
+        self.icon_photo = tk.PhotoImage(file=APP_IMAGES / 'ctk-tb-ico-taskbar.png')
+        self.iconphoto(False, self.icon_photo)
         self.title('Upgrade Script Generated')
         self.geometry('860x320')
         self.minsize(760, 280)
@@ -557,6 +563,7 @@ class ControlPanel(ctk.CTk):
                                              status_text_life=30,
                                              use_grid=False)
         self.bind("<Configure>", self.status_bar.auto_size_status_bar)
+        self.after(1500, self.start_update_check)
 
         # Populate Frames
         self.lbl_title = ctk.CTkLabel(master=title_frame, text='Control Panel', font=HEADING4, anchor='w')
@@ -969,6 +976,30 @@ class ControlPanel(ctk.CTk):
         log.log_debug(log_text='Launching About dialogue',
                       class_name='ControlPanel', method_name='about')
         about_dialog = About()
+
+    def start_update_check(self):
+        """Start a background update check after the control panel has settled."""
+        worker = threading.Thread(target=self._check_for_updates, daemon=True)
+        worker.start()
+
+    def _check_for_updates(self):
+        """Fetch update status and report only available updates to the status bar."""
+        update_status = fetch_update_status(mod.app_version())
+        if not self.winfo_exists():
+            return
+        self.after(0, lambda: self._apply_update_status(update_status))
+
+    def _apply_update_status(self, update_status: tuple[bool, str] | None):
+        """Display a status-bar notification only when a newer version exists."""
+        if not self.winfo_exists() or update_status is None:
+            return
+
+        update_available, latest_version = update_status
+        if update_available:
+            self.status_bar.set_status_text(
+                status_text=f'A CTk Theme Builder {latest_version} update is available.',
+                status_text_life=20,
+            )
 
     @log_call
     def launch_icon_browser(self):

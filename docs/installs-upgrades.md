@@ -28,6 +28,61 @@ For Ubuntu-based distributions, ensure that the `venv` package is installed for 
 
 `apt install python3.12-venv`
 
+### macOS Python and Tk support
+
+The application requires Tk, the graphical toolkit used by Python's `tkinter` module. Installing the PyPI package does not add Tk to an existing Python installation. Before creating a virtual environment, check the exact Python you intend to use:
+
+```bash
+python3 --version
+python3 -m tkinter
+```
+
+The Python version must be 3.10 to 3.13. The second command should open a small Tk test window. An error such as `ModuleNotFoundError: No module named '_tkinter'` means that Python was built without Tk support. A virtual environment made from that Python will have the same problem, even when `pip install ctk-theme-builder` succeeds.
+
+If you use Homebrew, install a supported Python and its matching Tk package. For Python 3.13:
+
+```bash
+brew install python-tk@3.13
+"$(brew --prefix)/bin/python3.13" -m tkinter
+"$(brew --prefix)/bin/python3.13" -m venv ~/CTkThemeBuilder/.venv
+source ~/CTkThemeBuilder/.venv/bin/activate
+python -m pip install ctk-theme-builder
+ctk-theme-builder
+```
+
+The Homebrew Tk formula installs `python@3.13` as a dependency. Using the full path to `python3.13` avoids accidentally selecting another Python through a shell shim or `PATH`. The `~/CTkThemeBuilder` directory also holds the application's themes, palettes, logs and settings; keep the virtual environment in its `.venv` subdirectory and do not delete the whole directory when rebuilding it.
+
+The macOS installer from python.org is another option because it includes Tk. Check its `python3` with `python3 -m tkinter` before creating the virtual environment. If you already created an environment with a Python that lacks Tk, recreate that environment with the Tk-capable interpreter and then install the package again. Installing `python-tk` afterwards does not change which interpreter an existing virtual environment uses.
+
+### Optional pyenv installation on macOS
+
+[`pyenv`](https://github.com/pyenv/pyenv) lets you keep several Python versions and select one for a particular directory. It is optional; the Homebrew Python route above is simpler if you only need to run CTk Theme Builder. `pyenv local` records a version in that directory's `.python-version` file. It selects the Python used for **new** virtual environments; it does not change the interpreter in an existing one.
+
+If `pyenv` is not already installed, install it with Homebrew and [set up your shell](https://github.com/pyenv/pyenv#set-up-your-shell-environment-for-pyenv). Install Tcl/Tk before building Python so `tkinter` can be built too. If another virtual environment is active, run `deactivate` first. For example, to use the latest available Python 3.13 patch release:
+
+```bash
+brew install pyenv tcl-tk@8
+pyenv install 3.13
+mkdir -p ~/ctk-theme-builder-install
+cd ~/ctk-theme-builder-install
+pyenv local 3.13
+python3 --version
+python3 -m tkinter
+```
+
+The Tk command must open a small test window. If it reports a missing `_tkinter` module, that pyenv Python cannot run CTk Theme Builder. Rebuild it with working Tcl/Tk support or use the Homebrew Python route above. Do not continue with the package install until the test passes.
+
+After closing the test window, create a fresh virtual environment and install the package:
+
+```bash
+python3 -m venv .venv-pyenv
+source .venv-pyenv/bin/activate
+python -m pip install ctk-theme-builder
+ctk-theme-builder
+```
+
+The `.venv-pyenv` name keeps an earlier environment intact; you can choose another name. For later launches, activate this same environment or run `~/ctk-theme-builder-install/.venv-pyenv/bin/ctk-theme-builder` directly. If you change the selected pyenv version later, create a new virtual environment and reinstall the package.
+
 ## Create And Activate A Virtual Environment
 
 Before installing CTk Theme Builder from PyPI, create and activate a Python virtual environment so the application and its dependencies are isolated from other Python packages on your system.
@@ -190,6 +245,8 @@ This writes a platform-specific launcher into:
 - Windows: `%USERPROFILE%\CTkThemeBuilder\launchers`
 
 The generated launcher uses the interpreter from the currently running CTk Theme Builder session, so it is a practical way to create a clickable shortcut for the exact environment you are using.
+
+On macOS, generating a launcher creates a working copy at `~/CTkThemeBuilder/launchers/.generated/CTk Theme Builder.app`. The hidden `.generated` folder keeps that working copy out of normal app searches. When upgrading from an older version, generation also moves a recognised old app from the visible `launchers` folder into that hidden folder. The dialogue can copy the new app to `~/Applications` and create a Desktop shortcut. Install to Applications first; the Desktop shortcut points to that copy. Running either action again replaces the same destination after confirmation rather than adding another entry. Older versions also copied the whole app to the Desktop. Use **Create Desktop Shortcut** to replace that old copy with a link. The Applications copy has everything it needs to launch the same Python environment.
 
 On Linux, the launcher generation step creates:
 

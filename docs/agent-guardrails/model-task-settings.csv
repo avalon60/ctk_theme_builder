@@ -1,0 +1,10 @@
+profile,role,model,reasoning,enabled
+balanced,planner,gpt-6.1-sol,medium,true
+balanced,implementer,gpt-6.1-sol,medium,true
+balanced,reviewer,gpt-6.1-sol,medium,false
+economy,planner,gpt-6.1-sol,low,true
+economy,implementer,gpt-6.1-sol,low,true
+economy,reviewer,gpt-6.1-sol,low,false
+critical,planner,gpt-6-astra,medium,true
+critical,implementer,gpt-6.1-sol,high,true
+critical,reviewer,gpt-6.1-sol,high,true

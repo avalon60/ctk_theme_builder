@@ -1,0 +1,9 @@
+schema_version=2
+template_id=app-engineering/ctk-theme-builder
+template_version=1.0.0
+template_payload_hash=5580b310501aecf2c8acd8a2e09fdd240149822e9fde698da57a2dfbd72cbe6b
+sdk_source=avalon-ai-plugins
+sdk_source_ref=master
+sdk_source_commit=4bab8fb291f07ffec18da9077d80b410b00799a4
+created_at=2026-10-06T17:45:46Z
+deployed_at=2026-10-06T17:45:46Z
