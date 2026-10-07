@@ -27,9 +27,11 @@ The application is designed to make iterative theme work practical: you can expe
 
 On macOS, first check that the Python you plan to use has Tk support: `python3 -m tkinter` should open a small test window. If it fails to import `_tkinter`, follow the [macOS Tk instructions](docs/installs-upgrades.md#macos-python-and-tk-support) before creating a virtual environment.
 
-Recommended installation from PyPI, using a virtual environment:
+For a predictable location, create `~/ctk_theme_builder` for the virtual environment. This is separate from `~/CTkThemeBuilder`, where the application stores your themes and settings. Install from PyPI with:
 
 ```bash
+mkdir -p ~/ctk_theme_builder
+cd ~/ctk_theme_builder
 python3 -m venv .venv
 source .venv/bin/activate
 python -m pip install ctk-theme-builder
@@ -40,10 +42,14 @@ If you manage several Python versions, see the [optional pyenv installation rout
 On Windows PowerShell:
 
 ```powershell
+New-Item -ItemType Directory -Force -Path "$HOME\ctk_theme_builder" | Out-Null
+Set-Location "$HOME\ctk_theme_builder"
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 pip install ctk-theme-builder
 ```
+
+Here, `$HOME\ctk_theme_builder` is the equivalent of `~/ctk_theme_builder`. The package is installed inside `.venv`, so you do not need to clone this repository for a PyPI installation.
 
 Alternative install methods for users who already use `uv`:
 
