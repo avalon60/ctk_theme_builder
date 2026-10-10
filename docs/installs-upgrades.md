@@ -44,13 +44,14 @@ If you use Homebrew, install a supported Python and its matching Tk package. For
 ```bash
 brew install python-tk@3.13
 "$(brew --prefix)/bin/python3.13" -m tkinter
-"$(brew --prefix)/bin/python3.13" -m venv ~/CTkThemeBuilder/.venv
-source ~/CTkThemeBuilder/.venv/bin/activate
+mkdir -p ~/ctk_theme_builder
+"$(brew --prefix)/bin/python3.13" -m venv ~/ctk_theme_builder/.venv
+source ~/ctk_theme_builder/.venv/bin/activate
 python -m pip install ctk-theme-builder
 ctk-theme-builder
 ```
 
-The Homebrew Tk formula installs `python@3.13` as a dependency. Using the full path to `python3.13` avoids accidentally selecting another Python through a shell shim or `PATH`. The `~/CTkThemeBuilder` directory also holds the application's themes, palettes, logs and settings; keep the virtual environment in its `.venv` subdirectory and do not delete the whole directory when rebuilding it.
+The Homebrew Tk formula installs `python@3.13` as a dependency. Using the full path to `python3.13` avoids accidentally selecting another Python through a shell shim or `PATH`. The `~/ctk_theme_builder` directory holds the virtual environment; the separate `~/CTkThemeBuilder` directory holds the application's themes, palettes, logs and settings.
 
 The macOS installer from python.org is another option because it includes Tk. Check its `python3` with `python3 -m tkinter` before creating the virtual environment. If you already created an environment with a Python that lacks Tk, recreate that environment with the Tk-capable interpreter and then install the package again. Installing `python-tk` afterwards does not change which interpreter an existing virtual environment uses.
 
@@ -63,8 +64,8 @@ If `pyenv` is not already installed, install it with Homebrew and [set up your s
 ```bash
 brew install pyenv tcl-tk@8
 pyenv install 3.13
-mkdir -p ~/ctk-theme-builder-install
-cd ~/ctk-theme-builder-install
+mkdir -p ~/ctk_theme_builder
+cd ~/ctk_theme_builder
 pyenv local 3.13
 python3 --version
 python3 -m tkinter
@@ -81,17 +82,19 @@ python -m pip install ctk-theme-builder
 ctk-theme-builder
 ```
 
-The `.venv-pyenv` name keeps an earlier environment intact; you can choose another name. For later launches, activate this same environment or run `~/ctk-theme-builder-install/.venv-pyenv/bin/ctk-theme-builder` directly. If you change the selected pyenv version later, create a new virtual environment and reinstall the package.
+The `.venv-pyenv` name keeps an earlier environment intact; you can choose another name. For later launches, activate this same environment or run `~/ctk_theme_builder/.venv-pyenv/bin/ctk-theme-builder` directly. If you change the selected pyenv version later, create a new virtual environment and reinstall the package.
 
 ## Create And Activate A Virtual Environment
 
-Before installing CTk Theme Builder from PyPI, create and activate a Python virtual environment so the application and its dependencies are isolated from other Python packages on your system.
+Before installing CTk Theme Builder from PyPI, create and activate a Python virtual environment so the application and its dependencies are isolated from other Python packages on your system. The suggested location is `~/ctk_theme_builder` on Linux and macOS, or `$HOME\ctk_theme_builder` in Windows PowerShell. This directory holds the virtual environment, not a source checkout; cloning the repository is unnecessary for a PyPI install.
 
 Recommended installation from PyPI is via a virtual environment.
 
 On Linux or macOS:
 
 ```bash
+mkdir -p ~/ctk_theme_builder
+cd ~/ctk_theme_builder
 python -m venv .venv
 source .venv/bin/activate
 ```
@@ -99,6 +102,8 @@ source .venv/bin/activate
 On Windows PowerShell:
 
 ```powershell
+New-Item -ItemType Directory -Force -Path "$HOME\ctk_theme_builder" | Out-Null
+Set-Location "$HOME\ctk_theme_builder"
 python -m venv .venv
 .venv\Scripts\Activate.ps1
 ```
