@@ -1,7 +1,7 @@
 __title__ = 'CB CustomTkinter Toolkit'
 __author__ = 'Clive Bostock'
 __version__ = "1.0.0"
-__license__ = 'MIT - see LICENSE.md'
+__license__ = 'MIT - see LICENSE'
 
 import tkinter as tk
 import customtkinter as ctk

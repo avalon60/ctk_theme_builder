@@ -1,6 +1,6 @@
 __title__ = 'CB CustomTkinter Theme Builder Preferences Module'
 __author__ = 'Clive Bostock'
-__license__ = 'MIT - see LICENSE.md'
+__license__ = 'MIT - see LICENSE'
 
 from pathlib import Path
 import customtkinter as ctk

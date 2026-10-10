@@ -1,6 +1,6 @@
 __title__ = 'CTk Theme Builder'
 __author__ = 'Clive Bostock'
-__license__ = 'MIT - see LICENSE.md'
+__license__ = 'MIT - see LICENSE'
 
 # A hat tip and thankyou, to Tom Schimansky for is excellent work with CustomTkinter.
 # Credit to my friend and colleague Jan Bejec, as well as my wife for their contributions to my logo.

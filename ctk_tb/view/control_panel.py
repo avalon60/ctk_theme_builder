@@ -7,7 +7,7 @@ import ctk_tb.model.ctk_theme_builder as mod
 import ctk_tb.paths as app_paths
 from ctk_tb.model.ctk_theme_builder import log_call
 import ctk_tb.utils.loggerutl as log
-from ctk_tb.utils.theme_compat import backfill_text_color_disabled, normalise_label_theme
+from ctk_tb.utils.theme_compat import backfill_text_color_disabled, normalise_theme
 from ctk_tb.utils.launcher_generator import applications_menu_label
 from ctk_tb.utils.launcher_generator import applications_menu_target_path
 from ctk_tb.utils.launcher_generator import desktop_shortcut_label
@@ -347,13 +347,6 @@ class ControlPanel(ctk.CTk):
                                      ' virtual environment!',
                             supplementary_text='CTk Theme Builder should normally run via ctk_theme_builder.bat ('
                                                'Windows) or ctk_theme_builder.sh (Linux/MacOS)')
-        # Grab the JSON for one of the JSON files released with the
-        # installed instance of CustomTkinter. We use this later
-        # to back-fill any missing properties when we open a theme.
-        green_theme_file = CTK_THEMES / 'green.json'
-        with open(green_theme_file) as json_file:
-            self.reference_theme_json = json.load(json_file)
-
         self.theme = None
         self.ASSETS_DIR = mod.ASSETS_DIR
         self.log_dir = mod.LOG_DIR
@@ -2044,10 +2037,11 @@ class ControlPanel(ctk.CTk):
         self.preview_json = self.TEMP_DIR / self.theme_file
         shutil.copyfile(self.source_json_file, self.wip_json)
         self.theme_json_data = mod.json_dict(json_file_path=self.wip_json)
+        original_theme_json = json.dumps(self.theme_json_data, sort_keys=True)
         # The patch function checks to see if the theme, has wrong, pre CustomTkinter 5.2.0 property names.
         # If so, it patches up the theme JSON. These should be CTkCheckBox and CTkRadioButton.
         self.theme_json_data = mod.patch_theme(theme_json=self.theme_json_data)
-        normalise_label_theme(self.theme_json_data)
+        normalise_theme(self.theme_json_data)
         with open(self.wip_json, "w") as f:
             json.dump(self.theme_json_data, f, indent=2)
 
@@ -2096,15 +2090,6 @@ class ControlPanel(ctk.CTk):
         if reload_preview:
             self.reload_preview()
 
-        # Here we load in the standard CustomTkinter green.json theme. We use this as a reference theme
-        # file. This is a belt n' braces approach to ensuring that we aren't missing any widget properties,
-        # which may have been introduced, in the event that someone has upgraded to a later version of
-        # CustomTkinter to a version that the app has not been updated to deal with. We can't maintain
-        # the properties but at least we can update the opened theme, to make the JSON is complete.
-        for widget, widget_property in self.reference_theme_json.items():
-            if widget not in self.theme_json_data:
-                self.theme_json_data[widget] = widget_property
-
         # Update the auto-save section of the preferences, to record the last theme we opened.
         # This may be required on the next app startup, if the last_theme_on_start preference is enabled.
         if not mod.update_preference_value(db_file_path=DB_FILE_PATH, scope='auto_save',
@@ -2113,7 +2098,8 @@ class ControlPanel(ctk.CTk):
             log.log_warning(log_text=f'Row miss: on update of auto save of selected theme.')
         self.status_bar.set_status_text(status_text_life=30,
                                         status_text=f'Theme file, {self.theme_file}, loaded. ')
-        self.json_state = 'clean'
+        self.json_state = ('dirty' if json.dumps(self.theme_json_data, sort_keys=True) != original_theme_json
+                           else 'clean')
         self.set_option_states()
 
     @log_call

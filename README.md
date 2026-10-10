@@ -89,8 +89,8 @@ ctktb-migrate-assets /path/to/old/install
 ## Documentation
 
 - Installation and upgrade notes: [docs/installs-upgrades.md](docs/installs-upgrades.md)
-- User guide: [docs/UserGuide-3.3.md](docs/UserGuide-3.3.md)
-- Release notes: [release-notes-3.2.4.md](release-notes-3.2.4.md)
+- User guide: [docs/UserGuide.md](docs/UserGuide.md)
+- Release notes: [3.3 series](release-notes-3.3.md) and [3.2 series](release-notes-3.2.md)
 
 ## Licence
 

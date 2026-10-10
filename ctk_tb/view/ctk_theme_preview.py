@@ -1,7 +1,7 @@
 __title__ = 'CTk Theme Builder'
 __author__ = 'Clive Bostock'
 __version__ = "2.4.0"
-__license__ = 'MIT - see LICENSE.md'
+__license__ = 'MIT - see LICENSE'
 
 import copy
 import time

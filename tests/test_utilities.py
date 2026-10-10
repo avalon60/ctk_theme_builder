@@ -177,3 +177,49 @@ def test_preview_frame_caption_stays_borderless():
     PreviewPanel._exec_geometry_command(panel)
     assert caption.width == 0
     assert sample.width == 20
+
+
+def test_scaffold_fills_missing_widgets_properties_and_nested_font_defaults():
+    """Use arbitrary scaffold additions without adding widget-specific code."""
+    from ctk_tb.utils.theme_compat import normalise_theme
+
+    scaffold = {"CTkEntry": {"border_width": 2, "new_colour": ["red", "blue"]},
+                "CTkFutureWidget": {"new_width": 3}, "CTkFont": {"Linux": {"size": 13}},
+                "provenance": {"name": "Default"}}
+    theme = {"CTkEntry": {"border_width": 9, "custom": "keep"},
+             "CTkFont": {"Linux": {"family": "Custom"}}, "provenance": {"name": "Original"}}
+    normalise_theme(theme, scaffold)
+    assert theme["CTkEntry"] == {"border_width": 9, "custom": "keep", "new_colour": ["red", "blue"]}
+    assert theme["CTkFutureWidget"] == {"new_width": 3}
+    assert theme["CTkFont"]["Linux"] == {"family": "Custom", "size": 13}
+    assert theme["provenance"] == {"name": "Original"}
+    theme["CTkEntry"]["new_colour"][0] = "green"
+    assert scaffold["CTkEntry"]["new_colour"][0] == "red"
+    import copy
+
+    before = copy.deepcopy(theme)
+    normalise_theme(theme, scaffold)
+    assert theme == before
+
+
+def test_scaffold_contains_renderable_defaults():
+    """Keep the shipped widget scaffold free of null colour placeholders."""
+    import json
+    from ctk_tb.paths import ETC_DIR
+    from ctk_tb.utils.theme_compat import normalise_theme
+
+    theme = {}
+    normalise_theme(theme)
+    assert "provenance" not in theme
+    assert "null" not in json.dumps(theme)
+    assert theme["CTkLabel"]["border_width"] == 0
+    assert theme["CTkLabel"]["border_color"] == ["#979DA2", "#565B5E"]
+    assert theme["CTkButton"]["border_width"] == json.loads((ETC_DIR / "theme_skeleton.json").read_text())["CTkButton"]["border_width"]
+
+
+def test_scaffold_rejects_malformed_widget_sections():
+    """Reject invalid sections instead of replacing user-owned values."""
+    from ctk_tb.utils.theme_compat import normalise_theme
+
+    with pytest.raises(ValueError, match="CTkLabel"):
+        normalise_theme({"CTkLabel": "invalid"}, {"CTkLabel": {"border_width": 0}})

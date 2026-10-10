@@ -1,7 +1,5 @@
 # Introduction
 
-> This is the archived 3.3 guide. For current instructions, see the [user guide](UserGuide.md).
-
 <p align="center">
   <img src="ctk-tb-logo.png" alt="CTk Theme Builder" width="720">
 </p>
@@ -18,8 +16,7 @@
 * [Control Panel](#control-panel)
 * [Preview Panel](#preview-panel)
 * [Composite Widgets](#composite-widgets)
-* [What's New in CTk Theme Builder 3.3](#whats-new-in-ctk-theme-builder-33)
-* [Known Issues and Behaviours](#known-issues-and-behaviours)
+* [Current Limitations and Behaviours](#current-limitations-and-behaviours)
 
 ## Acknowledgements
 *A thank-you to my ever patient, ever loving, beautiful wife, who has let me hide in my office and beaver away at this project for many an hour.*
@@ -76,7 +73,7 @@ There are several sets of colour tiles in the application, including those in th
 Copy and Paste functions are usually available from a floating right-click menu.
 
 ### Drag and Drop Operations
-Version 3.3 adds direct drag-and-drop support for colour swatches.
+Colour swatches support direct drag-and-drop.
 
 The following drag paths are supported:
 
@@ -362,6 +359,12 @@ These behave as expected. If you have unsaved changes, you will be prompted appr
 ## Widget Geometry
 The *Widget Geometry* buttons allow you to target a particular widget type and adjust non-colour properties such as corner radius and border width.
 
+The label geometry dialogue includes Corner Radius and Border Width (0–20). Its sample uses a contrasting background to show both effects. Save applies changes to the Preview Panel; Cancel discards them. Use `Label: border_color` in Colour Mappings to edit the border independently in Light and Dark modes. Changes update preview labels immediately and support undo/redo. Borders become visible when Border Width is greater than zero.
+
+Opened themes receive missing widget sections and properties from the bundled theme scaffold before mappings or previews are rendered. Existing values and provenance are preserved; original files change only when saved. The scaffold contains valid colour and geometry defaults, including label borders. New scaffold properties are added automatically, although new editing controls may require application changes. The v6 label theme schema omits `text_color_disabled`, so Theme Builder removes that legacy label entry when loading and saving themes.
+
+Changes to `CTkSlider.button_length` trigger a Preview Panel refresh so the new length is shown.
+
 ![geometry-dialog](geometry-dialog.png)
 
 ## Theme Palette
@@ -419,7 +422,7 @@ The *Lighter Shade* and *Darker Shade* options apply incremental shade adjustmen
 ### Copying, Pasting and Dragging
 You can still use right-click Copy and Paste between mapping tiles.
 
-Version 3.3 adds direct drag-and-drop for mapping swatches:
+Mapping swatches support direct drag-and-drop:
 
 * Drag one mapping swatch to another to copy the colour;
 * Hold `Shift` while dragging to swap colours;
@@ -445,37 +448,9 @@ This is an extension of `CTkFrame`. With the exception of `label_fg_color`, its 
 ### CTkTabview
 This is a composite of `CTkFrame` and `CTkSegmentedButton`. It has no theme properties of its own and inherits from those widgets.
 
-# What's New in CTk Theme Builder 3.3
-
-Ghost-swatch drag-and-drop support for Theme Palette and Colour Mappings swatches;
-Shift-drag swap support for editable swatches;
-Drag from Colour Harmonics generated swatches into the Control Panel;
-Drop from Control Panel swatches onto the Colour Harmonics keystone tile;
-Restored and surfaced `text_color_disabled` support across theme files and Control Panel property views;
-Updated drag-aware colour handling while preserving the existing live preview update path.
-
-### Fixes
-
-* Restored missing `text_color_disabled` entries in theme JSON files and templates;
-* Added Control Panel support for `text_color_disabled` in property views and palette cascade metadata;
-* Reduced redundant preview scaling updates to avoid instability during refresh in some CustomTkinter dropdown menu scenarios.
-
-# Known Issues and Behaviours
+# Current Limitations and Behaviours
 
 ### CustomTkinter
-
-#### CTkLabel Borders
-The label geometry dialogue includes Corner Radius and Border Width (0–20). The sample uses a contrasting background to show both effects. Save applies geometry changes to the Preview Panel; Cancel discards them.
-
-Use `Label: border_color` in Colour Mappings to edit the border independently in Light and Dark modes. Changes update preview labels immediately and support undo/redo. Borders become visible when Border Width is greater than zero.
-
-Older themes receive missing label border defaults in memory; their original files change only when saved. The v6 label theme schema omits `text_color_disabled`, so Theme Builder removes that legacy label entry when loading and saving themes.
-
-#### CTkSlider Configure button_corner_radius
-CustomTkinter 5.2.2 still has an issue when configuring `CTkSlider.button_corner_radius` dynamically. You can save the value and refresh the Preview Panel to confirm the effect.
-
-#### CTkSlider Configure button_length
-Adjusting `button_length` still requires Preview Panel refresh assistance because of CustomTkinter limitations.
 
 #### DropdownMenu
 `DropdownMenu` remains a sub-component used by `CTkComboBox` and `CTkOptionMenu`. Because it is not a standalone widget in the same sense as the others, some changes still require Preview Panel rebuild behaviour.
@@ -487,6 +462,3 @@ Linux users should be aware that by default clipboard contents may be cleared wh
 
 #### Transparent Colour Properties
 When a widget property is set to `"transparent"`, tile-based colour operations remain limited. For example, `CTkLabel -> fg_color` does not expose the same colour-edit affordances as ordinary hex-based colour properties.
-
-#### Drag and Drop Scope
-Within the *Colour Harmonics* dialogue, the *Keystone Colour* tile is a drop target, but generated harmony and shade tiles are intentionally source-only in version 3.3. This keeps derived harmony results consistent and avoids introducing ambiguous editing semantics for generated colours.
